@@ -1,0 +1,3590 @@
+{
+  "flora&fauna" : {
+    "fauna-001" : {
+      "area" : [ {
+        "latitude" : 1.326318,
+        "longitude" : 103.804393
+      }, {
+        "latitude" : 1.325814,
+        "longitude" : 103.807676
+      }, {
+        "latitude" : 1.32428,
+        "longitude" : 103.806603
+      }, {
+        "latitude" : 1.325224,
+        "longitude" : 103.803728
+      } ],
+      "description" : "Having plumed its bright sage-green suit and fixed its rufous collar tie, this slender migrant stares vigilantly into space on the rooftop garden outside Jingxian Library, on an outlook for the sight of bees patronising the pots of bougainvillea flowers. This bird can be told apart from its less common blue-throated relatives from its rufous throat. 'Chiwi', you might hear this shrill call as it takes flight in excitement and darts towards its prey.",
+      "imageRef" : [ "https://i.imgur.com/fBW1mmI.jpg", "https://i.imgur.com/E11oxnE.jpg", "https://i.imgur.com/bgOjlI1.jpg", "https://i.imgur.com/TW3xc5V.jpg", "https://i.imgur.com/IYTd8Mb.jpg", "https://i.imgur.com/4Ci5DKn.jpg" ],
+      "latitude" : 1.32603,
+      "locations" : "trail-01/route-02",
+      "longitude" : 103.80685,
+      "name" : "Blue-tailed Bee-eater",
+      "sciName" : "Merops superciliosus",
+      "smallImage" : "https://i.imgur.com/rTxejj6.png"
+    },
+    "fauna-002" : {
+      "area" : [ {
+        "latitude" : 1.327974,
+        "longitude" : 103.802408
+      }, {
+        "latitude" : 1.3257,
+        "longitude" : 103.80509
+      }, {
+        "latitude" : 1.324949,
+        "longitude" : 103.80465
+      }, {
+        "latitude" : 1.326343,
+        "longitude" : 103.801335
+      } ],
+      "description" : "This male black-naped oriole pecks at its brilliant yellow feathers on a tree behind Science Research Centre. Exclusive to South and Southeast Asia, this residential bird is ranked among the top 10 most common bird species in Singapore. The species has been spotted all over Hwa Chong campus, from college canteen to the drive along HCIS.\nThe cheerfully-coloured bird is also a skillful singer, with over 50 types of calls! The famous chinese poem '两个黄鹂鸣翠柳' manifests the singing of two orioles during spring.",
+      "imageRef" : [ "https://i.imgur.com/4AQ1Glu.jpg", "https://i.imgur.com/0wrZcHv.jpg" ],
+      "latitude" : 1.326032,
+      "locations" : "trail-02/route-11",
+      "longitude" : 103.803099,
+      "name" : "Black-naped Oriole",
+      "sciName" : "Oriolus chinensis",
+      "smallImage" : "https://i.imgur.com/tWnATHt.png"
+    },
+    "fauna-003" : {
+      "area" : [ {
+        "latitude" : 1.326805,
+        "longitude" : 103.803288
+      }, {
+        "latitude" : 1.325582,
+        "longitude" : 103.807955
+      }, {
+        "latitude" : 1.324424,
+        "longitude" : 103.807
+      }, {
+        "latitude" : 1.325389,
+        "longitude" : 103.802419
+      } ],
+      "description" : "Brown shrikes have a distinctive black mask around their eyes. Their harsh chatterings and rattlings often wake people up early in the morning. Don’t be deceived by its petite stature: this bird is a 'butcher', with a wide diet ranging from insects (mainly butterflies and moths) to even small birds and lizards! The shrike in this photo perches erect on the tree branch, searching for preys, which will be brutally impaled on plant thorns before consumption.",
+      "imageRef" : [ "https://i.imgur.com/GVlqQ4T.jpg", "https://i.imgur.com/7YTowpv.jpg" ],
+      "latitude" : 1.325984,
+      "locations" : "trail-02/route-07,trail-02/route-09",
+      "longitude" : 103.804585,
+      "name" : "Brown Shrike",
+      "sciName" : "Lanius cristatus",
+      "smallImage" : "https://i.imgur.com/GXMHHZl.png"
+    },
+    "fauna-004" : {
+      "area" : [ {
+        "latitude" : 1.327856,
+        "longitude" : 103.804436
+      }, {
+        "latitude" : 1.325571,
+        "longitude" : 103.807869
+      }, {
+        "latitude" : 1.324209,
+        "longitude" : 103.806582
+      }, {
+        "latitude" : 1.32555,
+        "longitude" : 103.802408
+      } ],
+      "description" : "The collared kingfisher is not just a 'king' fisher — it is also a very good insect hunter. Looked at its prominent beak: a pair of 'pincers' that never fail to capture their prey. Kingfishers are sometimes seen perching on the nets of our street football court or on the trees near our canteen, searching for unfortunate little bugs. Unlike like most birds where the male birds are duller than the female birds-- the female collared kingfisher features a jade-like green whereas the male features a plainer blue.",
+      "imageRef" : [ "https://i.imgur.com/yhm1EMH.jpg", "https://i.imgur.com/SCWsTRN.jpg", "https://i.imgur.com/KwRKW6I.jpg" ],
+      "latitude" : 1.326349,
+      "locations" : "trail-02/route-09",
+      "longitude" : 103.806108,
+      "name" : "Collared Kingfisher",
+      "sciName" : "Todiramphus chloris",
+      "smallImage" : "https://i.imgur.com/iymQi0U.png"
+    },
+    "fauna-005" : {
+      "area" : [ {
+        "latitude" : 1.327963,
+        "longitude" : 103.802472
+      }, {
+        "latitude" : 1.325957,
+        "longitude" : 103.805251
+      }, {
+        "latitude" : 1.324852,
+        "longitude" : 103.804597
+      }, {
+        "latitude" : 1.326214,
+        "longitude" : 103.801518
+      } ],
+      "description" : "This charming songbird has a wide range of calls - its lingering whistles in the early morning welcome Hwa Chong students into the campus. In fact, the Ioras found in Hwa Chong is the Singaporensis, a sub species unique to Singapore. Small it might seem, the Iora is carnivorous - it feeds on caterpillars thus keeping the trees in Hwa Chong healthy.",
+      "imageRef" : [ "https://i.imgur.com/IBdrwCb.jpg", "https://i.imgur.com/yviPXhF.jpg", "https://i.imgur.com/h5hRzNG.jpg" ],
+      "latitude" : 1.325516,
+      "locations" : "trail-02/route-06",
+      "longitude" : 103.803445,
+      "name" : "Common Iora",
+      "sciName" : "Aegithina tiphia",
+      "smallImage" : "https://i.imgur.com/AK3gf6C.png"
+    },
+    "fauna-006" : {
+      "area" : [ {
+        "latitude" : 1.326666,
+        "longitude" : 103.806174
+      }, {
+        "latitude" : 1.325679,
+        "longitude" : 103.807816
+      }, {
+        "latitude" : 1.324338,
+        "longitude" : 103.806571
+      }, {
+        "latitude" : 1.324982,
+        "longitude" : 103.804747
+      } ],
+      "description" : "Slightly larger in stature than Javan Mynas, common hill mynas are residents of primary and secondary forests. The small canopy near college reception has attracted a few from Botanic Gardens and Bukit Timah Nature Reserve. Their calls are loud and far-carrying. Their unique feature are the orange-yellow wattles on nape and below eyes.",
+      "imageRef" : [ "https://i.imgur.com/CEamxRJ.jpg", "https://i.imgur.com/nQg4gdR.jpg", "https://i.imgur.com/bjdfVUF.jpg", "https://i.imgur.com/8fdVQkR.jpg" ],
+      "latitude" : 1.326423,
+      "locations" : "trail-01/route-02",
+      "longitude" : 103.806486,
+      "name" : "Common Hill Myna",
+      "sciName" : "Gracula religiosa",
+      "smallImage" : "https://i.imgur.com/ygmsRZh.jpg"
+    },
+    "fauna-010" : {
+      "area" : [ {
+        "latitude" : 1.328896,
+        "longitude" : 103.80273
+      }, {
+        "latitude" : 1.325635,
+        "longitude" : 103.807848
+      }, {
+        "latitude" : 1.324284,
+        "longitude" : 103.806636
+      }, {
+        "latitude" : 1.326311,
+        "longitude" : 103.801443
+      } ],
+      "description" : "The spotted dove has black collar with white spots at back of neck, as if it were wearing strings of pearls. The spotted doves are loving birds — you can often spot them in pairs, fluttering in the languid afternoon sun. With the pale yellow walls of our 黄城 as backdrops, scenes of dancing doves remind us of poetic Chinese paintings.",
+      "imageRef" : [ "https://i.imgur.com/qH8t0nJ.jpg", "https://i.imgur.com/PwIP6su.jpg", "https://i.imgur.com/prBZhO3.jpg", "https://i.imgur.com/o0bNlQa.jpg" ],
+      "latitude" : 1.326597,
+      "locations" : "trail-02/route-07",
+      "longitude" : 103.80423,
+      "name" : "Spotted Dove",
+      "sciName" : "Spilopelia chinensis",
+      "smallImage" : "https://i.imgur.com/SfrFPDN.png"
+    },
+    "fauna-011" : {
+      "area" : [ {
+        "latitude" : 1.327416,
+        "longitude" : 103.802752
+      }, {
+        "latitude" : 1.326032,
+        "longitude" : 103.804394
+      }, {
+        "latitude" : 1.325721,
+        "longitude" : 103.803965
+      }, {
+        "latitude" : 1.326879,
+        "longitude" : 103.802087
+      } ],
+      "description" : "One of the smallest woodpeckers, this resident woodpecker is most frequently found in mangroves and coastal areas, yet is also common in gardens. This species can be identified by the black mask around its eyes, a brown plumage, as well as white, striated flanks and underbelly. \n'Dook, dook', you can often hear it pecking wood in the campus.",
+      "imageRef" : [ "https://i.imgur.com/FzJAWmL.jpg", "https://i.imgur.com/ZZiu903.jpg", "https://i.imgur.com/XWvYoUJ.jpg" ],
+      "latitude" : 1.326523,
+      "locations" : "trail-02/route-03,trail-02/route-04,trail-02/route-09",
+      "longitude" : 103.803224,
+      "name" : "Sunda Pygmy Woodpecker",
+      "sciName" : "Dendrocopos moluccensis",
+      "smallImage" : "https://i.imgur.com/GAmkGYU.png"
+    },
+    "fauna-012" : {
+      "area" : [ {
+        "latitude" : 1.325211,
+        "longitude" : 103.806445
+      }, {
+        "latitude" : 1.324825,
+        "longitude" : 103.807089
+      }, {
+        "latitude" : 1.324525,
+        "longitude" : 103.806928
+      }, {
+        "latitude" : 1.325008,
+        "longitude" : 103.806166
+      } ],
+      "description" : "This colourful bird is called 'hanging parrot' for a reason — it likes to hang upside down on trees and would even take a bath in the rain in the same position! You can often spot these birds pecking at fruits and flower buds while hanging acrobatically from the branches.. Adult males have a blue crown and a red throat, while the female birds are green all over. When you spot the parrots, don't try to talk to it — this species of parrot does not have the capacity to imitate human speech.",
+      "imageRef" : [ "https://i.imgur.com/9YRDmSo.jpg", "https://i.imgur.com/8VyGkAv.jpg", "https://i.imgur.com/OApSUUS.jpg", "https://i.imgur.com/GpPZDZu.jpg", "https://i.imgur.com/tqCBdal.jpg" ],
+      "latitude" : 1.324766,
+      "locations" : "trail-01/route-09",
+      "longitude" : 103.806671,
+      "name" : "Blue-crowned Hanging Parrot",
+      "sciName" : "Loriculus galgulus",
+      "smallImage" : "https://i.imgur.com/tji78am.jpg"
+    },
+    "fauna-013" : {
+      "area" : [ {
+        "latitude" : 1.325898,
+        "longitude" : 103.807443
+      }, {
+        "latitude" : 1.325512,
+        "longitude" : 103.807969
+      }, {
+        "latitude" : 1.324693,
+        "longitude" : 103.807398
+      }, {
+        "latitude" : 1.32513,
+        "longitude" : 103.807023
+      } ],
+      "description" : "This small and slender dove, also known as peaceful dove, is one of the most common dove species in Singapore. The narrow black lines on its pale-gray plumage gives the bird a zebra-like appearance, hence the name 'zebra dove'. Unfortunately, its high, far-carrying ka-do-do-do-do calls have attracted poachers who supply the bird trade.",
+      "imageRef" : [ "https://i.imgur.com/MetRh3a.jpg" ],
+      "latitude" : 1.324932,
+      "locations" : "trail-03/route-14",
+      "longitude" : 103.807384,
+      "name" : "Zebra Dove",
+      "sciName" : "Geopelia striata",
+      "smallImage" : "https://i.imgur.com/7oSHGie.png"
+    },
+    "fauna-014" : {
+      "area" : [ {
+        "latitude" : 1.326898,
+        "longitude" : 103.803182
+      }, {
+        "latitude" : 1.326415,
+        "longitude" : 103.803751
+      }, {
+        "latitude" : 1.325911,
+        "longitude" : 103.803257
+      }, {
+        "latitude" : 1.326833,
+        "longitude" : 103.802077
+      } ],
+      "description" : "Oriental white-eyes are unmistakable with a striking white ring around their eyes. What distinguishes this species from other white-eyes would be the yellow ventral stripe that goes up their grey-white belly. They love to gather around the tembusu trees near the clock tower. You can hear their cheerful and shrill 'chew' calls among the leaves and branches. Sadly, these petite birds are threatened by poachers who supply the pet trade.",
+      "imageRef" : [ "https://i.imgur.com/JaNvd0I.jpg", "https://i.imgur.com/j7HFEsp.jpg" ],
+      "latitude" : 1.326718,
+      "locations" : "trail-02/route-03,trail-02/route-04,trail-03/route-16",
+      "longitude" : 103.802856,
+      "name" : "Oriental White-eye",
+      "sciName" : "Zosterops palpebrosus",
+      "smallImage" : "https://i.imgur.com/CJy18Wr.png"
+    },
+    "fauna-015" : {
+      "area" : [ {
+        "latitude" : 1.3265,
+        "longitude" : 103.803987
+      }, {
+        "latitude" : 1.325717,
+        "longitude" : 103.805156
+      }, {
+        "latitude" : 1.325352,
+        "longitude" : 103.804952
+      }, {
+        "latitude" : 1.326231,
+        "longitude" : 103.803514
+      } ],
+      "description" : "This adorable little bird can often be seen perching quietly on trees outside Kong Chian Admin Centre. But don’t be fooled by its innocent look; its sharp beak is perfect for capturing insects. When it  spots its prey, it darts out swiftly to capture insects on the wing. Without it, there will be even more mosquitos in Hwa Chong.",
+      "imageRef" : [ "https://i.imgur.com/i1KDRyt.jpg", "https://i.imgur.com/DxBrSjx.jpg", "https://i.imgur.com/rLQQQg9.jpg" ],
+      "latitude" : 1.325887,
+      "locations" : "trail-02/route-03,trail-02/route-04",
+      "longitude" : 103.804315,
+      "name" : "Asian Brown Flycatcher",
+      "sciName" : "Muscicapa dauurica",
+      "smallImage" : "https://i.imgur.com/IZoDu8y.png"
+    },
+    "fauna-016" : {
+      "area" : [ {
+        "latitude" : 1.325748,
+        "longitude" : 103.807301
+      }, {
+        "latitude" : 1.325544,
+        "longitude" : 103.807913
+      }, {
+        "latitude" : 1.324686,
+        "longitude" : 103.807012
+      }, {
+        "latitude" : 1.324997,
+        "longitude" : 103.806679
+      } ],
+      "description" : "A Red-whiskered bulbul gazes proudly on as it perches on foliage. They have a prominent black crest and are so named because of the red 'whiskers' beside their eyes. There are about 5 bulbuls that call the Weeping Fig (Ficus benjamina) tree near Block D home. They are songbirds with beautiful, intricate songs.",
+      "imageRef" : [ "https://i.imgur.com/1I6jFV3.jpg", "https://i.imgur.com/U6Mbomu.jpg", "https://i.imgur.com/MCsYbOG.jpg", "https://i.imgur.com/QoyOqqm.jpg", "https://i.imgur.com/YLA9SKA.jpg" ],
+      "latitude" : 1.325163,
+      "locations" : "trail-01/route-09",
+      "longitude" : 103.807276,
+      "name" : "Red-whiskered Bulbul",
+      "sciName" : "Pycnonotus jocosus",
+      "smallImage" : "https://i.imgur.com/WyU1av6.jpg"
+    },
+    "fauna-017" : {
+      "area" : [ {
+        "latitude" : 1.325748,
+        "longitude" : 103.807301
+      }, {
+        "latitude" : 1.325544,
+        "longitude" : 103.807913
+      }, {
+        "latitude" : 1.324686,
+        "longitude" : 103.807012
+      }, {
+        "latitude" : 1.324997,
+        "longitude" : 103.806679
+      } ],
+      "description" : "The male Pink-necked Green Pigeon is probably the most colorful pigeon in tropical Asia with its green back, orange breast and pink neck. Often mistaken for parrots, these beautiful birds often nest in forests, but are attracted to Hwa Chong by the Weeping Fig(Ficus benjamina) trees near Block D. The birds seem to enjoy perching acrobatically on thin branches, looking down at students coming and going. ",
+      "imageRef" : [ "https://i.imgur.com/i3CAjCb.jpg", "https://i.imgur.com/g4RZTBT.jpg" ],
+      "latitude" : 1.325091,
+      "locations" : "trail-01/route-09",
+      "longitude" : 103.807328,
+      "name" : "Pink-necked Green Pigeon",
+      "sciName" : "Treron vernans",
+      "smallImage" : "https://i.imgur.com/dahvikm.png"
+    },
+    "fauna-018" : {
+      "area" : [ {
+        "latitude" : 1.327952,
+        "longitude" : 103.802547
+      }, {
+        "latitude" : 1.325689,
+        "longitude" : 103.807311
+      }, {
+        "latitude" : 1.324295,
+        "longitude" : 103.806345
+      }, {
+        "latitude" : 1.326397,
+        "longitude" : 103.801378
+      } ],
+      "description" : "This is perhaps the most common bird in Singapore. The Olive-backed sunbird enjoys feeding on the nectars of the colourful flowers of our tropical city, including the favorite with Biology students - hibiscus. The sunbirds are even seen building their own nests with twigs and catkins on the potted plants near the Junior College mother tongue department.",
+      "imageRef" : [ "https://i.imgur.com/Cr5cY9p.jpg", "https://i.imgur.com/DWmqXMU.jpg", "https://i.imgur.com/Jmvo0Y3.jpg", "https://i.imgur.com/LjT7nWX.jpg", "https://i.imgur.com/4NELPv8.jpg", "https://i.imgur.com/NIS1r1L.jpg" ],
+      "latitude" : 1.326308,
+      "locations" : "trail-02/route-01",
+      "longitude" : 103.804895,
+      "name" : "Olive-backed Sunbird",
+      "sciName" : "Cinnyris jugularis",
+      "smallImage" : "https://i.imgur.com/CmpG3zC.jpg"
+    },
+    "fauna-019" : {
+      "area" : [ {
+        "latitude" : 1.32644,
+        "longitude" : 103.803632
+      }, {
+        "latitude" : 1.325957,
+        "longitude" : 103.807773
+      }, {
+        "latitude" : 1.324412,
+        "longitude" : 103.807258
+      }, {
+        "latitude" : 1.324669,
+        "longitude" : 103.803653
+      } ],
+      "description" : "These birds' noisy calls ring as the early morning school bell. They have a distinctive glossy blueish-green plumage and striking dark-red eyes. Shown in the other picture is a juvenile, with fluffy freshly-plumed feathers and a white belly. They love to gather in flocks around the fig trees on the drive to Block D college section.",
+      "imageRef" : [ "https://i.imgur.com/HcSW27P.jpg", "https://i.imgur.com/DBF9ZWs.jpg", "https://i.imgur.com/TNgL8RQ.jpg", "https://i.imgur.com/wFmomIb.jpg" ],
+      "latitude" : 1.325246,
+      "locations" : "trail-01/route-09,trail-03/route-03",
+      "longitude" : 103.803758,
+      "name" : "Asian Glossy Starling",
+      "sciName" : "Aplonis panayensis",
+      "smallImage" : "https://i.imgur.com/ueKiTof.png"
+    },
+    "fauna-020" : {
+      "description" : "The orange Plain Tiger and the brown Chocolate Pansy are happily perching on their favourite nectar plant Stachytarpheta indica, the snake weed. These butterflies are frequently spotted near the international school, often in groups of three to four, bringing joy to students walking to class from Hwa Chong Boarding School . Sometimes you can also spot the black and yellow caterpillar of Plain Tiger and the black caterpillar of Chocolate Pansy on the pavement.",
+      "imageRef" : [ "https://i.imgur.com/JHSsmKy.jpg", "https://i.imgur.com/HHb2aTi.jpg", "https://i.imgur.com/wHAGD1o.jpg" ],
+      "locations" : "trail-03/route-06",
+      "name" : "Plain Tiger",
+      "sciName" : "Danaus chrysippus",
+      "smallImage" : "https://i.imgur.com/4Dk8vLb.png"
+    },
+    "fauna-021" : {
+      "area" : [ {
+        "latitude" : 1.327953,
+        "longitude" : 103.802258
+      }, {
+        "latitude" : 1.326516,
+        "longitude" : 103.805037
+      }, {
+        "latitude" : 1.324864,
+        "longitude" : 103.803986
+      }, {
+        "latitude" : 1.326419,
+        "longitude" : 103.801282
+      } ],
+      "description" : "A scarlet-backed flowerpecker perches on a thin branch of golden flowers. Flowerpeckers, sometimes grouped under sunbirds, have distinctive features including short tails and short, thick bills with a down-curve. Their tubular tongues are perfectly suited for nectar feeding, but surprisingly, they do occasionally spice up their diet with some small insects. They can commonly be found in gardens and parks.",
+      "imageRef" : [ "https://i.imgur.com/taAb4Q6.jpg", "https://i.imgur.com/yJ4ix8W.jpg" ],
+      "latitude" : 1.327316,
+      "locations" : "trail-02/route-07",
+      "longitude" : 103.803297,
+      "name" : "Scarlet-backed Flowerpecker",
+      "sciName" : "Dicaeum cruentatum",
+      "smallImage" : "https://i.imgur.com/LXnGhqV.jpg"
+    },
+    "flora-001" : {
+      "description" : "Located along the Science Research Centre, the Pomelo tree, like most of the species in the citrus family, has fragrant white blossoms. It is, in fact, the largest of all citrus fruits.\nIn the past, there used to be 2 Pomelos planted in the SRC compound, and 3 more grown in High School. However, due to difficulties in cultivating the Pomelo, this has become the only one left within the school campus today. Nonetheless, viable fruits can still be produced as the flowers of most citrus trees are self-pollinating.",
+      "imageRef" : [ "https://i.imgur.com/s7iHyqx.jpg" ],
+      "locations" : "trail-02/route-02,trail-03/route-11",
+      "name" : "Pomelo",
+      "sciName" : "Citrus maxima",
+      "smallImage" : "https://i.imgur.com/LuoCnXf.png"
+    },
+    "flora-002" : {
+      "description" : "Many of the Eugenia have been propagated, cloned and generously donated by our school alumnus Mr Mak Chin On, who is an expert in horticulture and plant propagation. After several years growing multiple generations of them, Mr Mak was able to successfully cultivate Eugenia with deep liver-red leaves that are seen in abundance in our school today. \nNumerous shrubs of both orange-red and liver-red Eugenia line the side of Tan Kah Kee Drive, acting as ornamental foliage, alongside the lipstick palms and bougainvilleas in the same row. These plants are pruned regularly by our school gardeners into dome-shapes, showcasing a fresh layer of red leaves after every trim. They certainly add on to the rich diversity of the plants and vibrant mixture of colours displayed along the driveway!\nIts larger companions stand in the SRC, with the shorter pomelo tree in between them. These slow growing trees were, in fact, planted just when the SRC was first built. The trees here may look very different from those along the road, but one can ascertain they are of the same species after observing the red leaves on the surface of its canopy.",
+      "imageRef" : [ "https://i.imgur.com/xiMG7kh.jpg", "https://i.imgur.com/6h7PKau.jpg", "https://i.imgur.com/4qA3AeK.jpg" ],
+      "locations" : "trail-02/route-02,trail-02/route-08,trail-02/route-09,trail-03/route-01,trail-03/route-17",
+      "name" : "Eugenia",
+      "sciName" : "Eugenia oleina",
+      "smallImage" : "https://i.imgur.com/WW4VgQW.png"
+    },
+    "flora-003" : {
+      "description" : "The Sago Cycad was planted in 2017 by then-Principal Dr Hon Chiew Weng, just before his retirement, in recognition of his extraordinary contribution to the school throughout his teaching career. Despite its Chinese name, this plant should not be mistaken for a tree. In fact, the earliest Cycads date back to around 300 million years ago--a true living fossil!\nNamed '忠树' (which directly translates to 'loyalty tree'), Dr Hon wishes that all Hwa Chong students remain eternally faithful and true-hearted to the people around them. ",
+      "imageRef" : [ "https://i.imgur.com/ZZvdW0T.jpg", "https://i.imgur.com/kHFeUpf.jpg", "https://i.imgur.com/LGoqChN.jpg" ],
+      "locations" : "trail-02/route-03,trail-02/route-04",
+      "name" : "Sago Cycad",
+      "sciName" : "Cycas revoluta",
+      "smallImage" : "https://i.imgur.com/O3r3QBi.png"
+    },
+    "flora-004" : {
+      "description" : "We still have quite a few Tembusu trees in our school. This is also the very species of tree that appears on our $5 notes. Due to their height, they are often seen towering over buildings and other trees, and can even be observed all the way from the Holistic Education Centre in JC. \nThe Tembusu trees are part of the primary forest cover on this land before the school was built - consequently, they are easily over a hundred years old. Despite their age and historical value, these trees were almost chopped down some years long ago.  As a result, you will realise that they often have one or more stumps. Luckily, these trees were able to survive the ordeal. Do not be fooled by the pictures, all of these trunks belong to the same tree!",
+      "imageRef" : [ "https://i.imgur.com/elCndY1.jpg", "https://i.imgur.com/wVTP1UG.jpg" ],
+      "locations" : "trail-01/route-07,trail-01/route-08,trail-02/route-03,trail-02/route-04,trail-02/route-10",
+      "name" : "Tembusu",
+      "sciName" : "Fagraea fragrans",
+      "smallImage" : "https://i.imgur.com/w6zq28O.png"
+    },
+    "flora-005" : {
+      "description" : "All of the Yellow Bells in the school are donated by alumnus Mr Mak Chin On. Many of these were grown in clusters all over the JC side in 2005, for the purpose of having more flowering trees to beautify our school landscape.\nYellow Bells are used for ornamental purposes due to their distinctive bright golden corollas that resemble miniature trumpets, or jingle bells on a Christmas tree. They also have pods containing layers of papery, winged seeds which disperse by wind.\nConsidered to be a ruderal species, these plants can often grow on rocky land. With countless flowers blooming on each tree at the same time, they certainly brighten the scenery and lightens the mood of students walking past them!",
+      "imageRef" : [ "https://i.imgur.com/fxn6JSf.jpg", "https://i.imgur.com/A3sv7ZQ.jpg", "https://i.imgur.com/Hiu9C1O.jpg" ],
+      "locations" : "trail-01/route-07,trail-01/route-09,trail-02/route-03,trail-02/route-04,trail-02/route-07",
+      "name" : "Yellow Bells",
+      "sciName" : "Tecoma stans",
+      "smallImage" : "https://i.imgur.com/wF8gAft.png"
+    },
+    "flora-006" : {
+      "description" : "The smooth, milky white petals of flowers have twisted tips that are arranged in a stellate blossom, just like a spinning pinwheel. Many of these flowers will be found strewn on the lawn under the tree after heavy rain - they must have twirled and danced all the way in their descent to the ground!",
+      "imageRef" : [ "https://i.imgur.com/HYqD8QT.jpg", "https://i.imgur.com/3s3eoma.jpg", "https://i.imgur.com/AopZXAB.jpg" ],
+      "locations" : "trail-02/route-03,trail-02/route-04",
+      "name" : "Pinwheel Flower",
+      "sciName" : "Tabernaemontana divaricata",
+      "smallImage" : "https://i.imgur.com/eySmNpY.png"
+    },
+    "flora-007" : {
+      "description" : "The Ixora blooms with stunning clusters of red, yellow, pink or orange flowers.\nThe Ixora is a common flower in Singapore. Some of us are aware that one could pluck out its corolla tube, and enjoy a sweet shot of  nectar from the other end!\nWhen in full bloom, the neatly trimmed bushes line Tan Kah Kee Drive with a thick ribbon of crimson blossoms. What a sight to behold! Kudos to our skillful gardeners who help to maintain these beautiful bushes all year long.",
+      "imageRef" : [ "https://i.imgur.com/TQ39dt4.jpg", "https://i.imgur.com/cN3KYxI.jpg", "https://i.imgur.com/leHh4Xa.jpg", "https://i.imgur.com/gccMUbN.jpg", "https://i.imgur.com/HejPcKr.jpg", "https://i.imgur.com/LoEH1uh.jpg" ],
+      "locations" : "trail-01/route-04,trail-02/route-03,trail-02/route-04,trail-02/route-05,trail-02/route-07,trail-02/route-08,trail-03/route-01,trail-03/route-04,trail-03/route-06,trail-03/route-07",
+      "name" : "Ixora",
+      "sciName" : "Ixora",
+      "smallImage" : "https://i.imgur.com/1EynPL4.png"
+    },
+    "flora-008" : {
+      "description" : "One of the most widely used decorative plant from the ginger family, the Red Button Ginger grabs attention with its exotic, torpedo-shaped, scarlet crowning glory that rises above a sea of lush green foliage - but do not mistake it for its flower! When it blooms, smaller, yellow-orange flowers are seen emerging from the top of these red cones.",
+      "imageRef" : [ "https://i.imgur.com/q0uD2rK.jpg" ],
+      "locations" : "trail-02/route-03",
+      "name" : "Red Button Ginger",
+      "sciName" : "Costus woodsonii maas",
+      "smallImage" : "https://i.imgur.com/oU5ZCrb.png"
+    },
+    "flora-009" : {
+      "description" : "The world's first golden yellow rain trees were cultivated by Maryland Nursery, headed by Mr Mak Chin On, in the 1990s to 2000s. Since then, these yellow trees have been increasingly sought after for their bright and striking golden foliage in Singapore. When planted alongside their green counterparts, it certainly adds greater diversity and  a contrast of colours to the typical rain trees that we are all so familiar with.\nThese yellow rain trees are grown all over the school campus, many of which were generously donated by our school alumni, Mr Mak. However, out of the estimated 200 that he had donated, only half of them still remain in the school due to difficulties in maintaining this particular variety.\nGiven that these trees were bred only around 2 decades ago, they are evidently much younger and smaller in size. It is for certain that some of them will be present to witness Hwa Chong's bicentennial celebrations.",
+      "imageRef" : [ "https://i.imgur.com/YIpr5Pa.jpg", "https://i.imgur.com/dZsN5Dh.jpg", "https://i.imgur.com/cZEbWCi.jpg" ],
+      "locations" : "trail-01/route-01,trail-02/route-03,trail-02/route-05,trail-02/route-07,trail-02/route-08,trail-03/route-07,trail-03/route-15",
+      "name" : "Golden Yellow Rain Tree",
+      "sciName" : "Samanea saman (yellow leaf var.)",
+      "smallImage" : "https://i.imgur.com/aDMdYkA.png"
+    },
+    "flora-010" : {
+      "description" : "The Dragon Blood Tree is an evergreen tree particularly distinctive for long, thin trunks spread wide apart, with elongated leaves growing as a cluster at the end of each branch. This particular species is native to Thailand. The name 'Dracaena' is a Greek word for dragon, referring to the deep red resin in their trunks - similar to that of a dragon's blood. \nUsually, these plants are grown for ornamental purposes. There used to be another Dracaena of similar size growing beside the one shown in the picture. However, it collapsed due to its own weight. Now, a younger tree has been planted in place of the previous one. \nDue to the medicinal properties of their resin, Dracaenas have become a vulnerable species in other parts of the world, particularly in China.",
+      "imageRef" : [ "https://i.imgur.com/CLsIvEd.jpg", "https://i.imgur.com/3Fqqg9C.jpg" ],
+      "locations" : "trail-02/route-04",
+      "name" : "Dragon Blood Tree",
+      "sciName" : "Dracaena cochinchinensis",
+      "smallImage" : "https://i.imgur.com/asq0ezM.png"
+    },
+    "flora-011" : {
+      "description" : "The Ruffled Fan Palm evidently lives up to its name with its huge fan-like, circular leaves. They certainly look out of the ordinary when compared to the usual trees and shrubs around them.\nAs these palms enjoy being in full shade or under partial sunlight, they are usually seen growing behind the Kuo Chuan House, or under the Willows and Saga Trees along the path to the Kong Chian Administration Centre.\nWhile this particular one has already begun fruiting, the younger, shorter palms lining the pathways have just been planted not long ago.\nTheir magnificent leaves indeed add a unique element to the lush landscape with their distinctive leaves.",
+      "imageRef" : [ "https://i.imgur.com/tzC3Gce.jpg", "https://i.imgur.com/ys7qPp8.jpg" ],
+      "locations" : "trail-02/route-04,trail-02/route-05",
+      "name" : "Ruffled Fan Palm",
+      "sciName" : "Licuala grandis",
+      "smallImage" : "https://i.imgur.com/liOX9Dy.png"
+    },
+    "flora-012" : {
+      "description" : "The 6 echoing shoutouts in one of Hwa Chong's cheers, 'Willow willow willow willow willow willow!', refers to the 6 willow trees beside the Clock Tower. \nThe willow is used for ornamental purposes. Its ethereal pendulous stem and slender leaves on their supple, dangling branches reminds one of the Rapunzel's luxurious locks as they sway gracefully in a breeze, giving an enchanting appearance to the landscape. This was exactly the landscape that DP Mr Tan Pheng Tiong sought after as he looked for trees to complement the existing ones in school.\nIn the past, this species of willows, also known as 旱柳 in chinese, were seldom seen around the school. In fact, they were only planted after their close relatives, the more commonly known Weeping Willows (or 垂柳), were unable to grow well under Singapore's hot climate and away from a water body. Soon, the Salix matsudanas have become a common sight within the campus, presenting a similar scenic effect as the Weeping Willows, despite having stiffer and shorter leaves.",
+      "imageRef" : [ "https://i.imgur.com/Y9J3Esj.jpg", "https://i.imgur.com/kD6bIGR.jpg", "https://i.imgur.com/MzA7Cg2.jpg" ],
+      "locations" : "trail-01/route-02,trail-02/route-05,trail-02/route-07,trail-03/route-04,trail-03/route-05,trail-03/route-18",
+      "name" : "Willow",
+      "sciName" : "Salix matsudana Koidz",
+      "smallImage" : "https://i.imgur.com/SX4h0hY.png"
+    },
+    "flora-013" : {
+      "description" : "The Saga Trees appear on both sides of the Clock Tower. They can be easily identified if one were to look intently on the ground for their small but distinctive red seeds. These seeds are scattered within the vicinity of the trees after its pods have burst. \nThere used to be 3 Saga Trees along Tan Kah Kee Drive. The oldest among the 3 was planted when the Clock Tower was built, and was located in front of the SRC. After being partially damaged, it died in 2015. Recently, more of these trees have been planted along the driveway, with wild orchids grafted to their trunks. \nThe iconic Saga Tree found beside the stone table and benches beside the Clock Tower once had the school bell hung from one of its the branches. Back then, students would gather below the tree, around the stone table and spend quality time with one another. This tree and its bell were wonderfully illustrated by alumnus and artist Mr Lee Kow Fong's ('Ah Guo') painting '百年钟声. 100 Years of Bell Ringing', as a tribute to Hwa Chong during its centennial year.",
+      "imageRef" : [ "https://i.imgur.com/fIFK19J.jpg", "https://i.imgur.com/w6Eyh39.jpg", "https://i.imgur.com/tVzruX2.jpg", "https://i.imgur.com/6Fhg62m.jpg", "https://i.imgur.com/JVlM30t.jpg" ],
+      "locations" : "trail-02/route-05,trail-02/route-07,trail-02/route-09,trail-03/route-03",
+      "name" : "Saga",
+      "sciName" : "Adenanthera pavonina",
+      "smallImage" : "https://i.imgur.com/MrsFLEX.png"
+    },
+    "flora-014" : {
+      "description" : "The Rain Tree, introduced to Singapore in 1976, is currently the most cultivated roadside tree. During rainy days, the leaves of the tree will droop, giving it its common name.  Along with its brothers in the Heritage trees registry, the majestic, iconic Rain Trees lining our school's terraces have also seen its fair share of Hwa Chong's history, from the annual Founder's Day events - including this year's centennial celebrations - to welcoming  yearly batches of new students at Orientation, cementing itself as a part of Hwa Chong's identity.\nDespite their sheer size, these raintrees were not here when our school was first established. In fact, they were only planted 3 to 4 decades ago, over the former Casuarina trees. The Casuarinas used leave a mess after shedding their leaves all over the ground, and also provided little shade for the students. Consequently, they were removed and replaced with the raintrees that we see today. With its widespread, umbrella-shaped canopy, these trees are perfect for providing shade for the students and teachers in daily flag raising ceremonies and physical education classes at the field.\nThe Rain Trees contribute significantly to the ecosystem in Hwa Chong. Using its fissured barks that retain water, it becomes an excellent host to a variety of epiphytes, such as the Bird Nest ferns and Dragonscale Ferns, while its sugary pods are found to provide food for the squirrels occasionally found wandering around the campus.",
+      "imageRef" : [ "https://i.imgur.com/aw1VZW1.jpg", "https://i.imgur.com/YHnUU54.jpg" ],
+      "locations" : "trail-02/route-08,trail-02/route-09",
+      "name" : "Rain Tree",
+      "sciName" : "Samanea saman",
+      "smallImage" : "https://i.imgur.com/arXtOVL.png"
+    },
+    "flora-015" : {
+      "description" : "The Lipstick Palm or Sealing Wax Palm has a prominent scarlet crownshaft and leaf sheath, which makes it stand out from other common palms. The hard outer wood of the stem can be used to make dart bodies.\nThis popular ornamental palm adds a vibrant shade of vermilion to the predominantly green landscape on this part of the school. It is also not uncommon to spot bird nests built between the huge leaves of the palms. They must have been attracted to the red stems!\nDespite its common name, it is not a source of sealing wax. Instead, its name originated from the the similar colour of  its red crownshaft and the wax used to seal letters.",
+      "imageRef" : [ "https://i.imgur.com/naO7r0t.jpg", "https://i.imgur.com/zHPzY3b.jpg", "https://i.imgur.com/BA10a6e.jpg", "https://i.imgur.com/EP69IZI.jpg" ],
+      "locations" : "trail-01/route-01,trail-01/route-03,trail-02/route-08,trail-02/route-09,trail-03/route-03,trail-03/route-06",
+      "name" : "Sealing Wax Palm",
+      "sciName" : "Cyrtostachys renda Blume",
+      "smallImage" : "https://i.imgur.com/PjpG33p.png"
+    },
+    "flora-016" : {
+      "description" : "The dragon’s scale ferns are commonly found growing alongside the bird’s-nest ferns and rabbit foot ferns on towering raintrees.\nThis fern grows two different kinds of fronds (leaves). The younger fronds are cute 'puffy' heart-shaped 'scales' that truly turn the tree they wrap around into a majestic dragon, while narrow, elongated mature fronds with brown spores dot the periphery.",
+      "imageRef" : [ "https://i.imgur.com/nHJxiBy.jpg", "https://i.imgur.com/Lm7ZaJ9.jpg", "https://i.imgur.com/mVNFimx.jpg", "https://i.imgur.com/mqhQR9g.jpg" ],
+      "locations" : "trail-02/route-09",
+      "name" : "Dragon's Scale Fern",
+      "sciName" : "Pyrrosia piloselloides",
+      "smallImage" : "https://i.imgur.com/mk7b8Sr.png"
+    },
+    "flora-017" : {
+      "description" : "The epiphytic fern is commonly seen wedged in the branches of large trees, especially raintrees in Singapore. The fern is not parasitic, and can be found to grow independently.\nFronds (leaves) form a rosette, resembling a bird's nest, where fallen leaves accumulate. The fallen leaves soaks up rainwater, decay, releasing water and nutrients for the fern.\nBrown spore sacs can be found on the underside of mature fronds (leaves).",
+      "imageRef" : [ "https://i.imgur.com/pj5lDem.jpg", "https://i.imgur.com/TCVm0Cl.jpg", "https://i.imgur.com/ISGOeZs.jpg", "https://i.imgur.com/sK40x1U.jpg", "https://i.imgur.com/QrOowxl.jpg", "https://i.imgur.com/9JLrW14.jpg" ],
+      "locations" : "trail-02/route-09,trail-03/route-14",
+      "name" : "Bird's Nest Fern",
+      "sciName" : "Asplenium nidus",
+      "smallImage" : "https://i.imgur.com/QCje9le.png"
+    },
+    "flora-018" : {
+      "description" : "Teak wood is particularly valued for its durability and water resistance. Its natural oils make it termite resistant in exposed locations. These high quality timber behind the high school labs were kindly donated by our alumni.\nUnfortunately, its papery leaves that can be a few times larger than an adult human's palm, may be infested with mealybugs. At one point, due to its proximity to the fenced garden behind the science labs, the mealybugs affected the growth of hybridised orchids. Consequently, the tree was later moved  to the periphery of the building.",
+      "imageRef" : [ "https://i.imgur.com/POLWGHr.jpg" ],
+      "locations" : "trail-02/route-10,trail-02/route-11",
+      "name" : "Teak Tree",
+      "sciName" : "Tectona grandis",
+      "smallImage" : "https://i.imgur.com/lpKnaCy.png"
+    },
+    "flora-019" : {
+      "description" : "The huge wall of Bengal vines cover the entire fence beside the high school street soccer court.\nCapable of growing up to 20 m in height, the length and ingenious placement of these flower-bearing vines hide the hideous-looking fence, turning it into a tall plane of lush greenery spotted with countless purple flowers.",
+      "imageRef" : [ "https://i.imgur.com/vVmanmD.jpg", "https://i.imgur.com/pL4XAYf.jpg" ],
+      "locations" : "trail-02/route-10",
+      "name" : "Bengal Trumpet",
+      "sciName" : "Thunbergia grandiflora",
+      "smallImage" : "https://i.imgur.com/m4XHz5Q.png"
+    },
+    "flora-020" : {
+      "description" : "Alexandra Palms grow in regions frequented by heavy rainfalls and thus they have become a common species here in Singapore. This row of palms are still in its infancy, as evident from their height. At full maturation, they are capable of growing up to 25m, similar to the tall royal palms that line the river in High School, as well as the roads in various other parts of the school.\nCome back and take a look at them after a few years. You will be surprised by how tall they have grown by then!",
+      "imageRef" : [ "https://i.imgur.com/OYuPU6n.jpg", "https://i.imgur.com/g1GXdjv.jpg", "https://i.imgur.com/y4RAr3A.jpg" ],
+      "locations" : "trail-02/route-10,trail-03/route-18",
+      "name" : "Alexandra Palm",
+      "sciName" : "Archontophoenix alexandrae",
+      "smallImage" : "https://i.imgur.com/NuDkjEv.png"
+    },
+    "flora-021" : {
+      "description" : "A phylogenetically ancient plant, Michelia champaca is part of the family Magnoliaceae, which appeared before plants differentiated into monocots and dicots.\nIf you look closely at its orange flowers, you’ll notice that all its petals are similar (rather than having 2 types of petals as with many modern plants), and its reproductive organs are less apparent than many modern plants.\nOne can determine the age of the plant by observing the colour of its flowers: younger plants produce bright yellow flowers while older ones give deep orange flowers.",
+      "imageRef" : [ "https://i.imgur.com/nod3RTK.jpg", "https://i.imgur.com/qkV3aY8.jpg", "https://i.imgur.com/S61fHiP.jpg" ],
+      "locations" : "trail-02/route-01,trail-02/route-06,trail-03/route-13",
+      "name" : "Orange Champaca",
+      "sciName" : "Michelia champaca",
+      "smallImage" : "https://i.imgur.com/kFpHk87.png"
+    },
+    "flora-022" : {
+      "description" : "While the one in the butterfly garden is still in its infancy, mature wild mango trees bearing fruits can be found behind the clock tower and the high school science labs. The fruits borne usually attract, and are consumed by, visiting birds and scampering squirrels.",
+      "imageRef" : [ "https://i.imgur.com/cFm5mLT.jpg", "https://i.imgur.com/LHjfLj4.jpg", "https://i.imgur.com/uWNed0w.jpg" ],
+      "locations" : "trail-02/route-01,trail-02/route-06,trail-03/route-12",
+      "name" : "Mango Tree",
+      "sciName" : "Mangifera indica",
+      "smallImage" : "https://i.imgur.com/SpDNDTe.png"
+    },
+    "flora-023" : {
+      "description" : "The brilliant red and yellow flowers of the Hibiscus is an appeasing sight with its glossy leaves as a background. The national flower of Malaysia, each hibiscus flower proudly displays its long and slender style, protruding from the center of its corolla. You have to admit that the Hibiscus truly has style.\nFlowers that have fallen off are often collected and used for dissection during Biology lessons in the high school labs, enriching the learning experience of our students.",
+      "imageRef" : [ "https://i.imgur.com/hkZ6eFs.jpg", "https://i.imgur.com/Fc65pI8.jpg", "https://i.imgur.com/cnfrdkv.jpg", "https://i.imgur.com/an8S2Hy.jpg", "https://i.imgur.com/LcNET9u.jpg", "https://i.imgur.com/6mGhVfg.jpg", "https://i.imgur.com/tGJV7DD.jpg" ],
+      "locations" : "trail-02/route-01",
+      "name" : "Chinese Hibiscus",
+      "sciName" : "Hibiscus rosa-sinensis",
+      "smallImage" : "https://i.imgur.com/rjTk1Au.png"
+    },
+    "flora-024" : {
+      "description" : "The Water Jasmines in our school were donated by alumnus Mr Tan Leong Teck (陈龙德学长). Many neatly trimmed bushes of Water Jasmines can also be found lining the pavements at different locations around the High School section. Some of them have also been turned into bonzai, which are being maintained by our skilful gardeners over the years. \nYou may be astonished to find that the bonsai are of the same species, presented as rows of 'typical' bushes. If you do not believe it, lean close and smell their sweet and fragrant white flowers!",
+      "imageRef" : [ "https://i.imgur.com/cmI5Q6h.jpg", "https://i.imgur.com/qihIqy0.jpg", "https://i.imgur.com/c6UOqlq.jpg", "https://i.imgur.com/fnDUhXa.jpg", "https://i.imgur.com/aiBgRoW.jpg" ],
+      "locations" : "trail-02/route-01,trail-02/route-07,trail-03/route-01,trail-03/route-15",
+      "name" : "Water Jasmine",
+      "sciName" : "Wrightia religiosa",
+      "smallImage" : "https://i.imgur.com/j3DSao5.png"
+    },
+    "flora-025" : {
+      "description" : "Indian Coral Tree is a showy tree with brilliant red blossoms. It has many stout branches that are armed with black tiger's claw spines (prickles). Like the butterfly pea and hibiscus, the flower of Indian coral tree is used for dissection in biology lessons on plant reproduction. Perhaps, you may be amazed to know that the Indian coral tree in Fabaceae (Legumes, Pea) family, the same as the butterfly pea. Thus, the red blossoms which may look structurally distinct from the butterfly pea does actually result in a peapod when fertilised!",
+      "imageRef" : [ "https://i.imgur.com/tMtq8mQ.jpg" ],
+      "locations" : "trail-02/route-01",
+      "name" : "Indian Coral Tree",
+      "sciName" : "Erythrina variegata",
+      "smallImage" : "https://i.imgur.com/36IxcDe.png"
+    },
+    "flora-027" : {
+      "description" : "The Podocarpus brevifolius in front of the high school science labs was planted by school alumni Mr Tan Leong Teck in 2004 as President of the Hwa Chong Seniors Club. He also held the position of President of  the Hwa Chong Alumni Association from 1960 - 1982. \nThis plant serves to recognise the generous donations and contributions that he had made to the school over the past few decades - a wonderful examplification of the value 饮水思源 that every Hwa Chong student should know.",
+      "imageRef" : [ "https://i.imgur.com/EI9Zdkw.jpg", "https://i.imgur.com/V2Soi1l.jpg" ],
+      "locations" : "trail-02/route-06",
+      "name" : "Podocarpus brevifolius",
+      "sciName" : "Podocarpus brevifolius",
+      "smallImage" : "https://i.imgur.com/lNsKVQ7.png"
+    },
+    "flora-028" : {
+      "description" : "The starfruit is particularly unique with 5 distinctive ridges along its length, giving it the shape of a star once it is sliced apart. \nThis tree flowers multiple times a year, each time blooming with fragrant lavender flowers and bearing small starfruits. It is self-fertilised, for this is the only starfruit tree around that area!\nEvery part of the plant is valuable. Besides having edible fruits, its fruit juice can be a stain remover while unripe fruits can be used for dyeing cloth. Its flowers, seeds and leaves all have medicinal properties of their own.",
+      "imageRef" : [ "https://i.imgur.com/OC6M0za.jpg", "https://i.imgur.com/24ECgw9.jpg", "https://i.imgur.com/B4qyssE.jpg", "https://i.imgur.com/Mw2PKBm.jpg" ],
+      "locations" : "trail-02/route-06",
+      "name" : "Starfruit Tree",
+      "sciName" : "Averrhoa carambola",
+      "smallImage" : "https://i.imgur.com/RAtecZ3.png"
+    },
+    "flora-029" : {
+      "description" : "The Seashore Pandan is typically found on undisturbed shores and back mangroves in Singapore. Because of poor oxygen conditions in the mangrove, it has aerial roots to 'breathe'. \nInitially, this tree was planted at the same time as the 'desert' plants beside Block A in High School to further beautify the school’s landscape. Due to its quick growing leaves, it has to be trimmed fairly regularly to prevent it from becoming too big. There also used to be a stone table in the middle of the cluster for students who are seeking shade from the hot afternoon sun to rest at. However, it was shortly removed due the proliferation of mosquitoes around the area. \nThe fruits of pandan have a deceiving green covering, almost similar to a durian. But unlike the durian, its outer covering itself is the seed, which will reveal a spectacular orange and yellow layer below the green when removed. This sprawling tree teaches us not to judge a book by its cover!",
+      "imageRef" : [ "https://i.imgur.com/Od7pGjr.jpg", "https://i.imgur.com/YkoWZ7T.jpg", "https://i.imgur.com/cyHa2S0.jpg" ],
+      "locations" : "trail-02/route-06",
+      "name" : "Seashore Pandan",
+      "sciName" : "Pandanus tectorius",
+      "smallImage" : "https://i.imgur.com/mbDB9MF.png"
+    },
+    "flora-030" : {
+      "description" : "The Chinese Juniper is a coniferous evergreen with familiar scale-like needles forming its foliage, which may mislead some to believe that it is part of the pine family.\nAs a beautiful landscape species native to China, these trees complement and embody the rich Chinese history and heritage of Hwa Chong. These temporal junipers have found a new home here in the tropics, adorning the exterior of Kuo Chuan House which is currently being refurbished to house the Centennial Art Gallery.\nHowever, as these junipers, similar to Weeping Willows, require large amounts of water to grow well, those around the Kuo Chuan House frequently die and have already been replaced numerous times. Luckily, the junipers growing along the river in High School are still faring well!",
+      "imageRef" : [ "https://i.imgur.com/EaRoWAq.jpg", "https://i.imgur.com/j93ROfy.jpg", "https://i.imgur.com/7G1VAVm.jpg", "https://i.imgur.com/d4aYyfV.jpg" ],
+      "locations" : "trail-02/route-07,trail-03/route-04",
+      "name" : "Chinese Juniper",
+      "sciName" : "Juniperus chinensis",
+      "smallImage" : "https://i.imgur.com/hSCkZXg.png"
+    },
+    "flora-031" : {
+      "description" : "As you walks around Hwa Chong amongst these 'flowers' especially during a rainy season, you may suspect the if they are real or simply origami crafts because of their papery texture.\nIf you stop to look closely, will you realise that what you have always mistaken as its petals, are really just the bracts meant to attract pollinators. Indeed, small cream-coloured flowers can be found hidden within the bracts. Common colours of these bracts include purple, white, orange and yellow; 'rainbow-coloured' Bougainvillea, with flowers of two or morecolours on the same plant, are also often seen.\nThe Bougainvillea has come to be synonymous with the Singapore landscape. It is extensively planted here because of the explosion of colours it bringsto our hot, tropical environment all year round.",
+      "imageRef" : [ "https://i.imgur.com/hmtRoNz.jpg", "https://i.imgur.com/sjeeKB9.jpg", "https://i.imgur.com/iH3OQAQ.jpg", "https://i.imgur.com/EDT1jgs.jpg", "https://i.imgur.com/P6N1khJ.jpg", "https://i.imgur.com/6UBJg0L.jpg", "https://i.imgur.com/xcoBRns.jpg", "https://i.imgur.com/sccNS1K.jpg", "https://i.imgur.com/QEg0TeA.jpg" ],
+      "locations" : "trail-01/route-02,trail-02/route-07,trail-03/route-04,trail-03/route-05,trail-03/route-14,trail-03/route-18",
+      "name" : "Bougainvillea",
+      "sciName" : "Bougainvillea glabra",
+      "smallImage" : "https://i.imgur.com/fQWB0M6.png"
+    },
+    "flora-032" : {
+      "description" : "The fast growing African Mahogany has a tall and firm trunk where lustrous leaves spread out evenly at its top. You may observe that unlike rain trees, they do not have epiphytic ferns growing on them. A row of these majestic trees lining the Tan Kah Kee Drive was planted in 1997. Apart from being well-known for providing beautiful lumber, the African Mahogany also provide cooling shade for pedestrians. It certainly makes walking up the hill every morning a lot easier!",
+      "imageRef" : [ "https://i.imgur.com/RjfJOMT.jpg" ],
+      "locations" : "trail-01/route-08,trail-02/route-11,trail-03/route-03,trail-03/route-07",
+      "name" : "African Mahogany",
+      "sciName" : "Khaya nyasica",
+      "smallImage" : "https://i.imgur.com/vvbt97F.png"
+    },
+    "flora-033" : {
+      "description" : "Unexpectedly, a single durian tree stands tall behind the High School Science Labs. It is relatively easy to identify this tree due to its near horizontal lateral branches growing away from the vertical, main trunk.\nThe yellowish green durian flowers are usually bloom during the dry season. They are mostly found growing on the older, lateral branches of the tree in order to bear the weight of the durians if they are pollinated and fertilised.\nHowever, durian trees are known to be highly self-incompatible, requiring its flowers to be cross-pollinated from other trees around them. It is for this reason the one we see here will rarely bear fruits. \nOn the bright side, you will not have to constantly look out for falling durians if you happen to walk under this particular tree!",
+      "imageRef" : [ "https://i.imgur.com/YJZwvvO.jpg", "https://i.imgur.com/tf91uwC.jpg" ],
+      "locations" : "trail-02/route-11",
+      "name" : "Durian Tree",
+      "sciName" : "Durio zibethinus",
+      "smallImage" : "https://i.imgur.com/MZmLqDg.png"
+    },
+    "flora-034" : {
+      "description" : "This living fossil belongs to a genus of conifers, the Podocarpus, that traces it lineage back to 240 million years ago. Its dark green leaves are lanceolate in shape and arranged spirally. The younger leaves at the center of each cluster are lighter in colour, giving the entire tree a dynamic colour scheme. Their fruits are purple and fleshy when matured, and are often hidden in the pockets between leaf clusters.\nThis  single podocarpus is found growing amongst the Mussaendas and Yellow Elders along the road. In fact, it was planted and cared for by the Hwa Chong Outdoor Activities Club!",
+      "imageRef" : [ "https://i.imgur.com/QcW5ngs.jpg", "https://i.imgur.com/iXEc5Q1.jpg", "https://i.imgur.com/MtaLPFD.jpg", "https://i.imgur.com/NyTjW3q.jpg" ],
+      "locations" : "trail-01/route-07,trail-03/route-01",
+      "name" : "Buddhist Pine",
+      "sciName" : "Podocarpus macrophyllus",
+      "smallImage" : "https://i.imgur.com/2PQRaAb.png"
+    },
+    "flora-035" : {
+      "description" : "This evergreen with glossy leaves boasts young flushes that are reddish-bronze in colour, which turn quickly to bright yellow-green, then finally to dark green when mature.\nEvery high school consortium garden, opened in the 2010s, has its own Happiness Tree. They were selected because they do not shed leaves and create a mess, making the jobs of students-gardeners tending to it much easier. They started off at around the height of an average adult human. Look how much they have grown!",
+      "imageRef" : [ "https://i.imgur.com/yJvXXKx.jpg", "https://i.imgur.com/BlI7wjJ.jpg" ],
+      "locations" : "trail-03/route-03,trail-03/route-06,trail-03/route-18",
+      "name" : "Happiness Tree",
+      "sciName" : "Garcinia subelliptica",
+      "smallImage" : "https://i.imgur.com/Xi8HzOl.png"
+    },
+    "flora-036" : {
+      "description" : "A clumping palm with pinnate fronds (feather-shaped divided leaf) just like the lipstick palm, MacArthur palm might confuse onlookers at their first glance. While the stems of these palms are not red, they do bear small, red fruits that many birds feed on. It is a common sight to see the ground under its foliage strewn with its bright red fruits.",
+      "imageRef" : [ "https://i.imgur.com/UWoTlGy.jpg" ],
+      "locations" : "trail-03/route-03,trail-03/route-15,trail-03/route-18",
+      "name" : "MacArthur Palm",
+      "sciName" : "Ptychosperma macarthurii",
+      "smallImage" : "https://i.imgur.com/uW102uY.png"
+    },
+    "flora-037" : {
+      "description" : "The Royal Palms are found in neat rows along high school and JC carparks. Capable of growing up to 30m tall, they tower over almost all other trees around them.\nEven though there are many tall trees around the campus, none grows with the uniformity as the Royal Palms does. Unlike the MacArthur Palm, the Royal Palms do not have clustering behaviour.\nSome may mistake the Royal Palms for coconut because of their similarity: While they are certainly both under the palm family, one shouldn’t hope to get coconut from growing Royal Palms!",
+      "imageRef" : [ "https://i.imgur.com/07QYsbG.jpg", "https://i.imgur.com/UAHgyUh.jpg", "https://i.imgur.com/1rvPgVW.jpg" ],
+      "locations" : "trail-01/route-07,trail-03/route-04,trail-03/route-05",
+      "name" : "Royal Palm",
+      "sciName" : "Roystonea regia",
+      "smallImage" : "https://i.imgur.com/VGntcQk.png"
+    },
+    "flora-038" : {
+      "description" : "This tree sits a stone's throw away from Kah Kee Hall, and is situated in front of a raised platform meant to be our very own 'Speakers' Corner'. Students are sometimes lucky enough to be greeted with a beautiful tree in full bloom, with purple flowers enveloping the tree as they make their way down to the canteen.\nWhen dried, leaves are traditionally used to treat diabetes and urinary problems in the Philippines. Its wood is also popular for boat building around the region.",
+      "imageRef" : [ "https://i.imgur.com/bkPkRGc.jpg", "https://i.imgur.com/WJme5WW.jpg", "https://i.imgur.com/eeBQ4bt.jpg" ],
+      "locations" : "trail-01/route-11,trail-03/route-05",
+      "name" : "Pride of India",
+      "sciName" : "Lagerstroemia speciosa",
+      "smallImage" : "https://i.imgur.com/3jUlnxC.png"
+    },
+    "flora-039" : {
+      "description" : "Heliconia is also called ‘lobster-claws’, which vividly describes the unique shape of its vibrant blossom. Each strain has its own distinct colour combination. For the ‘American Dwarf’, the showy inflorescences of light orange are cuddled with a long and narrow turmeric yellow bract that resembles the wing of an origami crane. This unique tubular flower reminds onlookers of a toucan’s beak, and produces a berry-shaped fruit after pollination.\nFound scattering along the road side, its unique bright yellow flower often attracts the attention of curious students walking across the campus",
+      "imageRef" : [ "https://i.imgur.com/jAIZDBz.jpg", "https://i.imgur.com/GHnTpj0.jpg" ],
+      "locations" : "trail-01/route-04,trail-01/route-11,trail-03/route-06",
+      "name" : "Heliconia 'American Dwarf'",
+      "sciName" : "Heliconia 'American Dwarf'",
+      "smallImage" : "https://i.imgur.com/UuhWXkZ.png"
+    },
+    "flora-040" : {
+      "description" : "Because of its resilient nature, this fast-growing and attractive epiphyte is often cultivated as a ground cover plant. This has also given it the reputation of being a weed, but we can’t deny that it can steal the limelight in our garden with its striking violet trumpet blossoms. ",
+      "imageRef" : [ "https://i.imgur.com/RitW8PD.jpg", "https://i.imgur.com/0z7jAK4.jpg" ],
+      "locations" : "trail-03/route-06,trail-03/route-09",
+      "name" : "Creeping Foxglove",
+      "sciName" : "Asytasia gangetica",
+      "smallImage" : "https://i.imgur.com/hH5LImc.png"
+    },
+    "flora-041" : {
+      "description" : "Plumbago blossoms one of the few flowers that boasts a hue of blue , making it a rarity among flowering plants . The fused corolla of the petal quintet are borne on rounded terminal clusters, and in Singapore flowering continues throughout the year.\nThe name 'Plumbago' is derived from the Latin word 'plumbum' meaning 'lead' (the metallic element), as the plant was widely used as a remedy for lead poisoning.",
+      "imageRef" : [ "https://i.imgur.com/pVs7v4X.jpg", "https://i.imgur.com/d99TS84.jpg", "https://i.imgur.com/1BdWPpf.jpg", "https://i.imgur.com/P4dLPoh.jpg" ],
+      "locations" : "trail-03/route-06",
+      "name" : "Blue Plumbago",
+      "sciName" : "Plumbago auriculata",
+      "smallImage" : "https://i.imgur.com/utDLT8k.png"
+    },
+    "flora-042" : {
+      "description" : "Senna alata has smooth, thin, leathery leaves and golden inflorescences that resemble  glowing candles. The flowers are arranged in a vertical column and they bloom from the base of the column while the unopened buds on top are covered under orange bracts. Below the yellow flowers where earlier blossoms have already fallen, you can see winged pods with frilly edges extending out horizontally from the flower stalk.\nSenna alata can be used medicinally for its fungicidal properties, specifically as treatment against ringworm and other skin fungal infections.",
+      "imageRef" : [ "https://i.imgur.com/FmCMDL6.jpg", "https://i.imgur.com/JPGaqma.jpg" ],
+      "locations" : "trail-01/route-06,trail-03/route-06",
+      "name" : "Candelabra Bush",
+      "sciName" : "Senna alata",
+      "smallImage" : "https://i.imgur.com/HOidPvb.png"
+    },
+    "flora-043" : {
+      "description" : "The scarlet flowers of this plant stand out from the green leaves. When these flowers cover the entire shrub, it looks as if the green plant is on fire, thus it acquired its name as the 'Fire Bush'. Interestingly, the flowers have a yellow to cream edge on its flowers. The sour fruits are edible, and it is used in folk remedies!",
+      "imageRef" : [ "https://i.imgur.com/dxBNa7j.jpg", "https://i.imgur.com/WYuFXVx.jpg", "https://i.imgur.com/wCpYRGB.jpg" ],
+      "locations" : "trail-03/route-06",
+      "name" : "Fire Bush",
+      "sciName" : "Hamelia patens",
+      "smallImage" : "https://i.imgur.com/oczPkUi.png"
+    },
+    "flora-044" : {
+      "description" : "The Singapore Rhododendron is native to Singapore, though most definitely not found only here. It is a very resilient plant that can survive even at altitudes of 3000m and outcompete the noxious weed Imperata cylindrica which would otherwise slowly 'poison' surrounding plants. Also a known hyperaccumulator of aluminium, it can be used for phytoremediation to clean up soils polluted by excessively high levels of aluminium!\nIts reddish stems are covered with bristly scales and minute hairs. Its fruit is a berry, which can be used to make a black dye. In traditional medicine, the leaves and roots can be used to treat diarrhoea and dysentery.\nDon't be surprised to see many different coloured flowers of white, vibrant purple and deep violet. Bees are often attracted to its alluring blossoms and can be often seen pollinating them in our butterfly garden. Do keep a lookout and observe the bees without disturbing them.",
+      "imageRef" : [ "https://i.imgur.com/g9DUcfU.jpg", "https://i.imgur.com/ieVwOao.jpg", "https://i.imgur.com/ViUiszh.jpg", "https://i.imgur.com/6bcB9bD.jpg" ],
+      "locations" : "trail-01/route-06,trail-03/route-07,trail-03/route-10",
+      "name" : "Singapore Rhododendron",
+      "sciName" : "Melastoma malabathricum",
+      "smallImage" : "https://i.imgur.com/zYKANhp.png"
+    },
+    "flora-045" : {
+      "description" : "The plant's specific epithet 'pulcherrima' means  'the most beautiful', in Latin, which truly describes its flowers of a brilliant mix of yellow, orange to red. The long stamens and style reminds one of the vibrant plumage trailing from a peacock's tail.",
+      "imageRef" : [ "https://i.imgur.com/c3cKu4V.jpg", "https://i.imgur.com/n3B1nyX.jpg", "https://i.imgur.com/83BHU08.jpg", "https://i.imgur.com/qrK0jtx.jpg" ],
+      "locations" : "trail-03/route-07",
+      "name" : "Peacock Flower",
+      "sciName" : "Caesalpinia pulcherrima",
+      "smallImage" : "https://i.imgur.com/jKlbNJc.png"
+    },
+    "flora-046" : {
+      "description" : "Pagoda Flowers are arranged in terminal panicles, or conical inflorescence, with distinct tiers that remind one of the layers of curved roofs on a pagoda. The slender style and stamen can be seen extending elegantly from the corolla. The hues of red of the flowers vary between the bright crimson bud and the subtle pastel blossom, adorning the butterfly garden in ombre red.\nInterestingly, the leaves of its genus Clerodendrum tend to release a smell that reminds one of peanut butter or burnt rubber when rubbed or bruised.",
+      "imageRef" : [ "https://i.imgur.com/NonQapn.jpg", "https://i.imgur.com/KcB6B6O.jpg", "https://i.imgur.com/up46jOt.jpg", "https://i.imgur.com/4UAF8Zb.jpg" ],
+      "locations" : "trail-03/route-08",
+      "name" : "Pagoda Flower",
+      "sciName" : "Clerodendrum paniculatum",
+      "smallImage" : "https://i.imgur.com/H5iAFOx.png"
+    },
+    "flora-047" : {
+      "description" : "The Bamboo Orchid bears unique, lilac flowers. Its three narrow sepals and two lateral, oval petals range from white to pink. The third petal is modified to a bright rosy purple lip with a central bright yellow patch.\nIts scientific name ‘Arundina’ means reed, which refers to its stem, while ‘graminifolia’ means ‘grass-like’. Its uncanny resemblance to bamboo is where it gets its common name.",
+      "imageRef" : [ "https://i.imgur.com/ZqQvOW3.jpg", "https://i.imgur.com/EkYO5jO.jpg", "https://i.imgur.com/rwAujLw.jpg" ],
+      "locations" : "trail-03/route-08",
+      "name" : "Bamboo Orchid",
+      "sciName" : "Arundina graminifolia",
+      "smallImage" : "https://i.imgur.com/w3xxtS3.png"
+    },
+    "flora-048" : {
+      "description" : "Crotalaria pallida exhibits cute stalks of yellow flowers, which then produce clusters of pea pods. While these flowers are not as attractive as the others around them, this plant actually acts as a food source for caterpillars, satisfying their cravings for fresh leaves in our butterfly garden.",
+      "imageRef" : [ "https://i.imgur.com/ialH3FB.jpg", "https://i.imgur.com/mqOmjEj.jpg", "https://i.imgur.com/Mz5U7cH.jpg", "https://i.imgur.com/PzEGL6l.jpg" ],
+      "locations" : "trail-03/route-08",
+      "name" : "Rattlebox",
+      "sciName" : "Crotalaria pallida",
+      "smallImage" : "https://i.imgur.com/5pZRS78.png"
+    },
+    "flora-049" : {
+      "description" : "The Giant Milkweed in the butterfly garden is often seen completely bare without a single leaf. They must have been eaten by the caterpillars! Look closely,  and you will find many caterpillars crawling on its stems and munching away on the juicy leaves. It is surprisingly resilient; new leaves on the bare plant will appear only after a few weeks, and sometimes even with budding flowers.",
+      "imageRef" : [ "https://i.imgur.com/JCL38Ci.jpg", "https://i.imgur.com/NOmRoYG.jpg", "https://i.imgur.com/CjA5HUo.jpg", "https://i.imgur.com/D66XhAd.jpg", "https://i.imgur.com/l8OFZJn.jpg", "https://i.imgur.com/5d8FvDX.jpg", "https://i.imgur.com/ndsmQXD.jpg" ],
+      "locations" : "trail-01/route-06,trail-03/route-09",
+      "name" : "Giant Milkweed",
+      "sciName" : "Calotropis gigantea",
+      "smallImage" : "https://i.imgur.com/2uyRoFl.png"
+    },
+    "flora-050" : {
+      "description" : "This ornamental plant is extremely unique, featuring a wide margin of green around a white leaf, and stunning magenta flowers. The plant is not native to Singapore, but is well regarded amongst decorators. Its common name is derived from the fact that people sometimes can see caricatures of human faces in the leaves! It has been studied for its anti-inflammation and analgesic properties.",
+      "imageRef" : [ "https://i.imgur.com/kDH2HW4.jpg" ],
+      "locations" : "trail-03/route-09",
+      "name" : "Caricature Plant",
+      "sciName" : "Graptophyllum pictum",
+      "smallImage" : "https://i.imgur.com/pC7tQ1X.png"
+    },
+    "flora-051" : {
+      "description" : "Aristolochia tagala found in our school is a host plant of many butterflies. While it does not bear conspicuous or gorgeous flowers, its luxuriant leaves provide nutrients for our voracious caterpillars to metamorphosise into magnificent butterflies!\nNotice that the shapes of the leaves show graduated variation: Its lower leaves are shaped like a lance-head, while the upper leaves are heart-shaped.",
+      "imageRef" : [ "https://i.imgur.com/rW1XasC.jpg", "https://i.imgur.com/sp4E1L0.jpg" ],
+      "locations" : "trail-03/route-09",
+      "name" : "Dutchman's Pipe",
+      "sciName" : "Aristolochia tagala",
+      "smallImage" : "https://i.imgur.com/T8EQo7A.png"
+    },
+    "flora-052" : {
+      "description" : "The Mexican Creeper is a typical butterfly food plant. It originates from Mexico, where the the natives cook and eat its underground tubers for their nutty flavour. The cascading recemes of bright pink flowers are fragrant and attractive to bees and butterflies. The flowers will turn dull pink and eventually brown as they age, while the fruits are usually hidden inside.",
+      "imageRef" : [ "https://i.imgur.com/3ipNv8y.jpg", "https://i.imgur.com/zEE17IH.jpg", "https://i.imgur.com/xw5H0MW.jpg" ],
+      "locations" : "trail-03/route-09",
+      "name" : "Mexican Creeper",
+      "sciName" : "Antigonon leptopus",
+      "smallImage" : "https://i.imgur.com/uRrwzyL.png"
+    },
+    "flora-053" : {
+      "description" : "Kopsia fruiticosa has glossy, leathery leaves with slightly sunken veins that create a quilt-like texture. Its young stems are covered in tiny, soft hairs.\nA versatile ornamental shrub, Kopsia fruiticosa grows well rain or shine, whether under the bright full sun or in shade, whether in dry or wet soil. This reflects its resilience and great adaptability to the environment, which important values for our students.",
+      "imageRef" : [ "https://i.imgur.com/2JoPQts.jpg" ],
+      "locations" : "trail-03/route-10",
+      "name" : "Pink Kopsia",
+      "sciName" : "Kopsia fruticosa",
+      "smallImage" : "https://i.imgur.com/KIdjaYB.png"
+    },
+    "flora-054" : {
+      "description" : "The Butterfly Pea is a member of the pea family. The sapphire blue flowers of this species are used to produce a blue dye used in colouring glutinous rice cakes (more familiarly known as Nyonya kueh) in Southeast Asia.\nOften used for dissection during high school biology lessons, the flowers have a distinctive free stamen among the other 9 fused stamens hidden at the center of its 3 types of petals, a feature that biology students often vividly recall.",
+      "imageRef" : [ "https://i.imgur.com/Ny5yoHR.jpg", "https://i.imgur.com/QaixP5u.jpg", "https://i.imgur.com/D4oBPCH.jpg" ],
+      "locations" : "trail-03/route-10",
+      "name" : "Butterfly Pea",
+      "sciName" : "Clitoria ternatea",
+      "smallImage" : "https://i.imgur.com/KnuaTMj.png"
+    },
+    "flora-055" : {
+      "description" : "Lemongrass is definitely a familiar plant to Singapore. It is widely used as a herb in Southeast Asian cooking, and is used in soups and curries. As an essential oil, lemongrass is antifungal, antibacterial and can act as a mosquito repellant. Consequently, it can be used as a traditional treatment for fungal infections.",
+      "imageRef" : [ "https://i.imgur.com/3gk1SMn.jpg" ],
+      "locations" : "trail-03/route-10,trail-03/route-11",
+      "name" : "Lemongrass",
+      "sciName" : "Cymbopogon",
+      "smallImage" : "https://i.imgur.com/7ohtFg4.png"
+    },
+    "flora-056" : {
+      "description" : "Like other mints, the Mexican Mint has variegated leaves and a four-angled (square) stem. Its fleshy leaves can leave a distinctive lemony smell on your hands after you touch them. They can be also be used to flavour food. The plant has been investigated for its anti-cancer and anti-inflammation properties.",
+      "imageRef" : [ "https://i.imgur.com/4IokX1I.jpg" ],
+      "locations" : "trail-03/route-10",
+      "name" : "Mexican Mint",
+      "sciName" : "Plectranthus amboinicus",
+      "smallImage" : "https://i.imgur.com/B9KpXir.png"
+    },
+    "flora-057" : {
+      "description" : "These short, stubby plants actually do resemble their fruits in some ways: from their long, sharp leaves, to the prickly body of the plant. \nIn fact, Pineapple plant can reproduce when you place the top of the pineapple fruit into the ground. After growing, the jewels then form at the top of the plant.\nEach fruit is derived from up to 200 flowers! The fruit of a pineapple is arranged in 2 interlocking helices, 8 in one direction, 13 in the other, each being a Fibonacci number.\nPerhaps you may not like pineapples because they contain the enzyme bromelain, which break down proteins and essentially attack your tongue, making it feel like its cutting your mouth. This is similar to Kiwi fruit although it contains a different enzyme.",
+      "imageRef" : [ "https://i.imgur.com/GlsIzxA.jpg" ],
+      "locations" : "trail-03/route-11",
+      "name" : "Pineapple",
+      "sciName" : "Ananas comosus",
+      "smallImage" : "https://i.imgur.com/08Zd9kx.png"
+    },
+    "flora-058" : {
+      "description" : "The Chiku Tree in our school's butterfly garden is still in its infancy - when fully grown it is capable of being over 9m tall. Nonetheless, edible fruits can still be found growing on it. The fruit, which is a large berry, can be eaten raw. Inside, its flesh ranges from a pale yellow to an earthy brown colour. The unripe fruit is hard to the touch and contains high amounts of saponin, which dries out the mouth. When fully ripe however, the flesh is soft and exceptionally sweet, with the flavour of pears, cinnamon and brown sugar combined. Commercially, the latex from the tree is used to make chewing gum.",
+      "imageRef" : [ "https://i.imgur.com/1yDBxhb.jpg" ],
+      "locations" : "trail-03/route-11",
+      "name" : "Chiku",
+      "sciName" : "Manilkara zapota",
+      "smallImage" : "https://i.imgur.com/spCiDox.png"
+    },
+    "flora-059" : {
+      "description" : "The modern banana is a curious plant for it boasts no seeds and is a triploid (having 3 sets of chromosomes, which is possible for plants but has not been found in animals. However, this makes it infertile, unable to reproduce sexually). It is very unlike its natural predecessors which has small fruits full of seeds. To reproduce, these artificially selected banana reproduce asexuallly through vegetative propagation. They produces suckers, lateral shoots that develop from the adult plant. Consequently, every variety found internationally are clones. This, unfortunately, makes them extremely vulnerable to diseases which can quickly wipe out whole plantations.",
+      "imageRef" : [ "https://i.imgur.com/JduQSHU.jpg" ],
+      "locations" : "trail-03/route-11",
+      "name" : "Banana",
+      "sciName" : "Musa sp.",
+      "smallImage" : "https://i.imgur.com/HKHevg6.jpg"
+    },
+    "flora-060" : {
+      "description" : "Found in the family of asparagus, the Red Dracaena is given a befitting variety name, ‘Firebrand’ - Dracaena literally means a female dragon. This plant is common all over Singapore and is appreciated for adding an outstanding  vibrant dark hue to our predominantly green foliage. Some have attempted to grow this terrestrial plant in terrariums but this often ends disastrously as the plant is not well adapted to moist soil.",
+      "imageRef" : [ "https://i.imgur.com/qEmq7iV.jpg" ],
+      "locations" : "trail-01/route-03,trail-03/route-11,trail-03/route-17",
+      "name" : "Red Dracaena",
+      "sciName" : "Cordyline fruticosa 'Firebrand'",
+      "smallImage" : "https://i.imgur.com/C7e04hM.png"
+    },
+    "flora-061" : {
+      "description" : "Easily cultivated, the sweet potato used to be the staple food in Singapore during wartime, when water was scarce and rice was difficult to grow or import.\nIts leaves are heart-shaped, and are often variegated with dark purple patches.\nBut do not be misled by its common name as Sweet Potato is more closely related to Morning Glory (which is in the same family) than the common 'white' potato.",
+      "imageRef" : [ "https://i.imgur.com/Bi4HMva.jpg" ],
+      "locations" : "trail-03/route-12",
+      "name" : "Sweet Potato",
+      "sciName" : "Ipomoea Batatas",
+      "smallImage" : "https://i.imgur.com/htynVkF.png"
+    },
+    "flora-062" : {
+      "description" : "Don’t underestimate this plant which looks like a weed. Native to China and Japan, Artemisia argyi is used as a common traditional medicine with 'warm' properties , and is often used to treat liver, spleen and kidney-associated ailments. Resilient, they actually survive better and are more aromatic when they grow on poor, dry soil. Its leaves and flowers have antibacterial, antifungal, and anti-inflammatory properties. Some research suggests that flavones extracted from it can potentially be used in cancer treatment..",
+      "imageRef" : [ "https://i.imgur.com/PSyadWW.jpg", "https://i.imgur.com/TiUoQR2.jpg" ],
+      "locations" : "trail-03/route-12",
+      "name" : "Silvery Wormwood",
+      "sciName" : "Artemisia argyi",
+      "smallImage" : "https://i.imgur.com/W0hQTZ9.png"
+    },
+    "flora-063" : {
+      "description" : "The fruit of this plant looks like a baby cousin of the mandarin orange. In Chinese culture, the plant is said to bring wealth, prosperity and good luck, so it is not uncommon to see families purchasing a pair of them to place in their homes just before Chinese New Year. Unlike mandarin oranges, however, the pulp inside may be slightly tart. Its rind is sweet, thus the fruit is often candied or made into preserves.",
+      "imageRef" : [ "https://i.imgur.com/n8PrtQS.jpg", "https://i.imgur.com/2eq4yuw.jpg" ],
+      "locations" : "trail-03/route-12",
+      "name" : "Kumquat",
+      "sciName" : "Citrus japonica",
+      "smallImage" : "https://i.imgur.com/YwITOLi.png"
+    },
+    "flora-064" : {
+      "description" : "Do not underestimate this plant because of its inconspicuous flowers! The plant has been in the limelight recently for the antioxidant and anticancer properties of its leaf extracts and may even help with diabetes!",
+      "imageRef" : [ "https://i.imgur.com/MivA7gz.jpg", "https://i.imgur.com/molBhA2.jpg" ],
+      "locations" : "trail-03/route-12",
+      "name" : "Black Face General",
+      "sciName" : "Strobilanthes crispus",
+      "smallImage" : "https://i.imgur.com/uUENKYT.png"
+    },
+    "flora-065" : {
+      "description" : "This recognisable plant with its 'hand-shaped' leaf has storage roots that make it an important food crop. Rich in starch, the tubers are used to make tapioca. Cooking is required to break down the toxic compounds it uses to defend itself. It is not only bitter when raw, but also makes a good poison: as little as two cassava roots can be fatal.",
+      "imageRef" : [ "https://i.imgur.com/yO4GJOW.jpg", "https://i.imgur.com/uxvJZXu.jpg", "https://i.imgur.com/GnAAFv8.jpg", "https://i.imgur.com/XvhubkT.jpg" ],
+      "locations" : "trail-03/route-12",
+      "name" : "Cassava",
+      "sciName" : "Manihot esculenta",
+      "smallImage" : "https://i.imgur.com/2MVbh1w.png"
+    },
+    "flora-066" : {
+      "description" : "White mulberry is a fast-growing, deciduous tree with alternate, toothy leaves.\nIt is the primary species on which silkworms are bred to produce silk. Its juicy purplish berries are also edible too! The leaves have wide-ranging medicinal effects and are used to treat diabetes, amongst other diseases.",
+      "imageRef" : [ "https://i.imgur.com/3XROFgs.jpg" ],
+      "locations" : "trail-03/route-12",
+      "name" : "White Mulberry",
+      "sciName" : "Morus alba",
+      "smallImage" : "https://i.imgur.com/wwK11vZ.png"
+    },
+    "flora-067" : {
+      "description" : "Look at the photo! There is a large soursop fruit growing here! While the soursop is native to the Caribbean and Central America, it was brought into Southeast Asia during the colonial era. The white flesh inside can be eaten directly, though it is common to see it processed into canned drinks or candies.\nThe raw fruits taste like a combination of strawberry and pineapple, with sour citrus flavour and creamy texture.\nIt has also been a target of recent research efforts - its leaves are found to have anti-inflammation and anticancer properties.",
+      "imageRef" : [ "https://i.imgur.com/D8SoeJ7.jpg" ],
+      "locations" : "trail-03/route-13",
+      "name" : "Soursop",
+      "sciName" : "Annona muricata",
+      "smallImage" : "https://i.imgur.com/4EHDhgx.png"
+    },
+    "flora-068" : {
+      "description" : "The Dillenia excelsa is a critically endangered species native to Singapore. Luckily, two of them still stand strong beside each other on the far end of the Butterfly Garden. These trees bear vibrant, yellow flowers that are particularly eye catching to the students walking along the pavement. Given their conservation status in Singapore, it is important that we learn to cherish these rare and precious trees.\nTheir close relative, the Dillenia suffruticosa (Simpoh Air), usually appears as a shrub with large leaves. These leaves were often used to wrap food, especially the fermented soyabean cakes (tempeh), or the traditional rojak.",
+      "imageRef" : [ "https://i.imgur.com/s8qBDXr.jpg", "https://i.imgur.com/lKPCfyE.jpg", "https://i.imgur.com/hUHxlOF.jpg", "https://i.imgur.com/h6Y2HRZ.jpg" ],
+      "locations" : "trail-03/route-13",
+      "name" : "Purple Simpoh",
+      "sciName" : "Dillenia excelsa",
+      "smallImage" : "https://i.imgur.com/WVzS0ie.png"
+    },
+    "flora-069" : {
+      "description" : "Do not be misled for the young fruits look uncannily similar to lime. Guavas are a common fruit in Singapore, often enjoyed with plum sugar on the side, which enhances its sweet flavor. The guavas on the trees in the school are often found wrapped in plastic, perhaps to keep potential pests and ants from damaging the fruit. Seems like somebody is preparing to grab some to eat.",
+      "imageRef" : [ "https://i.imgur.com/KFPdGAX.jpg" ],
+      "locations" : "trail-03/route-13",
+      "name" : "Guava",
+      "sciName" : "Psidium guajava",
+      "smallImage" : "https://i.imgur.com/A47svgj.png"
+    },
+    "flora-070" : {
+      "description" : "Although known as the century plant, Agave americana only has a lifespan of a few decades. ‘Agave’ literally means ‘admirable’, which refers to its majestic orange flower spikes.\nUnfortunately, as a monocarpic species, this plant is approaching the end of its lifespan if you ever see it bloom. Indeed it refuses mundanity and puts on a showstopper that marks its passage at the very end.\n(Warning! Contact with its sap and spikes may cause skin irritation! But with proper processing, it can be used as medicine.)",
+      "imageRef" : [ "https://i.imgur.com/ZYdvVXu.jpg" ],
+      "locations" : "trail-03/route-14",
+      "name" : "Century Plant",
+      "sciName" : "Agave americana",
+      "smallImage" : "https://i.imgur.com/w95pey2.png"
+    },
+    "flora-071" : {
+      "description" : "Well known for its healing properties across cultures, Aloes are hardy succulents native to arid environments. The Egyptians called it the 'Plant of Immortality' because it can live and even bloom without soil.\nIts sap can be used to treat burns, wounds and constipation, among many uses. Its ability to work its magic is attributed to the synergistic effects of over 160 different compounds, reminding us the power of teamwork.",
+      "imageRef" : [ "https://i.imgur.com/hXYas7u.jpg" ],
+      "locations" : "trail-03/route-14",
+      "name" : "Aloe",
+      "sciName" : "Aloe sp.",
+      "smallImage" : "https://i.imgur.com/CbXS4dM.png"
+    },
+    "flora-072" : {
+      "description" : "The long narrow leaves of ponytail 'palm' flow up from the 'elephant foot' much like a plume of water from a fountain. It is well adapted to its arid native environment in Mexico, storing water in its swollen base just like a camel’s hump. A slow growing tree, the ponytail 'palm' in our school is considered young and therefore only consists of a single trunk without branches.",
+      "imageRef" : [ "https://i.imgur.com/egiAwwi.jpg" ],
+      "locations" : "trail-03/route-14",
+      "name" : "Ponytail Palm",
+      "sciName" : "Beaucarnea recurvata",
+      "smallImage" : "https://i.imgur.com/j6532q2.png"
+    },
+    "flora-073" : {
+      "description" : "This species of date palm is native to Southeast Asia. Even though they are capable of growing into a slender tree of up to 3 metres tall, the younger ones in school can usually be found in pots. With a high drought tolerance, they are perfectly suitable to be grown under the hot sun here in Singapore!",
+      "imageRef" : [ "https://i.imgur.com/XJeQpvx.jpg", "https://i.imgur.com/tjFm357.jpg" ],
+      "locations" : "trail-03/route-14",
+      "name" : "Pygmy Date Palm",
+      "sciName" : "Phoenix roebelenii",
+      "smallImage" : "https://i.imgur.com/ER4yuDV.png"
+    },
+    "flora-074" : {
+      "description" : "After Cycas revoluta, the Cardboard Cycad is without doubt the second most commonly grown cycad. It is among the most primitive living seed plants (a living fossil) dating back to the time of the dinosaurs. Why is it called the cardboard cycad? Well...its leaves are uniquely (though not exceptionally) stiff, making it rather unpalatable and for good reasons.\nBe careful! All parts of the plant possess a lethal concoction of toxins (in its sap) which are together, carcinogenic, mutagenic, teratogenic and can cause liver and kidney failure, as well as eventual paralysis. ",
+      "imageRef" : [ "https://i.imgur.com/mhtyEUi.jpg", "https://i.imgur.com/nmZ919W.jpg" ],
+      "locations" : "trail-03/route-14",
+      "name" : "Cardboard Cycad",
+      "sciName" : "Zamia furfuracea",
+      "smallImage" : "https://i.imgur.com/7xkMOVy.png"
+    },
+    "flora-075" : {
+      "description" : "The single large Longan Tree hugging the back of the Clock Tower was donated by our school alumni, Mr Tan Leong Teck. Many trees in Singapore are often valued for its utility in providing shade; however, it was hoped that the longan could provide sweet treats to squirrels, birds and insects in our school.\nLongans are native to Southeast Asia. The brown shells of the fruit hides the sweet and juicy flesh inside, which can be eaten fresh or canned in a sweet syrup. While it is of the same family as the rambutan and lychee and their fruits do taste similar, the 'shells' of these fruits look nothing alike.",
+      "imageRef" : [ "https://i.imgur.com/GA8WyF3.jpg" ],
+      "locations" : "trail-03/route-15",
+      "name" : "Longan",
+      "sciName" : "Dimocarpus longan",
+      "smallImage" : "https://i.imgur.com/rC5jcpD.png"
+    },
+    "flora-077" : {
+      "description" : "There are different varieties of Madagascar periwinkle with flowers of different colours: white, mauve, peach, scarlet and reddish-orange. It has long been cultivated for herbal medicine in Asia, and used as an ornamental plant.\nAlthough the potent alkaloids isolated from it are poisonous, the plant has been used to treat diabetes, malaria, leukemia and Hodgkin's lymphoma. It has increased success rate of treating childhood leukemia (white blood cell cancer) from 10% to well over 80%! Recent patents by western pharmaceutical companies on drugs derived from the plant, without compensation to indigenous groups and traditional land owners, has led to accusations of biopiracy.\nFeatured in: https://www.youtube.com/watch?v=1nsY3rLl1gs 6.54",
+      "imageRef" : [ "https://i.imgur.com/mR5fJDe.jpg", "https://i.imgur.com/oFYvyRB.jpg" ],
+      "locations" : "trail-03/route-16",
+      "name" : "Madagascar Periwinkle",
+      "sciName" : "Catharanthus roseus",
+      "smallImage" : "https://i.imgur.com/6Pg8Or8.png"
+    },
+    "flora-078" : {
+      "description" : "This plant gets its interesting common name from the resemblance its scarlet blossom bears to the crest of a rooster. Cockscomb flowers are seen in vibrant yellows, pinks, reds and gold colours, although only the red ones are found in our school. Do not underestimate their numbers though, one inflorescence can easily contain hundreds of small flowers.",
+      "imageRef" : [ "https://i.imgur.com/TUlAhii.jpg", "https://i.imgur.com/L75MLLJ.jpg" ],
+      "locations" : "trail-03/route-16",
+      "name" : "Cockscomb",
+      "sciName" : "Celosia cristata",
+      "smallImage" : "https://i.imgur.com/H3WBZfo.png"
+    },
+    "flora-079" : {
+      "description" : "Often known as Desert Rose, this succulent shrub is well-adapted to its native African desert environment with its caudex-shaped, swollen stem for water storage. This feature is responsible for its specific epithet  ‘obesum’. It also has fleshy roots where water is stored.\nIts luxurious, dark green foliage is adorned with showy blossoms of vibrant colours.  But be careful, for its sap is poisonous, and is often used as arrow and fish poison by indigenous hunters.",
+      "imageRef" : [ "https://i.imgur.com/bD1jLrn.jpg" ],
+      "locations" : "trail-03/route-16",
+      "name" : "Desert Rose",
+      "sciName" : "Adenium obesum",
+      "smallImage" : "https://i.imgur.com/8JfGm5v.png"
+    },
+    "flora-080" : {
+      "description" : "The Traveller's Palm is iconic for its enormous paddle-shaped leaves aligned in a distinctive fan shape. Its flowers, upon pollination, produce bright blue seeds, a very rare colour for seeds in nature.\nThe sheaths of its stems can hold up to 1.5 litres of rainwater. Thus the name 'Traveller's Palm' is used to indicate an emergency water supply for thirsty travellers.",
+      "imageRef" : [ "https://i.imgur.com/PtAZpLC.jpg", "https://i.imgur.com/dqDneOd.jpg" ],
+      "locations" : "trail-03/route-17",
+      "name" : "Traveller's Palm",
+      "sciName" : "Ravenala madagascariensis sonn",
+      "smallImage" : "https://i.imgur.com/b3zW26d.png"
+    },
+    "flora-081" : {
+      "description" : "The Trumpet Tree's name originates from its white or pink trumpet-shaped flowers. A few of these old trees stand tall and firm beside the High School Canteen, where countless students pass by everyday as they go for lunch. \nHowever, this is no ordinary tree, for it is well known for its rare but stunning display of sakura-like flowers that covers the entire tree after a dry spell. Over a few days, the fallen blossoms would accumulate to form a beautiful bright carpet of pink flowers. It is certainly quite an eyeful for students and teachers who walk past the garden!",
+      "imageRef" : [ "https://i.imgur.com/ZfW3Iny.jpg", "https://i.imgur.com/0nhfhxn.jpg" ],
+      "locations" : "trail-01/route-02,trail-03/route-17",
+      "name" : "Trumpet Tree",
+      "sciName" : "Tabebuia rosea",
+      "smallImage" : "https://i.imgur.com/RJXXo1N.png"
+    },
+    "flora-082" : {
+      "description" : "Its genus name is derived from the hymen, meaning 'membrane', and kalos meaning 'beautiful'. It refers to the curious shape of the flowers, consisting of 6 narrow petals attached to a shallow cup that is formed from the fused stamens. However, its common name is a misnomer as Hymenocallis caribaea is not part of the Lily family but more closely related to daffodils. The flowers open in the evenings and emit a marvelous fragrance that is strong till dawn and this scent gradually decreases during the day.",
+      "imageRef" : [ "https://i.imgur.com/NhcuO9S.jpg" ],
+      "locations" : "trail-01/route-01,trail-03/route-17",
+      "name" : "Spider Lily",
+      "sciName" : "Hymenocallis caribaea",
+      "smallImage" : "https://i.imgur.com/raa8R6n.png"
+    },
+    "flora-083" : {
+      "description" : "This plant is special in that the underside of its leaves are crimson. There are a few variants: 'Firestorm', for example, has variegated leaves.\nLike many plants in its family, the sap is toxic and can cause allergic reactions, as well as irritation to skin and eyes. This is why it is also called the Blindness Tree. Yet, it also has anti-parasitic and haemostatic (stops bleeding) properties.",
+      "imageRef" : [ "https://i.imgur.com/bDx47Ie.jpg", "https://i.imgur.com/jw10oAY.jpg", "https://i.imgur.com/iqTW4pR.jpg", "https://i.imgur.com/RtJQnbI.jpg" ],
+      "locations" : "trail-01/route-05,trail-03/route-18",
+      "name" : "Chinese Croton",
+      "sciName" : "Excoecaria cochinchinensis",
+      "smallImage" : "https://i.imgur.com/X12Ipuz.png"
+    },
+    "flora-084" : {
+      "description" : "Heliconias are also called 'lobster-claws', which vividly describes the unique shape of its vibrant blossom. Each strain has its distinct colour combination. The species psittacorum (from greek word psittacus, which means parrot) is noted for the stark, chromatic contrast between its bright yellow inflorescence and crimson bract. The unique tubular flower reminds onlookers of a toco toucan beak, and produces a berry-shaped fruit after pollination. The flowers are proudly displayed at the tip of slender specialised shoots that are cuddled by dark green lanceolate foliages.",
+      "imageRef" : [ "https://i.imgur.com/98EKAEw.jpg", "https://i.imgur.com/QGERgsk.jpg" ],
+      "locations" : "trail-01/route-01",
+      "name" : "Lady Di Heliconia",
+      "sciName" : "Heliconia psittacorum 'Lady Di'",
+      "smallImage" : "https://i.imgur.com/Gwdgb5U.png"
+    },
+    "flora-085" : {
+      "description" : "These betel-nut palms shoot up as tall as the 4-storey high Block E in JC. They boast magnificent fronds (palm leaflets) that could grow up to 2m in length. The betel nut is not a true nut, but rather a fruit categorized as a berry. It is commercially available in dried, cured, and fresh forms. When fully ripen, the fruit is bright red in colour. The fruit flesh on the seed has psychoactive properties (stimulating effects). Addicts of betel quids reveal their habit when they smile - their teeth are stained a reddish-black, dyed from years of chewing potent parcels of betel nuts and tobacco, wrapped in a lime-coated betel leaf. Unfortunately, the fruit is also believed to be carcinogenic, accounting for high incidences of oral cancers in South-East Asian communities that still consume betel nut prolifically.",
+      "imageRef" : [ "https://i.imgur.com/cDuEIiJ.jpg", "https://i.imgur.com/C680nXM.jpg" ],
+      "locations" : "trail-01/route-01",
+      "name" : "Betel-nut palm",
+      "sciName" : "Areca catechu",
+      "smallImage" : "https://i.imgur.com/Ag0LecH.png"
+    },
+    "flora-086" : {
+      "description" : "The Money Plant is an evergreen vine with trailing stems, along with glossy and rubbery leaves with varying shades of green and yellow. They decorate the descending stairs from Block A to Central Plaza in JC, and the corners near our class benches.  It is also called Devil's Ivy as it is almost impossible to kill and stays green even when kept in the dark. Such a sturdy plant may serve as a constant reminder to all of us that 'what doesn't kill you makes you stronger.' Let's aspire to be as resilient as this plant!",
+      "imageRef" : [ "https://i.imgur.com/FGYKjET.jpg", "https://i.imgur.com/A9SVbIh.jpg" ],
+      "locations" : "trail-01/route-03",
+      "name" : "Money Plant",
+      "sciName" : "Epipremnum aureum",
+      "smallImage" : "https://i.imgur.com/DAn3h9H.png"
+    },
+    "flora-087" : {
+      "description" : "A perfect contrast to the typical green landscape, Tradescantia spathacea has circular clusters (rosettes) of waxy lance-shaped leaves. Leaves are dark to metallic green above, with glossy purple underneath. Hidden by boat-shaped, purple bracts are its white flowers, hence the common name Moses-in-the-Cradle.\nA curious fact: A related species, Tradescantia ohiensis, has one of the few known tissues that can effectively show ambient radiation levels. The blue stamen hairs of this related species mutates and changes to pink when exposed to ionising radiation.",
+      "imageRef" : [ "https://i.imgur.com/hoDN75R.jpg" ],
+      "locations" : "trail-01/route-03",
+      "name" : "Moses-in-the-Cradle",
+      "sciName" : "Tradescantia spathacea",
+      "smallImage" : "https://i.imgur.com/7Ke9lkk.png"
+    },
+    "flora-088" : {
+      "description" : "The Dumb Cane is a robust, herbaceous shrub with fleshy stems and large leaves arching gracefully from the upright stems. It is very commonly grown for its glossy dark green foliage with creamy white to yellow lines, spots, or patches, especially as an indoor or houseplant. Its modest flowers bloom in greenish-yellow inflorescence and that protrudes out of its silky white spathe (a large sheathing bract enclosing the flower cluster).\nHowever, the sap of this plant is poisonous and must not be allowed to come into contact with the mouth or eyes. The calcium oxalate crystals in the sap cause irritation and swelling of the tissues in the mouth and throat, resulting in possible loss of speech for several days, hence, the common name Dumb Cane.",
+      "imageRef" : [ "https://i.imgur.com/b5gZpCJ.jpg", "https://i.imgur.com/JaKwri1.jpg" ],
+      "locations" : "trail-01/route-03",
+      "name" : "Dumb Cane",
+      "sciName" : "Dieffenbachia amoena",
+      "smallImage" : "https://i.imgur.com/bVTuK87.png"
+    },
+    "flora-089" : {
+      "description" : "Alpinia purpurata or Red Ginger is a plant that epitomizes the tropics with its lance-shaped glossy bright green leaves all year round.\nThe red ginger also produces showy inflorescence spikes with delicate white flowers growing from the axils of the stunning, saffron bracts. During the Chinese New Year Celebration, as performances are staged under the bridge at Central Plaza, the blossoming red ginger flowers remind one of red firecrackers and add a touch of vibrancy to the festive season.",
+      "imageRef" : [ "https://i.imgur.com/6MZy7pB.jpg", "https://i.imgur.com/rATYuSE.jpg" ],
+      "locations" : "trail-01/route-05",
+      "name" : "Red Ginger",
+      "sciName" : "Alpinia Purpurata",
+      "smallImage" : "https://i.imgur.com/xT8CjZU.png"
+    },
+    "flora-091" : {
+      "description" : "The Madagascar Almond Tree is a deciduous or evergreen tree with conspicuously layered branches. It is as though they were trimmed ever so meticulously by our gardeners!  This species found behind Block A is a 'tricolour' cultiva, where each exquisite oval-shaped leaf is lined with a golden rim. Wonders never cease, even in this less-frequented corner behind our school building.",
+      "imageRef" : [ "https://i.imgur.com/6lhNTfm.jpg", "https://i.imgur.com/XfX9Ls4.jpg", "https://i.imgur.com/1KSd7PX.jpg", "https://i.imgur.com/4R6diJ7.png" ],
+      "locations" : "trail-01/route-08",
+      "name" : "Variegated Madagascar Almond",
+      "sciName" : "Terminalia mantaly 'Tricolor'",
+      "smallImage" : "https://i.imgur.com/NiWKzes.png"
+    },
+    "flora-092" : {
+      "description" : "This extremely graceful tree, with its spreading crown of delicate, feathery-looking foliage, can grow to about 20 metres in height. The leaves are made up of many small leaflets arranged alternately along a stalk. Its flowers are small and occur in bunches. These are lilac in colour during the budding stage, before turning pink, and finally white. \nThis tree is native to Myanmar and Thailand. It was introduced into Singapore as an ornamental wayside tree. The wood of this tree has been prized for producing high quality furniture.\nThe row of Tamalan Trees found growing on the left of the road leading up to college reception were planted in 2007, shortly after the building was upgraded.",
+      "imageRef" : [ "https://i.imgur.com/6N9jAkv.jpg", "https://i.imgur.com/4eyUzZ1.jpg" ],
+      "locations" : "trail-01/route-09",
+      "name" : "Tamalan Tree",
+      "sciName" : "Dalbergia oliveri",
+      "smallImage" : "https://i.imgur.com/6MUqC9S.png"
+    },
+    "flora-093" : {
+      "description" : "A Strangling Fig starts life in the canopy of its host tree. The young strangler fig sends several special root-like stems down to the soil, reach water and nutrients. Gradually its stems wrap around the host tree's trunk,  grow and fuse together until they more or less form a cylinder surrounding the trunk. Meanwhile, up in the tree, the young stranger is growing in a bushy fashion, eventually looking like a small tree growing atop the host tree. \nThis is a rare lowland rainforest species, whose figs ripen to an attractive yellow-orange hue, attracting many feeding birds. Here behind the parking lots, while the strangler fig deprives the tamalan tree of sunlight and nutrients, the gummy fig fruit falls onto and dirties the windshield of the cars parked underneath the tree - nature has cunning ways of finding everyone's weakest spot.",
+      "imageRef" : [ "https://i.imgur.com/6la3Q69.jpg" ],
+      "locations" : "trail-01/route-09",
+      "name" : "Strangling Fig",
+      "sciName" : "Ficus stricta",
+      "smallImage" : "https://i.imgur.com/ebSZcc8.png"
+    },
+    "flora-094" : {
+      "description" : "Scattered at various parts of the school, the differing colours of the bracts of different individual plants are a huge bewilderment. Similar to Bougainvilleas, their colourful 'flowers' are actually just the leaves, or bracts. The actual flowers are small and can only be found if you pay close attention to the plant. After touching its leaves, you will also immediately realise that they are furry and soft!\nThe yellow 'Queen Sirikit' is a hybrid variety that displays distinctive pink bracts; while 'Donna Aurora' boasts of dark orange flower nestled in 5 pearly white septals. Unlike most species of Mussaenda that have a single large bract (or enlarged sepal) for each flower, the crowning glories of these special cultivars usually have multiple of them.",
+      "imageRef" : [ "https://i.imgur.com/2uxgXS1.jpg", "https://i.imgur.com/H1nEXv5.jpg", "https://i.imgur.com/ONe4aon.jpg", "https://i.imgur.com/i0j70lb.jpg", "https://i.imgur.com/JuCT91j.jpg", "https://i.imgur.com/880a5KP.jpg" ],
+      "locations" : "trail-01/route-09",
+      "name" : "White Mussaenda / 'Queen Sirikit'",
+      "sciName" : "Mussaenda sp.",
+      "smallImage" : "https://i.imgur.com/G5PlcM5.png"
+    },
+    "flora-095" : {
+      "description" : "The dwarf umbrella tree is an evergreen shrub. Its leaves are palmately compound, which means leaflets radiate from a single point and are arranged like five fingers around the palm, forming a disc of leaflets quite unlike the usual geometry we see in leafy plants. The dark, glossy foliage of S. arboricola dress the building with a green facade that enhances it aesthetic appeal, and brings much-need respite from the heat.",
+      "imageRef" : [ "https://i.imgur.com/pioHOUI.jpg" ],
+      "locations" : "trail-01/route-10",
+      "name" : "Dwarf Umbrella Tree",
+      "sciName" : "Schefflera arboricola",
+      "smallImage" : "https://i.imgur.com/LxzNkk4.png"
+    },
+    "flora-096" : {
+      "description" : "The yellow-edged variety of Dracaena is planted as a decorative plant in our vertical garden. The genus Dracaena means a female dragon and could refer to the sap of the plant, which appears dark red when dried, hence fuelling the imagination for mythical creatures. 'Reflexa' means bent backwards, which refers to its elongated lanceolate leaves that are stacked and arranged radially around the stem.",
+      "imageRef" : [ "https://i.imgur.com/rDfEjLG.jpg" ],
+      "locations" : "trail-01/route-10",
+      "name" : "Song of India",
+      "sciName" : "Dracaena reflexa 'Song of India'",
+      "smallImage" : "https://i.imgur.com/2lwX9lV.png"
+    },
+    "flora-097" : {
+      "description" : "Boasting elliptic foliages with striking streaks of suffused green and pinkish maroon that arch downward in a rosette shape, the spectacular Pink Starlite is definitely the star of our vertical garden. Their unique star-like shape that resembles a starfish and the fabulous stripy colors of their variegated foliage certainly brightens up the seemingly mundane vertical green space and adds an element of novelty to the common houseplants cultivated alongside it.",
+      "imageRef" : [ "https://i.imgur.com/emOfrUR.jpg" ],
+      "locations" : "trail-01/route-10",
+      "name" : "Pink Starlite",
+      "sciName" : "Cryptanthus Bivittatus",
+      "smallImage" : "https://i.imgur.com/yQzQIzC.png"
+    },
+    "flora-098" : {
+      "description" : "This woody perennial vine bears slightly elongated leaves with two to three sunken prominent veins that are distinctly parallel. Young flowers are yellow-- bright as a ray of sunshine--and mature into a light saffron with time. \nProtruding from the receptacle, the orange petals have visible, branching veins like the fibers of fine silk. The bright blossoms are clustered into a spherical shape which somehow reminds the writer of a curled up tabby cat - or 'a little ball of fur'.",
+      "imageRef" : [ "https://i.imgur.com/utGM6Hd.jpg" ],
+      "locations" : "trail-01/route-10",
+      "name" : "Trailing Bauhinia",
+      "sciName" : "Phanera Kokiana",
+      "smallImage" : "https://i.imgur.com/O7Q6Uo9.png"
+    },
+    "flora-099" : {
+      "description" : "Calliandra literally means beautiful man in Greek, which refers to its conspicuous stamen that looks like red spikes. The red powderpuff has leaves which are initially orange, but become glossy green overtime. As a pea plant, it has flat legumes that disperses its seeds by explosive action. Other varieties can bear flowers that range from red to a gradient of violet and white. With lots of luck, one may observe hummingbirds visiting these stunning flowers.",
+      "imageRef" : [ "https://i.imgur.com/LWQ6h4g.jpg", "https://i.imgur.com/1kyG7a2.jpg" ],
+      "locations" : "trail-01/route-11",
+      "name" : "Red Powderpuff Plant",
+      "sciName" : "Calliandra tergemina",
+      "smallImage" : "https://i.imgur.com/VQaxVJX.png"
+    },
+    "flora-100" : {
+      "description" : "This plant belongs to a tribe of palm, the Trachycarpeae, identifiable by their simple, undivided foliage.\nTheir large (up to 6m in length), diamond shaped leaves have serrated edges and distinctive folds like that of the middle layer of corrugated paper. The singular palm leaves stand majestically and bolt upright along the bustling corridor inside our main gate.",
+      "imageRef" : [ "https://i.imgur.com/Hs0nUlN.jpg" ],
+      "locations" : "trail-01/route-12",
+      "name" : "Daun Payung",
+      "sciName" : "Johannesteijsmannia altifrons",
+      "smallImage" : "https://i.imgur.com/H5mvHAo.png"
+    },
+    "flora-101" : {
+      "description" : "C. cooperi, the Lacy Tree Fern, derives this name from its delicate, feather-like fronds (leaves) with lace-like edges. It is also known as the Australian Tree Fern being one of the most commonly grown Australian tree-ferns.\nIt has a slender trunk bears distinctive 'coin spots' where old fronds have broken off the trunk. Its fronds are bright green and tend to be very fast growing. Next time you pass by them in the morning when you come to school, try to observe how long it takes for the curled-up newborn frond to unfold and grow into a massive mature foliage. You will be surprised. ",
+      "imageRef" : [ "https://i.imgur.com/LxKnFpD.jpg", "https://i.imgur.com/J3qt7uj.jpg" ],
+      "locations" : "trail-01/route-12",
+      "name" : "Lacy Tree Fern",
+      "sciName" : "Cyathea cooperi",
+      "smallImage" : "https://i.imgur.com/li5ULyf.png"
+    },
+    "flora-102" : {
+      "description" : "The Breynia plant’s white and pink mottled leaves make it appear as if the plant has been snowed upon. It is an evergreen shrub, with pink and red stems growing in a zigzagged manner. It is native to Pacific islands, but acts as a nurturing host plant for the striking Common Grass Yellow butterfly in our butterfly garden.",
+      "imageRef" : [ "https://i.imgur.com/bxhetNi.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Red-Leaf Breynia",
+      "sciName" : "Breynia nivosa 'Roseo-picta'",
+      "smallImage" : "https://i.imgur.com/PUGdeuJ.png"
+    },
+    "flora-103" : {
+      "description" : "The Leea rubra is a food source for various butterfly sub-species, as well as some bird and bee species. Its red, white, or golden flowers cluster attractively together to encourage pollinators. The main variety in Hwa Chong bears predominantly red flowers.",
+      "imageRef" : [ "https://i.imgur.com/hmLg8R9.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Red Tree Shrub",
+      "sciName" : "​Leea rubra",
+      "smallImage" : "https://i.imgur.com/TMQBykv.png"
+    },
+    "flora-104" : {
+      "description" : "This special plant is filled with unique features. Its leaves are heart-shaped, while its flowers resemble the unique structures of the carnivorous pitcher plant. Being a host plant for the national butterfly, the Common Rose butterfly, it is a favourite in many  butterfly gardens. It originated from Tropical America. In its native home, its roots were used to treat snake bites.",
+      "imageRef" : [ "https://i.imgur.com/hiAXnDd.jpg", "https://i.imgur.com/6daOuXT.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Gaping Dutchman's Pipe",
+      "sciName" : "Aristolochia ringens",
+      "smallImage" : "https://i.imgur.com/KHZMZHq.png"
+    },
+    "flora-105" : {
+      "description" : "The Cordia cylindrostachya is a rich source of nectar for butterflies. Its white inflorescent flowers have a curious brush-like appearance. It is a resilient plant that is able to survive in relatively infertile soils, but requires much sunlight coverage. It has anti-bacterial and anti-inflammatory properties, and has been used in many communities that practice ethno-medicine. In the butterfly garden, this flower is frequently visited by butterflies, dragonflies, and other insects alike.",
+      "imageRef" : [ "https://i.imgur.com/TsufbXK.jpg", "https://i.imgur.com/K74Lw07.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Scorpion Weed",
+      "sciName" : "Cordia cylindrostachya",
+      "smallImage" : "https://i.imgur.com/27VYuvR.png"
+    },
+    "flora-106" : {
+      "description" : "This interesting nectaring plant originated from Africa, and is regarded as an invasive species in the rice fields of Asia. Its fresh leaves are consumed in bush tea as a 'cooling' tonic and blood cleanser, to treat asthma and sometimes ulcerated stomachs. In HCI’s butterfly garden, it proudly claims a small region of land as its own.",
+      "imageRef" : [ "https://i.imgur.com/KNYQn5U.jpg", "https://i.imgur.com/FxPK2wi.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Blue Snakeweed",
+      "sciName" : "Stachytarpheta indica",
+      "smallImage" : "https://i.imgur.com/eXvYpDC.png"
+    },
+    "flora-107" : {
+      "description" : "The lime plant lives up to its typical name of bearing not just the the sour and sweet fruit, but also the beautiful lime butterfly. It serves as a host plant for the Papilio demoleus, and is a common plant of the Indo-Malayan region. Its leaf margins are lined with tiny rounded teeth.",
+      "imageRef" : [ "https://i.imgur.com/2QG2wWN.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Lime",
+      "sciName" : "Citrus x aurantiifolia",
+      "smallImage" : "https://i.imgur.com/ony6N5k.png"
+    },
+    "flora-108" : {
+      "description" : "This choosy flower has attractive flowers that open to the sky. However, it only displays its magnificence during sunny days. On rainy days, the flowers hide underneath lustrous leaves. It is the host plant for spiny Tawny Coster caterpillar.​",
+      "imageRef" : [ "https://i.imgur.com/6EWYiUH.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Yellow Alder",
+      "sciName" : "Turnera ulmifolia",
+      "smallImage" : "https://i.imgur.com/8lr4bJs.png"
+    },
+    "flora-109" : {
+      "description" : "The Passiflora foetida is a climber, and possess large, hairy leaves. The leaves are tri-lobed, and the flowers are white, but marked with a ring of radially oriented purple streaks. They blossom in the morning, and close by about noon. The unique, minty fragrance of the flowers provides a soothing morning welcome to those who walk past. They are nectaring plants and also host plants for the Tawny Coster.",
+      "imageRef" : [ "https://i.imgur.com/e1N2JlW.jpg", "https://i.imgur.com/XQavzhj.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Love-in-a-mist",
+      "sciName" : "Passiflora foetida",
+      "smallImage" : "https://i.imgur.com/32BBXUa.png"
+    },
+    "flora-110" : {
+      "description" : "This tiny shrub has a significance that belies its size — it symbolises the collaboration of Hwa Chong Institution, Chung Cheng High School, and Jane Goodall Institution, promoting the spirit of habitat conservation. Singapore in starting the butterfly garden. This particular Duranta erecta was planted by our Principal, Mr Pang, on the opening of the garden. Its flowers are clustered together to form a lovely shade of purple. It grows best in full sun and moist soils.",
+      "imageRef" : [ "https://i.imgur.com/wKUKQIW.jpg", "https://i.imgur.com/QUbTcmm.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Sky Flower",
+      "sciName" : "Duranta erecta",
+      "smallImage" : "https://i.imgur.com/HMnYLAu.png"
+    },
+    "flora-111" : {
+      "description" : "This native Indian plant is a favourite for curry-lovers, as Its aromatic leaves are used in Indian cuisine to make the savoury dishes. It is no wonder the Common Mormon, its host butterfly, find the smell appealing. The curry plant has flowers that are small and white. In the HCI butterfly garden, it lies humbly beside the colourful Cuphea hyssopifolia, adding contrast and a subtle aroma to the garden.​",
+      "imageRef" : [ "https://i.imgur.com/Ak7QH0c.jpg", "https://i.imgur.com/I2uPW4A.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Curry Leaf Tree",
+      "sciName" : "Murraya koenigii",
+      "smallImage" : "https://i.imgur.com/eaJiI7Y.png"
+    },
+    "flora-112" : {
+      "description" : "This small, bushy plant adds a tinge of colour and excitement to the otherwise dull corner of the college reception. Despite being relatively smaller (its maximum height is 0.6m), its layered foliage gives a level of complexity to the landscape, enhancing the pleasantness of the area. Its beautiful blue to purple flowers are often displayed as ornaments. It is an ideal nectaring plant for butterfly gardens.​",
+      "imageRef" : [ "https://i.imgur.com/KXEJ51P.jpg" ],
+      "locations" : "trail-01/route-06",
+      "name" : "Elfin Herb",
+      "sciName" : "Cuphea hyssopifolia",
+      "smallImage" : "https://i.imgur.com/76BRURF.png"
+    },
+    "flora-113" : {
+      "description" : "Although these plants can be found littered around the landscape, their flowers are much rarer. These flowers only bloom when there is a temperature drop of around 5 °C. The flowers typically last only between 2 to 9 days, but while they are around, you can smell a subtle, sweet fragrance wafting around. From the side, the elegant flowers resemble pigeons, which is how the orchid acquired its name. These were once mistaken to be parasitic on their host trees, which led to the removal of many of them. However, we now know that they do not harm the host tree, and renewed efforts have been taken to restore many of them.",
+      "imageRef" : [ "https://i.imgur.com/GQ5rFG8.jpg" ],
+      "locations" : "",
+      "name" : "Pigeon Orchid",
+      "sciName" : "Dendrobium crumenatum",
+      "smallImage" : "https://i.imgur.com/JhmhwBf.png"
+    },
+    "flora-114" : {
+      "description" : "Among the vibrant plants in the butterfly garden is a young papaya tree. Its trunk is topped by an umbrella-like canopy of palmately-lobed leaves.\bPapaya trees are dioecious (separate male and female trees). Consequently, some may bear only male flowers and never bear fruits in their lifetime.",
+      "imageRef" : [ "https://i.imgur.com/yu46NHY.jpg", "https://i.imgur.com/fEQZ1aF.jpg" ],
+      "locations" : "",
+      "name" : "Papaya Tree",
+      "sciName" : "Carica papaya",
+      "smallImage" : "https://i.imgur.com/MJzEIOV.png"
+    },
+    "flora-115" : {
+      "description" : "With their small flowers, this compact bush may be easily overlooked by visitors. Yet, this vibrant little plant is perennially covered with blooms that cover a spectacular color spectrum: red, coral, apricot, pink and orange. Moreover, like all lantanas, 'Carlos' is a butterfly and hummingbird magnet. In the wrong places, these plants establish themselves as a toxic weed. It has also made its way into scientific research as a potential antimicrobial agent with its flavonoids and crude alkaloids.",
+      "imageRef" : [ "https://i.imgur.com/I833SsI.jpg", "https://i.imgur.com/IKKABju.jpg" ],
+      "locations" : "trail-03/route-08",
+      "name" : "Carlos Lantana",
+      "sciName" : "Lantana camara ‘Carlos’",
+      "smallImage" : "https://i.imgur.com/S9ofjju.png"
+    },
+    "flora-116" : {
+      "description" : "At full bloom, Arctic Snow is covered with small white flowers that look like snowflakes from a distance. While one may not be able to see real snowflakes in tropical Singapore, one can seek comfort in the beauty of Arctic Snow’s attractive flowers.\nThis juice from the bark of this slender and petite plant can be administered for mouth sores, and the leaves are used in treating several skin disorders, such as psoriasis.",
+      "imageRef" : [ "https://i.imgur.com/h2S6mcB.jpg" ],
+      "locations" : "trail-03/route-08",
+      "name" : "White Angel",
+      "sciName" : "Wrightia antidysenterica",
+      "smallImage" : "https://i.imgur.com/Ge3z7Iv.png"
+    },
+    "flora-118" : {
+      "description" : "A vine or climbing shrub with milky sap, its leaves are leathery while its large bright yellow flowers are trumpet-shaped with five spreading petal lobes.\nStudies on A. cathartica have shown various properties of the plant which includes being antimicrobial, antimalarial and antioxidant due to its wide variety of chemical composition. However, these useful chemicals needs to be isolated from the white latex which is an irritant.\nThis plant was donated to us by a group of retired alumni whose names can be found on the plaque. Like Mr Mak Chin On who has donated many plants to the school, they’ve demonstrated to us the spirit of giving back that the school hopes to inculcate in our students.",
+      "imageRef" : [ "https://i.imgur.com/oPEjMyh.jpg", "https://i.imgur.com/QnJ7Y3k.jpg" ],
+      "locations" : "trail-03/route-15",
+      "name" : "Golden Trumpet",
+      "sciName" : "Allamanda cathartica",
+      "smallImage" : "https://i.imgur.com/Zk2kspt.jpg"
+    },
+    "flora-119" : {
+      "description" : "Also known as phoenix tree is chinese, the flowers of Delonix regia are large and spectacular, with four spreading scarlet or orange-red petals and a fifth upright petal called the standard. Some varieties have yellow flowers instead.\nLike many pea plants, it has compound leaves. Its leaves have been used in folk medicine to treat a range of disorders, including constipation, inflammation and malaria. The seeds also contain oil that is antifungal and can also be used as natural herbicide and pesticide.\nThere are three of such trees found in our school, two next to Kong Chian Admin with huge significance: one was planted in commemoration of Nanyang Girls' High School 100th anniversary, while another for our own 100th year anniversary. These trees were donated by our alumni, Mr Mak Chin On.",
+      "imageRef" : [ "https://i.imgur.com/fo2zMjD.jpg", "https://i.imgur.com/5S7YnuD.jpg", "https://i.imgur.com/gbkwHfi.jpg", "https://i.imgur.com/PXwLxhe.jpg", "https://i.imgur.com/Xoq6F4f.jpg", "https://i.imgur.com/OJ25Ake.jpg" ],
+      "locations" : "trail-03/route-18",
+      "name" : "Flame of the Forest",
+      "sciName" : "Delonix regia",
+      "smallImage" : "https://i.imgur.com/FcobC4D.png"
+    },
+    "flora-120" : {
+      "description" : "The beautiful blue and purple flowers that bloom on the Snakeweed are particularly attractive to many species of butterflies within the vicinity. Apart from its leaves having numerous medicinal properties, they primarily act as nectar sources for the butterflies that frequent them in the garden. With these plants around, it is no wonder that the garden is teeming with lively butterflies!",
+      "imageRef" : [ "https://i.imgur.com/KNYQn5U.jpg", "https://i.imgur.com/FxPK2wi.jpg" ],
+      "locations" : "",
+      "name" : "Snakeweed",
+      "sciName" : "Stachytarpheta indica",
+      "smallImage" : "https://i.imgur.com/eXvYpDC.png"
+    },
+    "flora-121" : {
+      "description" : "The Asian Hazel produces hazelnuts that many people savour. It is also grown for its leaves, for it is an abundant source of food for the many species of caterpillars around the garden. With these host plants capable of growing up to 7 m, the caterpillars will never go hungry!",
+      "imageRef" : [ "https://i.imgur.com/E41vfhi.jpg" ],
+      "locations" : "",
+      "name" : "Asian Hazel",
+      "sciName" : "Corylus heterophylla",
+      "smallImage" : "https://i.imgur.com/eumy4UG.png"
+    },
+    "flora-122" : {
+      "description" : "Although in the podocarpus family — which has some very toxic members — Nageia Nagi (Nagi is the term for tree in Japanese) has edible young leaves and seed oil, which can be extracted from its marble size blue fruit. It is also a valuable timber tree but sadly, its native habitats are threatened.\nTo ensure we continue to enjoy the company of this magnificent and useful plant, we must protect our environment, and give back to it what it has provided us with — in line with our school value of gratitude.",
+      "imageRef" : [ "https://i.imgur.com/L1kw2Zr.jpg" ],
+      "locations" : "",
+      "name" : "Asian Bayberry",
+      "sciName" : "Nageia nagi",
+      "smallImage" : "https://i.imgur.com/gH1Sqzu.png"
+    },
+    "flora-124" : {
+      "description" : "Bower Vines attract nectar-eating birds and insects with their pale-pink trumpet flowers. It is also a vigorous ornamental native climber which quickly screens unsightly walls. A rather resilient plant, it can survive with little water once established.",
+      "imageRef" : [ "https://i.imgur.com/aELCCUu.jpg", "https://i.imgur.com/91xd33T.jpg" ],
+      "locations" : "",
+      "name" : "Bower Vine",
+      "sciName" : "Pandorea jasminoides",
+      "smallImage" : "https://i.imgur.com/BFlBd2F.png"
+    }
+  },
+  "historical" : {
+    "history-1" : {
+      "description" : "In the background, multiple palms were planted right in front of the clock tower, where the Ixoras are grown today.",
+      "height" : 928,
+      "imageRef" : "https://i.imgur.com/v5hVyB2.jpg",
+      "name" : "Clock Tower Palms",
+      "width" : 1263
+    },
+    "history-10" : {
+      "description" : "The empty patch in front of Block D in High School used to be full of dense, untrimmed grass. Now, there are many more trees and even a consortium garden in the same area.",
+      "height" : 473,
+      "imageRef" : "https://i.imgur.com/JTcp9Gp.jpg",
+      "name" : "Old HS Blk D",
+      "width" : 757
+    },
+    "history-11" : {
+      "description" : "The bell used to be hung on the Saga tree outside High School's Block A classrooms.",
+      "height" : 8251,
+      "imageRef" : "https://i.imgur.com/GK5K38j.jpg",
+      "name" : "Saga tree with bell",
+      "width" : 8400
+    },
+    "history-2" : {
+      "description" : "诚毅楼 in JC was built over the former outdoor courts which were meant for students to play sports.",
+      "height" : 590,
+      "imageRef" : "https://i.imgur.com/PfRQ6cz.jpg",
+      "name" : "Former Area of Cheng Yi",
+      "width" : 600
+    },
+    "history-3" : {
+      "description" : "Rubber trees used grow in front of where the current Block B classrooms stand in High School. ",
+      "height" : 250,
+      "imageRef" : "https://i.imgur.com/0oQBL27.jpg",
+      "name" : "Hevea brasiliensis HS Blk B",
+      "width" : 312
+    },
+    "history-4" : {
+      "description" : "The current swimming pool, cultural centre and carpark in High School used to be covered with dense forest – nothing like the modern buildings we see today.",
+      "height" : 372,
+      "imageRef" : "https://i.imgur.com/PvGWbPR.jpg",
+      "name" : "Less Old Gate 3 HS",
+      "width" : 600
+    },
+    "history-5" : {
+      "description" : "The road leading towards the Clock Tower did not have Eugenias or Mahoganies in the past. ",
+      "height" : 791,
+      "imageRef" : "https://i.imgur.com/zysEUPe.jpg",
+      "name" : "Old Along TKK Drive",
+      "width" : 497
+    },
+    "history-6" : {
+      "description" : "EP3 shed used to be the school’s canteen a long time ago. Since then, the front of the former canteen has been transformed into a street soccer court.",
+      "height" : 501,
+      "imageRef" : "https://i.imgur.com/roJPZmI.jpg",
+      "name" : "Old Canteen_Current EP3 Shed",
+      "width" : 801
+    },
+    "history-7" : {
+      "description" : "",
+      "height" : 332,
+      "imageRef" : "https://i.imgur.com/yQ6E78Y.jpg",
+      "name" : "Old College Blk B (Staffroom) 2",
+      "width" : 347
+    },
+    "history-8" : {
+      "description" : "",
+      "height" : 1303,
+      "imageRef" : "https://i.imgur.com/GJenKfV.jpg",
+      "name" : "Old College Blk B (Staffroom) 3",
+      "width" : 1744
+    },
+    "history-9" : {
+      "description" : "Palm trees used to grow in front of the teachers’ lodgings, named 虎豹楼 (Hu Bao Lou). This is where the current Block B in JC stands.",
+      "height" : 590,
+      "imageRef" : "https://i.imgur.com/3Mnl1cY.jpg",
+      "name" : "Old College Blk B (Staffroom)",
+      "width" : 600
+    }
+  },
+  "map" : {
+    "trail-01" : {
+      "color" : "red",
+      "name" : "Jing Xian Trail (College)",
+      "route" : {
+        "route-01" : {
+          "imageRef" : "https://i.imgur.com/FLTPZ16.jpg",
+          "latitude" : 1.325603,
+          "longitude" : 103.805239,
+          "points" : [ {
+            "left" : 0.7,
+            "params" : {
+              "name" : "flora-084"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-015"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-085"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.45
+          }, {
+            "left" : 0.8,
+            "params" : {
+              "name" : "flora-082"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.6
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-009"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.25
+          } ],
+          "smallImage" : "https://i.imgur.com/QhbikB7.png",
+          "title" : "Block E"
+        },
+        "route-02" : {
+          "imageRef" : "https://i.imgur.com/7xunDhL.jpg",
+          "latitude" : 1.324821,
+          "longitude" : 103.805996,
+          "points" : [ {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-031"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.65
+          }, {
+            "left" : 0.7,
+            "params" : {
+              "name" : "flora-012"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-081"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.4
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "fauna-001"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.1
+          }, {
+            "left" : 0.2,
+            "params" : {
+              "name" : "fauna-006"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          } ],
+          "smallImage" : "https://i.imgur.com/OM2V7SA.png",
+          "title" : "College Block B"
+        },
+        "route-03" : {
+          "imageRef" : "https://i.imgur.com/qMKrXq9.jpg",
+          "latitude" : 1.325477,
+          "longitude" : 103.806146,
+          "points" : [ {
+            "left" : 0.3,
+            "params" : {
+              "name" : "flora-060"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.55,
+            "params" : {
+              "name" : "flora-015"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.8,
+            "params" : {
+              "name" : "flora-086"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.9
+          }, {
+            "left" : 0.55,
+            "params" : {
+              "name" : "flora-087"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.85
+          }, {
+            "left" : 0.2,
+            "params" : {
+              "name" : "flora-088"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.9
+          } ],
+          "smallImage" : "https://i.imgur.com/cAQaKBB.jpg",
+          "title" : "Central Plaza (I)"
+        },
+        "route-04" : {
+          "imageRef" : "https://i.imgur.com/Nta3ZHs.jpg",
+          "latitude" : 1.325721,
+          "longitude" : 103.806384,
+          "points" : [ {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-039"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          } ],
+          "smallImage" : "https://i.imgur.com/qlv8kWz.png",
+          "title" : "Central Plaza (II)"
+        },
+        "route-05" : {
+          "imageRef" : "https://i.imgur.com/fACnH5e.jpg",
+          "latitude" : 1.32565,
+          "longitude" : 103.806317,
+          "points" : [ {
+            "left" : 0.2,
+            "params" : {
+              "name" : "flora-083"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-089"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.8
+          } ],
+          "smallImage" : "https://i.imgur.com/aFeYkT1.png",
+          "title" : "Central Plaza (III)"
+        },
+        "route-06" : {
+          "imageRef" : "https://i.imgur.com/w1H1GnD.jpg",
+          "latitude" : 1.324679,
+          "longitude" : 103.805966,
+          "points" : [ {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-102"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.65
+          }, {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-103"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-104"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.45,
+            "params" : {
+              "name" : "flora-105"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.6
+          }, {
+            "left" : 0.55,
+            "params" : {
+              "name" : "flora-106"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.6
+          }, {
+            "left" : 0.6,
+            "params" : {
+              "name" : "flora-107"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.6
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-108"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.6
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-049"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-109"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "flora-110"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-044"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.65
+          }, {
+            "left" : 0.6,
+            "params" : {
+              "name" : "flora-042"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.85
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-111"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-112"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          } ],
+          "smallImage" : "https://i.imgur.com/fUxbWUh.jpg",
+          "title" : "College Butterfly Garden"
+        },
+        "route-07" : {
+          "imageRef" : "https://i.imgur.com/sXcLa1F.jpg",
+          "latitude" : 1.324711,
+          "longitude" : 103.806605,
+          "points" : [ {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-037"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.1
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-005"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-004"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "flora-034"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          } ],
+          "smallImage" : "https://i.imgur.com/YQxh101.png",
+          "title" : "Outside College Reception (I)"
+        },
+        "route-08" : {
+          "imageRef" : "https://i.imgur.com/TOKvEnT.jpg",
+          "latitude" : 1.324939,
+          "longitude" : 103.806283,
+          "points" : [ {
+            "left" : 0.45,
+            "params" : {
+              "name" : "flora-032"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.3
+          }, {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-091"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-004"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.45
+          } ],
+          "smallImage" : "https://i.imgur.com/zMCmbjK.png",
+          "title" : "Outside College Reception (II)"
+        },
+        "route-09" : {
+          "imageRef" : "https://i.imgur.com/oWMPLRs.jpg",
+          "latitude" : 1.32479,
+          "longitude" : 103.807059,
+          "points" : [ {
+            "left" : 0.6,
+            "params" : {
+              "name" : "flora-005"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.5
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-092"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.4
+          }, {
+            "left" : 0.2,
+            "params" : {
+              "name" : "flora-093"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          }, {
+            "left" : 0.8,
+            "params" : {
+              "name" : "flora-094"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.8,
+            "params" : {
+              "name" : "fauna-016"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.4
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "fauna-017"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          }, {
+            "left" : 0.2,
+            "params" : {
+              "name" : "fauna-019"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.4
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "fauna-012"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          } ],
+          "smallImage" : "https://i.imgur.com/NEH7hFb.png",
+          "title" : "College Carpark"
+        },
+        "route-10" : {
+          "imageRef" : "https://i.imgur.com/R2H52cY.jpg",
+          "latitude" : 1.3252491,
+          "longitude" : 103.8082125,
+          "points" : [ {
+            "left" : 0.05,
+            "params" : {
+              "name" : "flora-095"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.45
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-096"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.45
+          }, {
+            "left" : 0.2,
+            "params" : {
+              "name" : "flora-097"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.45
+          }, {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-098"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.2
+          } ],
+          "smallImage" : "https://i.imgur.com/wvZwNqO.png",
+          "title" : "Block D (I)"
+        },
+        "route-11" : {
+          "imageRef" : "https://i.imgur.com/95qfTXx.jpg",
+          "latitude" : 1.32519,
+          "longitude" : 103.808163,
+          "points" : [ {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-099"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.5
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-039"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.55
+          }, {
+            "left" : 0.55,
+            "params" : {
+              "name" : "flora-038"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          } ],
+          "smallImage" : "https://i.imgur.com/HUepEwp.png",
+          "title" : "Block D (II)"
+        },
+        "route-12" : {
+          "imageRef" : "https://i.imgur.com/fYhwtlT.jpg",
+          "latitude" : 1.325398,
+          "longitude" : 103.807328,
+          "points" : [ {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-100"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-101"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          } ],
+          "smallImage" : "https://i.imgur.com/mTNpvWz.png",
+          "title" : "Outside Cafe"
+        }
+      }
+    },
+    "trail-02" : {
+      "color" : "purple",
+      "name" : "Kong Chian Trail (High School)",
+      "route" : {
+        "route-01" : {
+          "imageRef" : "https://i.imgur.com/PGsu84q.jpg",
+          "latitude" : 1.325888,
+          "longitude" : 103.803274,
+          "points" : [ {
+            "left" : 0.2,
+            "params" : {
+              "name" : "flora-021"
+            },
+            "pulse" : 5,
+            "size" : 100,
+            "top" : 0.4
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-022"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.25
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-023"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.7
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-024"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.45,
+            "params" : {
+              "name" : "flora-025"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.65
+          }, {
+            "left" : 0.6,
+            "params" : {
+              "name" : "fauna-018"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.7
+          } ],
+          "smallImage" : "https://i.imgur.com/KE5N1K8.png",
+          "title" : "Beside High School Science Labs"
+        },
+        "route-02" : {
+          "imageRef" : "https://i.imgur.com/kebn1qr.jpg",
+          "latitude" : 1.32535,
+          "longitude" : 103.804526,
+          "points" : [ {
+            "left" : 0.55,
+            "params" : {
+              "name" : "flora-001"
+            },
+            "pulse" : 5,
+            "size" : 100,
+            "top" : 0.55
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-002"
+            },
+            "pulse" : 5,
+            "size" : 100,
+            "top" : 0.3
+          } ],
+          "smallImage" : "https://i.imgur.com/fEJJo0a.png",
+          "title" : "Science Research Centre"
+        },
+        "route-03" : {
+          "imageRef" : "https://i.imgur.com/QHC3jeH.jpg",
+          "latitude" : 1.325762,
+          "longitude" : 103.804733,
+          "points" : [ {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-003"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.6
+          }, {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-004"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.1
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-005"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.5
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-006"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.4
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.7
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "flora-008"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.5
+          }, {
+            "left" : 0.8,
+            "params" : {
+              "name" : "flora-009"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.25
+          }, {
+            "left" : 0.45,
+            "params" : {
+              "name" : "fauna-011"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.4
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "fauna-015"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.25
+          }, {
+            "left" : 0.2,
+            "params" : {
+              "name" : "fauna-014"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.1
+          } ],
+          "smallImage" : "https://i.imgur.com/vMFFc7e.png",
+          "title" : "Kong Chian Administration Centre (I)"
+        },
+        "route-04" : {
+          "imageRef" : "https://i.imgur.com/uRamk2c.jpg",
+          "latitude" : 1.325904,
+          "longitude" : 103.804541,
+          "points" : [ {
+            "left" : 0.65,
+            "params" : {
+              "name" : "MISSING INFO"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.18,
+            "params" : {
+              "name" : "flora-010"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.7
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-006"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.75
+          }, {
+            "left" : 0.05,
+            "params" : {
+              "name" : "flora-003"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.8
+          }, {
+            "left" : 0.2,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.82
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-004"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.3
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-005"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.7
+          }, {
+            "left" : 0.19,
+            "params" : {
+              "name" : "flora-011"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.78
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "fauna-011"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.6
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "fauna-015"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.5
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "fauna-014"
+            },
+            "pulse" : 5,
+            "size" : 20,
+            "top" : 0.3
+          } ],
+          "smallImage" : "https://i.imgur.com/R21YuMv.png",
+          "title" : "Kong Chian Administration Centre (II)"
+        },
+        "route-05" : {
+          "imageRef" : "https://i.imgur.com/bOyKhdW.jpg",
+          "latitude" : 1.325968,
+          "longitude" : 103.804417,
+          "points" : [ {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-012"
+            },
+            "pulse" : 5,
+            "size" : 100,
+            "top" : 0.7
+          }, {
+            "left" : 0.7,
+            "params" : {
+              "name" : "flora-013"
+            },
+            "pulse" : 5,
+            "size" : 100,
+            "top" : 0.1
+          }, {
+            "left" : 0.7,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.9
+          }, {
+            "left" : 0.7,
+            "params" : {
+              "name" : "flora-009"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.5
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "flora-011"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.9
+          } ],
+          "smallImage" : "https://i.imgur.com/ncJo5HJ.png",
+          "title" : "Kong Chian Administration Centre (III)"
+        },
+        "route-06" : {
+          "imageRef" : "https://i.imgur.com/PavEuEi.jpg",
+          "latitude" : 1.326129,
+          "longitude" : 103.803598,
+          "points" : [ {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-027"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-022"
+            },
+            "pulse" : 5,
+            "size" : 100,
+            "top" : 0.2
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-028"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-021"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.65
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "flora-029"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "fauna-005"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.1
+          } ],
+          "smallImage" : "https://i.imgur.com/wcIVN32.png",
+          "title" : "Area beside Oei Tiong Ham (OTH) Hall"
+        },
+        "route-07" : {
+          "imageRef" : "https://i.imgur.com/rjhmsBp.jpg",
+          "latitude" : 1.326274,
+          "longitude" : 103.804068,
+          "points" : [ {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-005"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.6
+          }, {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-012"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.65
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-030"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.6,
+            "params" : {
+              "name" : "flora-031"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.75
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "flora-024"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.75
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.85
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-013"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-009"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.45
+          }, {
+            "left" : 0.45,
+            "params" : {
+              "name" : "fauna-021"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.55
+          }, {
+            "left" : 0.35,
+            "params" : {
+              "name" : "fauna-003"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.3
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "fauna-010"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.25
+          } ],
+          "smallImage" : "https://i.imgur.com/MrzJZFs.png",
+          "title" : "Kuo Chuan House"
+        },
+        "route-08" : {
+          "imageRef" : "https://i.imgur.com/Y25zYt0.jpg",
+          "latitude" : 1.326163,
+          "longitude" : 103.805139,
+          "points" : [ {
+            "left" : 0.8,
+            "params" : {
+              "name" : "flora-009"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          }, {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-002"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.55,
+            "params" : {
+              "name" : "flora-014"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "flora-015"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          } ],
+          "smallImage" : "https://i.imgur.com/vHc3o7H.png",
+          "title" : "Path Towards Terraces"
+        },
+        "route-09" : {
+          "imageRef" : "https://i.imgur.com/zYit7Xe.jpg",
+          "latitude" : 1.326242,
+          "longitude" : 103.80442,
+          "points" : [ {
+            "left" : 0.2,
+            "params" : {
+              "name" : "flora-002"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.6,
+            "params" : {
+              "name" : "flora-014"
+            },
+            "pulse" : 5,
+            "size" : 100,
+            "top" : 0.3
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-013"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.45
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-015"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.65
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-016"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.8
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-017"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.45
+          }, {
+            "left" : 0.35,
+            "params" : {
+              "name" : "fauna-011"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.1
+          }, {
+            "left" : 0.15,
+            "params" : {
+              "name" : "fauna-003"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.4
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "fauna-004"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.15
+          } ],
+          "smallImage" : "https://i.imgur.com/Cp4WvKI.png",
+          "title" : "Along Terraces"
+        },
+        "route-10" : {
+          "imageRef" : "https://i.imgur.com/hyi3oyg.jpg",
+          "latitude" : 1.325526,
+          "longitude" : 103.804019,
+          "points" : [ {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-004"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-018"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-019"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-020"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          } ],
+          "smallImage" : "https://i.imgur.com/Ks2hYfB.png",
+          "title" : "High School Street Soccer Court"
+        },
+        "route-11" : {
+          "imageRef" : "https://i.imgur.com/mqStSnj.jpg",
+          "latitude" : 1.325606,
+          "longitude" : 103.803378,
+          "points" : [ {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-032"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.25
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-033"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.65
+          }, {
+            "left" : 0.7,
+            "params" : {
+              "name" : "flora-018"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "fauna-002"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          } ],
+          "smallImage" : "https://i.imgur.com/GwLMsP5.png",
+          "title" : "Behind High School Science Labs"
+        }
+      }
+    },
+    "trail-03" : {
+      "color" : "blue",
+      "name" : "Kah Kee Trail (High School)",
+      "route" : {
+        "route-01" : {
+          "imageRef" : "https://i.imgur.com/f6QnVm7.jpg",
+          "latitude" : 1.326633,
+          "longitude" : 103.80367,
+          "points" : [ {
+            "left" : 0.82,
+            "params" : {
+              "name" : "flora-024"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.78
+          }, {
+            "left" : 0.55,
+            "params" : {
+              "name" : "flora-034"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.78
+          }, {
+            "left" : 0.92,
+            "params" : {
+              "name" : "flora-002"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.8
+          } ],
+          "smallImage" : "https://i.imgur.com/bgOjANr.png",
+          "title" : "Clock Tower"
+        },
+        "route-03" : {
+          "imageRef" : "https://i.imgur.com/pDNYHvQ.jpg",
+          "latitude" : 1.327601,
+          "longitude" : 103.802821,
+          "points" : [ {
+            "left" : 0.8,
+            "params" : {
+              "name" : "flora-032"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.2
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-015"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.6,
+            "params" : {
+              "name" : "flora-013"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.75
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "flora-035"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.8
+          }, {
+            "left" : 0.8,
+            "params" : {
+              "name" : "flora-036"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.8
+          }, {
+            "left" : 0.7,
+            "params" : {
+              "name" : "fauna-019"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.2
+          } ],
+          "smallImage" : "https://i.imgur.com/bg9TLsz.png",
+          "title" : "Along Tan Kah Kee Drive"
+        },
+        "route-04" : {
+          "imageRef" : "https://i.imgur.com/XQpv8Ze.jpg",
+          "latitude" : 1.326428,
+          "longitude" : 103.80268,
+          "points" : [ {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-031"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-012"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-037"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.3
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.6
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-030"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.6
+          } ],
+          "smallImage" : "https://i.imgur.com/2OzYHzl.png",
+          "title" : "思源坊 Si Yuan Fang"
+        },
+        "route-05" : {
+          "imageRef" : "https://i.imgur.com/vGC71Xv.jpg",
+          "latitude" : 1.326187,
+          "longitude" : 103.80307,
+          "points" : [ {
+            "left" : 0.52,
+            "params" : {
+              "name" : "flora-031"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.52
+          }, {
+            "left" : 0.7,
+            "params" : {
+              "name" : "flora-038"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.3
+          }, {
+            "left" : 0.12,
+            "params" : {
+              "name" : "flora-012"
+            },
+            "pulse" : 5,
+            "size" : 70,
+            "top" : 0.5
+          }, {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-037"
+            },
+            "pulse" : 5,
+            "size" : 70,
+            "top" : 0.27
+          } ],
+          "smallImage" : "https://i.imgur.com/ffuMuAO.png",
+          "title" : "Beside Oei Tiong Ham (OTH) Hall"
+        },
+        "route-06" : {
+          "imageRef" : "https://i.imgur.com/WyJM382.jpg",
+          "latitude" : 1.326668,
+          "longitude" : 103.802898,
+          "points" : [ {
+            "left" : 0.78,
+            "params" : {
+              "name" : "flora-035"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-039"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.85
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.75
+          }, {
+            "left" : 0.18,
+            "params" : {
+              "name" : "flora-040"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.85
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-041"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.8
+          }, {
+            "left" : 0.2,
+            "params" : {
+              "name" : "flora-042"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-043"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-015"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "fauna-020"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.5
+          } ],
+          "smallImage" : "https://i.imgur.com/qMblhoT.png",
+          "title" : "Butterfly Garden (1)"
+        },
+        "route-07" : {
+          "imageRef" : "https://i.imgur.com/zxZ6tyl.jpg",
+          "latitude" : 1.326797,
+          "longitude" : 103.80296,
+          "points" : [ {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-032"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.2
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-009"
+            },
+            "pulse" : 5,
+            "size" : 60,
+            "top" : 0.3
+          }, {
+            "left" : 0.55,
+            "params" : {
+              "name" : "flora-044"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.8
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "flora-007"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-045"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.7
+          } ],
+          "smallImage" : "https://i.imgur.com/i5v3oDx.png",
+          "title" : "Butterfly Garden (2)"
+        },
+        "route-08" : {
+          "imageRef" : "https://i.imgur.com/ZJ751u1.jpg",
+          "latitude" : 1.326811,
+          "longitude" : 103.802873,
+          "points" : [ {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-046"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.45
+          }, {
+            "left" : 0.45,
+            "params" : {
+              "name" : "flora-047"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-115"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.8
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-048"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.6
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-116"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.6
+          } ],
+          "smallImage" : "https://i.imgur.com/ttNHNqF.png",
+          "title" : "Butterfly Garden (3)"
+        },
+        "route-09" : {
+          "imageRef" : "https://i.imgur.com/Wwio7EX.jpg",
+          "latitude" : 1.326803,
+          "longitude" : 103.802817,
+          "points" : [ {
+            "left" : 0.2,
+            "params" : {
+              "name" : "flora-040"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.48,
+            "params" : {
+              "name" : "flora-049"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.65
+          }, {
+            "left" : 0.62,
+            "params" : {
+              "name" : "flora-050"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.45
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "flora-051"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-052"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          } ],
+          "smallImage" : "https://i.imgur.com/A0jo3a2.png",
+          "title" : "Butterfly Garden (4)"
+        },
+        "route-10" : {
+          "imageRef" : "https://i.imgur.com/djwad2E.jpg",
+          "latitude" : 1.326927,
+          "longitude" : 103.802777,
+          "points" : [ {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-053"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.62
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-044"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.8,
+            "params" : {
+              "name" : "flora-054"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.25
+          }, {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-055"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.4
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-056"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.48
+          } ],
+          "smallImage" : "https://i.imgur.com/2leoaJl.png",
+          "title" : "Butterfly Garden (5)"
+        },
+        "route-11" : {
+          "imageRef" : "https://i.imgur.com/uS0ebml.jpg",
+          "latitude" : 1.326853,
+          "longitude" : 103.802729,
+          "points" : [ {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-057"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.78,
+            "params" : {
+              "name" : "flora-055"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-058"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.2
+          }, {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-059"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          }, {
+            "left" : 0.6,
+            "params" : {
+              "name" : "flora-060"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.32
+          }, {
+            "left" : 0.42,
+            "params" : {
+              "name" : "flora-001"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          } ],
+          "smallImage" : "https://i.imgur.com/TAH7wR9.jpg",
+          "title" : "Butterfly Garden (6)"
+        },
+        "route-12" : {
+          "imageRef" : "https://i.imgur.com/5BHHdjP.jpg",
+          "latitude" : 1.326872,
+          "longitude" : 103.802761,
+          "points" : [ {
+            "left" : 0.28,
+            "params" : {
+              "name" : "flora-061"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.82
+          }, {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-062"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-022"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-063"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.6,
+            "params" : {
+              "name" : "flora-064"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.6
+          }, {
+            "left" : 0.6,
+            "params" : {
+              "name" : "flora-065"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.45
+          }, {
+            "left" : 0.8,
+            "params" : {
+              "name" : "flora-066"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          } ],
+          "smallImage" : "https://i.imgur.com/C5tFDOv.jpg",
+          "title" : "Butterfly Garden (7)"
+        },
+        "route-13" : {
+          "imageRef" : "https://i.imgur.com/TM7uJrK.jpg",
+          "latitude" : 1.326928,
+          "longitude" : 103.802628,
+          "points" : [ {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-067"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-068"
+            },
+            "pulse" : 5,
+            "size" : 100,
+            "top" : 0.4
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-021"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.55
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "flora-069"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          } ],
+          "smallImage" : "https://i.imgur.com/1d3gjJz.png",
+          "title" : "Butterfly Garden (8)"
+        },
+        "route-14" : {
+          "imageRef" : "https://i.imgur.com/L6CHnUe.jpg",
+          "latitude" : 1.326477,
+          "longitude" : 103.803101,
+          "points" : [ {
+            "left" : 0.78,
+            "params" : {
+              "name" : "flora-070"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.6
+          }, {
+            "left" : 0.55,
+            "params" : {
+              "name" : "flora-017"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.8
+          }, {
+            "left" : 0.88,
+            "params" : {
+              "name" : "flora-071"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.4,
+            "params" : {
+              "name" : "MISSING INFO"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.6
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "flora-072"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.15,
+            "params" : {
+              "name" : "flora-073"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "flora-074"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.48,
+            "params" : {
+              "name" : "flora-031"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.62
+          }, {
+            "left" : 0.25,
+            "params" : {
+              "name" : "fauna-013"
+            },
+            "pulse" : 5,
+            "size" : 30,
+            "top" : 0.85
+          } ],
+          "smallImage" : "https://i.imgur.com/kk49qAt.png",
+          "title" : "Arid Garden"
+        },
+        "route-15" : {
+          "imageRef" : "https://i.imgur.com/mSUURkw.jpg",
+          "latitude" : 1.326666,
+          "longitude" : 103.803255,
+          "points" : [ {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-075"
+            },
+            "pulse" : 5,
+            "size" : 100,
+            "top" : 0.35
+          }, {
+            "left" : 0.45,
+            "params" : {
+              "name" : "flora-117"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.65
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-009"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.2
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-118"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.9
+          }, {
+            "left" : 0.7,
+            "params" : {
+              "name" : "flora-036"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.7,
+            "params" : {
+              "name" : "flora-024"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.9
+          } ],
+          "smallImage" : "https://i.imgur.com/Br6zLnQ.png",
+          "title" : "Beside Clock Tower"
+        },
+        "route-16" : {
+          "imageRef" : "https://i.imgur.com/H7FsOW3.jpg",
+          "latitude" : 1.327157,
+          "longitude" : 103.802478,
+          "points" : [ {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-077"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          }, {
+            "left" : 0.45,
+            "params" : {
+              "name" : "flora-078"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.35
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-079"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "fauna-014"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.2
+          } ],
+          "smallImage" : "https://i.imgur.com/K3I93J1.png",
+          "title" : "High School Carpark beside High School Staffroom"
+        },
+        "route-17" : {
+          "imageRef" : "https://i.imgur.com/gtQfcvz.jpg",
+          "latitude" : 1.326232,
+          "longitude" : 103.802279,
+          "points" : [ {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-080"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-081"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.25
+          }, {
+            "left" : 0.35,
+            "params" : {
+              "name" : "flora-060"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.68
+          }, {
+            "left" : 0.23,
+            "params" : {
+              "name" : "flora-082"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.75
+          }, {
+            "left" : 0.9,
+            "params" : {
+              "name" : "flora-002"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          } ],
+          "smallImage" : "https://i.imgur.com/xP2EYQw.png",
+          "title" : "High School Canteen"
+        },
+        "route-18" : {
+          "imageRef" : "https://i.imgur.com/djtYIVl.jpg",
+          "latitude" : 1.327289,
+          "longitude" : 103.802943,
+          "points" : [ {
+            "left" : 0.75,
+            "params" : {
+              "name" : "flora-020"
+            },
+            "pulse" : 5,
+            "size" : 80,
+            "top" : 0.45
+          }, {
+            "left" : 0.18,
+            "params" : {
+              "name" : "flora-119"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.3
+          }, {
+            "left" : 0.1,
+            "params" : {
+              "name" : "flora-035"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.5
+          }, {
+            "left" : 0.3,
+            "params" : {
+              "name" : "flora-012"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.55
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "flora-036"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.4
+          }, {
+            "left" : 0.85,
+            "params" : {
+              "name" : "flora-031"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.7
+          }, {
+            "left" : 0.65,
+            "params" : {
+              "name" : "flora-083"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.9
+          }, {
+            "left" : 0.5,
+            "params" : {
+              "name" : "MISSING INFO"
+            },
+            "pulse" : 5,
+            "size" : 50,
+            "top" : 0.85
+          } ],
+          "smallImage" : "https://i.imgur.com/GOE37vX.png",
+          "title" : "High School Block D"
+        }
+      }
+    }
+  }
+}
