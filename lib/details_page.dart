@@ -1,5 +1,4 @@
-import 'package:bottom_sheet/library.dart';
-import 'package:transparent_image/transparent_image.dart';
+import 'library.dart';
 
 class DetailsPage extends StatefulWidget {
   final Entity entity;
@@ -29,9 +28,15 @@ class _DetailsPageState extends State<DetailsPage> {
             padding: EdgeInsets.fromLTRB(14, topPadding + 16, 14, 8),
             child: Row(
               children: <Widget>[
-                CircleAvatar(
-                  radius: 32,
-                  backgroundImage: NetworkImage(widget.entity.smallImage),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: CustomImage(
+                    widget.entity.smallImage,
+                    height: 64,
+                    width: 64,
+                    placeholderColor: Theme.of(context).dividerColor,
+                    fadeInDuration: null,
+                  ),
                 ),
                 const SizedBox(
                   width: 16,
@@ -65,21 +70,21 @@ class _DetailsPageState extends State<DetailsPage> {
             height: 8,
           ),
           Container(
-            height: 256,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: PageView(
+            height: 216,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+              scrollDirection: Axis.horizontal,
+              child: Row(
                 children: <Widget>[
                   for (var image in widget.entity.images)
-                    Container(
-                      height: 256,
-                      color: Theme.of(context).dividerColor,
-                      child: FadeInImage.memoryNetwork(
-                        fadeInDuration: Duration(milliseconds: 300),
-                        placeholder: kTransparentImage,
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: CustomImage(
+                        image,
+                        height: 216,
+                        width: 324,
                         fit: BoxFit.cover,
-                        image: image,
+                        placeholderColor: Theme.of(context).dividerColor,
                       ),
                     ),
                 ],

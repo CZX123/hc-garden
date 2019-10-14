@@ -1,4 +1,4 @@
-import 'package:bottom_sheet/library.dart';
+import 'library.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -10,11 +10,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // TODO: Add a StreamProvider for Firebase Database
         ChangeNotifierProvider(
           builder: (context) => DebugNotifier(),
         ),
         ChangeNotifierProvider(
           builder: (context) => AppNotifier(),
+        ),
+        Provider<Map<String, Uint8List>>.value(
+          value: {},
+        ),
+        FutureProvider.value(
+          value: getApplicationDocumentsDirectory(),
         ),
       ],
       child: Consumer<DebugNotifier>(
@@ -670,10 +677,19 @@ class EntityListPage extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
                 child: Row(
                   children: <Widget>[
-                    CircleAvatar(
-                      radius: 32,
-                      backgroundImage:
-                          NetworkImage(entityList[index].smallImage),
+                    // CircleAvatar(
+                    //   radius: 32,
+                    //   backgroundImage:
+                    //       NetworkImage(entityList[index].smallImage),
+                    // ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(32),
+                      child: CustomImage(
+                        entityList[index].smallImage,
+                        height: 64,
+                        width: 64,
+                        placeholderColor: Theme.of(context).dividerColor,
+                      ),
                     ),
                     const SizedBox(
                       width: 16,
@@ -743,10 +759,15 @@ class EntityListPage extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(14, 18, 14, 18),
                   child: Row(
                     children: <Widget>[
-                      CircleAvatar(
-                        radius: 32,
-                        backgroundImage:
-                            NetworkImage(entityList[index].smallImage),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(32),
+                        child: CustomImage(
+                          entityList[index].smallImage,
+                          height: 64,
+                          width: 64,
+                          placeholderColor: Theme.of(context).dividerColor,
+                          fadeInDuration: null,
+                        ),
                       ),
                     ],
                   ),
