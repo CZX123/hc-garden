@@ -1,4 +1,4 @@
-import '../library.dart';
+import '../../library.dart';
 
 // Custom FirebaseImage widget that can be reused for all images in the app
 class CustomImage extends StatefulWidget {
@@ -30,6 +30,8 @@ class _CustomImageState extends State<CustomImage>
   static final HttpClient _httpClient = HttpClient();
   MemoryImage _imageProvider;
   bool didUpdate = false;
+  bool fadeIn = false;
+  //int rebuildCount= 0;
 
   void fetchImageFromStorage(Map<String, Uint8List> imageMap) async {
     final String filePath = widget.url.replaceAll('/', '-');
@@ -38,13 +40,15 @@ class _CustomImageState extends State<CustomImage>
     if (file.existsSync()) {
       Uint8List bytes = file.readAsBytesSync();
       if (mounted && _imageProvider == null)
-        setState(() => _imageProvider = MemoryImage(bytes));
-      if (bytes.lengthInBytes < 500000) {
+        setState(() {
+          fadeIn = false;
+          _imageProvider = MemoryImage(bytes);
+        });
+      if (bytes.lengthInBytes < 200000) {
         var size = 0;
         imageMap.forEach((key, value) {
           size += value.length;
         });
-        print(size);
         while (size > 5000000) {
           size -= imageMap.values.toList()[0].length;
           imageMap.remove(imageMap.keys.toList()[0]);
@@ -52,7 +56,6 @@ class _CustomImageState extends State<CustomImage>
         imageMap.addAll({widget.url: bytes});
       }
     }
-    ImageCache().clear();
   }
 
   void fetchImageFromNetwork(Map<String, Uint8List> imageMap) async {
@@ -70,13 +73,15 @@ class _CustomImageState extends State<CustomImage>
         throw Exception('NetworkImage is an empty file: $resolved');
       }
       if (mounted && _imageProvider == null)
-        setState(() => _imageProvider = MemoryImage(bytes));
-      if (bytes.lengthInBytes < 500000) {
+        setState(() {
+          fadeIn = true;
+          _imageProvider = MemoryImage(bytes);
+        });
+      if (bytes.lengthInBytes < 200000) {
         var size = 0;
         imageMap.forEach((key, value) {
           size += value.lengthInBytes;
         });
-        print(size);
         while (size > 5000000) {
           size -= imageMap.values.toList()[0].lengthInBytes;
           imageMap.remove(imageMap.keys.toList()[0]);
@@ -88,11 +93,14 @@ class _CustomImageState extends State<CustomImage>
       final File file = File('${dir.path}/$filePath');
       file.writeAsBytes(bytes);
     } catch (e) {
-      if (mounted && _imageProvider == null)
-        setState(() => _imageProvider =
-            MemoryImage(widget.fallbackMemoryImage ?? kTransparentImage));
+      if (mounted && _imageProvider == null) {
+        setState(() {
+          fadeIn = true;
+          _imageProvider =
+              MemoryImage(widget.fallbackMemoryImage ?? kTransparentImage);
+        });
+      }
     }
-    ImageCache().clear();
   }
 
   @override
@@ -141,6 +149,8 @@ class _CustomImageState extends State<CustomImage>
       didUpdate = false;
     }
     super.build(context);
+    //rebuildCount += 1;
+    //print('Rebuilt: ${widget.url} $rebuildCount times');
     return _imageProvider == null
         ? Container(
             width: widget.width ?? widget.height,
@@ -153,23 +163,24 @@ class _CustomImageState extends State<CustomImage>
             decoration: BoxDecoration(
               color: widget.placeholderColor,
             ),
-            child: widget.fadeInDuration == null ||
-                    widget.fadeInDuration == Duration.zero
-                ? Image(
-                    gaplessPlayback: true,
-                    image: _imageProvider,
-                    width: widget.width,
-                    height: widget.height,
-                    fit: widget.fit,
-                  )
-                : FadeInImage(
-                    fadeInDuration: widget.fadeInDuration,
-                    placeholder: MemoryImage(kTransparentImage),
-                    image: _imageProvider,
-                    width: widget.width,
-                    height: widget.height,
-                    fit: widget.fit,
-                  ),
+            child: Image(
+              gaplessPlayback: true,
+              image: _imageProvider,
+              width: widget.width,
+              height: widget.height,
+              fit: widget.fit,
+              frameBuilder: (context, child, frames, wasSynchronouslyLoaded) {
+                if (fadeIn && !wasSynchronouslyLoaded && widget.fadeInDuration != null && widget.fadeInDuration != Duration.zero) {
+                  return AnimatedOpacity(
+                    opacity: frames == null ? 0 : 1,
+                    child: child,
+                    duration: widget.fadeInDuration,
+                    curve: Curves.easeIn,
+                  );
+                }
+                return child;
+              },
+            ),
           );
   }
 

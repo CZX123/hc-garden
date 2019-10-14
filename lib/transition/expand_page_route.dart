@@ -182,71 +182,71 @@ class ExpandItemPageTransition extends StatelessWidget {
           children: <Widget>[
             PositionedTransition(
               rect: itemPosition,
-              child: ClipRect(
-                child: OverflowBox(
-                  alignment: Alignment.topLeft,
-                  minHeight: constraints.maxHeight,
-                  maxHeight: constraints.maxHeight,
-                  child: Stack(
-                    fit: StackFit.passthrough,
-                    children: <Widget>[
-                      AnimatedBuilder(
-                        animation: contentOffset,
-                        child: Material(
-                          elevation: 8,
-                          child: FadeTransition(
-                            opacity: fadeContent,
-                            child: child,
-                          ),
+              child: Stack(
+                children: <Widget>[
+                  AnimatedBuilder(
+                    animation: contentOffset,
+                    builder: (context, child) {
+                      return Material(
+                        elevation: contentOffset.value.dy > -topDistance / 2 ? 2 : 0,
+                        animationDuration: Duration(milliseconds: 80),
+                        child: Transform.translate(
+                          offset: contentOffset.value,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: FadeTransition(
+                      opacity: fadeContent,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.biggest.height,
+                        ),
+                        child: child,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    right: 0,
+                    child: IgnorePointer(
+                      child: AnimatedBuilder(
+                        animation: oldChildOffset,
+                        child: FadeTransition(
+                          opacity: fadeOldContent,
+                          child: oldChild,
                         ),
                         builder: (context, child) {
                           return Transform.translate(
-                            offset: contentOffset.value,
+                            offset: oldChildOffset.value,
                             child: child,
                           );
                         },
                       ),
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        child: IgnorePointer(
-                          child: AnimatedBuilder(
-                            animation: oldChildOffset,
-                            child: FadeTransition(
-                              opacity: fadeOldContent,
-                              child: oldChild,
-                            ),
-                            builder: (context, child) {
-                              return Transform.translate(
-                                offset: oldChildOffset.value,
-                                child: child,
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      if (persistentOldChild != null) Positioned(
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        child: IgnorePointer(
-                          child: AnimatedBuilder(
-                            animation: oldChildOffset,
-                            child: persistentOldChild,
-                            builder: (context, child) {
-                              if (oldChildOffset.value.dy == topDistance) return SizedBox.shrink();
-                              return Transform.translate(
-                                offset: oldChildOffset.value,
-                                child: child,
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  if (persistentOldChild != null)
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      right: 0,
+                      child: IgnorePointer(
+                        child: AnimatedBuilder(
+                          animation: oldChildOffset,
+                          child: persistentOldChild,
+                          builder: (context, child) {
+                            if (oldChildOffset.value.dy == topDistance)
+                              return SizedBox.shrink();
+                            return Transform.translate(
+                              offset: oldChildOffset.value,
+                              child: child,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ],

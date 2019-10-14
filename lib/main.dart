@@ -87,253 +87,102 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
-    final state = Provider.of<AppNotifier>(context).state;
     Function(double) _animateTo;
-    return WillPopScope(
-      onWillPop: () async {
-        if (_navigatorKey.currentState.canPop()) {
-          _navigatorKey.currentState.pop();
-          Provider.of<AppNotifier>(context, listen: false).updateState(0, null);
-          return false;
-        } else if (!Provider.of<AppNotifier>(context, listen: false)
-            .sheetMinimised) {
-          _animateTo(height - 382);
-          return false;
-        }
-        return true;
-      },
-      child: Scaffold(
-        endDrawer: DebugDrawer(),
-        body: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/background.png',
-                fit: BoxFit.fitWidth,
-              ),
-            ),
-            if (height != 0)
-              NestedBottomSheet(
-                endCorrection: topPadding - 206,
-                height: height,
-                snappingPositions: state == 0
-                    ? [0, height - 382, height - 56]
-                    : [
-                        0,
-                        (height - 56) / 3,
-                        2 * (height - 56) / 3,
-                        height - 56,
-                      ],
-                initialPosition: height - 382,
-                tablength: 2,
-                headerBuilder: (
-                  context,
-                  animation,
-                  tabController,
-                  animateTo,
-                  isScrolledNotifier,
-                ) {
-                  _animateTo = animateTo;
-                  return BottomSheetHeader(
-                    animation: animation,
-                    tabController: tabController,
-                    animateTo: animateTo,
-                    isScrolledNotifier: isScrolledNotifier,
-                  );
-                },
-                bodyBuilder: (
-                  context,
-                  animation,
-                  tabController,
-                  scrollControllers,
-                  animateTo,
-                ) {
-                  return BottomSheetBody(
-                    animation: animation,
-                    tabController: tabController,
-                    scrollControllers: scrollControllers,
-                    animateTo: animateTo,
-                    navigatorKey: _navigatorKey,
-                  );
-                },
-                footerBuilder: (
-                  context,
-                  animation,
-                  tabController,
-                  animateTo,
-                  isScrolledNotifier,
-                ) {
-                  return BottomSheetFooter(
-                    animation: animation,
-                    animateTo: animateTo,
-                  );
-                },
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class BottomSheetFooter extends StatelessWidget {
-  final Animation<double> animation;
-  final Function(double) animateTo;
-  const BottomSheetFooter({
-    Key key,
-    @required this.animation,
-    @required this.animateTo,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final appNotifier = Provider.of<AppNotifier>(context);
-    final indexNotifier = ValueNotifier(1);
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: AnimatedBuilder(
-            animation: animation,
-            builder: (context, child) {
-              Offset offset;
-              if (appNotifier.state != 0) {
-                offset = Offset(0, 128);
-              } else if (animation.value > height - 382) {
-                offset = Offset(0, 0);
-              } else {
-                offset =
-                    Offset(0, 128 - animation.value / (height - 382) * 128);
-              }
-              return Transform.translate(
-                offset: offset,
-                child: child,
-              );
-            },
-            child: ValueListenableBuilder(
-                valueListenable: indexNotifier,
-                builder: (context, value, child) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      boxShadow: kElevationToShadow[8],
-                    ),
-                    child: BottomNavigationBar(
-                      elevation: 0,
-                      currentIndex: value,
-                      onTap: (index) {
-                        if (index == 1) animateTo(height - 382);
-                        indexNotifier.value = index;
-                      },
-                      items: [
-                        const BottomNavigationBarItem(
-                          icon: Icon(Icons.history),
-                          title: Text('History'),
-                        ),
-                        const BottomNavigationBarItem(
-                          icon: Icon(Icons.map),
-                          title: Text('Explore'),
-                        ),
-                        const BottomNavigationBarItem(
-                          icon: Icon(Icons.info),
-                          title: Text('About'),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-          ),
-        ),
-        SizedBox(
-          height: 76,
-          child: AnimatedBuilder(
-            animation: animation,
-            builder: (context, child) {
-              Offset offset;
-              if (animation.value > height - 382) {
-                offset = Offset(0, 152);
-              } else {
-                offset = Offset(0, animation.value / (height - 382) * 152);
-              }
-              return Transform.translate(
-                offset: offset,
-                child: child,
-              );
-            },
-            child: Stack(
+    return Selector<AppNotifier, int>(
+      selector: (context, appNotifier) => appNotifier.state,
+      builder: (context, state, child) {
+        return WillPopScope(
+          onWillPop: () async {
+            final appNotifier =
+                Provider.of<AppNotifier>(context, listen: false);
+            if (appNotifier.isSearching) {
+              appNotifier.isSearching = false;
+              return false;
+            }
+            if (_navigatorKey.currentState.canPop()) {
+              _navigatorKey.currentState.pop();
+              appNotifier.updateState(0, null);
+              return false;
+            }
+            if (!appNotifier.sheetMinimised) {
+              _animateTo(height - 382);
+              return false;
+            }
+            return true;
+          },
+          child: Scaffold(
+            endDrawer: DebugDrawer(),
+            body: Stack(
               children: <Widget>[
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: PhysicalShape(
-                    elevation: 8,
-                    color: Theme.of(context).canvasColor,
-                    clipper: BottomAppBarClipper(windowWidth: width),
-                    child: SizedBox(
-                      height: 48,
-                      child: Material(
-                        type: MaterialType.transparency,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            IconButton(
-                              icon: const Icon(Icons.arrow_back),
-                              onPressed: () => Navigator.maybePop(context),
-                              tooltip: 'Back',
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.sort),
-                              onPressed: () {},
-                              tooltip: 'Sort',
-                            ),
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/images/background.png',
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+                if (height != 0)
+                  NestedBottomSheet(
+                    endCorrection: topPadding - 206,
+                    height: height,
+                    snappingPositions: state == 0
+                        ? [0, height - 382, height - 56]
+                        : [
+                            0,
+                            (height - 56) / 3,
+                            2 * (height - 56) / 3,
+                            height - 56,
                           ],
-                        ),
-                      ),
-                    ),
+                    initialPosition: height - 382,
+                    tablength: 2,
+                    headerBuilder: (
+                      context,
+                      animation,
+                      tabController,
+                      animateTo,
+                      isScrolledNotifier,
+                    ) {
+                      _animateTo = animateTo;
+                      return BottomSheetHeader(
+                        animation: animation,
+                        tabController: tabController,
+                        animateTo: animateTo,
+                        isScrolledNotifier: isScrolledNotifier,
+                      );
+                    },
+                    bodyBuilder: (
+                      context,
+                      animation,
+                      tabController,
+                      scrollControllers,
+                      animateTo,
+                    ) {
+                      return BottomSheetBody(
+                        animation: animation,
+                        tabController: tabController,
+                        scrollControllers: scrollControllers,
+                        animateTo: animateTo,
+                        navigatorKey: _navigatorKey,
+                      );
+                    },
+                    footerBuilder: (
+                      context,
+                      animation,
+                      tabController,
+                      animateTo,
+                      isScrolledNotifier,
+                    ) {
+                      return BottomSheetFooter(
+                        animation: animation,
+                        animateTo: animateTo,
+                      );
+                    },
                   ),
-                ),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: FloatingActionButton(
-                    child: const Icon(Icons.search),
-                    onPressed: () {},
-                    tooltip: 'Search',
-                  ),
-                ),
               ],
             ),
           ),
-        ),
-      ],
+        );
+      },
     );
-  }
-}
-
-class BottomAppBarClipper extends CustomClipper<Path> {
-  final double windowWidth;
-  final double notchMargin;
-  const BottomAppBarClipper({
-    @required this.windowWidth,
-    this.notchMargin = 4,
-  })  : assert(windowWidth != null),
-        assert(notchMargin != null);
-
-  @override
-  Path getClip(Size size) {
-    final Rect button = Rect.fromCircle(
-      center: Offset(windowWidth / 2, 0),
-      radius: 28,
-    );
-    return CircularNotchedRectangle()
-        .getOuterPath(Offset.zero & size, button.inflate(notchMargin));
-  }
-
-  @override
-  bool shouldReclip(BottomAppBarClipper oldClipper) {
-    return oldClipper.windowWidth != windowWidth ||
-        oldClipper.notchMargin != notchMargin;
   }
 }
 
@@ -358,12 +207,13 @@ class BottomSheetHeader extends StatelessWidget {
     final topPadding = MediaQuery.of(context).padding.top;
     final anim =
         Tween<double>(begin: 0, end: 1 / (height - 56)).animate(animation);
-    return Consumer<AppNotifier>(
-      builder: (context, appNotifier, child) {
+    return Selector<AppNotifier, int>(
+      selector: (context, appNotifier) => appNotifier.state,
+      builder: (context, state, child) {
         return AnimatedOpacity(
-          opacity: appNotifier.state == 0 ? 1 : 0,
-          duration: Duration(milliseconds: appNotifier.state == 0 ? 400 : 300),
-          curve: appNotifier.state == 0
+          opacity: state == 0 ? 1 : 0,
+          duration: Duration(milliseconds: state == 0 ? 400 : 200),
+          curve: state == 0
               ? Interval(0.5, 1, curve: Curves.ease)
               : Curves.ease,
           child: child,
@@ -371,86 +221,95 @@ class BottomSheetHeader extends StatelessWidget {
       },
       child: Stack(
         children: <Widget>[
-          Column(
-            children: <Widget>[
-              const SizedBox(
-                height: 8,
-              ),
-              FadeTransition(
-                opacity: Tween(
-                  begin: (239 - height / 2) / 48,
-                  end: (height / 2 + 183) / 48,
-                ).animate(anim),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      height: 4,
-                      width: 24,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).dividerColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    Text(
-                      'Explore HC Garden',
-                      style: Theme.of(context).textTheme.title,
-                    ),
-                  ],
+          ValueListenableBuilder(
+            valueListenable: animation,
+            builder: (context, value, child) {
+              return IgnorePointer(
+                ignoring: value < height - 382,
+                child: child,
+              );
+            },
+            child: Column(
+              children: <Widget>[
+                const SizedBox(
+                  height: 8,
                 ),
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              FadeTransition(
-                opacity: Tween(
-                  begin: (406 - height) / 24,
-                  end: 14.58,
-                ).animate(anim),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: Row(
+                FadeTransition(
+                  opacity: Tween(
+                    begin: (239 - height / 2) / 48,
+                    end: (height / 2 + 183) / 48,
+                  ).animate(anim),
+                  child: Column(
                     children: <Widget>[
-                      for (var i = 0; i < 3; i++)
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FlatButton(
-                              colorBrightness: Brightness.dark,
-                              color: _colors[i],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Container(
-                                height: 96,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  _trails[i].toUpperCase(),
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .body2
-                                      .copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        height: 1.5,
-                                      ),
-                                ),
-                              ),
-                              onPressed: () {},
-                            ),
-                          ),
+                      Container(
+                        height: 4,
+                        width: 24,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).dividerColor,
+                          borderRadius: BorderRadius.circular(2),
                         ),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      Text(
+                        'Explore HC Garden',
+                        style: Theme.of(context).textTheme.title,
+                      ),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-            ],
+                const SizedBox(
+                  height: 16,
+                ),
+                FadeTransition(
+                  opacity: Tween(
+                    begin: (406 - height) / 24,
+                    end: 14.58,
+                  ).animate(anim),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Row(
+                      children: <Widget>[
+                        for (var i = 0; i < 3; i++)
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: FlatButton(
+                                colorBrightness: Brightness.dark,
+                                color: _colors[i],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Container(
+                                  height: 96,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    _trails[i].toUpperCase(),
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .body2
+                                        .copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.5,
+                                        ),
+                                  ),
+                                ),
+                                onPressed: () {},
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+              ],
+            ),
           ),
           AnimatedBuilder(
             animation: animation,
@@ -471,8 +330,10 @@ class BottomSheetHeader extends StatelessWidget {
                 child: child,
               );
             },
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(8, topPadding + 8, 0, 0),
+            child: Container(
+              margin: EdgeInsets.only(top: topPadding + 8),
+              color: Theme.of(context).canvasColor,
+              padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
               child: Row(
                 children: <Widget>[
                   for (var i = 0; i < 2; i++)
@@ -570,6 +431,7 @@ class BottomSheetBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
+    final color = Theme.of(context).canvasColor;
     final initialRoute = FadeOutPageRoute<void>(
       builder: (context) {
         return AnimatedBuilder(
@@ -600,19 +462,21 @@ class BottomSheetBody extends StatelessWidget {
                 TabBarView(
                   controller: tabController,
                   children: <Widget>[
-                    Consumer<AppNotifier>(
-                      builder: (context, appNotifier, child) {
+                    Selector<AppNotifier, List<Flora>>(
+                      selector: (context, appNotifier) => appNotifier.floraList,
+                      builder: (context, floraList, child) {
                         return EntityListPage(
                           scrollController: scrollControllers[0],
-                          entityList: appNotifier.floraList,
+                          entityList: floraList,
                         );
                       },
                     ),
-                    Consumer<AppNotifier>(
-                      builder: (context, appNotifier, child) {
+                    Selector<AppNotifier, List<Fauna>>(
+                      selector: (context, appNotifier) => appNotifier.faunaList,
+                      builder: (context, faunaList, child) {
                         return EntityListPage(
                           scrollController: scrollControllers[1],
-                          entityList: appNotifier.faunaList,
+                          entityList: faunaList,
                         );
                       },
                     ),
@@ -622,13 +486,43 @@ class BottomSheetBody extends StatelessWidget {
                   top: 0,
                   right: 0,
                   left: 0,
-                  child: Container(
-                    height: 16,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.white, Colors.white.withOpacity(0)],
+                  child: IgnorePointer(
+                    child: Container(
+                      height: 32,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              color,
+                              color.withOpacity(.738),
+                              color.withOpacity(.541),
+                              color.withOpacity(.382),
+                              color.withOpacity(.278),
+                              color.withOpacity(.194),
+                              color.withOpacity(.126),
+                              color.withOpacity(.075),
+                              color.withOpacity(.042),
+                              color.withOpacity(.021),
+                              color.withOpacity(.008),
+                              color.withOpacity(.002),
+                              color.withOpacity(0),
+                            ],
+                            stops: [
+                              0,
+                              .19,
+                              .34,
+                              .45,
+                              .565,
+                              .65,
+                              .73,
+                              .802,
+                              .861,
+                              .91,
+                              .952,
+                              .982,
+                              1,
+                            ]),
                       ),
                     ),
                   ),
@@ -645,149 +539,6 @@ class BottomSheetBody extends StatelessWidget {
         if (settings.name == Navigator.defaultRouteName) return initialRoute;
         return null;
       },
-    );
-  }
-}
-
-class EntityListPage extends StatelessWidget {
-  final ScrollController scrollController;
-  final List<Entity> entityList;
-  const EntityListPage({
-    Key key,
-    @required this.scrollController,
-    @required this.entityList,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final appNotifier = Provider.of<AppNotifier>(context);
-    return Scrollbar(
-      child: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(0, 16, 0, 72),
-        controller:
-            appNotifier.state == 0 ? scrollController : ScrollController(),
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: entityList.length,
-        itemBuilder: (context, index) {
-          final key = GlobalKey();
-          return Container(
-            key: key,
-            child: InkWell(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-                child: Row(
-                  children: <Widget>[
-                    // CircleAvatar(
-                    //   radius: 32,
-                    //   backgroundImage:
-                    //       NetworkImage(entityList[index].smallImage),
-                    // ),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(32),
-                      child: CustomImage(
-                        entityList[index].smallImage,
-                        height: 64,
-                        width: 64,
-                        placeholderColor: Theme.of(context).dividerColor,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 16,
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Text(
-                            entityList[index].name,
-                            style: Theme.of(context).textTheme.subhead,
-                          ),
-                          Text(
-                            entityList[index].description,
-                            style: Theme.of(context).textTheme.caption.copyWith(
-                                  height: 1.5,
-                                ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 3,
-                          ),
-                          const SizedBox(
-                            height: 4,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              onTap: () {
-                Provider.of<AppNotifier>(context)
-                    .updateState(1, entityList[index]);
-                final oldChild = Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-                  child: Row(
-                    children: <Widget>[
-                      const SizedBox(
-                        width: 80,
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            Text(
-                              entityList[index].name,
-                              style: Theme.of(context).textTheme.subhead,
-                            ),
-                            Text(
-                              entityList[index].description,
-                              style:
-                                  Theme.of(context).textTheme.caption.copyWith(
-                                        height: 1.5,
-                                      ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 3,
-                            ),
-                            const SizedBox(
-                              height: 4,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-                final persistentOldChild = Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 18, 14, 18),
-                  child: Row(
-                    children: <Widget>[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(32),
-                        child: CustomImage(
-                          entityList[index].smallImage,
-                          height: 64,
-                          width: 64,
-                          placeholderColor: Theme.of(context).dividerColor,
-                          fadeInDuration: null,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-                Navigator.of(context).push(
-                  ExpandPageRoute<void>(
-                    builder: (context) => DetailsPage(
-                      entity: entityList[index],
-                      scrollController: scrollController,
-                    ),
-                    sourceKey: key,
-                    oldChild: oldChild,
-                    persistentOldChild: persistentOldChild,
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'dart:ui' as ui show Codec;
-import '../library.dart';
+import '../../library.dart';
 
 /// This is a mixture of [FileImage] and [NetworkImage].
 /// It will download the image from the url once, save it locally in the file system,

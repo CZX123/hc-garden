@@ -98,7 +98,6 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   Drag _scrollDrag;
   ScrollHoldController _scrollHold;
   bool _scrolling;
-  // LocalHistoryEntry _localHistoryEntry;
   int _activeIndex;
   ValueNotifier<bool> _isScrolledNotifier = ValueNotifier(false);
 
@@ -237,10 +236,6 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     }
   }
 
-  // void debugAnimationListener() {
-  //   print('Value: ${_animationController.value}');
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -296,7 +291,6 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     _scrollControllers.forEach((_scrollController) {
       _scrollController.dispose();
     });
-    //_animationController.removeListener(debugAnimationListener);
     _animationController.dispose();
     super.dispose();
   }

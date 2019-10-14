@@ -33,6 +33,12 @@ class AppNotifier extends ChangeNotifier {
   // 0: entity list
   // 1: details page for one entity
   Entity entity;
+  bool _isSearching = false;
+  bool get isSearching => _isSearching;
+  set isSearching(bool isSearching) {
+    _isSearching = isSearching;
+    notifyListeners();
+  }
   bool sheetMinimised = true;
 
   void updateLists(List<Flora> _floraList, List<Fauna> _faunaList) {

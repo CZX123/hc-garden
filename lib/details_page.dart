@@ -16,11 +16,24 @@ class _DetailsPageState extends State<DetailsPage> {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final appNotifier = Provider.of<AppNotifier>(context);
-    return SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
-      controller:
-          appNotifier.state == 1 ? widget.scrollController : ScrollController(),
+    final width = MediaQuery.of(context).size.width;
+    List<String> newImages = [];
+    for (var image in widget.entity.images) {
+      var split = image.split('.');
+      final end = '.' + split.removeLast();
+      newImages.add(split.join('.') + 'h' + end);
+    }
+    return Selector<AppNotifier, int>(
+      selector: (context, appNotifier) => appNotifier.state,
+      builder: (context, state, child) {
+        return SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          controller: state == 1
+              ? widget.scrollController
+              : ScrollController(),
+          child: child,
+        );
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -76,13 +89,13 @@ class _DetailsPageState extends State<DetailsPage> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: <Widget>[
-                  for (var image in widget.entity.images)
+                  for (var image in newImages)
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: CustomImage(
                         image,
                         height: 216,
-                        width: 324,
+                        width: newImages.length == 1 ? width - 32 : 324,
                         fit: BoxFit.cover,
                         placeholderColor: Theme.of(context).dividerColor,
                       ),
