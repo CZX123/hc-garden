@@ -144,10 +144,10 @@ class ExpandItemPageTransition extends StatelessWidget {
           end: RelativeRect.fill,
         ).animate(positionAnimation);
 
-        final Animation<double> fadeMaterialBackground = CurvedAnimation(
-          parent: animation,
-          curve: const Interval(0, .2, curve: Curves.ease),
-        );
+        // final Animation<double> fadeMaterialBackground = CurvedAnimation(
+        //   parent: animation,
+        //   curve: const Interval(0, .2, curve: Curves.ease),
+        // );
 
         final Animation<double> fadeOldContent = Tween(
           begin: 1.0,
@@ -160,7 +160,7 @@ class ExpandItemPageTransition extends StatelessWidget {
         );
 
         //final double distanceToAvatar = topPadding + _calculateHeaderHeight(context, title) - 16;
-        final topDistance = topPadding - 2;
+        final topDistance = topPadding - 4;
         //final topDistance = 270.0;
 
         final Animation<Offset> contentOffset = Tween<Offset>(

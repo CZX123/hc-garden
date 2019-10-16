@@ -98,6 +98,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         width: newImages.length == 1 ? width - 32 : 324,
                         fit: BoxFit.cover,
                         placeholderColor: Theme.of(context).dividerColor,
+                        saveInCache: false,
                       ),
                     ),
                 ],

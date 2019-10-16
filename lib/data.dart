@@ -16,6 +16,11 @@ abstract class Entity {
           smallImage: parsedJson['smallImage'],
           images: List<String>.from(parsedJson['imageRef']),
         );
+
+  @override
+  String toString() {
+    return 'Entity(name: $name, sciName: $sciName)';
+  }
 }
 
 class Fauna extends Entity {
@@ -36,7 +41,14 @@ class AppNotifier extends ChangeNotifier {
   bool _isSearching = false;
   bool get isSearching => _isSearching;
   set isSearching(bool isSearching) {
+    if (isSearching == false) _searchTerm = '';
     _isSearching = isSearching;
+    notifyListeners();
+  }
+  String _searchTerm = '';
+  String get searchTerm => _searchTerm;
+  set searchTerm(String searchTerm) {
+    _searchTerm = searchTerm;
     notifyListeners();
   }
   bool sheetMinimised = true;

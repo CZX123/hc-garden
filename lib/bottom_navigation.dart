@@ -144,7 +144,7 @@ class NotchedAppBar extends StatelessWidget {
               ),
             ),
             Selector<AppNotifier, bool>(
-              selector: (context, appNotifier) => appNotifier.isSearching,
+              selector: (context, appNotifier) => appNotifier.isSearching && appNotifier.state == 0,
               builder: (context, value, child) {
                 return AnimatedPositioned(
                   left: value ? 0 : width / 2 - 28,
@@ -181,7 +181,7 @@ class NotchedAppBar extends StatelessWidget {
               },
             ),
             Selector<AppNotifier, bool>(
-              selector: (context, appNotifier) => appNotifier.isSearching,
+              selector: (context, appNotifier) => appNotifier.isSearching && appNotifier.state == 0,
               builder: (context, value, child) {
                 return AnimatedPositioned(
                   left: width / 2 - 28,
@@ -232,7 +232,7 @@ class _SearchBarState extends State<SearchBar> {
   final focusNode = FocusNode();
 
   void onTextChange() {
-    // search
+    Provider.of<AppNotifier>(context, listen: false).searchTerm = controller.text;
   }
 
   @override

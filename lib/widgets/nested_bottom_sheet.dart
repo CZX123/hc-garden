@@ -50,6 +50,14 @@ typedef NestedBottomSheetBodyBuilder = Widget Function(
   Animation<double> animation,
   TabController tabController,
   List<ScrollController> scrollControllers,
+  List<ScrollController> extraScrollControllers,
+  void Function(double) animateTo,
+);
+
+typedef NestedBottomSheetBackgroundBuilder = Widget Function(
+  BuildContext context,
+  Animation<double> animation,
+  TabController tabController,
   void Function(double) animateTo,
 );
 
@@ -61,9 +69,13 @@ class NestedBottomSheet extends StatefulWidget {
   final double initialPosition;
   final int tablength;
   final int initialTabIndex;
+  final int extraScrollControllers;
+  final ValueNotifier<int>
+      state; // 0: original scroll controllers, 1: extraScrollControllers[0], 2: ...
   final NestedBottomSheetHeaderBuilder headerBuilder;
   final NestedBottomSheetBodyBuilder bodyBuilder;
   final NestedBottomSheetHeaderBuilder footerBuilder;
+  final NestedBottomSheetBackgroundBuilder backgroundBuilder;
   final double endCorrection; // Only from 0 to first snapping position
 
   const NestedBottomSheet({
@@ -79,9 +91,12 @@ class NestedBottomSheet extends StatefulWidget {
     @required this.initialPosition,
     @required this.tablength,
     this.initialTabIndex = 0,
+    this.extraScrollControllers = 0,
+    this.state,
     @required this.headerBuilder,
     @required this.bodyBuilder,
     this.footerBuilder,
+    this.backgroundBuilder,
     this.endCorrection = 0,
   }) : super(key: key);
 
@@ -94,11 +109,14 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   List<double> _sortedPositions;
   AnimationController _animationController;
   List<ScrollController> _scrollControllers;
+  List<ScrollController> _extraScrollControllers;
+  int _state = 0;
+  ScrollController _activeScrollController;
   TabController _tabController;
   Drag _scrollDrag;
   ScrollHoldController _scrollHold;
   bool _scrolling;
-  int _activeIndex;
+  //int _activeIndex;
   ValueNotifier<bool> _isScrolledNotifier = ValueNotifier(false);
 
   void animateTo(double end) {
@@ -106,22 +124,38 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       _sortedPositions.contains(end),
       'Value to animate to should be one of the snapping positions',
     );
-    if (_scrollControllers[_activeIndex].hasClients &&
-        _scrollControllers[_activeIndex].position.maxScrollExtent > 0) {
-      _scrollControllers[_activeIndex].jumpTo(0);
+    if (_activeScrollController.hasClients &&
+        _activeScrollController.position.maxScrollExtent > 0) {
+      _activeScrollController.jumpTo(0);
     }
     final start = _animationController.value;
     final simulation = ScrollSpringSimulation(spring, start, end, 0);
     _animationController.animateWith(simulation);
   }
 
+  void stateListener() {
+    final _newState = widget.state.value;
+    if (_newState != 0) {
+      if (_newState != _state) {
+        dragCancel();
+        _state = _newState;
+        _activeScrollController = _extraScrollControllers[_state - 1];
+      }
+    } else {
+      _state = 0;
+      tabListener();
+    }
+  }
+
   void tabListener() {
-    final _newIndex = _tabController.index;
-    if (_activeIndex != _newIndex) {
-      dragCancel();
-      _activeIndex = _newIndex;
-      _isScrolledNotifier.value = _scrollControllers[_activeIndex].hasClients &&
-          _scrollControllers[_activeIndex].offset > 5;
+    if (_state == 0) {
+      final _newScrollController = _scrollControllers[_tabController.index];
+      if (_activeScrollController != _newScrollController) {
+        dragCancel();
+        _activeScrollController = _newScrollController;
+        _isScrolledNotifier.value = _activeScrollController.hasClients &&
+            _activeScrollController.offset > 5;
+      }
     }
   }
 
@@ -146,47 +180,44 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     _animationController.value = _animationController.value;
 
     // Check if the scroll view is scrollable in the first place
-    if (_scrollControllers[_activeIndex].hasClients &&
-        _scrollControllers[_activeIndex].position.maxScrollExtent > 0) {
+    if (_activeScrollController.hasClients &&
+        _activeScrollController.position.maxScrollExtent > 0) {
       // simulate a hold on the scroll view
-      _scrollHold = _scrollControllers[_activeIndex].position.hold(removeHold);
+      _scrollHold = _activeScrollController.position.hold(removeHold);
     }
   }
 
   // User has just started to drag
   void dragStart(DragStartDetails details) {
     // Check if the [SingleChildScrollView] is scrollable in the first place
-    if (_scrollControllers[_activeIndex].hasClients &&
-        _scrollControllers[_activeIndex].position.maxScrollExtent > 0) {
+    if (_activeScrollController.hasClients &&
+        _activeScrollController.position.maxScrollExtent > 0) {
       // simulate a scroll on the [SingleChildScrollView]
-      _scrollDrag =
-          _scrollControllers[_activeIndex].position.drag(details, removeDrag);
+      _scrollDrag = _activeScrollController.position.drag(details, removeDrag);
     }
   }
 
   // User is in the process of dragging
   void dragUpdate(DragUpdateDetails details) {
     // Scrolling the inner scroll view
-    if (_scrollControllers[_activeIndex].hasClients &&
+    if (_activeScrollController.hasClients &&
         _animationController.value == _sortedPositions.first &&
-        (details.primaryDelta < 0 ||
-            _scrollControllers[_activeIndex].offset > 0)) {
+        (details.primaryDelta < 0 || _activeScrollController.offset > 0)) {
       if (_scrollDrag == null) {
-        _scrollDrag = _scrollControllers[_activeIndex].position.drag(
-              DragStartDetails(
-                sourceTimeStamp: details.sourceTimeStamp,
-                globalPosition: details.globalPosition,
-              ),
-              removeDrag,
-            );
+        _scrollDrag = _activeScrollController.position.drag(
+          DragStartDetails(
+            sourceTimeStamp: details.sourceTimeStamp,
+            globalPosition: details.globalPosition,
+          ),
+          removeDrag,
+        );
       }
       _scrolling = true;
       _scrollDrag.update(details);
     } else {
       // Dragging the outer bottom sheet
       dragCancel();
-      if (_scrollControllers[_activeIndex].hasClients)
-        _scrollControllers[_activeIndex].jumpTo(0);
+      if (_activeScrollController.hasClients) _activeScrollController.jumpTo(0);
       _scrolling = false;
       if (_animationController.value < _sortedPositions[1]) {
         final range = _sortedPositions[1] - _sortedPositions.first;
@@ -239,7 +270,6 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   @override
   void initState() {
     super.initState();
-    _activeIndex = widget.initialTabIndex;
     _sortedPositions = widget.snappingPositions;
     _sortedPositions.sort();
     final _initialPosition = widget.initialPosition ?? _sortedPositions.first;
@@ -256,11 +286,19 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     _scrollControllers = [
       for (int i = 0; i < widget.tablength; i++) ScrollController(),
     ];
+    _extraScrollControllers = [
+      for (int i = 0; i < widget.extraScrollControllers; i++)
+        ScrollController(),
+    ];
     _tabController = TabController(
-      initialIndex: _activeIndex,
+      initialIndex: widget.initialTabIndex,
       length: widget.tablength,
       vsync: this,
     )..addListener(tabListener);
+    if (widget.state != null) {
+      widget.state.addListener(stateListener);
+    }
+    stateListener();
   }
 
   @override
@@ -287,6 +325,9 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   @override
   void dispose() {
     _tabController.removeListener(tabListener);
+    if (widget.state != null) {
+      widget.state.removeListener(stateListener);
+    }
     _tabController.dispose();
     _scrollControllers.forEach((_scrollController) {
       _scrollController.dispose();
@@ -307,88 +348,101 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       begin: RoundedRectangleBorder(),
       end: widget.shape.scale(1 / _sortedPositions[1]),
     ).animate(_animationController);
-    return GestureDetector(
-      onVerticalDragDown: dragDown,
-      onVerticalDragStart: dragStart,
-      onVerticalDragUpdate: dragUpdate,
-      onVerticalDragEnd: dragEnd,
-      onVerticalDragCancel: dragCancel,
-      child: Stack(
-        children: <Widget>[
-          SlideTransition(
-            position: position,
-            child: Container(
-              decoration: BoxDecoration(
-                boxShadow: kElevationToShadow[6],
-              ),
-              child: AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) {
-                  return PhysicalShape(
-                    color: widget.color ?? Theme.of(context).canvasColor,
-                    clipper: ShapeBorderClipper(
-                      shape: _animationController.value < _sortedPositions[1]
-                          ? shape.value
-                          : widget.shape,
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: child,
-                  );
-                },
-                child: Stack(
-                  children: <Widget>[
-                    NotificationListener(
-                      onNotification: (notification) {
-                        if (notification is ScrollUpdateNotification &&
-                            notification.depth == 1) {
-                          if (notification.metrics.pixels <= 5 &&
-                              _isScrolledNotifier.value == true) {
-                            _isScrolledNotifier.value = false;
-                          } else if (notification.metrics.pixels > 5 &&
-                              _isScrolledNotifier.value == false)
-                            _isScrolledNotifier.value = true;
-                        }
-                        return null;
-                      },
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: height,
-                        child: widget.bodyBuilder(
+    return Stack(
+      children: <Widget>[
+        if (widget.backgroundBuilder != null)
+          widget.backgroundBuilder(
+            context,
+            _animationController.view,
+            _tabController,
+            animateTo,
+          ),
+        GestureDetector(
+          onVerticalDragDown: dragDown,
+          onVerticalDragStart: dragStart,
+          onVerticalDragUpdate: dragUpdate,
+          onVerticalDragEnd: dragEnd,
+          onVerticalDragCancel: dragCancel,
+          child: Stack(
+            children: <Widget>[
+              SlideTransition(
+                position: position,
+                child: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: kElevationToShadow[6],
+                  ),
+                  child: AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      return PhysicalShape(
+                        color: widget.color ?? Theme.of(context).canvasColor,
+                        clipper: ShapeBorderClipper(
+                          shape:
+                              _animationController.value < _sortedPositions[1]
+                                  ? shape.value
+                                  : widget.shape,
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: child,
+                      );
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        NotificationListener(
+                          onNotification: (notification) {
+                            if (notification is ScrollUpdateNotification &&
+                                notification.depth == 1) {
+                              if (notification.metrics.pixels <= 5 &&
+                                  _isScrolledNotifier.value == true) {
+                                _isScrolledNotifier.value = false;
+                              } else if (notification.metrics.pixels > 5 &&
+                                  _isScrolledNotifier.value == false)
+                                _isScrolledNotifier.value = true;
+                            }
+                            return null;
+                          },
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            height: height,
+                            child: widget.bodyBuilder(
+                              context,
+                              _animationController.view,
+                              _tabController,
+                              _scrollControllers,
+                              _extraScrollControllers,
+                              animateTo,
+                            ),
+                          ),
+                        ),
+                        widget.headerBuilder(
                           context,
                           _animationController.view,
                           _tabController,
-                          _scrollControllers,
                           animateTo,
+                          _isScrolledNotifier,
                         ),
-                      ),
+                      ],
                     ),
-                    widget.headerBuilder(
-                      context,
-                      _animationController.view,
-                      _tabController,
-                      animateTo,
-                      _isScrolledNotifier,
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+              if (widget.footerBuilder != null)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: widget.footerBuilder(
+                    context,
+                    _animationController.view,
+                    _tabController,
+                    animateTo,
+                    _isScrolledNotifier,
+                  ),
+                ),
+            ],
           ),
-          if (widget.footerBuilder != null)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: widget.footerBuilder(
-                context,
-                _animationController.view,
-                _tabController,
-                animateTo,
-                _isScrolledNotifier,
-              ),
-            ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -37,8 +37,7 @@ class MyApp extends StatelessWidget {
             home: MyHomePage(title: 'Nested Bottom Sheet'),
             debugShowMaterialGrid: debugInfo.debugShowMaterialGrid,
             showPerformanceOverlay: debugInfo.showPerformanceOverlay,
-            checkerboardRasterCacheImages:
-                debugInfo.checkerboardRasterCacheImages,
+            checkerboardRasterCacheImages: debugInfo.checkerboardRasterCacheImages,
             checkerboardOffscreenLayers: debugInfo.checkerboardOffscreenLayers,
             showSemanticsDebugger: debugInfo.showSemanticsDebugger,
             debugShowCheckedModeBanner: debugInfo.debugShowCheckedModeBanner,
@@ -60,6 +59,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _navigatorKey = GlobalKey<NavigatorState>();
+  final _state = ValueNotifier(0);
 
   @override
   void initState() {
@@ -91,11 +91,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return Selector<AppNotifier, int>(
       selector: (context, appNotifier) => appNotifier.state,
       builder: (context, state, child) {
+        _state.value = state;
         return WillPopScope(
           onWillPop: () async {
             final appNotifier =
                 Provider.of<AppNotifier>(context, listen: false);
-            if (appNotifier.isSearching) {
+            if (appNotifier.isSearching && appNotifier.state == 0) {
               appNotifier.isSearching = false;
               return false;
             }
@@ -112,16 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
           },
           child: Scaffold(
             endDrawer: DebugDrawer(),
-            body: Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/images/background.png',
-                    fit: BoxFit.fitWidth,
-                  ),
-                ),
-                if (height != 0)
-                  NestedBottomSheet(
+            body: height != 0
+                ? NestedBottomSheet(
                     endCorrection: topPadding - 206,
                     height: height,
                     snappingPositions: state == 0
@@ -134,6 +127,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           ],
                     initialPosition: height - 382,
                     tablength: 2,
+                    extraScrollControllers: 1,
+                    state: _state,
+                    backgroundBuilder:
+                        (context, animation, tabController, animateTo) {
+                      return MapWidget();
+                    },
                     headerBuilder: (
                       context,
                       animation,
@@ -154,12 +153,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       animation,
                       tabController,
                       scrollControllers,
+                      extraScrollControllers,
                       animateTo,
                     ) {
                       return BottomSheetBody(
                         animation: animation,
                         tabController: tabController,
                         scrollControllers: scrollControllers,
+                        extraScrollControllers: extraScrollControllers,
                         animateTo: animateTo,
                         navigatorKey: _navigatorKey,
                       );
@@ -176,9 +177,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         animateTo: animateTo,
                       );
                     },
-                  ),
-              ],
-            ),
+                  )
+                : SizedBox.shrink(),
           ),
         );
       },
@@ -213,9 +213,8 @@ class BottomSheetHeader extends StatelessWidget {
         return AnimatedOpacity(
           opacity: state == 0 ? 1 : 0,
           duration: Duration(milliseconds: state == 0 ? 400 : 200),
-          curve: state == 0
-              ? Interval(0.5, 1, curve: Curves.ease)
-              : Curves.ease,
+          curve:
+              state == 0 ? Interval(0.5, 1, curve: Curves.ease) : Curves.ease,
           child: child,
         );
       },
@@ -416,6 +415,7 @@ class BottomSheetBody extends StatelessWidget {
   final Animation<double> animation;
   final TabController tabController;
   final List<ScrollController> scrollControllers;
+  final List<ScrollController> extraScrollControllers;
   final Function(double) animateTo;
   final GlobalKey<NavigatorState> navigatorKey;
   const BottomSheetBody({
@@ -423,6 +423,7 @@ class BottomSheetBody extends StatelessWidget {
     @required this.animation,
     @required this.tabController,
     @required this.scrollControllers,
+    @required this.extraScrollControllers,
     @required this.animateTo,
     @required this.navigatorKey,
   }) : super(key: key);
@@ -467,6 +468,7 @@ class BottomSheetBody extends StatelessWidget {
                       builder: (context, floraList, child) {
                         return EntityListPage(
                           scrollController: scrollControllers[0],
+                          extraScrollController: extraScrollControllers[0],
                           entityList: floraList,
                         );
                       },
@@ -476,6 +478,7 @@ class BottomSheetBody extends StatelessWidget {
                       builder: (context, faunaList, child) {
                         return EntityListPage(
                           scrollController: scrollControllers[1],
+                          extraScrollController: extraScrollControllers[0],
                           entityList: faunaList,
                         );
                       },

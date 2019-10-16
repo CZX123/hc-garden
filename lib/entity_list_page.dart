@@ -2,29 +2,49 @@ import 'library.dart';
 
 class EntityListPage extends StatelessWidget {
   final ScrollController scrollController; // From the bottom sheet
+  final ScrollController extraScrollController; // For the details page;
   final List<Entity> entityList;
   const EntityListPage({
     Key key,
     @required this.scrollController,
+    @required this.extraScrollController,
     @required this.entityList,
   }) : super(key: key);
 
+  static bool _isValid(Entity entity, String searchTerm) {
+    return !entity.name.split(' ').every((name) {
+          return !name.toLowerCase().startsWith(searchTerm.toLowerCase());
+        }) ||
+        !entity.sciName.split(' ').every((name) {
+          return !name.toLowerCase().startsWith(searchTerm.toLowerCase());
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Selector<AppNotifier, int>(
-      selector: (context, appNotifier) => appNotifier.state,
-      builder: (context, state, child) {
-        return Scrollbar(
+    if (entityList.length == 0) return SizedBox.shrink();
+    return Selector<AppNotifier, String>(
+      selector: (context, appNotifier) => appNotifier.searchTerm,
+      builder: (context, searchTerm, child) {
+        List<Entity> _list = [];
+        entityList.forEach((entity) {
+          if (_isValid(entity, searchTerm)) {
+            _list.add(entity);
+          }
+        });
+        print(_list);
+        return CustomAnimatedSwitcher(
           child: ListView.builder(
+            key: ValueKey(searchTerm),
             padding: const EdgeInsets.fromLTRB(0, 16, 0, 72),
-            controller: state == 0 ? scrollController : ScrollController(),
+            controller: scrollController,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: entityList.length,
+            itemCount: _list.length,
+            itemExtent: 104,
             itemBuilder: (context, index) {
               return EntityListRow(
-                key: ObjectKey(entityList[index]),
-                entity: entityList[index],
-                scrollController: scrollController,
+                entity: _list[index],
+                scrollController: extraScrollController,
               );
             },
           ),
@@ -48,6 +68,7 @@ class EntityListRow extends StatelessWidget {
     final key = GlobalKey();
     return Container(
       key: key,
+      height: 104,
       child: InkWell(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
@@ -69,6 +90,7 @@ class EntityListRow extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
                       entity.name,
@@ -94,7 +116,8 @@ class EntityListRow extends StatelessWidget {
         onTap: () {
           Provider.of<AppNotifier>(context, listen: false)
               .updateState(1, entity);
-          final oldChild = Padding(
+          final oldChild = Container(
+            height: 104,
             padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
             child: Row(
               children: <Widget>[
@@ -104,6 +127,7 @@ class EntityListRow extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
                         entity.name,
@@ -126,7 +150,8 @@ class EntityListRow extends StatelessWidget {
               ],
             ),
           );
-          final persistentOldChild = Padding(
+          final persistentOldChild = Container(
+            height: 104,
             padding: const EdgeInsets.fromLTRB(14, 18, 14, 18),
             child: Row(
               children: <Widget>[

@@ -10,6 +10,8 @@ class CustomImage extends StatefulWidget {
   final double width;
   final double height;
   final Duration fadeInDuration;
+  final bool keepAlive;
+  final bool saveInCache;
   CustomImage(
     this.url, {
     Key key,
@@ -20,6 +22,8 @@ class CustomImage extends StatefulWidget {
     this.width,
     this.height,
     this.fadeInDuration: const Duration(milliseconds: 400),
+    this.keepAlive: false,
+    this.saveInCache: true,
   }) : super(key: key);
 
   _CustomImageState createState() => _CustomImageState();
@@ -29,6 +33,7 @@ class _CustomImageState extends State<CustomImage>
     with AutomaticKeepAliveClientMixin {
   static final HttpClient _httpClient = HttpClient();
   MemoryImage _imageProvider;
+  bool networkError = false;
   bool didUpdate = false;
   bool fadeIn = false;
   //int rebuildCount= 0;
@@ -39,17 +44,18 @@ class _CustomImageState extends State<CustomImage>
     final File file = File('${dir.path}/$filePath');
     if (file.existsSync()) {
       Uint8List bytes = file.readAsBytesSync();
-      if (mounted && _imageProvider == null)
+      if (mounted && (_imageProvider == null || networkError))
         setState(() {
+          networkError = false;
           fadeIn = false;
           _imageProvider = MemoryImage(bytes);
         });
-      if (bytes.lengthInBytes < 200000) {
+      if (widget.saveInCache) {
         var size = 0;
         imageMap.forEach((key, value) {
           size += value.length;
         });
-        while (size > 5000000) {
+        while (size > 10000000) {
           size -= imageMap.values.toList()[0].length;
           imageMap.remove(imageMap.keys.toList()[0]);
         }
@@ -77,12 +83,12 @@ class _CustomImageState extends State<CustomImage>
           fadeIn = true;
           _imageProvider = MemoryImage(bytes);
         });
-      if (bytes.lengthInBytes < 200000) {
+      if (widget.saveInCache) {
         var size = 0;
         imageMap.forEach((key, value) {
           size += value.lengthInBytes;
         });
-        while (size > 5000000) {
+        while (size > 10000000) {
           size -= imageMap.values.toList()[0].lengthInBytes;
           imageMap.remove(imageMap.keys.toList()[0]);
         }
@@ -96,6 +102,7 @@ class _CustomImageState extends State<CustomImage>
       if (mounted && _imageProvider == null) {
         setState(() {
           fadeIn = true;
+          networkError = true;
           _imageProvider =
               MemoryImage(widget.fallbackMemoryImage ?? kTransparentImage);
         });
@@ -185,5 +192,5 @@ class _CustomImageState extends State<CustomImage>
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => widget.keepAlive;
 }
