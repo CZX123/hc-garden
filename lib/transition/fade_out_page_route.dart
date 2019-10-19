@@ -1,4 +1,4 @@
-import 'package:bottom_sheet/library.dart';
+import '../library.dart';
 
 class FadeOutPageRoute<T> extends PageRoute<T> {
   final WidgetBuilder builder;

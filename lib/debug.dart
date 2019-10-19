@@ -1,5 +1,5 @@
 import 'dart:io' show Platform;
-import 'package:bottom_sheet/library.dart';
+import 'library.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 
 class DebugNotifier extends ChangeNotifier {
