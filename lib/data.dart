@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'library.dart';
 
 // TODO: Edit this to contain more information about each Entity in Firebase Database
 abstract class Entity {
@@ -7,14 +7,43 @@ abstract class Entity {
   final String description;
   final String smallImage;
   final List<String> images;
-  const Entity({this.name, this.sciName, this.description, this.smallImage, this.images});
-  Entity.fromJson(Map<String, dynamic> parsedJson)
+  final LatLng coordinates;
+  final List<TrailLocation> locations;
+  final List<LatLng> area;
+  const Entity({
+    this.name,
+    this.sciName,
+    this.description,
+    this.smallImage,
+    this.images,
+    this.coordinates,
+    this.locations,
+    this.area,
+  });
+  Entity.fromJson(Map<String, dynamic> parsedJson, [int id])
       : this(
           name: parsedJson['name'],
           sciName: parsedJson['sciName'],
           description: parsedJson['description'],
           smallImage: parsedJson['smallImage'],
           images: List<String>.from(parsedJson['imageRef']),
+          coordinates: parsedJson.containsKey('latitude')
+              ? LatLng(parsedJson['latitude'], parsedJson['longitude'])
+              : null,
+          locations: List<String>.from(parsedJson['locations'].split(','))
+              .map((value) {
+            final split = value.split('/');
+            return TrailLocation(
+              trail: split[0],
+              // todo
+            );
+          }).toList(),
+          area: parsedJson.containsKey('area')
+              ? List<Map<String, dynamic>>.from(parsedJson['area'])
+                  .map((position) {
+                  return LatLng(position['latitude'], position['longitude']);
+                }).toList()
+              : null,
         );
 
   @override
@@ -31,6 +60,33 @@ class Flora extends Entity {
   Flora.fromJson(Map<String, dynamic> parsedJson) : super.fromJson(parsedJson);
 }
 
+// A TrailLocation is a point on the trail
+class TrailLocation {
+  final String trail;
+  final String name;
+  final String image;
+  final String smallImage;
+  final LatLng coordinates;
+  final List<EntityPosition> entityPositions;
+  TrailLocation({
+    this.trail,
+    this.name,
+    this.image,
+    this.smallImage,
+    this.coordinates,
+    this.entityPositions,
+  });
+}
+
+class EntityPosition {
+  final Entity entity;
+  final double left;
+  final double top;
+  final num pulse;
+  final num size;
+  EntityPosition({this.entity, this.left, this.top, this.pulse, this.size});
+}
+
 class AppNotifier extends ChangeNotifier {
   List<Flora> floraList = [];
   List<Fauna> faunaList = [];
@@ -45,12 +101,14 @@ class AppNotifier extends ChangeNotifier {
     _isSearching = isSearching;
     notifyListeners();
   }
+
   String _searchTerm = '';
   String get searchTerm => _searchTerm;
   set searchTerm(String searchTerm) {
     _searchTerm = searchTerm;
     notifyListeners();
   }
+
   bool sheetMinimised = true;
 
   void updateLists(List<Flora> _floraList, List<Fauna> _faunaList) {
@@ -64,4 +122,34 @@ class AppNotifier extends ChangeNotifier {
     entity = newEntity;
     notifyListeners();
   }
+}
+
+class SearchNotifier extends ChangeNotifier {
+  bool _isSearching = false;
+  bool get isSearching => _isSearching;
+  set isSearching(bool isSearching) {
+    if (isSearching == false) _searchTerm = '';
+    _isSearching = isSearching;
+    notifyListeners();
+  }
+
+  String _searchTerm = '';
+  String get searchTerm => _searchTerm;
+  set searchTerm(String searchTerm) {
+    _searchTerm = searchTerm;
+    notifyListeners();
+  }
+
+  FocusNode focusNode;
+
+  bool _keyboardAppear = false;
+  bool get keyboardAppear => _keyboardAppear;
+  set keyboardAppear(bool keyboardAppear) {
+    _keyboardAppear = keyboardAppear;
+    if (focusNode == null) return;
+    if (keyboardAppear) focusNode.requestFocus();
+    else focusNode.unfocus();
+    notifyListeners();
+  }
+
 }

@@ -22,7 +22,17 @@ class EntityListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final floraIcons = [
+      Icons.nature_people,
+      Icons.filter_vintage,
+      Icons.spa,
+    ];
+    final faunaIcons = [
+      Icons.bug_report,
+      Icons.pets,
+    ];
     if (entityList.length == 0) return SizedBox.shrink();
+    final bool isFlora = entityList[0] is Flora;
     return Selector<AppNotifier, String>(
       selector: (context, appNotifier) => appNotifier.searchTerm,
       builder: (context, searchTerm, child) {
@@ -32,22 +42,49 @@ class EntityListPage extends StatelessWidget {
             _list.add(entity);
           }
         });
-        print(_list);
+        if (isFlora)
+          floraIcons.shuffle();
+        else
+          faunaIcons.shuffle();
         return CustomAnimatedSwitcher(
-          child: ListView.builder(
-            key: ValueKey(searchTerm),
-            padding: const EdgeInsets.fromLTRB(0, 16, 0, 72),
-            controller: scrollController,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: _list.length,
-            itemExtent: 104,
-            itemBuilder: (context, index) {
-              return EntityListRow(
-                entity: _list[index],
-                scrollController: extraScrollController,
-              );
-            },
-          ),
+          child: _list.length == 0
+              ? Padding(
+                  key: ValueKey(searchTerm + '-i'),
+                  padding: const EdgeInsets.fromLTRB(0, 16, 0, 64),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        isFlora ? floraIcons[0] : faunaIcons[0],
+                        size: 64,
+                        color: Theme.of(context).disabledColor,
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      Text(
+                        'No matching ${isFlora ? 'flora' : 'fauna'}',
+                        style: Theme.of(context).textTheme.body1.copyWith(
+                              color: Theme.of(context).disabledColor,
+                            ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  key: ValueKey(searchTerm),
+                  padding: const EdgeInsets.fromLTRB(0, 16, 0, 96),
+                  controller: scrollController,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: _list.length,
+                  itemExtent: 104,
+                  itemBuilder: (context, index) {
+                    return EntityListRow(
+                      entity: _list[index],
+                      scrollController: extraScrollController,
+                    );
+                  },
+                ),
         );
       },
     );
@@ -177,6 +214,7 @@ class EntityListRow extends StatelessWidget {
               sourceKey: key,
               oldChild: oldChild,
               persistentOldChild: persistentOldChild,
+              scrollController: scrollController,
             ),
           );
         },

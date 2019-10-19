@@ -10,15 +10,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Custom cache for all images in the app
+        Provider<Map<String, Uint8List>>.value(
+          value: {},
+        ),
         // TODO: Add a StreamProvider for Firebase Database
         ChangeNotifierProvider(
           builder: (context) => DebugNotifier(),
         ),
         ChangeNotifierProvider(
           builder: (context) => AppNotifier(),
-        ),
-        Provider<Map<String, Uint8List>>.value(
-          value: {},
         ),
         FutureProvider.value(
           value: getApplicationDocumentsDirectory(),

@@ -24,7 +24,7 @@ class DebugNotifier extends ChangeNotifier {
   }
 
   void toggleSlowAnimations() {
-    timeDilation = timeDilation == 1.0 ? 6.0 : 1.0;
+    timeDilation = timeDilation == 1.0 ? 5.0 : 1.0;
   }
 
   void toggleMaterialGrid() {

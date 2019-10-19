@@ -5,6 +5,8 @@ class ExpandPageRoute<T> extends PageRoute<T> {
   final GlobalKey sourceKey;
   final Widget oldChild;
   final Widget persistentOldChild;
+  final ScrollController
+      scrollController; // Scroll Controller of next page to listen to so the hero transition works even after scrolling
 
   ExpandPageRoute({
     @required this.builder,
@@ -12,6 +14,7 @@ class ExpandPageRoute<T> extends PageRoute<T> {
     @required this.sourceKey,
     this.oldChild,
     this.persistentOldChild,
+    this.scrollController,
     RouteSettings settings,
   })  : assert(builder != null),
         assert(transitionDuration != null),
@@ -94,6 +97,8 @@ class ExpandPageRoute<T> extends PageRoute<T> {
       animation: animation,
       secondaryAnimation: secondaryAnimation,
       child: child,
+      scrollController: scrollController,
+      transitionDuration: transitionDuration,
     );
   }
 
@@ -102,7 +107,7 @@ class ExpandPageRoute<T> extends PageRoute<T> {
 }
 
 // Borrowed from https://github.com/flschweiger/reply
-class ExpandItemPageTransition extends StatelessWidget {
+class ExpandItemPageTransition extends StatefulWidget {
   const ExpandItemPageTransition({
     Key key,
     @required this.sourceKey,
@@ -112,6 +117,8 @@ class ExpandItemPageTransition extends StatelessWidget {
     @required this.animation,
     @required this.secondaryAnimation,
     @required this.child,
+    this.scrollController,
+    this.transitionDuration,
   }) : super(key: key);
 
   final GlobalKey sourceKey;
@@ -121,11 +128,39 @@ class ExpandItemPageTransition extends StatelessWidget {
   final Animation<double> animation;
   final Animation<double> secondaryAnimation;
   final Widget child;
+  final ScrollController scrollController;
+  final Duration transitionDuration;
+
+  @override
+  _ExpandItemPageTransitionState createState() =>
+      _ExpandItemPageTransitionState();
+}
+
+class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
+  double scrollOffset = 0;
+
+  void scrollListener() {
+    scrollOffset =
+        widget.scrollController.hasClients ? widget.scrollController.offset : 0;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController?.addListener(scrollListener);
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController?.removeListener(scrollListener);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final Animation<double> animation = ModalRoute.of(context).animation;
     final double topPadding = MediaQuery.of(context).padding.top;
+    final topDistance = topPadding - 4;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -137,9 +172,9 @@ class ExpandItemPageTransition extends StatelessWidget {
         final Animation<RelativeRect> itemPosition = RelativeRectTween(
           begin: RelativeRect.fromLTRB(
             0,
-            sourceRect.top,
+            widget.sourceRect.top,
             0,
-            constraints.biggest.height - sourceRect.bottom,
+            constraints.biggest.height - widget.sourceRect.bottom,
           ),
           end: RelativeRect.fill,
         ).animate(positionAnimation);
@@ -159,18 +194,14 @@ class ExpandItemPageTransition extends StatelessWidget {
           ),
         );
 
-        //final double distanceToAvatar = topPadding + _calculateHeaderHeight(context, title) - 16;
-        final topDistance = topPadding - 4;
-        //final topDistance = 270.0;
-
         final Animation<Offset> contentOffset = Tween<Offset>(
-          begin: Offset(0, -topDistance),
+          begin: Offset(0, -topDistance + scrollOffset),
           end: Offset.zero,
         ).animate(positionAnimation);
 
         final Animation<Offset> oldChildOffset = Tween<Offset>(
           begin: Offset.zero,
-          end: Offset(0, topDistance),
+          end: Offset(0, topDistance - scrollOffset),
         ).animate(positionAnimation);
 
         final Animation<double> fadeContent = CurvedAnimation(
@@ -188,8 +219,13 @@ class ExpandItemPageTransition extends StatelessWidget {
                     animation: contentOffset,
                     builder: (context, child) {
                       return Material(
-                        elevation: contentOffset.value.dy > -topDistance / 2 ? 2 : 0,
-                        animationDuration: Duration(milliseconds: 80),
+                        elevation:
+                            animation.status == AnimationStatus.reverse ||
+                                    contentOffset.value.dy ==
+                                        -topDistance + scrollOffset
+                                ? 0
+                                : 3,
+                        animationDuration: widget.transitionDuration,
                         child: Transform.translate(
                           offset: contentOffset.value,
                           child: child,
@@ -202,7 +238,7 @@ class ExpandItemPageTransition extends StatelessWidget {
                         constraints: BoxConstraints(
                           minHeight: constraints.biggest.height,
                         ),
-                        child: child,
+                        child: widget.child,
                       ),
                     ),
                   ),
@@ -215,7 +251,7 @@ class ExpandItemPageTransition extends StatelessWidget {
                         animation: oldChildOffset,
                         child: FadeTransition(
                           opacity: fadeOldContent,
-                          child: oldChild,
+                          child: widget.oldChild,
                         ),
                         builder: (context, child) {
                           return Transform.translate(
@@ -226,7 +262,7 @@ class ExpandItemPageTransition extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (persistentOldChild != null)
+                  if (widget.persistentOldChild != null)
                     Positioned(
                       left: 0,
                       top: 0,
@@ -234,7 +270,7 @@ class ExpandItemPageTransition extends StatelessWidget {
                       child: IgnorePointer(
                         child: AnimatedBuilder(
                           animation: oldChildOffset,
-                          child: persistentOldChild,
+                          child: widget.persistentOldChild,
                           builder: (context, child) {
                             if (oldChildOffset.value.dy == topDistance)
                               return SizedBox.shrink();
