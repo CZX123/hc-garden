@@ -58,5 +58,13 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 ## Future Improvements
 
-### Images
+### Possible
 - Images should not use a new cache, but somehow utilise ImageCache instead. Make use of ImageProvider to place images directly in ImageCache.
+- ExpandPageRouteTransition can be simplified greatly, and also figure out how to properly use Heroes to animate the Entity thumbnail to the DetailsPage.
+
+### Possible but very hard
+- Tablet support
+- Web support
+
+### Far Future
+- Should there be a Google Maps for Dart SDK in the future, migrate to it asap. The native Google Maps view is filled with bugs.
