@@ -2,6 +2,7 @@ import 'library.dart';
 
 // TODO: Edit this to contain more information about each Entity in Firebase Database
 abstract class Entity {
+  final String code;
   final String name;
   final String sciName;
   final String description;
@@ -11,6 +12,7 @@ abstract class Entity {
   final List<TrailLocation> locations;
   final List<LatLng> area;
   const Entity({
+    this.code,
     this.name,
     this.sciName,
     this.description,
@@ -20,8 +22,9 @@ abstract class Entity {
     this.locations,
     this.area,
   });
-  Entity.fromJson(Map<String, dynamic> parsedJson, [int id])
+  Entity.fromJson(String key, dynamic parsedJson, [int id])
       : this(
+          code: key,
           name: parsedJson['name'],
           sciName: parsedJson['sciName'],
           description: parsedJson['description'],
@@ -53,11 +56,11 @@ abstract class Entity {
 }
 
 class Fauna extends Entity {
-  Fauna.fromJson(Map<String, dynamic> parsedJson) : super.fromJson(parsedJson);
+  Fauna.fromJson(String key, dynamic parsedJson, [int id]) : super.fromJson(key, parsedJson);
 }
 
 class Flora extends Entity {
-  Flora.fromJson(Map<String, dynamic> parsedJson) : super.fromJson(parsedJson);
+  Flora.fromJson(String key, dynamic parsedJson, [int id]) : super.fromJson(key, parsedJson);
 }
 
 // A TrailLocation is a point on the trail
