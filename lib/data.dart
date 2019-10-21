@@ -42,7 +42,7 @@ abstract class Entity {
             );
           }).toList(),
           area: parsedJson.containsKey('area')
-              ? List<Map<String, dynamic>>.from(parsedJson['area'])
+              ? List.from(parsedJson['area'])
                   .map((position) {
                   return LatLng(position['latitude'], position['longitude']);
                 }).toList()
