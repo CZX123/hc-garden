@@ -1,4 +1,5 @@
 import 'library.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -61,27 +62,53 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _navigatorKey = GlobalKey<NavigatorState>();
   final _state = ValueNotifier(0);
+  StreamSubscription<List<Entity>> stream;
+
+  void onData(List<Entity> list) {
+    List<Flora> floraList = [];
+    List<Fauna> faunaList = [];
+    for (var entity in list) {
+      if (entity is Flora) {
+        floraList.add(entity);
+      } else {
+        final fauna = entity as Fauna;
+        faunaList.add(fauna);
+      }
+    }
+    floraList.sort((a, b) => a.name.compareTo(b.name));
+    faunaList.sort((a, b) => a.name.compareTo(b.name));
+    Provider.of<AppNotifier>(context, listen: false)
+        .updateLists(floraList, faunaList);
+  }
 
   @override
   void initState() {
     super.initState();
-    // TODO: Change to Firebase Database
-    rootBundle.loadString('assets/data/data.json').then((contents) {
-      List<Flora> floraList = [];
-      List<Fauna> faunaList = [];
-      final parsedJson = jsonDecode(contents);
-      parsedJson['flora&fauna'].forEach((key, value) {
-        if (key.contains('flora')) {
-          floraList.add(Flora.fromJson(value));
-        } else if (key.contains('fauna')) {
-          faunaList.add(Fauna.fromJson(value));
-        }
-      });
-      floraList.sort((a, b) => a.name.compareTo(b.name));
-      faunaList.sort((a, b) => a.name.compareTo(b.name));
-      Provider.of<AppNotifier>(context, listen: false)
-          .updateLists(floraList, faunaList);
-    });
+    stream = FirebaseDatabase.instance
+        .reference()
+        .child('flora&fauna')
+        .onValue
+        .map((event) {
+      if (event == null) return null;
+      final parsedJson = Map<String, dynamic>.from(event.snapshot.value);
+      var list = parsedJson
+          .map((key, value) {
+            if (key.contains('flora')) {
+              return MapEntry(Flora.fromJson(key, value), 0);
+            } else {
+              return MapEntry(Fauna.fromJson(key, value), 0);
+            }
+          })
+          .keys
+          .toList();
+      return list;
+    }).listen(onData);
+  }
+
+  @override
+  void dispose() {
+    stream.cancel();
+    super.dispose();
   }
 
   @override
