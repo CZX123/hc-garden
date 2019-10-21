@@ -1,4 +1,3 @@
-// AIzaSyD-mmzS2c9AcbKfT5Y4UhHypE5GiG7Bgqw
 import 'library.dart';
 
 class MapWidget extends StatefulWidget {
