@@ -84,12 +84,32 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    // TODO: offline indicator if user opens app when offline, and old contents show instead
+    // Maybe can reduce code duplication
+    rootBundle.loadString('assets/data/data.json').then((contents) {
+      List<Flora> floraList = [];
+      List<Fauna> faunaList = [];
+      final parsedJson = jsonDecode(contents);
+      parsedJson['flora&fauna'].forEach((key, value) {
+        if (key.contains('flora')) {
+          floraList.add(Flora.fromJson(key, value));
+        } else if (key.contains('fauna')) {
+          faunaList.add(Fauna.fromJson(key, value));
+        }
+      });
+      floraList.sort((a, b) => a.name.compareTo(b.name));
+      faunaList.sort((a, b) => a.name.compareTo(b.name));
+      Provider.of<AppNotifier>(context, listen: false)
+          .updateBackupLists(floraList, faunaList);
+    });
     stream = FirebaseDatabase.instance
         .reference()
         .child('flora&fauna')
         .onValue
         .map((event) {
-      if (event == null) return null;
+      if (event?.snapshot?.value == null) {
+        throw Exception('List of entities is empty!');
+      }
       final parsedJson = Map<String, dynamic>.from(event.snapshot.value);
       var list = parsedJson
           .map((key, value) {

@@ -1,8 +1,7 @@
 import 'library.dart';
 
-// TODO: Edit this to contain more information about each Entity in Firebase Database
 abstract class Entity {
-  final String code;
+  final String id;
   final String name;
   final String sciName;
   final String description;
@@ -12,7 +11,7 @@ abstract class Entity {
   final List<TrailLocation> locations;
   final List<LatLng> area;
   const Entity({
-    this.code,
+    this.id,
     this.name,
     this.sciName,
     this.description,
@@ -24,7 +23,7 @@ abstract class Entity {
   });
   Entity.fromJson(String key, dynamic parsedJson, [int id])
       : this(
-          code: key,
+          id: key,
           name: parsedJson['name'],
           sciName: parsedJson['sciName'],
           description: parsedJson['description'],
@@ -91,8 +90,16 @@ class EntityPosition {
 }
 
 class AppNotifier extends ChangeNotifier {
-  List<Flora> floraList = [];
-  List<Fauna> faunaList = [];
+  List<Flora> _backupFloraList = [];
+  List<Fauna> _backupFaunaList = [];
+  List<Flora> _floraList = [];
+  List<Flora> get floraList {
+    return _floraList.isEmpty ? _backupFloraList : _floraList;
+  }
+  List<Fauna> _faunaList = [];
+  List<Fauna> get faunaList {
+    return _faunaList.isEmpty ? _backupFaunaList : _faunaList;
+  }
   int state = 0;
   // 0: entity list
   // 1: details page for one entity
@@ -114,9 +121,16 @@ class AppNotifier extends ChangeNotifier {
 
   bool sheetMinimised = true;
 
-  void updateLists(List<Flora> _floraList, List<Fauna> _faunaList) {
-    floraList = _floraList;
-    faunaList = _faunaList;
+  void updateBackupLists(List<Flora> floraList, List<Fauna> faunaList) {
+    _backupFloraList = floraList;
+    _backupFaunaList = faunaList;
+    if (_floraList.isEmpty) notifyListeners();
+  }
+
+  void updateLists(List<Flora> floraList, List<Fauna> faunaList) {
+    updateBackupLists(floraList, faunaList);
+    _floraList = floraList;
+    _faunaList = faunaList;
     notifyListeners();
   }
 
@@ -127,6 +141,7 @@ class AppNotifier extends ChangeNotifier {
   }
 }
 
+// TODO
 class SearchNotifier extends ChangeNotifier {
   bool _isSearching = false;
   bool get isSearching => _isSearching;
