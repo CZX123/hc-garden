@@ -106,7 +106,7 @@ class NestedBottomSheet extends StatefulWidget {
 
 class _NestedBottomSheetState extends State<NestedBottomSheet>
     with TickerProviderStateMixin {
-  Tolerance _tolerance = Tolerance(distance: 1);
+  Tolerance _tolerance = Tolerance(distance: 1, time: 1, velocity: 1);
   List<double> _sortedPositions;
   AnimationController _animationController;
   List<ScrollController> _scrollControllers;
@@ -121,10 +121,10 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   ValueNotifier<bool> _isScrolledNotifier = ValueNotifier(false);
 
   void animateTo(double end) {
-    assert(
-      _sortedPositions.contains(end),
-      'Value to animate to should be one of the snapping positions',
-    );
+    // assert(
+    //   _sortedPositions.contains(end),
+    //   'Value to animate to should be one of the snapping positions',
+    // );
     // if (_activeScrollController.hasClients &&
     //     _activeScrollController.position.maxScrollExtent > 0) {
     //   _activeScrollController.jumpTo(0);

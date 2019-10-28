@@ -300,7 +300,6 @@ class ExploreBody extends StatelessWidget {
         return AnimatedBuilder(
           animation: animation,
           builder: (context, child) {
-            print(animation.value);
             Offset offset;
             if (animation.value > height - bottomHeight)
               offset = Offset(
