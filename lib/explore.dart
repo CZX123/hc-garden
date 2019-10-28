@@ -362,9 +362,7 @@ class ExploreBody extends StatelessWidget {
                   top: 0,
                   right: 0,
                   left: 0,
-                  child: IgnorePointer(
-                    child: WhiteGradient(),
-                  ),
+                  child: WhiteGradient(),
                 ),
               ],
             ),
@@ -382,48 +380,51 @@ class ExploreBody extends StatelessWidget {
   }
 }
 
+// This is just for a much smoother gradient
 class WhiteGradient extends StatelessWidget {
   const WhiteGradient({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).canvasColor;
-    return Container(
-      height: 32,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            color,
-            color.withOpacity(.738),
-            color.withOpacity(.541),
-            color.withOpacity(.382),
-            color.withOpacity(.278),
-            color.withOpacity(.194),
-            color.withOpacity(.126),
-            color.withOpacity(.075),
-            color.withOpacity(.042),
-            color.withOpacity(.021),
-            color.withOpacity(.008),
-            color.withOpacity(.002),
-            color.withOpacity(0),
-          ],
-          stops: [
-            0,
-            .19,
-            .34,
-            .45,
-            .565,
-            .65,
-            .73,
-            .802,
-            .861,
-            .91,
-            .952,
-            .982,
-            1,
-          ],
+    return IgnorePointer(
+      child: Container(
+        height: 32,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              color,
+              color.withOpacity(.738),
+              color.withOpacity(.541),
+              color.withOpacity(.382),
+              color.withOpacity(.278),
+              color.withOpacity(.194),
+              color.withOpacity(.126),
+              color.withOpacity(.075),
+              color.withOpacity(.042),
+              color.withOpacity(.021),
+              color.withOpacity(.008),
+              color.withOpacity(.002),
+              color.withOpacity(0),
+            ],
+            stops: [
+              0,
+              .19,
+              .34,
+              .45,
+              .565,
+              .65,
+              .73,
+              .802,
+              .861,
+              .91,
+              .952,
+              .982,
+              1,
+            ],
+          ),
         ),
       ),
     );
