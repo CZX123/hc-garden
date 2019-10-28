@@ -275,8 +275,157 @@ class ExploreHeader extends StatelessWidget {
 }
 
 class ExploreBody extends StatelessWidget {
-  const ExploreBody({Key key}) : super(key: key);
+  final Animation<double> animation;
+  final TabController tabController;
+  final List<ScrollController> scrollControllers;
+  final List<ScrollController> extraScrollControllers;
+  final Function(double) animateTo;
+  final GlobalKey<NavigatorState> navigatorKey;
+  const ExploreBody({
+    Key key,
+    @required this.animation,
+    @required this.tabController,
+    @required this.scrollControllers,
+    @required this.extraScrollControllers,
+    @required this.animateTo,
+    @required this.navigatorKey,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {}
+  Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    final height = MediaQuery.of(context).size.height;
+    final initialRoute = FadeOutPageRoute<void>(
+      builder: (context) {
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            print(animation.value);
+            Offset offset;
+            if (animation.value > height - bottomHeight)
+              offset = Offset(
+                0,
+                bottomHeight -
+                    bottomBarHeight -
+                    entityButtonHeightCollapsed -
+                    16 -
+                    topPadding,
+              );
+            else
+              offset = Offset(
+                0,
+                animation.value *
+                    (bottomHeight -
+                        bottomBarHeight -
+                        entityButtonHeightCollapsed -
+                        16 -
+                        topPadding) /
+                    (height - bottomHeight),
+              );
+            return Transform.translate(
+              offset: offset,
+              child: child,
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.only(top: topPadding + 72),
+            height: height + 128,
+            child: Stack(
+              fit: StackFit.passthrough,
+              children: <Widget>[
+                TabBarView(
+                  controller: tabController,
+                  children: <Widget>[
+                    Selector<AppNotifier, List<Flora>>(
+                      selector: (context, appNotifier) => appNotifier.floraList,
+                      builder: (context, floraList, child) {
+                        return EntityListPage(
+                          scrollController: scrollControllers[0],
+                          extraScrollController: extraScrollControllers[0],
+                          entityList: floraList,
+                        );
+                      },
+                    ),
+                    Selector<AppNotifier, List<Fauna>>(
+                      selector: (context, appNotifier) => appNotifier.faunaList,
+                      builder: (context, faunaList, child) {
+                        return EntityListPage(
+                          scrollController: scrollControllers[1],
+                          extraScrollController: extraScrollControllers[0],
+                          entityList: faunaList,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  left: 0,
+                  child: IgnorePointer(
+                    child: WhiteGradient(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    return Navigator(
+      key: navigatorKey,
+      onGenerateRoute: (settings) {
+        if (settings.name == Navigator.defaultRouteName) return initialRoute;
+        return null;
+      },
+    );
+  }
+}
+
+class WhiteGradient extends StatelessWidget {
+  const WhiteGradient({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).canvasColor;
+    return Container(
+      height: 32,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            color,
+            color.withOpacity(.738),
+            color.withOpacity(.541),
+            color.withOpacity(.382),
+            color.withOpacity(.278),
+            color.withOpacity(.194),
+            color.withOpacity(.126),
+            color.withOpacity(.075),
+            color.withOpacity(.042),
+            color.withOpacity(.021),
+            color.withOpacity(.008),
+            color.withOpacity(.002),
+            color.withOpacity(0),
+          ],
+          stops: [
+            0,
+            .19,
+            .34,
+            .45,
+            .565,
+            .65,
+            .73,
+            .802,
+            .861,
+            .91,
+            .952,
+            .982,
+            1,
+          ],
+        ),
+      ),
+    );
+  }
 }
