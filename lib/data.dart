@@ -1,5 +1,6 @@
 import 'library.dart';
 
+// TODO: handle cases of incomplete data
 abstract class Entity {
   final int id;
   final String name;
@@ -7,55 +8,25 @@ abstract class Entity {
   final String description;
   final String smallImage;
   final List<String> images;
-  final LatLng coordinates;
   final List<Map<int, int>> locations;
-  final List<LatLng> area;
-  const Entity({
-    this.id,
-    this.name,
-    this.sciName,
-    this.description,
-    this.smallImage,
-    this.images,
-    this.coordinates,
-    this.locations,
-    this.area,
-  });
-  Entity.fromJson(String key, dynamic parsedJson, [int id])
-      : this(
-          id: int.parse(key.split('-').last),
-          name: parsedJson['name'],
-          sciName: parsedJson['sciName'],
-          description: parsedJson['description'],
-          smallImage: parsedJson['smallImage'],
-          images: List<String>.from(parsedJson['imageRef']),
-          coordinates: parsedJson.containsKey('latitude')
-              ? LatLng(parsedJson['latitude'], parsedJson['longitude'])
-              : null,
-          locations: List.from(parsedJson['locations'].split(',')).where((value) {
-            return value != null && value.isNotEmpty;
-          }).map((value) {
-            final split = value.split('/');
-            return {
-              int.tryParse(split.first.split('-').last):
-                  int.tryParse(split.last.split('-').last)
-            };
-          }).toList(),
-          // locations: List<String>.from(parsedJson['locations'].split(','))
-          //     .map((value) {
-          //   final split = value.split('/');
-          //   return TrailLocation(
-          //       //trailId: int.parse(split.first.split('-').last),
-          //       id: int.parse(split.last.split('-').last)
-          //       // todo
-          //       );
-          // }).toList(),
-          area: parsedJson.containsKey('area')
-              ? List.from(parsedJson['area']).map((position) {
-                  return LatLng(position['latitude'], position['longitude']);
-                }).toList()
-              : null,
-        );
+
+  Entity.fromJson(String key, dynamic parsedJson)
+      : this.id = int.parse(key.split('-').last),
+        this.name = parsedJson['name'],
+        this.sciName = parsedJson['sciName'],
+        this.description = parsedJson['description'],
+        this.smallImage = parsedJson['smallImage'],
+        this.images = List<String>.from(parsedJson['imageRef']),
+        this.locations =
+            List.from(parsedJson['locations'].split(',')).where((value) {
+          return value != null && value.isNotEmpty;
+        }).map((value) {
+          final split = value.split('/');
+          return {
+            int.tryParse(split.first.split('-').last):
+                int.tryParse(split.last.split('-').last)
+          };
+        }).toList();
 
   @override
   String toString() {
@@ -64,12 +35,19 @@ abstract class Entity {
 }
 
 class Fauna extends Entity {
-  Fauna.fromJson(String key, dynamic parsedJson, [int id])
-      : super.fromJson(key, parsedJson);
+  // A fauna has 2 extra keys: areas and coordinates. These are most likely not to be used.
+  final List<LatLng> area;
+  final LatLng coordinates;
+  Fauna.fromJson(String key, dynamic parsedJson)
+      : this.area = List.from(parsedJson['area']).map((position) {
+                return LatLng(position['latitude'], position['longitude']);
+              }).toList(),
+        this.coordinates = LatLng(parsedJson['latitude'], parsedJson['longitude']),
+        super.fromJson(key, parsedJson);
 }
 
 class Flora extends Entity {
-  Flora.fromJson(String key, dynamic parsedJson, [int id])
+  Flora.fromJson(String key, dynamic parsedJson)
       : super.fromJson(key, parsedJson);
 }
 
