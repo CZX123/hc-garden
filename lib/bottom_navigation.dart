@@ -29,12 +29,13 @@ class BottomSheetFooter extends StatelessWidget {
                   Offset offset;
                   if (state != 0) {
                     offset = Offset(0, 128);
-                  } else if (animation.value > height - 382) {
+                  } else if (animation.value > height - bottomHeight) {
                     offset = Offset(0, 0);
                   } else {
                     offset =
-                        Offset(0, 128 - animation.value / (height - 382) * 128);
+                        Offset(0, 128 - animation.value / (height - bottomHeight) * 128);
                   }
+                  if (offset.dy == 128) return const SizedBox.shrink();
                   return Transform.translate(
                     offset: offset,
                     child: child,
@@ -55,7 +56,7 @@ class BottomSheetFooter extends StatelessWidget {
                   elevation: 0,
                   currentIndex: value,
                   onTap: (index) {
-                    if (index == 1) animateTo(height - 382);
+                    if (index == 1) animateTo(height - bottomHeight);
                     indexNotifier.value = index;
                   },
                   items: [
@@ -94,17 +95,25 @@ class NotchedAppBar extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     return SizedBox(
       height: 76,
-      child: AnimatedBuilder(
-        animation: animation,
-        builder: (context, child) {
-          Offset offset;
-          if (animation.value > height - 382) {
-            offset = Offset(0, 152);
-          } else {
-            offset = Offset(0, animation.value / (height - 382) * 152);
-          }
-          return Transform.translate(
-            offset: offset,
+      child: Selector<AppNotifier, int>(
+        selector: (context, appNotifier) => appNotifier.state,
+        builder: (context, state, child) {
+          return AnimatedBuilder(
+            animation: animation,
+            builder: (context, child) {
+              Offset offset = Offset(0, 0);
+              if (state == 0) {
+                if (animation.value > height - 382) {
+                  offset = Offset(0, 152);
+                } else {
+                  offset = Offset(0, animation.value / (height - 382) * 152);
+                }
+              }
+              return Transform.translate(
+                offset: offset,
+                child: child,
+              );
+            },
             child: child,
           );
         },
@@ -115,10 +124,17 @@ class NotchedAppBar extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Material(
                 type: MaterialType.transparency,
-                child: PhysicalShape(
-                  elevation: 8,
-                  color: Theme.of(context).canvasColor,
-                  clipper: BottomAppBarClipper(windowWidth: width),
+                child: Selector<AppNotifier, bool>(
+                  selector: (context, appNotifier) => appNotifier.state == 0,
+                  builder: (context, value, child) {
+                    return AnimatedNotchedShape(
+                      elevation: 12,
+                      color: Theme.of(context).canvasColor,
+                      notchMargin: value ? 4 : 0,
+                      fabRadius: value ? 28 : 0,
+                      child: child,
+                    );
+                  },
                   child: SizedBox(
                     height: 48,
                     child: Material(
@@ -131,10 +147,20 @@ class NotchedAppBar extends StatelessWidget {
                             onPressed: () => Navigator.maybePop(context),
                             tooltip: 'Back',
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.sort),
-                            onPressed: () {},
-                            tooltip: 'Sort',
+                          Selector<AppNotifier, int>(
+                            selector: (context, appNotifier) => appNotifier.state,
+                            builder: (context, state, child) {
+                              return AnimatedOpacity(
+                                opacity: state == 0 ? 1 : 0,
+                                duration: const Duration(milliseconds: 280),
+                                child: child,
+                              );
+                            },
+                            child: IconButton(
+                              icon: const Icon(Icons.sort),
+                              onPressed: () {},
+                              tooltip: 'Sort',
+                            ),
                           ),
                         ],
                       ),
@@ -143,8 +169,8 @@ class NotchedAppBar extends StatelessWidget {
                 ),
               ),
             ),
-            Selector<AppNotifier, bool>(
-              selector: (context, appNotifier) => appNotifier.isSearching && appNotifier.state == 0,
+            Selector<SearchNotifier, bool>(
+              selector: (context, searchNotifier) => searchNotifier.isSearching,
               builder: (context, value, child) {
                 return AnimatedPositioned(
                   left: value ? 0 : width / 2 - 28,
@@ -153,35 +179,44 @@ class NotchedAppBar extends StatelessWidget {
                   height: value ? 48 : 56,
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.fastLinearToSlowEaseIn,
-                  child: AnimatedContainer(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(value ? 0 : 28),
-                      boxShadow: kElevationToShadow[4].map((shadow) {
-                        return BoxShadow(
-                          color: shadow.color
-                              .withOpacity(shadow.color.opacity / 2),
-                          offset: shadow.offset,
-                          blurRadius: shadow.blurRadius,
-                          spreadRadius: shadow.spreadRadius,
-                        );
-                      }).toList(),
-                    ),
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.fastLinearToSlowEaseIn,
-                    child: AnimatedOpacity(
-                      opacity: value ? 1 : 0,
-                      duration: Duration(milliseconds: value ? 300 : 80),
-                      child: SearchBar(
-                        isSearching: value,
+                  child: Selector<AppNotifier, bool>(
+                    selector: (context, appNotifier) => appNotifier.state == 0,
+                    builder: (context, hasSearch, child) {
+                      return AnimatedScale(
+                        scale: hasSearch ? 1 : 0,
+                        child: child,
+                      );
+                    },
+                    child: AnimatedContainer(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(value ? 0 : 28),
+                        boxShadow: kElevationToShadow[4].map((shadow) {
+                          return BoxShadow(
+                            color: shadow.color
+                                .withOpacity(shadow.color.opacity / 2),
+                            offset: shadow.offset,
+                            blurRadius: shadow.blurRadius,
+                            spreadRadius: shadow.spreadRadius,
+                          );
+                        }).toList(),
+                      ),
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.fastLinearToSlowEaseIn,
+                      child: AnimatedOpacity(
+                        opacity: value ? 1 : 0,
+                        duration: Duration(milliseconds: value ? 300 : 80),
+                        child: SearchBar(
+                          isSearching: value,
+                        ),
                       ),
                     ),
                   ),
                 );
               },
             ),
-            Selector<AppNotifier, bool>(
-              selector: (context, appNotifier) => appNotifier.isSearching && appNotifier.state == 0,
+            Selector<SearchNotifier, bool>(
+              selector: (context, searchNotifier) => searchNotifier.isSearching,
               builder: (context, value, child) {
                 return AnimatedPositioned(
                   left: width / 2 - 28,
@@ -190,12 +225,21 @@ class NotchedAppBar extends StatelessWidget {
                   height: 56,
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.fastLinearToSlowEaseIn,
-                  child: IgnorePointer(
-                    ignoring: value,
-                    child: AnimatedOpacity(
-                      opacity: value ? 0 : 1,
-                      duration: Duration(milliseconds: value ? 80 : 300),
-                      child: child,
+                  child: Selector<AppNotifier, bool>(
+                    selector: (context, appNotifier) => appNotifier.state == 0,
+                    builder: (context, hasSearch, child) {
+                      return AnimatedScale(
+                        scale: hasSearch ? 1 : 0,
+                        child: child,
+                      );
+                    },
+                    child: IgnorePointer(
+                      ignoring: value,
+                      child: AnimatedOpacity(
+                        opacity: value ? 0 : 1,
+                        duration: Duration(milliseconds: value ? 80 : 300),
+                        child: child,
+                      ),
                     ),
                   ),
                 );
@@ -206,8 +250,12 @@ class NotchedAppBar extends StatelessWidget {
                 elevation: 0,
                 highlightElevation: 0,
                 onPressed: () {
-                  Provider.of<AppNotifier>(context, listen: false).isSearching =
-                      true;
+                  Provider.of<SearchNotifier>(context, listen: false)
+                      .isSearching = true;
+                  Future.delayed(const Duration(milliseconds: 400), () {
+                    Provider.of<SearchNotifier>(context, listen: false)
+                        .keyboardAppear = true;
+                  });
                 },
                 tooltip: 'Search',
               ),
@@ -232,17 +280,25 @@ class _SearchBarState extends State<SearchBar> {
   final focusNode = FocusNode();
 
   void onTextChange() {
-    Provider.of<AppNotifier>(context, listen: false).searchTerm = controller.text;
+    Provider.of<SearchNotifier>(context, listen: false).searchTerm =
+        controller.text;
+  }
+
+  void onFocus() {
+    Provider.of<SearchNotifier>(context, listen: false)
+        .keyboardAppearFromFocus();
   }
 
   @override
   void initState() {
     super.initState();
     controller.addListener(onTextChange);
+    focusNode.addListener(onFocus);
   }
 
   @override
   void dispose() {
+    focusNode.removeListener(onFocus);
     controller.removeListener(onTextChange);
     controller.dispose();
     super.dispose();
@@ -250,17 +306,7 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.isSearching) {
-      Future.delayed(
-        const Duration(milliseconds: 400),
-        () => focusNode.requestFocus(),
-      );
-    } else {
-      Future.delayed(
-        const Duration(milliseconds: 400),
-        () => focusNode.unfocus(),
-      );
-    }
+    Provider.of<SearchNotifier>(context, listen: false).focusNode = focusNode;
     return Material(
       type: MaterialType.transparency,
       child: Stack(
@@ -318,35 +364,5 @@ class _SearchBarState extends State<SearchBar> {
         ],
       ),
     );
-  }
-}
-
-// The clipper for clipping the bottom app bar for the notched search fab
-class BottomAppBarClipper extends CustomClipper<Path> {
-  final double windowWidth;
-  final double notchMargin;
-  final double radius;
-  const BottomAppBarClipper({
-    @required this.windowWidth,
-    this.notchMargin = 4,
-    this.radius = 28,
-  })  : assert(windowWidth != null),
-        assert(notchMargin != null),
-        assert(radius != null);
-
-  @override
-  Path getClip(Size size) {
-    final Rect button = Rect.fromCircle(
-      center: Offset(windowWidth / 2, 0),
-      radius: radius,
-    );
-    return CircularNotchedRectangle()
-        .getOuterPath(Offset.zero & size, button.inflate(notchMargin));
-  }
-
-  @override
-  bool shouldReclip(BottomAppBarClipper oldClipper) {
-    return oldClipper.windowWidth != windowWidth ||
-        oldClipper.notchMargin != notchMargin;
   }
 }

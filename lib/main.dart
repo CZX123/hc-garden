@@ -3,10 +3,10 @@ import 'package:firebase_database/firebase_database.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(MyApp());
+  runApp(HcGardenApp());
 }
 
-class MyApp extends StatelessWidget {
+class HcGardenApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -21,6 +21,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           builder: (context) => AppNotifier(),
+        ),
+        ChangeNotifierProvider(
+          builder: (context) => SearchNotifier(),
         ),
         FutureProvider.value(
           value: getApplicationDocumentsDirectory(),
@@ -39,7 +42,8 @@ class MyApp extends StatelessWidget {
             home: MyHomePage(title: 'Nested Bottom Sheet'),
             debugShowMaterialGrid: debugInfo.debugShowMaterialGrid,
             showPerformanceOverlay: debugInfo.showPerformanceOverlay,
-            checkerboardRasterCacheImages: debugInfo.checkerboardRasterCacheImages,
+            checkerboardRasterCacheImages:
+                debugInfo.checkerboardRasterCacheImages,
             checkerboardOffscreenLayers: debugInfo.checkerboardOffscreenLayers,
             showSemanticsDebugger: debugInfo.showSemanticsDebugger,
             debugShowCheckedModeBanner: debugInfo.debugShowCheckedModeBanner,
@@ -99,8 +103,22 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       floraList.sort((a, b) => a.name.compareTo(b.name));
       faunaList.sort((a, b) => a.name.compareTo(b.name));
+      Map<Trail, List<TrailLocation>> trails = {};
+      parsedJson['map'].forEach((key, value) {
+        final trail = Trail.fromJson(key, value);
+        trails[trail] = [];
+        value['route'].forEach((key, value) {
+          trails[trail].add(TrailLocation.fromJson(
+            key,
+            value,
+            floraList: floraList,
+            faunaList: faunaList,
+          ));
+        });
+      });
       Provider.of<AppNotifier>(context, listen: false)
           .updateBackupLists(floraList, faunaList);
+      Provider.of<AppNotifier>(context, listen: false).trails = trails;
     });
     stream = FirebaseDatabase.instance
         .reference()
@@ -144,17 +162,29 @@ class _MyHomePageState extends State<MyHomePage> {
           onWillPop: () async {
             final appNotifier =
                 Provider.of<AppNotifier>(context, listen: false);
-            if (appNotifier.isSearching && appNotifier.state == 0) {
-              appNotifier.isSearching = false;
+            final searchNotifier =
+                Provider.of<SearchNotifier>(context, listen: false);
+            if (searchNotifier.isSearching && appNotifier.state == 0) {
+              Future.delayed(const Duration(milliseconds: 400), () {
+                return searchNotifier.keyboardAppear = false;
+              });
+              searchNotifier.isSearching = false;
+              searchNotifier.searchTerm = '';
               return false;
             }
             if (_navigatorKey.currentState.canPop()) {
               _navigatorKey.currentState.pop();
               appNotifier.updateState(0, null);
+              _animateTo(0);
+              if (searchNotifier.searchTerm.isNotEmpty) {
+                Future.delayed(const Duration(milliseconds: 280), () {
+                  return searchNotifier.isSearching = true;
+                });
+              }
               return false;
             }
             if (!appNotifier.sheetMinimised) {
-              _animateTo(height - 382);
+              _animateTo(height - bottomHeight);
               return false;
             }
             return true;
@@ -163,23 +193,36 @@ class _MyHomePageState extends State<MyHomePage> {
             endDrawer: DebugDrawer(),
             body: height != 0
                 ? NestedBottomSheet(
-                    endCorrection: topPadding - 206,
+                    endCorrection: state == 0
+                        ? topPadding - offsetTranslation
+                        : topPadding,
                     height: height,
                     snappingPositions: state == 0
-                        ? [0, height - 382, height - 56]
+                        ? [0, height - bottomHeight, height - 62]
                         : [
                             0,
-                            (height - 56) / 3,
-                            2 * (height - 56) / 3,
-                            height - 56,
+                            height - 48 - 96 - 216 - 16,
+                            height - 48 - 96,
                           ],
-                    initialPosition: height - 382,
+                    initialPosition: height - bottomHeight,
                     tablength: 2,
                     extraScrollControllers: 1,
                     state: _state,
                     backgroundBuilder:
                         (context, animation, tabController, animateTo) {
-                      return MapWidget();
+                      Provider.of<AppNotifier>(context, listen: false)
+                          .animation = animation;
+                      return Stack(
+                        children: <Widget>[
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            right: 0,
+                            bottom: 62,
+                            child: MapWidget(),
+                          ),
+                        ],
+                      );
                     },
                     headerBuilder: (
                       context,
@@ -189,7 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       isScrolledNotifier,
                     ) {
                       _animateTo = animateTo;
-                      return BottomSheetHeader(
+                      return ExploreHeader(
                         animation: animation,
                         tabController: tabController,
                         animateTo: animateTo,
@@ -234,231 +277,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class BottomSheetHeader extends StatelessWidget {
-  final Animation<double> animation;
-  final TabController tabController;
-  final Function(double) animateTo;
-  final ValueNotifier<bool> isScrolledNotifier;
-  const BottomSheetHeader({
-    Key key,
-    @required this.animation,
-    @required this.tabController,
-    @required this.animateTo,
-    @required this.isScrolledNotifier,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    const _trails = ['Jing Xian Trail', 'Kong Chian Trail', 'Kah Kee Trail'];
-    final _colors = [Colors.amber[600], Colors.pink, Colors.lightBlue];
-    final height = MediaQuery.of(context).size.height;
-    final topPadding = MediaQuery.of(context).padding.top;
-    final anim =
-        Tween<double>(begin: 0, end: 1 / (height - 56)).animate(animation);
-    return Selector<AppNotifier, int>(
-      selector: (context, appNotifier) => appNotifier.state,
-      builder: (context, state, child) {
-        return AnimatedOpacity(
-          opacity: state == 0 ? 1 : 0,
-          duration: Duration(milliseconds: state == 0 ? 400 : 200),
-          curve:
-              state == 0 ? Interval(0.5, 1, curve: Curves.ease) : Curves.ease,
-          child: child,
-        );
-      },
-      child: Stack(
-        children: <Widget>[
-          ValueListenableBuilder(
-            valueListenable: animation,
-            builder: (context, value, child) {
-              return IgnorePointer(
-                ignoring: value < height - 382,
-                child: child,
-              );
-            },
-            child: Column(
-              children: <Widget>[
-                const SizedBox(
-                  height: 8,
-                ),
-                FadeTransition(
-                  opacity: Tween(
-                    begin: (239 - height / 2) / 48,
-                    end: (height / 2 + 183) / 48,
-                  ).animate(anim),
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        height: 4,
-                        width: 24,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).dividerColor,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      Text(
-                        'Explore HC Garden',
-                        style: Theme.of(context).textTheme.title,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                FadeTransition(
-                  opacity: Tween(
-                    begin: (406 - height) / 24,
-                    end: 14.58,
-                  ).animate(anim),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Row(
-                      children: <Widget>[
-                        for (var i = 0; i < 3; i++)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: FlatButton(
-                                colorBrightness: Brightness.dark,
-                                color: _colors[i],
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Container(
-                                  height: 96,
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    _trails[i].toUpperCase(),
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .body2
-                                        .copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.5,
-                                        ),
-                                  ),
-                                ),
-                                onPressed: () {},
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-              ],
-            ),
-          ),
-          AnimatedBuilder(
-            animation: animation,
-            builder: (context, child) {
-              Offset offset;
-              if (animation.value > height - 382) {
-                offset = Offset(0, 174 - topPadding);
-                Provider.of<AppNotifier>(context, listen: false)
-                    .sheetMinimised = true;
-              } else {
-                offset = Offset(
-                    0, animation.value / (height - 382) * (174 - topPadding));
-                Provider.of<AppNotifier>(context, listen: false)
-                    .sheetMinimised = false;
-              }
-              return Transform.translate(
-                offset: offset,
-                child: child,
-              );
-            },
-            child: Container(
-              margin: EdgeInsets.only(top: topPadding + 8),
-              color: Theme.of(context).canvasColor,
-              padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
-              child: Row(
-                children: <Widget>[
-                  for (var i = 0; i < 2; i++)
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(i == 0
-                                  ? 'assets/images/flora.jpg'
-                                  : 'assets/images/fauna.jpg'),
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: FlatButton(
-                            colorBrightness: Brightness.dark,
-                            color: Colors.black38,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: AnimatedBuilder(
-                              animation: animation,
-                              builder: (context, child) {
-                                double cardHeight = 128;
-                                if (animation.value < height - 382) {
-                                  cardHeight = 64 +
-                                      64 *
-                                          animation.value /
-                                          height *
-                                          height /
-                                          (height - 382);
-                                }
-                                return Container(
-                                  height: cardHeight,
-                                  alignment: Alignment.center,
-                                  child: child,
-                                );
-                              },
-                              child: Text(
-                                i == 0 ? 'FLORA' : 'FAUNA',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ),
-                            onPressed: () {
-                              if (animation.value < height - 382)
-                                tabController.animateTo(i);
-                              else {
-                                tabController.animateTo(
-                                  i,
-                                  duration: const Duration(
-                                    milliseconds: 1,
-                                  ),
-                                );
-                              }
-                              animateTo(0);
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class BottomSheetBody extends StatelessWidget {
   final Animation<double> animation;
   final TabController tabController;
@@ -486,17 +304,28 @@ class BottomSheetBody extends StatelessWidget {
         return AnimatedBuilder(
           animation: animation,
           builder: (context, child) {
+            print(animation.value);
             Offset offset;
-            if (animation.value > height - 382)
-              offset = Offset(0, 238 - topPadding);
+            if (animation.value > height - bottomHeight)
+              offset = Offset(
+                0,
+                bottomHeight -
+                    bottomBarHeight -
+                    entityButtonHeightCollapsed -
+                    16 -
+                    topPadding,
+              );
             else
               offset = Offset(
-                  0,
-                  animation.value /
-                      height *
-                      (238 - topPadding) *
-                      height /
-                      (height - 382));
+                0,
+                animation.value *
+                    (bottomHeight -
+                        bottomBarHeight -
+                        entityButtonHeightCollapsed -
+                        16 -
+                        topPadding) /
+                    (height - bottomHeight),
+              );
             return Transform.translate(
               offset: offset,
               child: child,

@@ -45,6 +45,7 @@ flutter:
     - assets/images/background.png
     - assets/images/flora.jpg
     - assets/images/fauna.jpg
+    - assets/images/hci.png
   fonts:
     - family: Manrope
       fonts:

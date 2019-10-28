@@ -9,7 +9,7 @@ class AnimatedScale extends ImplicitlyAnimatedWidget {
     Key key,
     @required this.scale,
     this.opacity = 1,
-    this.alignment = Alignment.topCenter,
+    this.alignment = Alignment.center,
     @required this.child,
     Duration duration = const Duration(milliseconds: 300),
     Curve curve = Curves.ease,

@@ -1,20 +1,21 @@
-import 'package:flutter/material.dart';
+import '../library.dart';
 
 class ExpandPageRoute<T> extends PageRoute<T> {
+  final ValueNotifier<double> newTopPadding;
+  final ValueNotifier<double> oldTopPadding;
   final WidgetBuilder builder;
   final GlobalKey sourceKey;
   final Widget oldChild;
   final Widget persistentOldChild;
-  final ScrollController
-      scrollController; // Scroll Controller of next page to listen to so the hero transition works even after scrolling
 
   ExpandPageRoute({
+    @required this.newTopPadding,
+    @required this.oldTopPadding,
     @required this.builder,
     this.transitionDuration = const Duration(milliseconds: 360),
     @required this.sourceKey,
     this.oldChild,
     this.persistentOldChild,
-    this.scrollController,
     RouteSettings settings,
   })  : assert(builder != null),
         assert(transitionDuration != null),
@@ -90,6 +91,8 @@ class ExpandPageRoute<T> extends PageRoute<T> {
       }
     }
     return ExpandItemPageTransition(
+      oldTopPadding: oldTopPadding,
+      newTopPadding: newTopPadding,
       sourceKey: sourceKey,
       sourceRect: _sourceRect,
       oldChild: _oldChild,
@@ -97,7 +100,6 @@ class ExpandPageRoute<T> extends PageRoute<T> {
       animation: animation,
       secondaryAnimation: secondaryAnimation,
       child: child,
-      scrollController: scrollController,
       transitionDuration: transitionDuration,
     );
   }
@@ -110,6 +112,8 @@ class ExpandPageRoute<T> extends PageRoute<T> {
 class ExpandItemPageTransition extends StatefulWidget {
   const ExpandItemPageTransition({
     Key key,
+    @required this.newTopPadding,
+    @required this.oldTopPadding,
     @required this.sourceKey,
     @required this.sourceRect,
     @required this.oldChild,
@@ -117,10 +121,11 @@ class ExpandItemPageTransition extends StatefulWidget {
     @required this.animation,
     @required this.secondaryAnimation,
     @required this.child,
-    this.scrollController,
     this.transitionDuration,
   }) : super(key: key);
 
+  final ValueNotifier<double> newTopPadding;
+  final ValueNotifier<double> oldTopPadding;
   final GlobalKey sourceKey;
   final Rect sourceRect;
   final Widget oldChild;
@@ -128,7 +133,6 @@ class ExpandItemPageTransition extends StatefulWidget {
   final Animation<double> animation;
   final Animation<double> secondaryAnimation;
   final Widget child;
-  final ScrollController scrollController;
   final Duration transitionDuration;
 
   @override
@@ -137,30 +141,11 @@ class ExpandItemPageTransition extends StatefulWidget {
 }
 
 class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
-  double scrollOffset = 0;
-
-  void scrollListener() {
-    scrollOffset =
-        widget.scrollController.hasClients ? widget.scrollController.offset : 0;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.scrollController?.addListener(scrollListener);
-  }
-
-  @override
-  void dispose() {
-    widget.scrollController?.removeListener(scrollListener);
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final Animation<double> animation = ModalRoute.of(context).animation;
-    final double topPadding = MediaQuery.of(context).padding.top;
-    final topDistance = topPadding - 4;
+    final topDistance = widget.newTopPadding.value - widget.oldTopPadding.value;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -195,13 +180,13 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
         );
 
         final Animation<Offset> contentOffset = Tween<Offset>(
-          begin: Offset(0, -topDistance + scrollOffset),
+          begin: Offset(0, -topDistance),
           end: Offset.zero,
         ).animate(positionAnimation);
 
         final Animation<Offset> oldChildOffset = Tween<Offset>(
           begin: Offset.zero,
-          end: Offset(0, topDistance - scrollOffset),
+          end: Offset(0, topDistance),
         ).animate(positionAnimation);
 
         final Animation<double> fadeContent = CurvedAnimation(
@@ -221,8 +206,7 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
                       return Material(
                         elevation:
                             animation.status == AnimationStatus.reverse ||
-                                    contentOffset.value.dy ==
-                                        -topDistance + scrollOffset
+                                    contentOffset.value.dy == -topDistance
                                 ? 0
                                 : 3,
                         animationDuration: widget.transitionDuration,

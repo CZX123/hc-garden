@@ -106,6 +106,7 @@ class NestedBottomSheet extends StatefulWidget {
 
 class _NestedBottomSheetState extends State<NestedBottomSheet>
     with TickerProviderStateMixin {
+  Tolerance _tolerance = Tolerance(distance: 1);
   List<double> _sortedPositions;
   AnimationController _animationController;
   List<ScrollController> _scrollControllers;
@@ -124,12 +125,18 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       _sortedPositions.contains(end),
       'Value to animate to should be one of the snapping positions',
     );
-    if (_activeScrollController.hasClients &&
-        _activeScrollController.position.maxScrollExtent > 0) {
-      _activeScrollController.jumpTo(0);
-    }
+    // if (_activeScrollController.hasClients &&
+    //     _activeScrollController.position.maxScrollExtent > 0) {
+    //   _activeScrollController.jumpTo(0);
+    // }
     final start = _animationController.value;
-    final simulation = ScrollSpringSimulation(spring, start, end, 0);
+    final simulation = ScrollSpringSimulation(
+      spring,
+      start,
+      end,
+      0,
+      tolerance: _tolerance,
+    );
     _animationController.animateWith(simulation);
   }
 
@@ -177,7 +184,9 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   // User has touched the screen and may begin to drag
   void dragDown(DragDownDetails details) {
     // Fix bottom sheet position if it is animating
-    _animationController.value = _animationController.value;
+    if (_animationController.isAnimating) {
+      _animationController.value = _animationController.value;
+    }
 
     // Check if the scroll view is scrollable in the first place
     if (_activeScrollController.hasClients &&
@@ -217,14 +226,19 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     } else {
       // Dragging the outer bottom sheet
       dragCancel();
-      if (_activeScrollController.hasClients) _activeScrollController.jumpTo(0);
+      //if (_activeScrollController.hasClients) _activeScrollController.jumpTo(0);
       _scrolling = false;
       if (_animationController.value < _sortedPositions[1]) {
         final range = _sortedPositions[1] - _sortedPositions.first;
         _animationController.value +=
             (widget.endCorrection / range + 1) * details.primaryDelta;
       } else {
-        _animationController.value += details.primaryDelta;
+        if (_animationController.value < _sortedPositions.last ||
+            details.primaryDelta.isNegative) {
+          _animationController.value += details.primaryDelta;
+        } else {
+          _animationController.value = _sortedPositions.last;
+        }
       }
     }
   }
@@ -232,11 +246,18 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   // user has finished dragging
   void dragEnd(DragEndDetails details) {
     // Bunch of physics going on
-    final velocity = details.primaryVelocity;
+    double velocity = details.primaryVelocity;
+    if (_animationController.value >= _sortedPositions.last) velocity = 0;
     final start = _animationController.value;
     if (!_scrolling && velocity == 0) {
       final end = closestValue(_sortedPositions, start);
-      final simulation = ScrollSpringSimulation(spring, start, end, velocity);
+      final simulation = ScrollSpringSimulation(
+        spring,
+        start,
+        end,
+        velocity,
+        tolerance: _tolerance,
+      );
       _animationController.animateWith(simulation);
     } else if (!_scrolling) {
       double end;
@@ -259,7 +280,13 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       //   final finalX = scrollSimulation.x(double.infinity);
       //   end = closestValue(_sortedPositions, finalX);
       // }
-      final simulation = ScrollSpringSimulation(spring, start, end, velocity);
+      final simulation = ScrollSpringSimulation(
+        spring,
+        start,
+        end,
+        velocity,
+        tolerance: _tolerance,
+      );
       _animationController.animateWith(simulation);
     } else {
       _scrolling = false;
@@ -280,7 +307,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     _animationController = AnimationController(
       vsync: this,
       lowerBound: _sortedPositions.first,
-      upperBound: _sortedPositions.last,
+      upperBound: widget.height,
       value: _initialPosition,
     );
     _scrollControllers = [
@@ -307,11 +334,11 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     if (oldWidget.snappingPositions != widget.snappingPositions) {
       final newSortedPositions = widget.snappingPositions;
       newSortedPositions.sort();
-      assert(
-        _sortedPositions.first == newSortedPositions.first &&
-            _sortedPositions.last == newSortedPositions.last,
-        'Cannot change to new snapping positions with different end points',
-      );
+      // assert(
+      //   _sortedPositions.first == newSortedPositions.first &&
+      //       _sortedPositions.last == newSortedPositions.last,
+      //   'Cannot change to new snapping positions with different end points',
+      // );
       _sortedPositions = newSortedPositions;
     }
   }
