@@ -139,6 +139,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final _navigatorKey = GlobalKey<NavigatorState>();
     final _state = ValueNotifier(0);
+    final _pageIndex = ValueNotifier(1);
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     Function(double) _animateTo;
@@ -207,7 +208,25 @@ class MyHomePage extends StatelessWidget {
                             top: 0,
                             right: 0,
                             bottom: 62,
-                            child: MapWidget(),
+                            child: ValueListenableBuilder(
+                              valueListenable: _pageIndex,
+                              builder: (context, pageIndex, child) {
+                                return CustomAnimatedSwitcher(
+                                  child: pageIndex == 0
+                                      ? Container(
+                                          key: ValueKey(0),
+                                          color: Colors.green,
+                                        )
+                                      : pageIndex == 2
+                                          ? Container(
+                                              key: ValueKey(2),
+                                              color: Colors.blue,
+                                            )
+                                          : child,
+                                );
+                              },
+                              child: MapWidget(),
+                            ),
                           ),
                         ],
                       );
@@ -254,6 +273,7 @@ class MyHomePage extends StatelessWidget {
                       return BottomSheetFooter(
                         animation: animation,
                         animateTo: animateTo,
+                        pageIndex: _pageIndex,
                       );
                     },
                   )

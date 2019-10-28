@@ -3,15 +3,16 @@ import 'library.dart';
 class BottomSheetFooter extends StatelessWidget {
   final Animation<double> animation;
   final Function(double) animateTo;
+  final ValueNotifier<int> pageIndex;
   const BottomSheetFooter({
     Key key,
     @required this.animation,
     @required this.animateTo,
+    @required this.pageIndex,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final indexNotifier = ValueNotifier(1);
     final height = MediaQuery.of(context).size.height;
     return Stack(
       children: <Widget>[
@@ -46,7 +47,7 @@ class BottomSheetFooter extends StatelessWidget {
             );
           },
           child: ValueListenableBuilder(
-            valueListenable: indexNotifier,
+            valueListenable: pageIndex,
             builder: (context, value, child) {
               return Container(
                 decoration: BoxDecoration(
@@ -57,7 +58,8 @@ class BottomSheetFooter extends StatelessWidget {
                   currentIndex: value,
                   onTap: (index) {
                     if (index == 1) animateTo(height - bottomHeight);
-                    indexNotifier.value = index;
+                    else animateTo(height);
+                    pageIndex.value = index;
                   },
                   items: [
                     const BottomNavigationBarItem(

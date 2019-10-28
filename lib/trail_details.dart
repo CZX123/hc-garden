@@ -1,16 +1,14 @@
 import 'library.dart';
 
-class TrailDetailsScreen extends StatelessWidget {
+class TrailDetailsPage extends StatelessWidget {
   final Trail trail;
-  const TrailDetailsScreen({
+  const TrailDetailsPage({
     Key key,
     @required this.trail,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: child,
-    );
+    return null;
   }
 }
