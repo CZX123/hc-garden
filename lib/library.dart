@@ -14,7 +14,7 @@ export 'package:provider/provider.dart';
 export 'bottom_navigation.dart';
 export 'data.dart';
 export 'debug.dart';
-export 'details_page.dart';
+export 'entity_details_page.dart';
 export 'entity_list_page.dart';
 export 'explore.dart';
 export 'main.dart';

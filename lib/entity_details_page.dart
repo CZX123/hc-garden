@@ -1,10 +1,10 @@
 import 'library.dart';
 
-class DetailsPage extends StatelessWidget {
+class EntityDetailsPage extends StatelessWidget {
   final ValueNotifier<double> newTopPadding;
   final Entity entity;
   final ScrollController scrollController;
-  const DetailsPage({
+  const EntityDetailsPage({
     Key key,
     @required this.newTopPadding,
     @required this.entity,
@@ -12,7 +12,9 @@ class DetailsPage extends StatelessWidget {
   }) : super(key: key);
 
   List<Widget> locations(
-      BuildContext context, Map<Trail, List<TrailLocation>> trails) {
+    BuildContext context,
+    Map<Trail, List<TrailLocation>> trails,
+  ) {
     List<Widget> children = [];
     for (var location in entity.locations) {
       final trailId = location.keys.first;

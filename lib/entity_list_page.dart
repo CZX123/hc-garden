@@ -220,7 +220,7 @@ class _EntityListRowState extends State<EntityListRow> {
             ExpandPageRoute<void>(
               oldTopPadding: oldTopPadding,
               newTopPadding: newTopPadding,
-              builder: (context) => DetailsPage(
+              builder: (context) => EntityDetailsPage(
                 newTopPadding: newTopPadding,
                 entity: widget.entity,
                 scrollController: widget.scrollController,
