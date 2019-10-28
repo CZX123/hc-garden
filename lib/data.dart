@@ -73,12 +73,19 @@ class Flora extends Entity {
       : super.fromJson(key, parsedJson);
 }
 
+class FirebaseData {
+  final List<Flora> floraList;
+  final List<Fauna> faunaList;
+  final Map<Trail, List<TrailLocation>> trails;
+  FirebaseData({this.floraList, this.faunaList, this.trails});
+}
+
 class Trail {
   final int id;
   final String name;
   final String color;
   Trail({this.id, this.name, this.color});
-  factory Trail.fromJson(String key, Map<String, dynamic> parsedJson) {
+  factory Trail.fromJson(String key, dynamic parsedJson) {
     return Trail(
       id: int.parse(key.split('-').last),
       name: parsedJson['name'],
@@ -105,7 +112,7 @@ class TrailLocation {
   });
   factory TrailLocation.fromJson(
     String key,
-    Map<String, dynamic> parsedJson, {
+    dynamic parsedJson, {
     @required List<Flora> floraList,
     @required List<Fauna> faunaList,
   }) {
@@ -136,7 +143,7 @@ class EntityPosition {
   final num size;
   EntityPosition({this.entity, this.left, this.top, this.pulse, this.size});
   factory EntityPosition.fromJson(
-    Map<String, dynamic> parsedJson, {
+    dynamic parsedJson, {
     @required List<Flora> floraList,
     @required List<Fauna> faunaList,
   }) {
@@ -164,22 +171,6 @@ class EntityPosition {
 
 class AppNotifier extends ChangeNotifier {
   Animation<double> animation;
-  List<Flora> _backupFloraList = [];
-  List<Fauna> _backupFaunaList = [];
-  List<Flora> _floraList = [];
-  List<Flora> get floraList {
-    return _floraList.isEmpty ? _backupFloraList : _floraList;
-  }
-  List<Fauna> _faunaList = [];
-  List<Fauna> get faunaList {
-    return _faunaList.isEmpty ? _backupFaunaList : _faunaList;
-  }
-  Map<Trail, List<TrailLocation>> _trails;
-  Map<Trail, List<TrailLocation>> get trails => _trails;
-  set trails(Map<Trail, List<TrailLocation>> trails) {
-    _trails = trails;
-    notifyListeners();
-  }
 
   int state = 0;
   // 0: entity list
@@ -187,18 +178,18 @@ class AppNotifier extends ChangeNotifier {
   Entity entity;
   bool sheetMinimised = true;
 
-  void updateBackupLists(List<Flora> floraList, List<Fauna> faunaList) {
-    _backupFloraList = floraList;
-    _backupFaunaList = faunaList;
-    if (_floraList.isEmpty) notifyListeners();
-  }
+  // void updateBackupLists(List<Flora> floraList, List<Fauna> faunaList) {
+  //   _backupFloraList = floraList;
+  //   _backupFaunaList = faunaList;
+  //   if (_floraList.isEmpty) notifyListeners();
+  // }
 
-  void updateLists(List<Flora> floraList, List<Fauna> faunaList) {
-    updateBackupLists(floraList, faunaList);
-    _floraList = floraList;
-    _faunaList = faunaList;
-    notifyListeners();
-  }
+  // void updateLists(List<Flora> floraList, List<Fauna> faunaList) {
+  //   updateBackupLists(floraList, faunaList);
+  //   _floraList = floraList;
+  //   _faunaList = faunaList;
+  //   notifyListeners();
+  // }
 
   void updateState(int newState, Entity newEntity) {
     state = newState;
