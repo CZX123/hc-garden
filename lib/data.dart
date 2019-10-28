@@ -39,10 +39,14 @@ class Fauna extends Entity {
   final List<LatLng> area;
   final LatLng coordinates;
   Fauna.fromJson(String key, dynamic parsedJson)
-      : this.area = List.from(parsedJson['area']).map((position) {
+      : this.area = parsedJson.containsKey('area')
+            ? List.from(parsedJson['area']).map((position) {
                 return LatLng(position['latitude'], position['longitude']);
-              }).toList(),
-        this.coordinates = LatLng(parsedJson['latitude'], parsedJson['longitude']),
+              }).toList()
+            : null,
+        this.coordinates = parsedJson.containsKey('latitude')
+            ? LatLng(parsedJson['latitude'], parsedJson['longitude'])
+            : null,
         super.fromJson(key, parsedJson);
 }
 

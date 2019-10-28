@@ -25,9 +25,7 @@ class HcGardenApp extends StatelessWidget {
               if (event.snapshot.value == null) {
                 throw Exception('List of entities is empty!');
               }
-              final parsedJson =
-                  Map<String, dynamic>.from(event.snapshot.value);
-
+              final parsedJson = Map<String, dynamic>.from(event.snapshot.value);
               List<Flora> floraList = [];
               List<Fauna> faunaList = [];
               parsedJson['flora&fauna'].forEach((key, value) {
