@@ -336,8 +336,8 @@ class ExploreBody extends StatelessWidget {
                 TabBarView(
                   controller: tabController,
                   children: <Widget>[
-                    Selector<AppNotifier, List<Flora>>(
-                      selector: (context, appNotifier) => appNotifier.floraList,
+                    Selector<FirebaseData, List<Flora>>(
+                      selector: (context, firebaseData) => firebaseData.floraList,
                       builder: (context, floraList, child) {
                         return EntityListPage(
                           scrollController: scrollControllers[0],
@@ -346,8 +346,8 @@ class ExploreBody extends StatelessWidget {
                         );
                       },
                     ),
-                    Selector<AppNotifier, List<Fauna>>(
-                      selector: (context, appNotifier) => appNotifier.faunaList,
+                    Selector<FirebaseData, List<Fauna>>(
+                      selector: (context, firebaseData) => firebaseData.faunaList,
                       builder: (context, faunaList, child) {
                         return EntityListPage(
                           scrollController: scrollControllers[1],

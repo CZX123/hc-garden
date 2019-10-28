@@ -157,8 +157,8 @@ class EntityDetailsPage extends StatelessWidget {
             const SizedBox(
               height: 8,
             ),
-            Selector<AppNotifier, Map<Trail, List<TrailLocation>>>(
-              selector: (context, appNotifier) => appNotifier.trails,
+            Selector<FirebaseData, Map<Trail, List<TrailLocation>>>(
+              selector: (context, firebaseData) => firebaseData.trails,
               builder: (context, trails, child) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,

@@ -15,7 +15,50 @@ class HcGardenApp extends StatelessWidget {
         Provider<Map<String, Uint8List>>.value(
           value: {},
         ),
-        // TODO: Add a StreamProvider for Firebase Database
+        StreamProvider.value(
+            initialData: FirebaseData(
+              floraList: [],
+              faunaList: [],
+              trails: {},
+            ),
+            value: FirebaseDatabase.instance.reference().onValue.map((event) {
+              if (event.snapshot.value == null) {
+                throw Exception('List of entities is empty!');
+              }
+              final parsedJson =
+                  Map<String, dynamic>.from(event.snapshot.value);
+
+              List<Flora> floraList = [];
+              List<Fauna> faunaList = [];
+              parsedJson['flora&fauna'].forEach((key, value) {
+                if (key.contains('flora'))
+                  floraList.add(Flora.fromJson(key, value));
+                else
+                  faunaList.add(Fauna.fromJson(key, value));
+              });
+              floraList.sort((a, b) => a.name.compareTo(b.name));
+              faunaList.sort((a, b) => a.name.compareTo(b.name));
+
+              Map<Trail, List<TrailLocation>> trails = {};
+              parsedJson['map'].forEach((key, value) {
+                final trail = Trail.fromJson(key, value);
+                trails[trail] = [];
+                value['route'].forEach((key, value) {
+                  trails[trail].add(TrailLocation.fromJson(
+                    key,
+                    value,
+                    floraList: floraList,
+                    faunaList: faunaList,
+                  ));
+                });
+              });
+
+              return FirebaseData(
+                floraList: floraList,
+                faunaList: faunaList,
+                trails: trails,
+              );
+            })),
         ChangeNotifierProvider(
           builder: (context) => DebugNotifier(),
         ),
@@ -54,103 +97,48 @@ class HcGardenApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final _navigatorKey = GlobalKey<NavigatorState>();
-  final _state = ValueNotifier(0);
-  StreamSubscription<List<Entity>> stream;
-
-  void onData(List<Entity> list) {
+  // TODO: offline indicator if user opens app when offline, and old contents show instead
+  // Maybe can reduce code duplication
+  /* rootBundle.loadString('assets/data/data.json').then((contents) {
     List<Flora> floraList = [];
     List<Fauna> faunaList = [];
-    for (var entity in list) {
-      if (entity is Flora) {
-        floraList.add(entity);
-      } else {
-        final fauna = entity as Fauna;
-        faunaList.add(fauna);
+    final parsedJson = jsonDecode(contents);
+    parsedJson['flora&fauna'].forEach((key, value) {
+      if (key.contains('flora')) {
+        floraList.add(Flora.fromJson(key, value));
+      } else if (key.contains('fauna')) {
+        faunaList.add(Fauna.fromJson(key, value));
       }
-    }
+    });
     floraList.sort((a, b) => a.name.compareTo(b.name));
     faunaList.sort((a, b) => a.name.compareTo(b.name));
-    Provider.of<AppNotifier>(context, listen: false)
-        .updateLists(floraList, faunaList);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // TODO: offline indicator if user opens app when offline, and old contents show instead
-    // Maybe can reduce code duplication
-    rootBundle.loadString('assets/data/data.json').then((contents) {
-      List<Flora> floraList = [];
-      List<Fauna> faunaList = [];
-      final parsedJson = jsonDecode(contents);
-      parsedJson['flora&fauna'].forEach((key, value) {
-        if (key.contains('flora')) {
-          floraList.add(Flora.fromJson(key, value));
-        } else if (key.contains('fauna')) {
-          faunaList.add(Fauna.fromJson(key, value));
-        }
+    Map<Trail, List<TrailLocation>> trails = {};
+    parsedJson['map'].forEach((key, value) {
+      final trail = Trail.fromJson(key, value);
+      trails[trail] = [];
+      value['route'].forEach((key, value) {
+        trails[trail].add(TrailLocation.fromJson(
+          key,
+          value,
+          floraList: floraList,
+          faunaList: faunaList,
+        ));
       });
-      floraList.sort((a, b) => a.name.compareTo(b.name));
-      faunaList.sort((a, b) => a.name.compareTo(b.name));
-      Map<Trail, List<TrailLocation>> trails = {};
-      parsedJson['map'].forEach((key, value) {
-        final trail = Trail.fromJson(key, value);
-        trails[trail] = [];
-        value['route'].forEach((key, value) {
-          trails[trail].add(TrailLocation.fromJson(
-            key,
-            value,
-            floraList: floraList,
-            faunaList: faunaList,
-          ));
-        });
-      });
-      Provider.of<AppNotifier>(context, listen: false)
-          .updateBackupLists(floraList, faunaList);
-      Provider.of<AppNotifier>(context, listen: false).trails = trails;
     });
-    stream = FirebaseDatabase.instance
-        .reference()
-        .child('flora&fauna')
-        .onValue
-        .map((event) {
-      if (event?.snapshot?.value == null) {
-        throw Exception('List of entities is empty!');
-      }
-      final parsedJson = Map<String, dynamic>.from(event.snapshot.value);
-      var list = parsedJson
-          .map((key, value) {
-            if (key.contains('flora')) {
-              return MapEntry(Flora.fromJson(key, value), 0);
-            } else {
-              return MapEntry(Fauna.fromJson(key, value), 0);
-            }
-          })
-          .keys
-          .toList();
-      return list;
-    }).listen(onData);
-  }
-
-  @override
-  void dispose() {
-    stream.cancel();
-    super.dispose();
-  }
+    Provider.of<AppNotifier>(context, listen: false)
+        .updateBackupLists(floraList, faunaList);
+    Provider.of<AppNotifier>(context, listen: false).trails = trails;
+  }); */
 
   @override
   Widget build(BuildContext context) {
+    final _navigatorKey = GlobalKey<NavigatorState>();
+    final _state = ValueNotifier(0);
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     Function(double) _animateTo;
