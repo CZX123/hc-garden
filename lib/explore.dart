@@ -104,50 +104,7 @@ class ExploreHeader extends StatelessWidget {
                       begin: 16 / 12 - totalTranslation / 12,
                       end: 16 / 12,
                     ).animate(anim),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Image.asset(
-                          'assets/images/hci.png',
-                          height: imageHeight - 2,
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              'Hwa Chong'.toUpperCase(),
-                              style: Theme.of(context).textTheme.title.copyWith(
-                                color: Theme.of(context).hintColor,
-                                    fontSize: imageHeight / 2,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1,
-                                  ),
-                            ),
-                            Text(
-                              'Institution'.toUpperCase(),
-                              style: Theme.of(context).textTheme.title.copyWith(
-                                color: Theme.of(context).hintColor,
-                                    letterSpacing: 0.15,
-                                    fontSize: imageHeight / 2,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1,
-                                  ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        Image.asset(
-                          'assets/images/app_logo.png',
-                          height: imageHeight,
-                        ),
-                      ],
-                    ),
+                    child: AppLogo(),
                   ),
                   const SizedBox(
                     height: 8,
@@ -214,84 +171,10 @@ class ExploreHeader extends StatelessWidget {
                   const SizedBox(
                     height: 8,
                   ),
-                  Material(
-                    color: Theme.of(context).canvasColor,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Row(
-                        children: <Widget>[
-                          for (var i = 0; i < 2; i++)
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage(
-                                        i == 0
-                                            ? 'assets/images/flora.jpg'
-                                            : 'assets/images/fauna.jpg',
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: FlatButton(
-                                    colorBrightness: Brightness.dark,
-                                    color: Colors.black38,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: AnimatedBuilder(
-                                      animation: animation,
-                                      builder: (context, child) {
-                                        double cardHeight = entityButtonHeight;
-                                        if (animation.value <
-                                            height - bottomHeight) {
-                                          cardHeight = entityButtonHeightCollapsed +
-                                              (entityButtonHeight -
-                                                      entityButtonHeightCollapsed) *
-                                                  animation.value /
-                                                  (height - bottomHeight);
-                                        }
-                                        return Container(
-                                          height: cardHeight,
-                                          alignment: Alignment.center,
-                                          child: child,
-                                        );
-                                      },
-                                      child: Text(
-                                        i == 0 ? 'FLORA' : 'FAUNA',
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.5,
-                                        ),
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      if (animation.value <
-                                          height - bottomHeight)
-                                        tabController.animateTo(i);
-                                      else {
-                                        tabController.animateTo(
-                                          i,
-                                          duration: const Duration(
-                                            milliseconds: 1,
-                                          ),
-                                        );
-                                      }
-                                      animateTo(0);
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                  FloraFaunaTabBar(
+                    animateTo: animateTo,
+                    animation: animation,
+                    tabController: tabController,
                   ),
                   FadeTransition(
                     opacity: Tween<double>(
@@ -305,6 +188,195 @@ class ExploreHeader extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AppLogo extends StatelessWidget {
+  const AppLogo({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Image.asset(
+          'assets/images/hci.png',
+          height: imageHeight - 2,
+        ),
+        const SizedBox(
+          width: 12,
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Hwa Chong'.toUpperCase(),
+              style: Theme.of(context).textTheme.title.copyWith(
+                    color: Theme.of(context).hintColor,
+                    fontSize: imageHeight / 2,
+                    fontWeight: FontWeight.bold,
+                    height: 1,
+                  ),
+            ),
+            Text(
+              'Institution'.toUpperCase(),
+              style: Theme.of(context).textTheme.title.copyWith(
+                    color: Theme.of(context).hintColor,
+                    letterSpacing: 0.15,
+                    fontSize: imageHeight / 2,
+                    fontWeight: FontWeight.bold,
+                    height: 1,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(
+          width: 12,
+        ),
+        Image.asset(
+          'assets/images/app_logo.png',
+          height: imageHeight,
+        ),
+      ],
+    );
+  }
+}
+
+class FloraFaunaTabBar extends StatelessWidget {
+  final Function(double) animateTo;
+  final Animation<double> animation;
+  final TabController tabController;
+  const FloraFaunaTabBar({
+    Key key,
+    @required this.animateTo,
+    @required this.animation,
+    @required this.tabController,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+    final anim = Tween<double>(
+      begin: 0,
+      end: 1 / (height - bottomHeight),
+    ).animate(animation);
+    final tabIndicatorWidth = 72.0;
+    final firstTabOffset = (width - 24) / 4 + 8 - tabIndicatorWidth / 2;
+    final secondTabOffset = (width - 24) / 4 * 3 + 16 - tabIndicatorWidth / 2;
+    return Material(
+      color: Theme.of(context).canvasColor,
+      child: Stack(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: Row(
+              children: <Widget>[
+                for (var i = 0; i < 2; i++)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                              i == 0
+                                  ? 'assets/images/flora.jpg'
+                                  : 'assets/images/fauna.jpg',
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: FlatButton(
+                          colorBrightness: Brightness.dark,
+                          color: Colors.black38,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ValueListenableBuilder(
+                            valueListenable: anim,
+                            builder: (context, value, child) {
+                              double y = 0;
+                              double cardHeight = entityButtonHeight;
+                              if (value < 1) {
+                                cardHeight = entityButtonHeightCollapsed +
+                                    (entityButtonHeight -
+                                            entityButtonHeightCollapsed) *
+                                        value;
+                                y = (value - 1) * 3;
+                              }
+                              return Container(
+                                height: cardHeight,
+                                alignment: Alignment.center,
+                                child: Transform.translate(
+                                  offset: Offset(0, y),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: Text(
+                              i == 0 ? 'FLORA' : 'FAUNA',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (animation.value < height - bottomHeight) {
+                              tabController.animateTo(i);
+                            } else {
+                              tabController.animateTo(
+                                i,
+                                duration: const Duration(
+                                  milliseconds: 1,
+                                ),
+                              );
+                            }
+                            animateTo(0);
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Positioned(
+            left: 0,
+            bottom: 18,
+            height: 2.4,
+            width: tabIndicatorWidth,
+            child: FadeTransition(
+              opacity: Tween<double>(
+                begin: 1,
+                end: -1,
+              ).animate(anim),
+              child: IgnorePointer(
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: Offset(firstTabOffset / tabIndicatorWidth, 0),
+                    end: Offset(secondTabOffset / tabIndicatorWidth, 0),
+                  ).animate(tabController.animation),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(69),
+                      boxShadow: kElevationToShadow[1],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
