@@ -17,6 +17,7 @@ export 'debug.dart';
 export 'entity_details_page.dart';
 export 'entity_list_page.dart';
 export 'explore.dart';
+export 'history.dart';
 export 'main.dart';
 export 'map.dart';
 export 'transition/animated_notched_shape.dart';
