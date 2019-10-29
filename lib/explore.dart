@@ -1,7 +1,7 @@
 import 'library.dart';
 
-const spacing = 4 * 8 + 2 * 16 + 4.0;
-const imageHeight = 28.0;
+const spacing = 4 * 8 + 16 + 20 + 4.0;
+const imageHeight = 24.0;
 const headingHeight = 28.0;
 const trailButtonHeight = 80.0;
 const entityButtonHeight = 108.0;
@@ -95,7 +95,7 @@ class ExploreHeader extends StatelessWidget {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.only(top: 16 + 12.0),
+              padding: const EdgeInsets.only(top: 20 + 12.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -104,9 +104,49 @@ class ExploreHeader extends StatelessWidget {
                       begin: 16 / 12 - totalTranslation / 12,
                       end: 16 / 12,
                     ).animate(anim),
-                    child: Image.asset(
-                      'assets/images/hci.png',
-                      height: imageHeight,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Image.asset(
+                          'assets/images/hci.png',
+                          height: imageHeight - 2,
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              'Hwa Chong'.toUpperCase(),
+                              style: Theme.of(context).textTheme.title.copyWith(
+                                color: Theme.of(context).hintColor,
+                                    fontSize: imageHeight / 2,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1,
+                                  ),
+                            ),
+                            Text(
+                              'Institution'.toUpperCase(),
+                              style: Theme.of(context).textTheme.title.copyWith(
+                                color: Theme.of(context).hintColor,
+                                    letterSpacing: 0.15,
+                                    fontSize: imageHeight / 2,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        Image.asset(
+                          'assets/images/app_logo.png',
+                          height: imageHeight,
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(
@@ -336,7 +376,8 @@ class ExploreBody extends StatelessWidget {
                   controller: tabController,
                   children: <Widget>[
                     Selector<FirebaseData, List<Flora>>(
-                      selector: (context, firebaseData) => firebaseData.floraList,
+                      selector: (context, firebaseData) =>
+                          firebaseData.floraList,
                       builder: (context, floraList, child) {
                         return EntityListPage(
                           scrollController: scrollControllers[0],
@@ -346,7 +387,8 @@ class ExploreBody extends StatelessWidget {
                       },
                     ),
                     Selector<FirebaseData, List<Fauna>>(
-                      selector: (context, firebaseData) => firebaseData.faunaList,
+                      selector: (context, firebaseData) =>
+                          firebaseData.faunaList,
                       builder: (context, faunaList, child) {
                         return EntityListPage(
                           scrollController: scrollControllers[1],
