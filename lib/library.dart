@@ -16,6 +16,7 @@ export 'main.dart';
 export 'bottom_navigation.dart';
 export 'data.dart';
 export 'debug.dart';
+export 'about/about.dart';
 export 'explore/entity/details_page.dart';
 export 'explore/entity/list_page.dart';
 export 'explore/explore.dart';
