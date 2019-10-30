@@ -245,10 +245,7 @@ class MyHomePage extends StatelessWidget {
                                   child: pageIndex == 0
                                       ? HistoryPage()
                                       : pageIndex == 2
-                                          ? Container(
-                                              key: ValueKey(2),
-                                              color: Colors.blue,
-                                            )
+                                          ? AboutPage()
                                           : child,
                                 );
                               },
