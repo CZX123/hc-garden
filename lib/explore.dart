@@ -72,22 +72,17 @@ class ExploreHeader extends StatelessWidget {
               ),
             ),
           ),
-          AnimatedBuilder(
-            animation: animation,
-            builder: (context, child) {
+          ValueListenableBuilder(
+            valueListenable: anim,
+            builder: (context, value, child) {
               Offset offset;
-              if (animation.value > height - bottomHeight) {
+              if (value > 1) {
                 offset = Offset(0, 0);
-                Provider.of<AppNotifier>(context, listen: false)
-                    .sheetMinimised = true;
               } else {
                 offset = Offset(
                   0,
-                  (animation.value / (height - bottomHeight) - 1) *
-                      totalTranslation,
+                  (value - 1) * totalTranslation,
                 );
-                Provider.of<AppNotifier>(context, listen: false)
-                    .sheetMinimised = false;
               }
               return Transform.translate(
                 offset: offset,
@@ -356,7 +351,7 @@ class FloraFaunaTabBar extends StatelessWidget {
           Positioned(
             left: 0,
             bottom: 18,
-            height: 2.4,
+            height: 2,
             width: tabIndicatorWidth,
             child: FadeTransition(
               opacity: Tween<double>(
@@ -392,7 +387,6 @@ class ExploreBody extends StatelessWidget {
   final List<ScrollController> scrollControllers;
   final List<ScrollController> extraScrollControllers;
   final Function(double) animateTo;
-  final GlobalKey<NavigatorState> navigatorKey;
   const ExploreBody({
     Key key,
     @required this.animation,
@@ -400,7 +394,6 @@ class ExploreBody extends StatelessWidget {
     @required this.scrollControllers,
     @required this.extraScrollControllers,
     @required this.animateTo,
-    @required this.navigatorKey,
   }) : super(key: key);
 
   @override
@@ -484,10 +477,9 @@ class ExploreBody extends StatelessWidget {
       },
     );
     return Navigator(
-      key: navigatorKey,
+      key: Provider.of<AppNotifier>(context, listen: false).navigatorKey,
       onGenerateRoute: (settings) {
         if (settings.name == Navigator.defaultRouteName) return initialRoute;
-        return null;
       },
     );
   }

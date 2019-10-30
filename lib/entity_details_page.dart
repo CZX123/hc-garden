@@ -135,13 +135,60 @@ class EntityDetailsPage extends StatelessWidget {
                     for (var image in newImages)
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: CustomImage(
-                          image,
-                          height: 216,
-                          width: newImages.length == 1 ? width - 32 : 324,
-                          fit: BoxFit.cover,
-                          placeholderColor: Theme.of(context).dividerColor,
-                          saveInCache: false,
+                        child: Stack(
+                          children: <Widget>[
+                            Hero(
+                              tag: image,
+                              flightShuttleBuilder: (
+                                flightContext,
+                                animation,
+                                flightDirection,
+                                fromHeroContext,
+                                toHeroContext,
+                              ) {
+                                return Container(
+                                  color: Colors.white,
+                                  height: 80,
+                                  width: 80,
+                                );
+                              },
+                              child: CustomImage(
+                                image,
+                                height: 216,
+                                width: newImages.length == 1 ? width - 32 : 324,
+                                fit: BoxFit.cover,
+                                placeholderColor:
+                                    Theme.of(context).dividerColor,
+                                saveInCache: false,
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: Material(
+                                type: MaterialType.transparency,
+                                child: InkWell(
+                                  onTap: () {
+                                    Provider.of<AppNotifier>(
+                                      context,
+                                      listen: false,
+                                    )
+                                      ..state = 2
+                                      ..draggingDisabled = true;
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, _, __) {
+                                          return ImageGallery(
+                                            images: newImages,
+                                            initialImage: image,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                   ],

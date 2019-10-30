@@ -26,7 +26,8 @@ class HcGardenApp extends StatelessWidget {
               if (event.snapshot.value == null) {
                 throw Exception('List of entities is empty!');
               }
-              final parsedJson = Map<String, dynamic>.from(event.snapshot.value);
+              final parsedJson =
+                  Map<String, dynamic>.from(event.snapshot.value);
               List<Flora> floraList = [];
               List<Fauna> faunaList = [];
               parsedJson['flora&fauna'].forEach((key, value) {
@@ -141,48 +142,70 @@ class MyHomePage extends StatelessWidget {
     Provider.of<AppNotifier>(context, listen: false).trails = trails;
   }); */
 
+  Future<bool> onBack(
+    BuildContext context,
+    double height,
+  ) async {
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final searchNotifier = Provider.of<SearchNotifier>(context, listen: false);
+    final animation = appNotifier.animation;
+    final state = appNotifier.state;
+    final navigatorKey = appNotifier.navigatorKey;
+    if (state == 0) {
+      if (searchNotifier.isSearching) {
+        Future.delayed(const Duration(milliseconds: 400), () {
+          return searchNotifier.keyboardAppear = false;
+        });
+        searchNotifier
+          ..isSearching = false
+          ..searchTerm = '';
+        return false;
+      } else if (animation.value < height - bottomHeight) {
+        appNotifier.animateTo(height - bottomHeight);
+        return false;
+      }
+      return true;
+    } else if (state == 1) {
+      if (animation.value > 10) {
+        appNotifier.animateTo(0);
+      } else if (navigatorKey.currentState.canPop()) {
+        navigatorKey.currentState.pop();
+        appNotifier
+          ..state = 0
+          ..entity = null;
+        if (searchNotifier.searchTerm.isNotEmpty) {
+          Future.delayed(const Duration(milliseconds: 280), () {
+            searchNotifier.isSearching = true;
+          });
+        }
+      }
+      return false;
+    } else if (state == 2) {
+      // TODO: Replace with list of callbacks
+      if (navigatorKey.currentState.canPop()) {
+        navigatorKey.currentState.pop();
+        appNotifier
+          ..state = 1
+          ..draggingDisabled = false;
+        return false;
+      }
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final _navigatorKey = GlobalKey<NavigatorState>();
     final _state = ValueNotifier(0);
     final _pageIndex = ValueNotifier(1);
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
-    Function(double) _animateTo;
     return Selector<AppNotifier, int>(
       selector: (context, appNotifier) => appNotifier.state,
       builder: (context, state, child) {
         _state.value = state;
         return WillPopScope(
-          onWillPop: () async {
-            final appNotifier =
-                Provider.of<AppNotifier>(context, listen: false);
-            final searchNotifier =
-                Provider.of<SearchNotifier>(context, listen: false);
-            if (searchNotifier.isSearching && appNotifier.state == 0) {
-              Future.delayed(const Duration(milliseconds: 400), () {
-                return searchNotifier.keyboardAppear = false;
-              });
-              searchNotifier.isSearching = false;
-              searchNotifier.searchTerm = '';
-              return false;
-            }
-            if (_navigatorKey.currentState.canPop()) {
-              _navigatorKey.currentState.pop();
-              appNotifier.updateState(0, null);
-              _animateTo(0);
-              if (searchNotifier.searchTerm.isNotEmpty) {
-                Future.delayed(const Duration(milliseconds: 280), () {
-                  return searchNotifier.isSearching = true;
-                });
-              }
-              return false;
-            }
-            if (!appNotifier.sheetMinimised) {
-              _animateTo(height - bottomHeight);
-              return false;
-            }
-            return true;
+          onWillPop: () {
+            return onBack(context, height);
           },
           child: Scaffold(
             endDrawer: DebugDrawer(),
@@ -206,7 +229,8 @@ class MyHomePage extends StatelessWidget {
                     backgroundBuilder:
                         (context, animation, tabController, animateTo) {
                       Provider.of<AppNotifier>(context, listen: false)
-                          .animation = animation;
+                        ..animation = animation
+                        ..animateTo = animateTo;
                       return Stack(
                         children: <Widget>[
                           Positioned(
@@ -241,7 +265,6 @@ class MyHomePage extends StatelessWidget {
                       animateTo,
                       isScrolledNotifier,
                     ) {
-                      _animateTo = animateTo;
                       return ExploreHeader(
                         animation: animation,
                         tabController: tabController,
@@ -263,7 +286,6 @@ class MyHomePage extends StatelessWidget {
                         scrollControllers: scrollControllers,
                         extraScrollControllers: extraScrollControllers,
                         animateTo: animateTo,
-                        navigatorKey: _navigatorKey,
                       );
                     },
                     footerBuilder: (
@@ -274,8 +296,6 @@ class MyHomePage extends StatelessWidget {
                       isScrolledNotifier,
                     ) {
                       return BottomSheetFooter(
-                        animation: animation,
-                        animateTo: animateTo,
                         pageIndex: _pageIndex,
                       );
                     },

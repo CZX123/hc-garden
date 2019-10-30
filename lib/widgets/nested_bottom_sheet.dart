@@ -1,6 +1,4 @@
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
+import '../library.dart';
 
 // Returns an element from the sorted list which is closest to the given value
 double closestValue(
@@ -41,7 +39,7 @@ typedef NestedBottomSheetHeaderBuilder = Widget Function(
   BuildContext context,
   Animation<double> animation,
   TabController tabController,
-  void Function(double) animateTo,
+  void Function(double, [Duration]) animateTo,
   ValueNotifier<bool> isScrolledNotifier,
 );
 
@@ -51,14 +49,14 @@ typedef NestedBottomSheetBodyBuilder = Widget Function(
   TabController tabController,
   List<ScrollController> scrollControllers,
   List<ScrollController> extraScrollControllers,
-  void Function(double) animateTo,
+  void Function(double, [Duration]) animateTo,
 );
 
 typedef NestedBottomSheetBackgroundBuilder = Widget Function(
   BuildContext context,
   Animation<double> animation,
   TabController tabController,
-  void Function(double) animateTo,
+  void Function(double, [Duration]) animateTo,
 );
 
 class NestedBottomSheet extends StatefulWidget {
@@ -120,7 +118,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   //int _activeIndex;
   ValueNotifier<bool> _isScrolledNotifier = ValueNotifier(false);
 
-  void animateTo(double end) {
+  void animateTo(double end, [Duration duration]) {
     // assert(
     //   _sortedPositions.contains(end),
     //   'Value to animate to should be one of the snapping positions',
@@ -129,15 +127,23 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     //     _activeScrollController.position.maxScrollExtent > 0) {
     //   _activeScrollController.jumpTo(0);
     // }
-    final start = _animationController.value;
-    final simulation = ScrollSpringSimulation(
-      spring,
-      start,
-      end,
-      0,
-      tolerance: _tolerance,
-    );
-    _animationController.animateWith(simulation);
+    if (duration == null) {
+      final start = _animationController.value;
+      final simulation = ScrollSpringSimulation(
+        spring,
+        start,
+        end,
+        0,
+        tolerance: _tolerance,
+      );
+      _animationController.animateWith(simulation);
+    } else {
+      _animationController.animateTo(
+        end,
+        duration: duration,
+        curve: Curves.fastOutSlowIn,
+      );
+    }
   }
 
   void stateListener() {
@@ -146,7 +152,9 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       if (_newState != _state) {
         dragCancel();
         _state = _newState;
-        _activeScrollController = _extraScrollControllers[_state - 1];
+        // TODO: Update state
+        _activeScrollController =
+            _state == 2 ? null : _extraScrollControllers[_state - 1];
       }
     } else {
       _state = 0;
@@ -384,12 +392,20 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
             _tabController,
             animateTo,
           ),
-        GestureDetector(
-          onVerticalDragDown: dragDown,
-          onVerticalDragStart: dragStart,
-          onVerticalDragUpdate: dragUpdate,
-          onVerticalDragEnd: dragEnd,
-          onVerticalDragCancel: dragCancel,
+        Selector<AppNotifier, bool>(
+          selector: (context, appNotifier) => appNotifier.draggingDisabled,
+          builder: (context, draggingDisabled, child) {
+            return GestureDetector(
+              onVerticalDragDown: draggingDisabled ?? false ? null : dragDown,
+              onVerticalDragStart: draggingDisabled ?? false ? null : dragStart,
+              onVerticalDragUpdate:
+                  draggingDisabled ?? false ? null : dragUpdate,
+              onVerticalDragEnd: draggingDisabled ?? false ? null : dragEnd,
+              onVerticalDragCancel:
+                  draggingDisabled ?? false ? null : dragCancel,
+              child: child,
+            );
+          },
           child: Stack(
             children: <Widget>[
               SlideTransition(

@@ -1,19 +1,18 @@
 import 'library.dart';
 
 class BottomSheetFooter extends StatelessWidget {
-  final Animation<double> animation;
-  final Function(double) animateTo;
   final ValueNotifier<int> pageIndex;
   const BottomSheetFooter({
     Key key,
-    @required this.animation,
-    @required this.animateTo,
     @required this.pageIndex,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final animateTo = appNotifier.animateTo;
+    final animation = appNotifier.animation;
     return Stack(
       children: <Widget>[
         // 3 Button Bottom Navigation
@@ -33,8 +32,8 @@ class BottomSheetFooter extends StatelessWidget {
                   } else if (animation.value > height - bottomHeight) {
                     offset = Offset(0, 0);
                   } else {
-                    offset =
-                        Offset(0, 128 - animation.value / (height - bottomHeight) * 128);
+                    offset = Offset(0,
+                        128 - animation.value / (height - bottomHeight) * 128);
                   }
                   if (offset.dy == 128) return const SizedBox.shrink();
                   return Transform.translate(
@@ -57,8 +56,16 @@ class BottomSheetFooter extends StatelessWidget {
                   elevation: 0,
                   currentIndex: value,
                   onTap: (index) {
-                    if (index == 1) animateTo(height - bottomHeight);
-                    else animateTo(height);
+                    if (index == 1) {
+                      appNotifier.draggingDisabled = false;
+                      animateTo(height - bottomHeight);
+                    } else {
+                      appNotifier.draggingDisabled = true;
+                      animateTo(
+                        height - bottomBarHeight,
+                        const Duration(milliseconds: 240),
+                      );
+                    }
                     pageIndex.value = index;
                   },
                   items: [
@@ -150,7 +157,8 @@ class NotchedAppBar extends StatelessWidget {
                             tooltip: 'Back',
                           ),
                           Selector<AppNotifier, int>(
-                            selector: (context, appNotifier) => appNotifier.state,
+                            selector: (context, appNotifier) =>
+                                appNotifier.state,
                             builder: (context, state, child) {
                               return AnimatedOpacity(
                                 opacity: state == 0 ? 1 : 0,

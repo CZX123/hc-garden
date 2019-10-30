@@ -140,8 +140,8 @@ class _EntityListRowState extends State<EntityListRow> {
           Text(
             widget.entity.name,
             style: Theme.of(context).textTheme.subhead.copyWith(
-              fontSize: widget.searchTerm.isEmpty ? 16 : 17,
-            ),
+                  fontSize: widget.searchTerm.isEmpty ? 16 : 17,
+                ),
           ),
           if (widget.searchTerm.isEmpty)
             Padding(
@@ -191,8 +191,9 @@ class _EntityListRowState extends State<EntityListRow> {
             searchNotifier.keyboardAppear = false;
             await Future.delayed(const Duration(milliseconds: 200));
           }
-          Provider.of<AppNotifier>(context, listen: false)
-              .updateState(1, widget.entity);
+          Provider.of<AppNotifier>(context, listen: false).state = 1;
+          Provider.of<AppNotifier>(context, listen: false).entity =
+              widget.entity;
           searchNotifier.isSearching = false;
           final oldChild = Container(
             height: widget.searchTerm.isEmpty ? 104 : 88,
@@ -215,7 +216,8 @@ class _EntityListRowState extends State<EntityListRow> {
               ],
             ),
           );
-          final oldTopPadding = ValueNotifier(((widget.searchTerm.isEmpty ? 104 : 88) - 64) / 2);
+          final oldTopPadding =
+              ValueNotifier(((widget.searchTerm.isEmpty ? 104 : 88) - 64) / 2);
           final newTopPadding = ValueNotifier(topPadding + 16);
           Navigator.of(context).push(
             ExpandPageRoute<void>(

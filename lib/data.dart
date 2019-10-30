@@ -60,7 +60,8 @@ class FirebaseData {
   final List<Fauna> faunaList;
   final Map<Trail, List<TrailLocation>> trails;
   final List<HistoricalData> historicalDataList;
-  FirebaseData({this.floraList, this.faunaList, this.trails, this.historicalDataList});
+  FirebaseData(
+      {this.floraList, this.faunaList, this.trails, this.historicalDataList});
 }
 
 class Trail {
@@ -159,9 +160,16 @@ class HistoricalData {
   final String name;
   final num height;
   final num width;
-  HistoricalData({this.id, this.description, this.image, this.name, this.height, this.width});
+  HistoricalData({
+    this.id,
+    this.description,
+    this.image,
+    this.name,
+    this.height,
+    this.width,
+  });
 
-  factory HistoricalData.fromJson(String key, dynamic parsedJson){
+  factory HistoricalData.fromJson(String key, dynamic parsedJson) {
     return HistoricalData(
       id: int.tryParse(key.split('-').last),
       description: parsedJson['description'],
@@ -179,13 +187,34 @@ class HistoricalData {
 }
 
 class AppNotifier extends ChangeNotifier {
-  Animation<double> animation;
+  Animation<double> animation; //  Animation for bottom sheet
+  void Function(double, [Duration]) animateTo; // AnimateTo function for bottom sheet
+  GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>(); // key for navigator in explore body
 
-  int state = 0;
-  // 0: entity list
-  // 1: details page for one entity
-  Entity entity;
-  bool sheetMinimised = true;
+  bool _draggingDisabled = false;
+  bool get draggingDisabled => _draggingDisabled;
+  set draggingDisabled(bool draggingDisabled) {
+    _draggingDisabled = draggingDisabled;
+    notifyListeners();
+  }
+
+  int _state = 0;
+  int get state => _state;
+  set state(int state) {
+    _state = state;
+    notifyListeners();
+  }
+  // 0: Entity List Page
+  // 1: Entity Details Page
+  // 2: Image Gallery within Entity Details Page
+
+  Entity _entity;
+  Entity get entity => _entity;
+  set entity(Entity entity) {
+    _entity = entity;
+    notifyListeners();
+  }
 
   // void updateBackupLists(List<Flora> floraList, List<Fauna> faunaList) {
   //   _backupFloraList = floraList;
@@ -200,11 +229,6 @@ class AppNotifier extends ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void updateState(int newState, Entity newEntity) {
-    state = newState;
-    entity = newEntity;
-    notifyListeners();
-  }
 }
 
 class SearchNotifier extends ChangeNotifier {
