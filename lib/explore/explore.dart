@@ -1,4 +1,4 @@
-import 'library.dart';
+import '../library.dart';
 
 const spacing = 4 * 8 + 16 + 20 + 4.0;
 const imageHeight = 24.0;

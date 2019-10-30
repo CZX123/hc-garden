@@ -1,4 +1,4 @@
-import 'library.dart';
+import '../library.dart';
 
 class MapWidget extends StatefulWidget {
   const MapWidget({Key key}) : super(key: key);

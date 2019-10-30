@@ -1,4 +1,4 @@
-import 'library.dart';
+import '../../library.dart';
 
 class TrailDetailsPage extends StatelessWidget {
   final Trail trail;

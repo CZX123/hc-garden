@@ -1,4 +1,4 @@
-import 'library.dart';
+import '../../library.dart';
 
 class ImageGallery extends StatelessWidget {
   final String initialImage;

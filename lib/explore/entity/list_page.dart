@@ -1,4 +1,4 @@
-import 'library.dart';
+import '../../library.dart';
 
 class EntityListPage extends StatelessWidget {
   final ScrollController scrollController; // From the bottom sheet

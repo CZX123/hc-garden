@@ -1,4 +1,4 @@
-import 'library.dart';
+import '../../library.dart';
 
 class EntityDetailsPage extends StatelessWidget {
   final ValueNotifier<double> newTopPadding;

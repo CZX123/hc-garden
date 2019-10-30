@@ -1,4 +1,4 @@
-import 'library.dart';
+import '../library.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({Key key}) : super(key: key);
