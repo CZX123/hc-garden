@@ -20,6 +20,7 @@ class HcGardenApp extends StatelessWidget {
               floraList: [],
               faunaList: [],
               trails: {},
+              historicalDataList: [],
             ),
             value: FirebaseDatabase.instance.reference().onValue.map((event) {
               if (event.snapshot.value == null) {
@@ -51,10 +52,17 @@ class HcGardenApp extends StatelessWidget {
                 });
               });
 
+              List<HistoricalData> historicalDataList = [];
+              parsedJson['historical'].forEach((key, value) {
+                historicalDataList.add(HistoricalData.fromJson(key, value));
+              });
+              historicalDataList.sort((a, b) => a.id.compareTo(b.id));
+
               return FirebaseData(
                 floraList: floraList,
                 faunaList: faunaList,
                 trails: trails,
+                historicalDataList: historicalDataList,
               );
             })),
         ChangeNotifierProvider(
@@ -211,10 +219,7 @@ class MyHomePage extends StatelessWidget {
                               builder: (context, pageIndex, child) {
                                 return CustomAnimatedSwitcher(
                                   child: pageIndex == 0
-                                      ? Container(
-                                          key: ValueKey(0),
-                                          color: Colors.green,
-                                        )
+                                      ? HistoryPage()
                                       : pageIndex == 2
                                           ? Container(
                                               key: ValueKey(2),

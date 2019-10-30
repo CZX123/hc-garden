@@ -59,7 +59,8 @@ class FirebaseData {
   final List<Flora> floraList;
   final List<Fauna> faunaList;
   final Map<Trail, List<TrailLocation>> trails;
-  FirebaseData({this.floraList, this.faunaList, this.trails});
+  final List<HistoricalData> historicalDataList;
+  FirebaseData({this.floraList, this.faunaList, this.trails, this.historicalDataList});
 }
 
 class Trail {
@@ -148,6 +149,32 @@ class EntityPosition {
       pulse: parsedJson['pulse'],
       size: parsedJson['size'],
     );
+  }
+}
+
+class HistoricalData {
+  final int id;
+  final String description;
+  final String image;
+  final String name;
+  final num height;
+  final num width;
+  HistoricalData({this.id, this.description, this.image, this.name, this.height, this.width});
+
+  factory HistoricalData.fromJson(String key, dynamic parsedJson){
+    return HistoricalData(
+      id: int.tryParse(key.split('-').last),
+      description: parsedJson['description'],
+      image: parsedJson['imageRef'],
+      name: parsedJson['name'],
+      height: parsedJson['height'],
+      width: parsedJson['width'],
+    );
+  }
+
+  @override
+  String toString() {
+    return 'HistoricalData(id: $id, description: $description, imageURL: $image)';
   }
 }
 
