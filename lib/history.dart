@@ -5,41 +5,58 @@ class HistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
+    final width = MediaQuery.of(context).size.width;
     return Selector<FirebaseData, List<HistoricalData>>(
       selector: (context, firebaseData) => firebaseData.historicalDataList,
       builder: (context, historicalDataList, child) {
-        print(historicalDataList);
-        return ListView(
-          padding: EdgeInsets.only(top: topPadding + 24),
-          children: <Widget>[
-            Text(
-              'Historical Photos',
-              style: Theme.of(context).textTheme.display1.copyWith(
-                    color: Colors.black87,
-                    fontSize: 34.0,
-                    fontWeight: FontWeight.w400,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(
-              height: 8.0,
-            ),
-            for (var historicalData in historicalDataList) Column(
-              children: <Widget>[
-                if (historicalData.description!='') SizedBox(
-                  height: 6.0,
+        final newImages = historicalDataList.map((h) {
+          var split = h.image.split('.');
+          final end = '.' + split.removeLast();
+          return split.join('.') + 'h' + end;
+        }).toList();
+        return CustomScrollView(
+          slivers: <Widget>[
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(16, topPadding + 24, 16, 16),
+              sliver: SliverToBoxAdapter(
+                child: Text(
+                  'Historical Photos',
+                  style: Theme.of(context).textTheme.display1.copyWith(
+                        color: Colors.black87,
+                        fontSize: 32.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                  textAlign: TextAlign.center,
                 ),
-                CustomImage(historicalData.image),
-                if (historicalData.description!='') SizedBox(
-                  height: 6.0,
-                ),
-                if (historicalData.description!='') Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    historicalData.description,
-                  ),
-                )
-              ],
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final height = width *
+                      historicalDataList[index].height /
+                      historicalDataList[index].width;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      CustomImage(
+                        newImages[index],
+                        height: height,
+                        width: width,
+                        placeholderColor: Theme.of(context).dividerColor,
+                      ),
+                      if (historicalDataList[index].description != '')
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                          child: Text(
+                            historicalDataList[index].description,
+                          ),
+                        ),
+                    ],
+                  );
+                },
+                childCount: historicalDataList.length,
+              ),
             ),
           ],
         );
