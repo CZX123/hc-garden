@@ -12,42 +12,60 @@ class ImageGallery extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final animation = ModalRoute.of(context).animation;
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: Offset(0, 1),
-        end: Offset(0, 0),
+    return FadeTransition(
+      opacity: Tween(
+        begin: 0.0,
+        end: 3.0,
       ).animate(CurvedAnimation(
         parent: animation,
-        curve: Curves.decelerate,
+        curve: Curves.fastOutSlowIn,
       )),
-      child: Material(
-        color: Colors.black,
-        clipBehavior: Clip.hardEdge,
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: Offset(0, -.97),
-            end: Offset(0, 0),
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.decelerate,
-          )),
-          // child: PhotoViewGallery.builder(
-          //   builder: (context, index) {
-          //     return PhotoViewGalleryPageOptions(
-          //       imageProvider: NetworkImage(images[index]),
-          //       minScale: PhotoViewComputedScale.contained,
-          //       maxScale: PhotoViewComputedScale.covered,
-          //     );
-          //   },
-          //   itemCount: images.length,
-          // ),
-          child: PageView(
-            controller: PageController(
-              initialPage: images.indexOf(initialImage),
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: Offset(0, .3),
+          end: Offset(0, 0),
+        ).animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.fastOutSlowIn,
+        )),
+        child: Material(
+          color: Colors.black,
+          clipBehavior: Clip.hardEdge,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(0, -.25),
+              end: Offset(0, 0),
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.fastOutSlowIn,
+            )),
+            // child: PhotoViewGallery.builder(
+            //   builder: (context, index) {
+            //     return PhotoViewGalleryPageOptions(
+            //       imageProvider: NetworkImage(images[index]),
+            //       minScale: PhotoViewComputedScale.contained,
+            //       maxScale: PhotoViewComputedScale.covered,
+            //     );
+            //   },
+            //   itemCount: images.length,
+            // ),
+            child: FadeTransition(
+              opacity: Tween(
+                begin: -1.0,
+                end: 2.0,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.fastOutSlowIn,
+              )),
+              child: PageView(
+                controller: PageController(
+                  initialPage: images.indexOf(initialImage),
+                ),
+                children: <Widget>[
+                  for (var image in images) ZoomableImage(image: image),
+                ],
+              ),
             ),
-            children: <Widget>[
-              for (var image in images) ZoomableImage(image: image),
-            ],
           ),
         ),
       ),

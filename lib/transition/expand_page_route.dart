@@ -141,20 +141,20 @@ class ExpandItemPageTransition extends StatefulWidget {
 }
 
 class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
-
   @override
   Widget build(BuildContext context) {
-    final Animation<double> animation = ModalRoute.of(context).animation;
+    final animation = ModalRoute.of(context).animation;
+    final secondaryAnimation = ModalRoute.of(context).secondaryAnimation;
     final topDistance = widget.newTopPadding.value - widget.oldTopPadding.value;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final Animation<double> positionAnimation = CurvedAnimation(
+        final positionAnimation = CurvedAnimation(
           parent: animation,
           curve: Curves.fastOutSlowIn,
         );
 
-        final Animation<RelativeRect> itemPosition = RelativeRectTween(
+        final itemPosition = RelativeRectTween(
           begin: RelativeRect.fromLTRB(
             0,
             widget.sourceRect.top,
@@ -169,7 +169,7 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
         //   curve: const Interval(0, .2, curve: Curves.ease),
         // );
 
-        final Animation<double> fadeOldContent = Tween(
+        final fadeOldContent = Tween(
           begin: 1.0,
           end: 0.0,
         ).animate(
@@ -179,17 +179,17 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
           ),
         );
 
-        final Animation<Offset> contentOffset = Tween<Offset>(
+        final contentOffset = Tween<Offset>(
           begin: Offset(0, -topDistance),
           end: Offset.zero,
         ).animate(positionAnimation);
 
-        final Animation<Offset> oldChildOffset = Tween<Offset>(
+        final oldChildOffset = Tween<Offset>(
           begin: Offset.zero,
           end: Offset(0, topDistance),
         ).animate(positionAnimation);
 
-        final Animation<double> fadeContent = CurvedAnimation(
+        final fadeContent = CurvedAnimation(
           parent: animation,
           curve: const Interval(.1, .8, curve: Curves.ease),
         );
@@ -198,55 +198,50 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
           children: <Widget>[
             PositionedTransition(
               rect: itemPosition,
-              child: Stack(
-                children: <Widget>[
-                  AnimatedBuilder(
-                    animation: contentOffset,
-                    builder: (context, child) {
-                      return Material(
-                        elevation:
-                            animation.status == AnimationStatus.reverse ||
-                                    contentOffset.value.dy == -topDistance
-                                ? 0
-                                : 3,
-                        animationDuration: widget.transitionDuration,
-                        child: Transform.translate(
-                          offset: contentOffset.value,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: FadeTransition(
-                      opacity: fadeContent,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: constraints.biggest.height,
-                        ),
-                        child: widget.child,
-                      ),
-                    ),
+              child: SlideTransition(
+                position: Tween(
+                  begin: Offset(0, 0),
+                  end: Offset(0, -.01),
+                ).animate(
+                  CurvedAnimation(
+                    parent: secondaryAnimation,
+                    curve: Curves.fastOutSlowIn,
                   ),
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    right: 0,
-                    child: IgnorePointer(
-                      child: AnimatedBuilder(
-                        animation: oldChildOffset,
-                        child: FadeTransition(
-                          opacity: fadeOldContent,
-                          child: widget.oldChild,
-                        ),
-                        builder: (context, child) {
-                          return Transform.translate(
-                            offset: oldChildOffset.value,
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    AnimatedBuilder(
+                      animation: contentOffset,
+                      builder: (context, child) {
+                        return Material(
+                          elevation:
+                              animation.status == AnimationStatus.reverse ||
+                                      contentOffset.value.dy == -topDistance
+                                  ? 0
+                                  : 3,
+                          animationDuration: widget.transitionDuration,
+                          child: Transform.translate(
+                            offset: contentOffset.value,
                             child: child,
-                          );
-                        },
+                          ),
+                        );
+                      },
+                      child: FadeTransition(
+                        opacity: fadeContent,
+                        child: FadeTransition(
+                          opacity: Tween(
+                            begin: 1.0,
+                            end: -1.0,
+                          ).animate(secondaryAnimation),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.biggest.height,
+                            ),
+                            child: widget.child,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  if (widget.persistentOldChild != null)
                     Positioned(
                       left: 0,
                       top: 0,
@@ -254,10 +249,11 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
                       child: IgnorePointer(
                         child: AnimatedBuilder(
                           animation: oldChildOffset,
-                          child: widget.persistentOldChild,
+                          child: FadeTransition(
+                            opacity: fadeOldContent,
+                            child: widget.oldChild,
+                          ),
                           builder: (context, child) {
-                            if (oldChildOffset.value.dy == topDistance)
-                              return SizedBox.shrink();
                             return Transform.translate(
                               offset: oldChildOffset.value,
                               child: child,
@@ -266,7 +262,28 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
                         ),
                       ),
                     ),
-                ],
+                    if (widget.persistentOldChild != null)
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        child: IgnorePointer(
+                          child: AnimatedBuilder(
+                            animation: oldChildOffset,
+                            child: widget.persistentOldChild,
+                            builder: (context, child) {
+                              if (oldChildOffset.value.dy == topDistance)
+                                return SizedBox.shrink();
+                              return Transform.translate(
+                                offset: oldChildOffset.value,
+                                child: child,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ],
