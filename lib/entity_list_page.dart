@@ -162,6 +162,7 @@ class _EntityListRowState extends State<EntityListRow> {
                 widget.entity.sciName,
                 style: Theme.of(context).textTheme.caption.copyWith(
                       fontSize: 15,
+                      fontStyle: FontStyle.italic,
                     ),
               ),
             ),

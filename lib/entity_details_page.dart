@@ -117,6 +117,7 @@ class EntityDetailsPage extends StatelessWidget {
                         style: Theme.of(context).textTheme.subhead.copyWith(
                               height: 1,
                               color: Theme.of(context).hintColor,
+                              fontStyle: FontStyle.italic,
                             ),
                       ),
                     ],
