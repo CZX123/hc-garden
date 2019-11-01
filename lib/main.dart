@@ -21,6 +21,7 @@ class HcGardenApp extends StatelessWidget {
               faunaList: [],
               trails: {},
               historicalDataList: [],
+              aboutPageDataList: [],
             ),
             value: FirebaseDatabase.instance.reference().onValue.map((event) {
               if (event.snapshot.value == null) {
@@ -59,11 +60,17 @@ class HcGardenApp extends StatelessWidget {
               });
               historicalDataList.sort((a, b) => a.id.compareTo(b.id));
 
+              List<AboutPageData> aboutPageDataList = [];
+              parsedJson['about'].forEach((key, value) {
+                aboutPageDataList.add(AboutPageData.fromJson(key, value));
+              });
+
               return FirebaseData(
                 floraList: floraList,
                 faunaList: faunaList,
                 trails: trails,
                 historicalDataList: historicalDataList,
+                aboutPageDataList: aboutPageDataList,
               );
             })),
         ChangeNotifierProvider(

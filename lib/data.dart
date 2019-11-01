@@ -60,8 +60,10 @@ class FirebaseData {
   final List<Fauna> faunaList;
   final Map<Trail, List<TrailLocation>> trails;
   final List<HistoricalData> historicalDataList;
+  final List<AboutPageData> aboutPageDataList;
   FirebaseData(
-      {this.floraList, this.faunaList, this.trails, this.historicalDataList});
+      {this.floraList, this.faunaList, this.trails, this.historicalDataList, this.aboutPageDataList}
+  );
 }
 
 class Trail {
@@ -183,6 +185,23 @@ class HistoricalData {
   @override
   String toString() {
     return 'HistoricalData(id: $id, description: $description, imageURL: $image)';
+  }
+}
+
+class AboutPageData {
+  final String body;
+  final String quote;
+  final String title;
+  bool isExpanded = false;
+  AboutPageData({this.body, this.quote, this.title, this.isExpanded});
+
+  factory AboutPageData.fromJson(String key, dynamic parsedJson){
+    return AboutPageData(
+      body: parsedJson['body'],
+      quote: parsedJson['quote'],
+      title: parsedJson['title'],
+      isExpanded: false,
+    );
   }
 }
 
