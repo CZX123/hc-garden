@@ -133,14 +133,14 @@ class NotchedAppBar extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Material(
                 type: MaterialType.transparency,
-                child: Selector<AppNotifier, bool>(
-                  selector: (context, appNotifier) => appNotifier.state == 0,
-                  builder: (context, value, child) {
+                child: Selector<AppNotifier, int>(
+                  selector: (context, appNotifier) => appNotifier.state,
+                  builder: (context, state, child) {
                     return AnimatedNotchedShape(
-                      elevation: 12,
+                      elevation: state == 1 ? 0 : 12,
                       color: Theme.of(context).canvasColor,
-                      notchMargin: value ? 4 : 0,
-                      fabRadius: value ? 28 : 0,
+                      notchMargin: state == 0 ? 4 : 0,
+                      fabRadius: state == 0 ? 28 : 0,
                       child: child,
                     );
                   },
@@ -268,6 +268,27 @@ class NotchedAppBar extends StatelessWidget {
                   });
                 },
                 tooltip: 'Search',
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              height: 1,
+              bottom: 47,
+              child: IgnorePointer(
+                child: Selector<AppNotifier, bool>(
+                  selector: (context, appNotifier) => appNotifier.state == 1,
+                  builder: (context, value, child) {
+                    return AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: value ? 1 : 0,
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    color: Theme.of(context).dividerColor,
+                  ),
+                ),
               ),
             ),
           ],

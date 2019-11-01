@@ -3,6 +3,7 @@ import '../library.dart';
 const northEastBound = const LatLng(1.328278, 103.807815);
 const southWestBound = const LatLng(1.324095, 103.800954);
 const center = const LatLng(1.326580, 103.804453);
+const bottomSheetCenter = const LatLng(1.325080, 103.804453);
 Set<Polygon> polygons = {
   Polygon(
     polygonId: PolygonId("salt centre"),

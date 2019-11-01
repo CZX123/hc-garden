@@ -15,23 +15,38 @@ class EntityDetailsPage extends StatelessWidget {
     BuildContext context,
     Map<Trail, List<TrailLocation>> trails,
   ) {
+    final height = MediaQuery.of(context).size.height;
     List<Widget> children = [];
-    for (var location in entity.locations) {
-      final trailId = location.keys.first;
-      final locationId = location.values.first;
+    for (var loc in entity.locations) {
+      final trailId = loc.keys.first;
+      final locationId = loc.values.first;
       final trail = trails.keys.firstWhere((trail) {
         return trail.id == trailId;
       });
-      final name = trails[trail].firstWhere((loc) {
+      final location = trails[trail].firstWhere((loc) {
         return loc.id == locationId;
-      }).name;
+      });
       children.add(ListTile(
         leading: Icon(Icons.location_on),
         title: Text(
-          '$name',
+          '${location.name}',
           style: Theme.of(context).textTheme.subtitle,
         ),
-        onTap: () {},
+        onTap: () {
+          scrollController.animateTo(
+            0,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.fastOutSlowIn,
+          );
+          Provider.of<AppNotifier>(
+            context,
+            listen: false,
+          ).animateTo(height - 48 - 96);
+          Provider.of<MapNotifier>(
+            context,
+            listen: false,
+          ).animateToLocation(location);
+        },
       ));
     }
     return children;
@@ -56,15 +71,9 @@ class EntityDetailsPage extends StatelessWidget {
         }
         return false;
       },
-      child: Selector<AppNotifier, int>(
-        selector: (context, appNotifier) => appNotifier.state,
-        builder: (context, state, child) {
-          return SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            controller: state == 1 ? scrollController : ScrollController(),
-            child: child,
-          );
-        },
+      child: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        controller: scrollController,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -165,7 +174,8 @@ class EntityDetailsPage extends StatelessWidget {
                                             initialImage: image,
                                           );
                                         },
-                                        transitionDuration: const Duration(milliseconds: 340),
+                                        transitionDuration:
+                                            const Duration(milliseconds: 340),
                                       ),
                                     );
                                   },
@@ -199,7 +209,7 @@ class EntityDetailsPage extends StatelessWidget {
               },
             ),
             const SizedBox(
-              height: 100,
+              height: 64,
             ),
           ],
         ),
