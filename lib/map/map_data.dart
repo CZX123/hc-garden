@@ -12,7 +12,8 @@ Set<Polygon> polygons = {
       const LatLng(1.328082, 103.801477),
       const LatLng(1.327769, 103.801919),
     ],
-    fillColor: Color(0x7fff5722),
+    fillColor: const Color(0x7fff5722),
+    strokeWidth: 0,
   ),
   Polygon(
     polygonId: PolygonId("hs staffroom"),
@@ -30,7 +31,8 @@ Set<Polygon> polygons = {
       const LatLng(1.327214, 103.802399),
       const LatLng(1.327158, 103.802352),
     ],
-    fillColor: Color(0x7ff5b041),
+    fillColor: const Color(0x7ff5b041),
+    strokeWidth: 0,
   ),
   Polygon(
     polygonId: PolygonId("hs block e"),
@@ -43,7 +45,8 @@ Set<Polygon> polygons = {
       const LatLng(1.326815, 103.803218),
       const LatLng(1.327284, 103.802641),
     ],
-    fillColor: Color(0x7ff9e79f),
+    fillColor: const Color(0x7ff9e79f),
+    strokeWidth: 0,
   ),
   Polygon(
     polygonId: PolygonId("hs block b"),
@@ -53,7 +56,8 @@ Set<Polygon> polygons = {
       const LatLng(1.326335, 103.802943),
       const LatLng(1.326440, 103.803026),
     ],
-    fillColor: Color(0x7f6e2c00),
+    fillColor: const Color(0x7f6e2c00),
+    strokeWidth: 0,
   ),
   Polygon(
     polygonId: PolygonId("hs block c"),
@@ -72,7 +76,8 @@ Set<Polygon> polygons = {
       const LatLng(1.326234, 103.802808),
       const LatLng(1.326635, 103.802350),
     ],
-    fillColor: Color(0x7fe74c3c),
+    fillColor: const Color(0x7fe74c3c),
+    strokeWidth: 0,
   ),
   Polygon(
     polygonId: PolygonId("clock tower"),
@@ -82,7 +87,8 @@ Set<Polygon> polygons = {
       const LatLng(1.326266, 103.803678),
       const LatLng(1.326348, 103.803745),
     ],
-    fillColor: Color(0x7fe74c3c),
+    fillColor: const Color(0x7fe74c3c),
+    strokeWidth: 0,
   ),
   Polygon(
     polygonId: PolygonId("kkh"),
@@ -98,6 +104,7 @@ Set<Polygon> polygons = {
       const LatLng(1.325423, 103.802787),
       const LatLng(1.325373, 103.802848),
     ],
-    fillColor: Color(0x7f6e2c00),
+    fillColor: const Color(0x7f6e2c00),
+    strokeWidth: 0,
   ),
 };

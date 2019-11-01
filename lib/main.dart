@@ -82,6 +82,9 @@ class HcGardenApp extends StatelessWidget {
         ChangeNotifierProvider(
           builder: (context) => SearchNotifier(),
         ),
+        ChangeNotifierProvider(
+          builder: (context) => MapNotifier(),
+        ),
         FutureProvider.value(
           value: getApplicationDocumentsDirectory(),
         ),

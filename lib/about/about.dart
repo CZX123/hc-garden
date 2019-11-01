@@ -43,7 +43,8 @@ class _AboutPageState extends State<AboutPage> {
                   },
                   children: aboutPageDataList.map((aboutPageData) {
                     final List<String> bodyStrings =
-                        aboutPageData.body.split("\n");
+                        aboutPageData.body.split('\n');
+                    print(bodyStrings);
                     return ExpansionPanel(
                       canTapOnHeader: true,
                       headerBuilder: (BuildContext context, bool isExpanded) {
@@ -77,12 +78,15 @@ class _AboutPageState extends State<AboutPage> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                                padding:
+                                    const EdgeInsets.fromLTRB(24, 8, 24, 0),
                                 child: Column(
                                   children: <Widget>[
-                                    for (var bodyString in bodyStrings) {
+                                    for (var bodyString in bodyStrings)
                                       Padding(
-                                        padding: const EdgeInsets.only(bottom: 10),
+                                        padding: const EdgeInsets.only(
+                                          bottom: 10,
+                                        ),
                                         child: Text(
                                           bodyString,
                                           style: TextStyle(
@@ -90,7 +94,6 @@ class _AboutPageState extends State<AboutPage> {
                                           ),
                                         ),
                                       ),
-                                    }
                                   ],
                                 ),
                               ),

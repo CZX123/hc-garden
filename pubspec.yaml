@@ -24,6 +24,7 @@ dependencies:
   google_maps_flutter: ^0.5.21+7
   firebase_core: ^0.4.0+1
   firebase_database: ^3.0.7
+  image: ^2.1.7
 
 dev_dependencies:
   flutter_test:
