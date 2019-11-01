@@ -190,14 +190,16 @@ class HistoricalData {
 
 class AboutPageData {
   final String body;
+  final int id;
   final String quote;
   final String title;
   bool isExpanded = false;
-  AboutPageData({this.body, this.quote, this.title, this.isExpanded});
+  AboutPageData({this.body, this.id, this.quote, this.title, this.isExpanded});
 
   factory AboutPageData.fromJson(String key, dynamic parsedJson){
     return AboutPageData(
       body: parsedJson['body'],
+      id: parsedJson['id'],
       quote: parsedJson['quote'],
       title: parsedJson['title'],
       isExpanded: false,
