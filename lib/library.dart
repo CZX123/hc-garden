@@ -22,6 +22,7 @@ export 'explore/entity/list_page.dart';
 export 'explore/explore.dart';
 export 'history/history.dart';
 export 'map/map.dart';
+export 'map/map_data.dart';
 export 'transition/animated_notched_shape.dart';
 export 'transition/animated_scale.dart';
 export 'transition/expand_page_route.dart';

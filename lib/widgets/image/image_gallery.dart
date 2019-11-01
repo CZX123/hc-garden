@@ -111,7 +111,7 @@ class _ZoomableImageState extends State<ZoomableImage>
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    // final width = MediaQuery.of(context).size.width;
     return GestureDetector(
       // onScaleStart: (details) {
       //   _ended = false;

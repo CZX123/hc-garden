@@ -24,7 +24,7 @@ class HcGardenApp extends StatelessWidget {
             ),
             value: FirebaseDatabase.instance.reference().onValue.map((event) {
               if (event.snapshot.value == null) {
-                throw Exception('List of entities is empty!');
+                throw Exception('Value is empty!');
               }
               final parsedJson =
                   Map<String, dynamic>.from(event.snapshot.value);

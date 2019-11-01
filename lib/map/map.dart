@@ -8,21 +8,47 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> {
-  GoogleMapController mapController;
-  final LatLng _center = const LatLng(1.326580, 103.804453);
 
   void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+    Provider.of<MapNotifier>(
+      context,
+      listen: false,
+    ).mapController = controller;
   }
 
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-      onMapCreated: _onMapCreated,
-      initialCameraPosition: CameraPosition(
-        target: _center,
-        zoom: 17,
-      ),
+    return Selector<FirebaseData, Map<Trail, List<TrailLocation>>>(
+      selector: (context, firebaseData) => firebaseData.trails,
+      builder: (context, trails, child) {
+        final locations = trails.values.reduce((a, b) => a + b);
+        return CustomAnimatedSwitcher(
+          crossShrink: false,
+          child: trails.isEmpty
+              ? DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).dividerColor,
+                  ),
+                )
+              : GoogleMap(
+                  cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+                    northeast: northEastBound,
+                    southwest: southWestBound,
+                  )),
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: center,
+                    zoom: 17,
+                  ),
+                  polygons: polygons,
+                ),
+        );
+      },
     );
   }
+}
+
+class MapNotifier extends ChangeNotifier {
+  GoogleMapController mapController;
+  Set<Marker> markers;
 }
