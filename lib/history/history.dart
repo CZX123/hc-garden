@@ -32,17 +32,6 @@ class HistoryPage extends StatelessWidget {
                 ),
               ),
             ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
-              sliver: SliverToBoxAdapter(
-                child: Text(
-                  'This page is dedicated for all alumni whom may be interested in the brief history of flora in Hwa Chong. Are you able to guess which years were these photos taken?',
-                  style: TextStyle(
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-            ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
@@ -52,7 +41,7 @@ class HistoryPage extends StatelessWidget {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      CustomImage(
+                      if(historicalDataList[index].image != '') CustomImage(
                         newImages[index],
                         height: height,
                         width: width,
