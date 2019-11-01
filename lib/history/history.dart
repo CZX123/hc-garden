@@ -16,17 +16,29 @@ class HistoryPage extends StatelessWidget {
         }).toList();
         return CustomScrollView(
           slivers: <Widget>[
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              expandedHeight: 96 + topPadding,
+              backgroundColor: Colors.transparent,
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: true,
+                title: Text(
+                  'Historical Photos',
+                  style: Theme.of(context).textTheme.title.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+            ),
             SliverPadding(
-              padding: EdgeInsets.fromLTRB(16, topPadding + 24, 16, 16),
+              padding: EdgeInsets.fromLTRB(16, 24, 16, 24),
               sliver: SliverToBoxAdapter(
                 child: Text(
-                  'Historical Photos',
-                  style: Theme.of(context).textTheme.display1.copyWith(
-                        color: Colors.black87,
-                        fontSize: 32.0,
-                        fontWeight: FontWeight.w700,
-                      ),
-                  textAlign: TextAlign.center,
+                  'This page is dedicated for all alumni whom may be interested in the brief history of flora in Hwa Chong. Are you able to guess which years were these photos taken?',
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),
@@ -47,9 +59,12 @@ class HistoryPage extends StatelessWidget {
                       ),
                       if (historicalDataList[index].description != '')
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                           child: Text(
                             historicalDataList[index].description,
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
                           ),
                         ),
                     ],
