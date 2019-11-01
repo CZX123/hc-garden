@@ -64,6 +64,7 @@ class HcGardenApp extends StatelessWidget {
               parsedJson['about'].forEach((key, value) {
                 aboutPageDataList.add(AboutPageData.fromJson(key, value));
               });
+              aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
 
               return FirebaseData(
                 floraList: floraList,
@@ -81,6 +82,9 @@ class HcGardenApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           builder: (context) => SearchNotifier(),
+        ),
+        ChangeNotifierProvider(
+          builder: (context) => SortNotifier(),
         ),
         ChangeNotifierProvider(
           builder: (context) => MapNotifier(),
