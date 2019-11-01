@@ -22,7 +22,7 @@ class HistoryPage extends StatelessWidget {
                 child: Text(
                   'Historical Photos',
                   style: Theme.of(context).textTheme.display1.copyWith(
-                        color: Colors.black87,
+                        color: Colors.brown,
                         fontSize: 32.0,
                         fontWeight: FontWeight.w700,
                       ),
