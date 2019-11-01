@@ -55,6 +55,7 @@ class HistoryPage extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 15,
                             ),
+                            textAlign: TextAlign.justify,
                           ),
                         ),
                     ],

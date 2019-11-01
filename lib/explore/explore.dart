@@ -155,7 +155,37 @@ class ExploreHeader extends StatelessWidget {
                                           ),
                                     ),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: i == 0
+                                      ? () {
+                                          Provider.of<MapNotifier>(context)
+                                              .animateToPosition(
+                                            LatLng(
+                                              1.324617,
+                                              103.80630,
+                                            ),
+                                            17.5,
+                                          );
+                                        }
+                                      : i == 1
+                                          ? () {
+                                              Provider.of<MapNotifier>(context)
+                                                  .animateToPosition(
+                                                LatLng(
+                                                  1.325326,
+                                                  103.80420,
+                                                ),
+                                                17.8,
+                                              );
+                                            }
+                                          : () {
+                                              Provider.of<MapNotifier>(context)
+                                                  .animateToPosition(
+                                                LatLng(
+                                                  1.326287,
+                                                  103.80295,
+                                                ),
+                                              );
+                                            },
                                 ),
                               ),
                             ),

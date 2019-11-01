@@ -193,7 +193,10 @@ class EntityDetailsPage extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: Text(
                 entity.description,
-                style: Theme.of(context).textTheme.subtitle,
+                style: TextStyle(
+                  fontSize: 14.5,
+                ),
+                textAlign: TextAlign.justify,
               ),
             ),
             const SizedBox(

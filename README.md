@@ -7,22 +7,15 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 ### Branding
 - App Icon
 - App Loading Screen
-- ~~HCI logo and banner should be visible on the home page~~
+- App Logo should be bigger
 
 ### Search
-- ~~Search keyboard should close when~~
-	- ~~going to details page, and should not open again when going back if searchTerm is blank~~
-	- ~~scrolling the entity list~~
-- ~~Search fab should also disappear when navigating to details page~~
 - Search should be unified for both flora and fauna
-- ~~Search should also show scientific name~~, and perhaps highlight the searchTerm within the name for clarity
+- Search should perhaps highlight the searchTerm within the name for clarity
 
 ### Entity Details Page
-- Latin names should be italicised (clarify with Dr Chia)
 - Image gallery widget (expand photo in image scrollview)
-- ~~Locations of entity~~
-- Interaction with map
-- ~~correct bottom sheet snapping~~
+- Improve interaction with map (focus on marker)
 
 ### Sorting
 - Sorting by trails, distance
@@ -39,14 +32,20 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 	- Require careful organisation of the Navigator stack
 
 ### Other Screens
-- HistoryScreen
-- Introduction, CommitteeMessage, Acknowledgements, References
+- ~~HistoryScreen~~
+- ~~Introduction, CommitteeMessage, Acknowledgements, References~~
+
+### Map
+- Going to location from EntityDetailsPage should also focus on the marker (need wait for package update)
+- Marker window should also contain image (need wait for package update)
+- Highlight buildings on map, correct colour selection
 
 ## Bugs
 
 ### High Priority
 
-- Map Widget frequently gets stuck
+- ScrollController bug when switching between entity list and details page after searching
+- ~~Map Widget frequently gets stuck~~ _Not solveable_
 
 ### Medium Priority
 
