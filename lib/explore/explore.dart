@@ -19,20 +19,18 @@ const offsetTranslation = bottomHeight -
     bottomBarHeight; // without topPadding
 
 class ExploreHeader extends StatelessWidget {
-  final Animation<double> animation;
   final TabController tabController;
-  final Function(double) animateTo;
-  final ValueNotifier<bool> isScrolledNotifier;
   const ExploreHeader({
     Key key,
-    @required this.animation,
     @required this.tabController,
-    @required this.animateTo,
-    @required this.isScrolledNotifier,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final bottomSheetNotifier =
+        Provider.of<BottomSheetNotifier>(context, listen: false);
+    final animation = bottomSheetNotifier.animation;
+    final animateTo = bottomSheetNotifier.animateTo;
     const _trails = ['Jing Xian Trail', 'Kong Chian Trail', 'Kah Kee Trail'];
     final _colors = [Colors.amber[600], Colors.pink, Colors.lightBlue];
     final height = MediaQuery.of(context).size.height;
@@ -155,7 +153,37 @@ class ExploreHeader extends StatelessWidget {
                                           ),
                                     ),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: i == 0
+                                      ? () {
+                                          Provider.of<MapNotifier>(context)
+                                              .animateToPosition(
+                                            LatLng(
+                                              1.324617,
+                                              103.80630,
+                                            ),
+                                            17.5,
+                                          );
+                                        }
+                                      : i == 1
+                                          ? () {
+                                              Provider.of<MapNotifier>(context)
+                                                  .animateToPosition(
+                                                LatLng(
+                                                  1.325326,
+                                                  103.80420,
+                                                ),
+                                                17.8,
+                                              );
+                                            }
+                                          : () {
+                                              Provider.of<MapNotifier>(context)
+                                                  .animateToPosition(
+                                                LatLng(
+                                                  1.326287,
+                                                  103.80295,
+                                                ),
+                                              );
+                                            },
                                 ),
                               ),
                             ),
@@ -382,22 +410,19 @@ class FloraFaunaTabBar extends StatelessWidget {
 }
 
 class ExploreBody extends StatelessWidget {
-  final Animation<double> animation;
   final TabController tabController;
   final List<ScrollController> scrollControllers;
-  final List<ScrollController> extraScrollControllers;
-  final Function(double) animateTo;
   const ExploreBody({
     Key key,
-    @required this.animation,
     @required this.tabController,
     @required this.scrollControllers,
-    @required this.extraScrollControllers,
-    @required this.animateTo,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final bottomSheetNotifier =
+        Provider.of<BottomSheetNotifier>(context, listen: false);
+    final animation = bottomSheetNotifier.animation;
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     final initialRoute = FadeOutPageRoute<void>(
@@ -445,9 +470,8 @@ class ExploreBody extends StatelessWidget {
                           firebaseData.floraList,
                       builder: (context, floraList, child) {
                         return EntityListPage(
-                          scrollController: scrollControllers[0],
-                          extraScrollController: extraScrollControllers[0],
                           entityList: floraList,
+                          scrollController: scrollControllers[0],
                         );
                       },
                     ),
@@ -456,9 +480,8 @@ class ExploreBody extends StatelessWidget {
                           firebaseData.faunaList,
                       builder: (context, faunaList, child) {
                         return EntityListPage(
-                          scrollController: scrollControllers[1],
-                          extraScrollController: extraScrollControllers[0],
                           entityList: faunaList,
+                          scrollController: scrollControllers[1],
                         );
                       },
                     ),
@@ -480,6 +503,7 @@ class ExploreBody extends StatelessWidget {
       key: Provider.of<AppNotifier>(context, listen: false).navigatorKey,
       onGenerateRoute: (settings) {
         if (settings.name == Navigator.defaultRouteName) return initialRoute;
+        return null;
       },
     );
   }

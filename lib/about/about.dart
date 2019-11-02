@@ -44,7 +44,6 @@ class _AboutPageState extends State<AboutPage> {
                   children: aboutPageDataList.map((aboutPageData) {
                     final List<String> bodyStrings =
                         aboutPageData.body.split('\n');
-                    print(bodyStrings);
                     return ExpansionPanel(
                       canTapOnHeader: true,
                       headerBuilder: (BuildContext context, bool isExpanded) {
@@ -92,6 +91,10 @@ class _AboutPageState extends State<AboutPage> {
                                           style: TextStyle(
                                             fontSize: 15,
                                           ),
+                                          textAlign: aboutPageData.title ==
+                                                  'References'
+                                              ? TextAlign.left
+                                              : TextAlign.justify,
                                         ),
                                       ),
                                   ],

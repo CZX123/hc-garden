@@ -35,66 +35,29 @@ final SpringDescription spring = SpringDescription.withDampingRatio(
   ratio: 1.1,
 );
 
-typedef NestedBottomSheetHeaderBuilder = Widget Function(
-  BuildContext context,
-  Animation<double> animation,
-  TabController tabController,
-  void Function(double, [Duration]) animateTo,
-  ValueNotifier<bool> isScrolledNotifier,
-);
-
-typedef NestedBottomSheetBodyBuilder = Widget Function(
-  BuildContext context,
-  Animation<double> animation,
-  TabController tabController,
-  List<ScrollController> scrollControllers,
-  List<ScrollController> extraScrollControllers,
-  void Function(double, [Duration]) animateTo,
-);
-
-typedef NestedBottomSheetBackgroundBuilder = Widget Function(
-  BuildContext context,
-  Animation<double> animation,
-  TabController tabController,
-  void Function(double, [Duration]) animateTo,
-);
-
 class NestedBottomSheet extends StatefulWidget {
-  final double height;
   final ShapeBorder shape;
   final Color color;
-  final List<double> snappingPositions;
   final double initialPosition;
-  final int tablength;
-  final int initialTabIndex;
-  final int extraScrollControllers;
-  final ValueNotifier<int>
-      state; // 0: original scroll controllers, 1: extraScrollControllers[0], 2: ...
-  final NestedBottomSheetHeaderBuilder headerBuilder;
-  final NestedBottomSheetBodyBuilder bodyBuilder;
-  final NestedBottomSheetHeaderBuilder footerBuilder;
-  final NestedBottomSheetBackgroundBuilder backgroundBuilder;
+  final Widget header;
+  final Widget body;
+  final Widget footer;
+  final Widget background;
   final double endCorrection; // Only from 0 to first snapping position
 
   const NestedBottomSheet({
     Key key,
-    this.height,
     this.shape = const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
       topLeft: Radius.circular(16),
       topRight: Radius.circular(16),
     )),
     this.color,
-    @required this.snappingPositions,
     @required this.initialPosition,
-    @required this.tablength,
-    this.initialTabIndex = 0,
-    this.extraScrollControllers = 0,
-    this.state,
-    @required this.headerBuilder,
-    @required this.bodyBuilder,
-    this.footerBuilder,
-    this.backgroundBuilder,
+    this.header,
+    @required this.body,
+    this.footer,
+    this.background,
     this.endCorrection = 0,
   }) : super(key: key);
 
@@ -103,30 +66,22 @@ class NestedBottomSheet extends StatefulWidget {
 }
 
 class _NestedBottomSheetState extends State<NestedBottomSheet>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
+  bool _init = false;
+  BottomSheetNotifier _bottomSheetNotifier;
   Tolerance _tolerance = Tolerance(distance: 1, time: 1, velocity: 1);
   List<double> _sortedPositions;
   AnimationController _animationController;
-  List<ScrollController> _scrollControllers;
-  List<ScrollController> _extraScrollControllers;
-  int _state = 0;
-  ScrollController _activeScrollController;
-  TabController _tabController;
   Drag _scrollDrag;
   ScrollHoldController _scrollHold;
   bool _scrolling;
-  //int _activeIndex;
   ValueNotifier<bool> _isScrolledNotifier = ValueNotifier(false);
 
   void animateTo(double end, [Duration duration]) {
-    // assert(
-    //   _sortedPositions.contains(end),
-    //   'Value to animate to should be one of the snapping positions',
-    // );
-    // if (_activeScrollController.hasClients &&
-    //     _activeScrollController.position.maxScrollExtent > 0) {
-    //   _activeScrollController.jumpTo(0);
-    // }
+    assert(
+      _sortedPositions.contains(end),
+      'Value to animate to should be one of the snapping positions',
+    );
     if (duration == null) {
       final start = _animationController.value;
       final simulation = ScrollSpringSimulation(
@@ -146,34 +101,6 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     }
   }
 
-  void stateListener() {
-    final _newState = widget.state.value;
-    if (_newState != 0) {
-      if (_newState != _state) {
-        dragCancel();
-        _state = _newState;
-        // TODO: Update state
-        _activeScrollController =
-            _state == 2 ? null : _extraScrollControllers[_state - 1];
-      }
-    } else {
-      _state = 0;
-      tabListener();
-    }
-  }
-
-  void tabListener() {
-    if (_state == 0) {
-      final _newScrollController = _scrollControllers[_tabController.index];
-      if (_activeScrollController != _newScrollController) {
-        dragCancel();
-        _activeScrollController = _newScrollController;
-        _isScrolledNotifier.value = _activeScrollController.hasClients &&
-            _activeScrollController.offset > 5;
-      }
-    }
-  }
-
   void removeHold() {
     _scrollHold = null;
   }
@@ -182,46 +109,54 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     _scrollDrag = null;
   }
 
-  void dragCancel() {
+  void cancelScrollDragHold() {
     _scrollHold?.cancel();
     _scrollDrag?.cancel();
     removeHold();
     removeDrag();
   }
 
+  void dragCancel() {
+    cancelScrollDragHold();
+    if (!_sortedPositions.contains(_animationController.value)) {
+      animateTo(closestValue(_sortedPositions, _animationController.value));
+    }
+  }
+
   // User has touched the screen and may begin to drag
   void dragDown(DragDownDetails details) {
+    final controller = _bottomSheetNotifier.activeScrollController;
     // Fix bottom sheet position if it is animating
     if (_animationController.isAnimating) {
       _animationController.value = _animationController.value;
     }
 
     // Check if the scroll view is scrollable in the first place
-    if (_activeScrollController.hasClients &&
-        _activeScrollController.position.maxScrollExtent > 0) {
+    if (controller.hasClients && controller.position.maxScrollExtent > 0) {
       // simulate a hold on the scroll view
-      _scrollHold = _activeScrollController.position.hold(removeHold);
+      _scrollHold = controller.position.hold(removeHold);
     }
   }
 
   // User has just started to drag
   void dragStart(DragStartDetails details) {
+    final controller = _bottomSheetNotifier.activeScrollController;
     // Check if the [SingleChildScrollView] is scrollable in the first place
-    if (_activeScrollController.hasClients &&
-        _activeScrollController.position.maxScrollExtent > 0) {
+    if (controller.hasClients && controller.position.maxScrollExtent > 0) {
       // simulate a scroll on the [SingleChildScrollView]
-      _scrollDrag = _activeScrollController.position.drag(details, removeDrag);
+      _scrollDrag = controller.position.drag(details, removeDrag);
     }
   }
 
   // User is in the process of dragging
   void dragUpdate(DragUpdateDetails details) {
+    final controller = _bottomSheetNotifier.activeScrollController;
     // Scrolling the inner scroll view
-    if (_activeScrollController.hasClients &&
+    if (controller.hasClients &&
         _animationController.value == _sortedPositions.first &&
-        (details.primaryDelta < 0 || _activeScrollController.offset > 0)) {
+        (details.primaryDelta < 0 || controller.offset > 0)) {
       if (_scrollDrag == null) {
-        _scrollDrag = _activeScrollController.position.drag(
+        _scrollDrag = controller.position.drag(
           DragStartDetails(
             sourceTimeStamp: details.sourceTimeStamp,
             globalPosition: details.globalPosition,
@@ -233,7 +168,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       _scrollDrag.update(details);
     } else {
       // Dragging the outer bottom sheet
-      dragCancel();
+      cancelScrollDragHold();
       //if (_activeScrollController.hasClients) _activeScrollController.jumpTo(0);
       _scrolling = false;
       if (_animationController.value < _sortedPositions[1]) {
@@ -302,78 +237,83 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _sortedPositions = widget.snappingPositions;
-    _sortedPositions.sort();
-    final _initialPosition = widget.initialPosition ?? _sortedPositions.first;
-    assert(
-      _sortedPositions.contains(_initialPosition),
-      'Initial position should be one of the snapping positions',
-    );
-    _animationController = AnimationController(
-      vsync: this,
-      lowerBound: _sortedPositions.first,
-      upperBound: widget.height,
-      value: _initialPosition,
-    );
-    _scrollControllers = [
-      for (int i = 0; i < widget.tablength; i++) ScrollController(),
-    ];
-    _extraScrollControllers = [
-      for (int i = 0; i < widget.extraScrollControllers; i++)
-        ScrollController(),
-    ];
-    _tabController = TabController(
-      initialIndex: widget.initialTabIndex,
-      length: widget.tablength,
-      vsync: this,
-    )..addListener(tabListener);
-    if (widget.state != null) {
-      widget.state.addListener(stateListener);
-    }
-    stateListener();
-  }
-
-  @override
-  void didUpdateWidget(NestedBottomSheet oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.snappingPositions != widget.snappingPositions) {
-      final newSortedPositions = widget.snappingPositions;
-      newSortedPositions.sort();
-      // assert(
-      //   _sortedPositions.first == newSortedPositions.first &&
-      //       _sortedPositions.last == newSortedPositions.last,
-      //   'Cannot change to new snapping positions with different end points',
-      // );
-      _sortedPositions = newSortedPositions;
-    }
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _sortedPositions = widget.snappingPositions;
+  //   _sortedPositions.sort();
+  //   final _initialPosition = widget.initialPosition ?? _sortedPositions.first;
+  //   assert(
+  //     _sortedPositions.contains(_initialPosition),
+  //     'Initial position should be one of the snapping positions',
+  //   );
+  //   _animationController = AnimationController(
+  //     vsync: this,
+  //     lowerBound: _sortedPositions.first,
+  //     upperBound: widget.height,
+  //     value: _initialPosition,
+  //   );
+  // }
 
   // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   _isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+  // void didUpdateWidget(NestedBottomSheet oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   if (oldWidget.snappingPositions != widget.snappingPositions) {
+  //     final newSortedPositions = widget.snappingPositions;
+  //     newSortedPositions.sort();
+  //     _sortedPositions = newSortedPositions;
+  //   }
   // }
+
+  void listener() {
+    final newSortedPositions = _bottomSheetNotifier.snappingPositions.value;
+    newSortedPositions.sort();
+    if (listEquals(_sortedPositions, newSortedPositions)) return;
+    _sortedPositions = newSortedPositions;
+    if (!_sortedPositions.contains(_animationController.value)) {
+      animateTo(closestValue(_sortedPositions, _animationController.value));
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_init) {
+      final height = MediaQuery.of(context).size.height;
+      if (height == 0) return;
+      _bottomSheetNotifier =
+          Provider.of<BottomSheetNotifier>(context, listen: false);
+      _sortedPositions = _bottomSheetNotifier.snappingPositions.value;
+      _sortedPositions.sort();
+      final _initialPosition = widget.initialPosition ?? _sortedPositions.first;
+      assert(
+        _sortedPositions.contains(_initialPosition),
+        'Initial position should be one of the snapping positions',
+      );
+      _animationController = AnimationController(
+        vsync: this,
+        lowerBound: _sortedPositions.first,
+        upperBound: height,
+        value: _initialPosition,
+      );
+      _bottomSheetNotifier
+        ..animation = _animationController.view
+        ..animateTo = animateTo;
+      _bottomSheetNotifier.snappingPositions.addListener(listener);
+      _init = true;
+    }
+  }
 
   @override
   void dispose() {
-    _tabController.removeListener(tabListener);
-    if (widget.state != null) {
-      widget.state.removeListener(stateListener);
-    }
-    _tabController.dispose();
-    _scrollControllers.forEach((_scrollController) {
-      _scrollController.dispose();
-    });
+    _bottomSheetNotifier.snappingPositions.removeListener(listener);
     _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final height = widget.height ?? MediaQuery.of(context).size.height;
+    final height = MediaQuery.of(context).size.height;
     final range = _sortedPositions.last - _sortedPositions.first;
     final position = Tween<Offset>(
       begin: Offset(0, _sortedPositions.first / height / range),
@@ -385,15 +325,10 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     ).animate(_animationController);
     return Stack(
       children: <Widget>[
-        if (widget.backgroundBuilder != null)
-          widget.backgroundBuilder(
-            context,
-            _animationController.view,
-            _tabController,
-            animateTo,
-          ),
-        Selector<AppNotifier, bool>(
-          selector: (context, appNotifier) => appNotifier.draggingDisabled,
+        if (widget.background != null) widget.background,
+        Selector<BottomSheetNotifier, bool>(
+          selector: (context, bottomSheetNotifier) =>
+              bottomSheetNotifier.draggingDisabled,
           builder: (context, draggingDisabled, child) {
             return GestureDetector(
               onVerticalDragDown: draggingDisabled ?? false ? null : dragDown,
@@ -447,45 +382,42 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
                           child: SizedBox(
                             width: MediaQuery.of(context).size.width,
                             height: height,
-                            child: widget.bodyBuilder(
-                              context,
-                              _animationController.view,
-                              _tabController,
-                              _scrollControllers,
-                              _extraScrollControllers,
-                              animateTo,
-                            ),
+                            child: widget.body,
                           ),
                         ),
-                        widget.headerBuilder(
-                          context,
-                          _animationController.view,
-                          _tabController,
-                          animateTo,
-                          _isScrolledNotifier,
-                        ),
+                        if (widget.header != null) widget.header,
                       ],
                     ),
                   ),
                 ),
               ),
-              if (widget.footerBuilder != null)
+              if (widget.footer != null)
                 Positioned(
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: widget.footerBuilder(
-                    context,
-                    _animationController.view,
-                    _tabController,
-                    animateTo,
-                    _isScrolledNotifier,
-                  ),
+                  child: widget.footer,
                 ),
             ],
           ),
         ),
       ],
     );
+  }
+}
+
+class BottomSheetNotifier extends ChangeNotifier {
+  Animation<double> animation; //  Animation for bottom sheet
+  void Function(double, [Duration])
+      animateTo; // AnimateTo function for bottom sheet
+  ScrollController activeScrollController;
+  ValueNotifier<bool> isScrolledNotifier = ValueNotifier(false);
+  ValueNotifier<List<double>> snappingPositions = ValueNotifier(null);
+
+  bool _draggingDisabled = false;
+  bool get draggingDisabled => _draggingDisabled;
+  set draggingDisabled(bool draggingDisabled) {
+    _draggingDisabled = draggingDisabled;
+    notifyListeners();
   }
 }

@@ -1,40 +1,75 @@
 import '../../library.dart';
 
-class EntityDetailsPage extends StatelessWidget {
+class EntityDetailsPage extends StatefulWidget {
   final ValueNotifier<double> newTopPadding;
   final Entity entity;
-  final ScrollController scrollController;
   const EntityDetailsPage({
     Key key,
     @required this.newTopPadding,
     @required this.entity,
-    @required this.scrollController,
   }) : super(key: key);
+
+  @override
+  _EntityDetailsPageState createState() => _EntityDetailsPageState();
+}
+
+class _EntityDetailsPageState extends State<EntityDetailsPage> {
+  final _scrollController = ScrollController();
+
 
   List<Widget> locations(
     BuildContext context,
     Map<Trail, List<TrailLocation>> trails,
   ) {
+    final height = MediaQuery.of(context).size.height;
     List<Widget> children = [];
-    for (var location in entity.locations) {
-      final trailId = location.keys.first;
-      final locationId = location.values.first;
+    for (var loc in widget.entity.locations) {
+      final trailId = loc.keys.first;
+      final locationId = loc.values.first;
       final trail = trails.keys.firstWhere((trail) {
         return trail.id == trailId;
       });
-      final name = trails[trail].firstWhere((loc) {
+      final location = trails[trail].firstWhere((loc) {
         return loc.id == locationId;
-      }).name;
+      });
       children.add(ListTile(
         leading: Icon(Icons.location_on),
         title: Text(
-          '$name',
+          '${location.name}',
           style: Theme.of(context).textTheme.subtitle,
         ),
-        onTap: () {},
+        onTap: () {
+          _scrollController.animateTo(
+            0,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.fastOutSlowIn,
+          );
+          Provider.of<BottomSheetNotifier>(
+            context,
+            listen: false,
+          ).animateTo(height - 48 - 96);
+          Provider.of<MapNotifier>(
+            context,
+            listen: false,
+          ).animateToLocation(location);
+        },
       ));
     }
     return children;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (Provider.of<AppNotifier>(context, listen: false).state == 1)
+      Provider.of<BottomSheetNotifier>(context, listen: false)
+          .activeScrollController = _scrollController;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,7 +78,7 @@ class EntityDetailsPage extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     List<String> newImages = [];
-    for (var image in entity.images) {
+    for (var image in widget.entity.images) {
       var split = image.split('.');
       final end = '.' + split.removeLast();
       newImages.add(split.join('.') + 'h' + end);
@@ -52,30 +87,24 @@ class EntityDetailsPage extends StatelessWidget {
       onNotification: (notification) {
         if (notification is ScrollUpdateNotification &&
             notification.depth == 0) {
-          newTopPadding.value -= notification.scrollDelta;
+          widget.newTopPadding.value -= notification.scrollDelta;
         }
         return false;
       },
-      child: Selector<AppNotifier, int>(
-        selector: (context, appNotifier) => appNotifier.state,
-        builder: (context, state, child) {
-          return SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            controller: state == 1 ? scrollController : ScrollController(),
-            child: child,
-          );
-        },
+      child: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        controller: _scrollController,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             ValueListenableBuilder(
               valueListenable:
-                  Provider.of<AppNotifier>(context, listen: false).animation,
+                  Provider.of<BottomSheetNotifier>(context, listen: false).animation,
               builder: (context, value, child) {
                 double h = 0;
                 if (value < height - bottomHeight) {
                   h = (1 - value / (height - bottomHeight)) * topPadding;
-                  if (value > 1) newTopPadding.value = h + 16;
+                  if (value > 1) widget.newTopPadding.value = h + 16;
                 }
                 return SizedBox(
                   height: h,
@@ -89,7 +118,7 @@ class EntityDetailsPage extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(32),
                     child: CustomImage(
-                      entity.smallImage,
+                      widget.entity.smallImage,
                       height: 64,
                       width: 64,
                       placeholderColor: Theme.of(context).dividerColor,
@@ -104,7 +133,7 @@ class EntityDetailsPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        entity.name,
+                        widget.entity.name,
                         style: Theme.of(context).textTheme.title.copyWith(
                               height: 1,
                             ),
@@ -113,7 +142,7 @@ class EntityDetailsPage extends StatelessWidget {
                         height: 8,
                       ),
                       Text(
-                        entity.sciName,
+                        widget.entity.sciName,
                         style: Theme.of(context).textTheme.subhead.copyWith(
                               height: 1,
                               color: Theme.of(context).hintColor,
@@ -153,9 +182,11 @@ class EntityDetailsPage extends StatelessWidget {
                                     Provider.of<AppNotifier>(
                                       context,
                                       listen: false,
-                                    )
-                                      ..state = 2
-                                      ..draggingDisabled = true;
+                                    ).state = 2;
+                                    Provider.of<BottomSheetNotifier>(
+                                      context,
+                                      listen: false,
+                                    ).draggingDisabled = true;
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(
@@ -165,7 +196,8 @@ class EntityDetailsPage extends StatelessWidget {
                                             initialImage: image,
                                           );
                                         },
-                                        transitionDuration: const Duration(milliseconds: 340),
+                                        transitionDuration:
+                                            const Duration(milliseconds: 340),
                                       ),
                                     );
                                   },
@@ -182,8 +214,11 @@ class EntityDetailsPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: Text(
-                entity.description,
-                style: Theme.of(context).textTheme.subtitle,
+                widget.entity.description,
+                style: TextStyle(
+                  fontSize: 14.5,
+                ),
+                textAlign: TextAlign.justify,
               ),
             ),
             const SizedBox(
@@ -199,7 +234,7 @@ class EntityDetailsPage extends StatelessWidget {
               },
             ),
             const SizedBox(
-              height: 100,
+              height: 64,
             ),
           ],
         ),

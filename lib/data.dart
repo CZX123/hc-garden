@@ -208,17 +208,7 @@ class AboutPageData {
 }
 
 class AppNotifier extends ChangeNotifier {
-  Animation<double> animation; //  Animation for bottom sheet
-  void Function(double, [Duration]) animateTo; // AnimateTo function for bottom sheet
-  GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>(); // key for navigator in explore body
-
-  bool _draggingDisabled = false;
-  bool get draggingDisabled => _draggingDisabled;
-  set draggingDisabled(bool draggingDisabled) {
-    _draggingDisabled = draggingDisabled;
-    notifyListeners();
-  }
+  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>(); // key for navigator in explore body
 
   int _state = 0;
   int get state => _state;
