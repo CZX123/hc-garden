@@ -1,14 +1,12 @@
 import '../../library.dart';
 
 class EntityListPage extends StatelessWidget {
-  final ScrollController scrollController; // From the bottom sheet
-  final ScrollController extraScrollController; // For the details page;
   final List<Entity> entityList;
+  final ScrollController scrollController;
   const EntityListPage({
     Key key,
-    @required this.scrollController,
-    @required this.extraScrollController,
     @required this.entityList,
+    @required this.scrollController,
   }) : super(key: key);
 
   static bool _isValid(Entity entity, String searchTerm) {
@@ -32,7 +30,7 @@ class EntityListPage extends StatelessWidget {
       Icons.pets,
     ];
     if (entityList.length == 0) return SizedBox.shrink();
-    final bool isFlora = entityList[0] is Flora;
+    final isFlora = entityList[0] is Flora;
     return NotificationListener(
       onNotification: (notification) {
         if (notification is ScrollUpdateNotification &&
@@ -46,7 +44,7 @@ class EntityListPage extends StatelessWidget {
         builder: (context, searchTerm, child) {
           List<Entity> _list = [];
           entityList.forEach((entity) {
-            if (_isValid(entity, searchTerm)) {
+            if (EntityListPage._isValid(entity, searchTerm)) {
               _list.add(entity);
             }
           });
@@ -57,7 +55,7 @@ class EntityListPage extends StatelessWidget {
           return CustomAnimatedSwitcher(
             child: _list.length == 0
                 ? Padding(
-                    key: ValueKey(searchTerm + '-i'),
+                    key: ValueKey(searchTerm + '!'),
                     padding: const EdgeInsets.fromLTRB(0, 16, 0, 64),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -90,7 +88,6 @@ class EntityListPage extends StatelessWidget {
                       return EntityListRow(
                         searchTerm: searchTerm,
                         entity: _list[index],
-                        scrollController: extraScrollController,
                       );
                     },
                   ),
@@ -104,12 +101,10 @@ class EntityListPage extends StatelessWidget {
 class EntityListRow extends StatefulWidget {
   final String searchTerm;
   final Entity entity;
-  final ScrollController scrollController;
   const EntityListRow({
     Key key,
     @required this.searchTerm,
     @required this.entity,
-    @required this.scrollController,
   }) : super(key: key);
 
   @override
@@ -121,6 +116,7 @@ class _EntityListRowState extends State<EntityListRow> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
     final thumbnail = ClipRRect(
       borderRadius: BorderRadius.circular(32),
@@ -191,10 +187,17 @@ class _EntityListRowState extends State<EntityListRow> {
             searchNotifier.keyboardAppear = false;
             await Future.delayed(const Duration(milliseconds: 200));
           }
-          Provider.of<AppNotifier>(context, listen: false).state = 1;
-          Provider.of<AppNotifier>(context, listen: false).entity =
-              widget.entity;
+          Provider.of<AppNotifier>(context, listen: false)
+            ..state = 1
+            ..entity = widget.entity;
           searchNotifier.isSearching = false;
+          Provider.of<BottomSheetNotifier>(context, listen: false)
+              .snappingPositions
+              .value = [
+            0,
+            height - 48 - 96 - 216 - 16,
+            height - 48 - 96,
+          ];
           final oldChild = Container(
             height: widget.searchTerm.isEmpty ? 104 : 88,
             padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -226,7 +229,6 @@ class _EntityListRowState extends State<EntityListRow> {
               builder: (context) => EntityDetailsPage(
                 newTopPadding: newTopPadding,
                 entity: widget.entity,
-                scrollController: widget.scrollController,
               ),
               sourceKey: _key,
               oldChild: oldChild,

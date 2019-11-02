@@ -10,9 +10,10 @@ class BottomSheetFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
-    final animateTo = appNotifier.animateTo;
-    final animation = appNotifier.animation;
+    // final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(context, listen: false);
+    final animateTo = bottomSheetNotifier.animateTo;
+    final animation = bottomSheetNotifier.animation;
     return Stack(
       children: <Widget>[
         // 3 Button Bottom Navigation
@@ -57,10 +58,10 @@ class BottomSheetFooter extends StatelessWidget {
                   currentIndex: value,
                   onTap: (index) {
                     if (index == 1) {
-                      appNotifier.draggingDisabled = false;
+                      bottomSheetNotifier.draggingDisabled = false;
                       animateTo(height - bottomHeight);
                     } else {
-                      appNotifier.draggingDisabled = true;
+                      bottomSheetNotifier.draggingDisabled = true;
                       animateTo(
                         height - bottomBarHeight,
                         const Duration(milliseconds: 240),
@@ -160,10 +161,13 @@ class NotchedAppBar extends StatelessWidget {
                             selector: (context, appNotifier) =>
                                 appNotifier.state,
                             builder: (context, state, child) {
-                              return AnimatedOpacity(
-                                opacity: state == 0 ? 1 : 0,
-                                duration: const Duration(milliseconds: 280),
-                                child: child,
+                              return IgnorePointer(
+                                ignoring: state != 0,
+                                child: AnimatedOpacity(
+                                  opacity: state == 0 ? 1 : 0,
+                                  duration: const Duration(milliseconds: 280),
+                                  child: child,
+                                ),
                               );
                             },
                             child: IconButton(
@@ -175,6 +179,27 @@ class NotchedAppBar extends StatelessWidget {
                         ],
                       ),
                     ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              height: 1,
+              bottom: 47,
+              child: IgnorePointer(
+                child: Selector<AppNotifier, bool>(
+                  selector: (context, appNotifier) => appNotifier.state == 1,
+                  builder: (context, value, child) {
+                    return AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: value ? 1 : 0,
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    color: Theme.of(context).dividerColor,
                   ),
                 ),
               ),
@@ -268,27 +293,6 @@ class NotchedAppBar extends StatelessWidget {
                   });
                 },
                 tooltip: 'Search',
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              height: 1,
-              bottom: 47,
-              child: IgnorePointer(
-                child: Selector<AppNotifier, bool>(
-                  selector: (context, appNotifier) => appNotifier.state == 1,
-                  builder: (context, value, child) {
-                    return AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      opacity: value ? 1 : 0,
-                      child: child,
-                    );
-                  },
-                  child: Container(
-                    color: Theme.of(context).dividerColor,
-                  ),
-                ),
               ),
             ),
           ],

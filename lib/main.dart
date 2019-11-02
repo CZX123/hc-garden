@@ -15,31 +15,37 @@ class HcGardenApp extends StatelessWidget {
         Provider<Map<String, Uint8List>>.value(
           value: {},
         ),
+        // All Firebase data
         StreamProvider.value(
-            initialData: FirebaseData(
-              floraList: [],
-              faunaList: [],
-              trails: {},
-              historicalDataList: [],
-              aboutPageDataList: [],
-            ),
-            value: FirebaseDatabase.instance.reference().onValue.map((event) {
+          initialData: FirebaseData(
+            floraList: [],
+            faunaList: [],
+            trails: {},
+            historicalDataList: [],
+            aboutPageDataList: [],
+          ),
+          value: FirebaseDatabase.instance.reference().onValue.map(
+            (event) {
               if (event.snapshot.value == null) {
                 throw Exception('Value is empty!');
               }
+
+              // Add list of entities
               final parsedJson =
                   Map<String, dynamic>.from(event.snapshot.value);
               List<Flora> floraList = [];
               List<Fauna> faunaList = [];
               parsedJson['flora&fauna'].forEach((key, value) {
-                if (key.contains('flora'))
+                if (key.contains('flora')) {
                   floraList.add(Flora.fromJson(key, value));
-                else
+                } else {
                   faunaList.add(Fauna.fromJson(key, value));
+                }
               });
               floraList.sort((a, b) => a.name.compareTo(b.name));
               faunaList.sort((a, b) => a.name.compareTo(b.name));
 
+              // Add trails and locations
               Map<Trail, List<TrailLocation>> trails = {};
               parsedJson['map'].forEach((key, value) {
                 final trail = Trail.fromJson(key, value);
@@ -73,12 +79,17 @@ class HcGardenApp extends StatelessWidget {
                 historicalDataList: historicalDataList,
                 aboutPageDataList: aboutPageDataList,
               );
-            })),
+            },
+          ),
+        ),
         ChangeNotifierProvider(
           builder: (context) => DebugNotifier(),
         ),
         ChangeNotifierProvider(
           builder: (context) => AppNotifier(),
+        ),
+        ChangeNotifierProvider(
+          builder: (context) => BottomSheetNotifier(),
         ),
         ChangeNotifierProvider(
           builder: (context) => SearchNotifier(),
@@ -118,10 +129,23 @@ class HcGardenApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  final _pageIndex = ValueNotifier(1);
+  TabController _tabController;
+  final _scrollControllers = [
+    ScrollController(),
+    ScrollController(),
+  ];
 
   // TODO: offline indicator if user opens app when offline, and old contents show instead
   // Maybe can reduce code duplication
@@ -158,11 +182,13 @@ class MyHomePage extends StatelessWidget {
 
   Future<bool> onBack(
     BuildContext context,
-    double height,
   ) async {
+    final height = MediaQuery.of(context).size.height;
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final bottomSheetNotifier =
+        Provider.of<BottomSheetNotifier>(context, listen: false);
     final searchNotifier = Provider.of<SearchNotifier>(context, listen: false);
-    final animation = appNotifier.animation;
+    final animation = bottomSheetNotifier.animation;
     final state = appNotifier.state;
     final navigatorKey = appNotifier.navigatorKey;
     if (state == 0) {
@@ -175,18 +201,25 @@ class MyHomePage extends StatelessWidget {
           ..searchTerm = '';
         return false;
       } else if (animation.value < height - bottomHeight) {
-        appNotifier.animateTo(height - bottomHeight);
+        bottomSheetNotifier.animateTo(height - bottomHeight);
         return false;
       }
       return true;
     } else if (state == 1) {
       if (animation.value > 10) {
-        appNotifier.animateTo(0);
+        bottomSheetNotifier.animateTo(0);
       } else if (navigatorKey.currentState.canPop()) {
         navigatorKey.currentState.pop();
         appNotifier
           ..state = 0
           ..entity = null;
+        bottomSheetNotifier
+          ..activeScrollController = _scrollControllers[_tabController.index]
+          ..snappingPositions.value = [
+            0,
+            height - bottomHeight,
+            height - bottomBarHeight
+          ];
         if (searchNotifier.searchTerm.isNotEmpty) {
           Future.delayed(const Duration(milliseconds: 280), () {
             searchNotifier.isSearching = true;
@@ -198,118 +231,99 @@ class MyHomePage extends StatelessWidget {
       // TODO: Replace with list of callbacks
       if (navigatorKey.currentState.canPop()) {
         navigatorKey.currentState.pop();
-        appNotifier
-          ..state = 1
-          ..draggingDisabled = false;
+        appNotifier.state = 1;
+        bottomSheetNotifier.draggingDisabled = false;
         return false;
       }
     }
     return true;
   }
 
+  void tabListener() {
+    if (Provider.of<AppNotifier>(context, listen: false).state == 0)
+      Provider.of<BottomSheetNotifier>(context, listen: false)
+          .activeScrollController = _scrollControllers[_tabController.index];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+    )..addListener(tabListener);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final height = MediaQuery.of(context).size.height;
+    if (Provider.of<AppNotifier>(context, listen: false).state == 0)
+      Provider.of<BottomSheetNotifier>(context, listen: false)
+        ..snappingPositions.value = [
+          0,
+          height - bottomHeight,
+          height - bottomBarHeight,
+        ]
+        ..activeScrollController ??= _scrollControllers[_tabController.index];
+  }
+
+  @override
+  void dispose() {
+    _tabController.removeListener(tabListener);
+    _tabController.dispose();
+    _pageIndex.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final _state = ValueNotifier(0);
-    final _pageIndex = ValueNotifier(1);
+    print('$this rebuilt');
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     return Selector<AppNotifier, int>(
       selector: (context, appNotifier) => appNotifier.state,
       builder: (context, state, child) {
-        _state.value = state;
         return WillPopScope(
           onWillPop: () {
-            return onBack(context, height);
+            return onBack(context);
           },
           child: Scaffold(
+            // resizeToAvoidBottomInset: false,
             endDrawer: DebugDrawer(),
             body: height != 0
                 ? NestedBottomSheet(
                     endCorrection: state == 0
                         ? topPadding - offsetTranslation
                         : topPadding,
-                    height: height,
-                    snappingPositions: state == 0
-                        ? [0, height - bottomHeight, height - 62]
-                        : [
-                            0,
-                            height - 48 - 96 - 216 - 16,
-                            height - 48 - 96,
-                          ],
                     initialPosition: height - bottomHeight,
-                    tablength: 2,
-                    extraScrollControllers: 1,
-                    state: _state,
-                    backgroundBuilder:
-                        (context, animation, tabController, animateTo) {
-                      Provider.of<AppNotifier>(context, listen: false)
-                        ..animation = animation
-                        ..animateTo = animateTo;
-                      return Stack(
-                        children: <Widget>[
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            right: 0,
-                            bottom: 62,
-                            child: ValueListenableBuilder(
-                              valueListenable: _pageIndex,
-                              builder: (context, pageIndex, child) {
-                                return CustomAnimatedSwitcher(
-                                  child: pageIndex == 0
-                                      ? HistoryPage()
-                                      : pageIndex == 2
-                                          ? AboutPage()
-                                          : child,
-                                );
-                              },
-                              child: MapWidget(),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                    headerBuilder: (
-                      context,
-                      animation,
-                      tabController,
-                      animateTo,
-                      isScrolledNotifier,
-                    ) {
-                      return ExploreHeader(
-                        animation: animation,
-                        tabController: tabController,
-                        animateTo: animateTo,
-                        isScrolledNotifier: isScrolledNotifier,
-                      );
-                    },
-                    bodyBuilder: (
-                      context,
-                      animation,
-                      tabController,
-                      scrollControllers,
-                      extraScrollControllers,
-                      animateTo,
-                    ) {
-                      return ExploreBody(
-                        animation: animation,
-                        tabController: tabController,
-                        scrollControllers: scrollControllers,
-                        extraScrollControllers: extraScrollControllers,
-                        animateTo: animateTo,
-                      );
-                    },
-                    footerBuilder: (
-                      context,
-                      animation,
-                      tabController,
-                      animateTo,
-                      isScrolledNotifier,
-                    ) {
-                      return BottomSheetFooter(
-                        pageIndex: _pageIndex,
-                      );
-                    },
+                    background: Positioned(
+                      left: 0,
+                      top: 0,
+                      right: 0,
+                      bottom: 62,
+                      child: ValueListenableBuilder(
+                        valueListenable: _pageIndex,
+                        builder: (context, pageIndex, child) {
+                          return CustomAnimatedSwitcher(
+                            child: pageIndex == 0
+                                ? HistoryPage()
+                                : pageIndex == 2 ? AboutPage() : child,
+                          );
+                        },
+                        child: MapWidget(),
+                      ),
+                    ),
+                    header: ExploreHeader(
+                      tabController: _tabController,
+                    ),
+                    body: ExploreBody(
+                      tabController: _tabController,
+                      scrollControllers: _scrollControllers,
+                    ),
+                    footer: BottomSheetFooter(
+                      pageIndex: _pageIndex,
+                    ),
                   )
                 : SizedBox.shrink(),
           ),
