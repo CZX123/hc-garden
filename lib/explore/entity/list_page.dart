@@ -192,12 +192,12 @@ class _EntityListRowState extends State<EntityListRow> {
             ..entity = widget.entity;
           searchNotifier.isSearching = false;
           Provider.of<BottomSheetNotifier>(context, listen: false)
-              .snappingPositions
-              .value = [
-            0,
-            height - 48 - 96 - 216 - 16,
-            height - 48 - 96,
-          ];
+            ..snappingPositions.value = [
+              0,
+              height - 48 - 96 - 216 - 16,
+              height - 48 - 96,
+            ]
+            ..endCorrection = topPadding;
           final oldChild = Container(
             height: widget.searchTerm.isEmpty ? 104 : 88,
             padding: const EdgeInsets.symmetric(horizontal: 14),

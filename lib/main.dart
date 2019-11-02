@@ -72,6 +72,9 @@ class HcGardenApp extends StatelessWidget {
               });
               aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
 
+              // TODO: handle cases of invalid data
+              // i.e. filter those whose data fields are null out
+
               return FirebaseData(
                 floraList: floraList,
                 faunaList: faunaList,
@@ -140,12 +143,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
+  final _location = Location();
   final _pageIndex = ValueNotifier(1);
   TabController _tabController;
   final _scrollControllers = [
     ScrollController(),
     ScrollController(),
   ];
+  double topPadding;
+  double height;
 
   // TODO: offline indicator if user opens app when offline, and old contents show instead
   // Maybe can reduce code duplication
@@ -180,10 +186,7 @@ class _MyHomePageState extends State<MyHomePage>
     Provider.of<AppNotifier>(context, listen: false).trails = trails;
   }); */
 
-  Future<bool> onBack(
-    BuildContext context,
-  ) async {
-    final height = MediaQuery.of(context).size.height;
+  Future<bool> onBack(BuildContext context) async {
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     final bottomSheetNotifier =
         Provider.of<BottomSheetNotifier>(context, listen: false);
@@ -219,7 +222,8 @@ class _MyHomePageState extends State<MyHomePage>
             0,
             height - bottomHeight,
             height - bottomBarHeight
-          ];
+          ]
+          ..endCorrection = topPadding - offsetTranslation;
         if (searchNotifier.searchTerm.isNotEmpty) {
           Future.delayed(const Duration(milliseconds: 280), () {
             searchNotifier.isSearching = true;
@@ -239,6 +243,25 @@ class _MyHomePageState extends State<MyHomePage>
     return true;
   }
 
+  void checkPermission() async {
+    var granted = await _location.hasPermission();
+    if (!granted) {
+      granted = await _location.requestPermission();
+    }
+    Provider.of<MapNotifier>(context, listen: false).permissionEnabled = granted;
+    if (granted) {
+      checkGPS();
+    }
+  }
+
+  void checkGPS() async {
+    var isOn = await _location.serviceEnabled();
+    if (!isOn) {
+      isOn = await _location.requestService();
+    }
+    Provider.of<MapNotifier>(context, listen: false).gpsOn = isOn;
+  }
+
   void tabListener() {
     if (Provider.of<AppNotifier>(context, listen: false).state == 0)
       Provider.of<BottomSheetNotifier>(context, listen: false)
@@ -248,6 +271,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
+    checkPermission();
     _tabController = TabController(
       length: 2,
       vsync: this,
@@ -257,7 +281,9 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final height = MediaQuery.of(context).size.height;
+    topPadding = MediaQuery.of(context).padding.top;
+    height = MediaQuery.of(context).size.height;
+    if (height == 0) return;
     if (Provider.of<AppNotifier>(context, listen: false).state == 0)
       Provider.of<BottomSheetNotifier>(context, listen: false)
         ..snappingPositions.value = [
@@ -265,70 +291,64 @@ class _MyHomePageState extends State<MyHomePage>
           height - bottomHeight,
           height - bottomBarHeight,
         ]
+        ..endCorrection = topPadding - offsetTranslation
         ..activeScrollController ??= _scrollControllers[_tabController.index];
   }
 
   @override
   void dispose() {
-    _tabController.removeListener(tabListener);
-    _tabController.dispose();
+    _tabController
+      ..removeListener(tabListener)
+      ..dispose();
     _pageIndex.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('$this rebuilt');
-    final topPadding = MediaQuery.of(context).padding.top;
-    final height = MediaQuery.of(context).size.height;
-    return Selector<AppNotifier, int>(
-      selector: (context, appNotifier) => appNotifier.state,
-      builder: (context, state, child) {
-        return WillPopScope(
-          onWillPop: () {
-            return onBack(context);
-          },
-          child: Scaffold(
-            // resizeToAvoidBottomInset: false,
-            endDrawer: DebugDrawer(),
-            body: height != 0
-                ? NestedBottomSheet(
-                    endCorrection: state == 0
-                        ? topPadding - offsetTranslation
-                        : topPadding,
-                    initialPosition: height - bottomHeight,
-                    background: Positioned(
-                      left: 0,
-                      top: 0,
-                      right: 0,
-                      bottom: 62,
-                      child: ValueListenableBuilder(
-                        valueListenable: _pageIndex,
-                        builder: (context, pageIndex, child) {
-                          return CustomAnimatedSwitcher(
-                            child: pageIndex == 0
-                                ? HistoryPage()
-                                : pageIndex == 2 ? AboutPage() : child,
-                          );
-                        },
-                        child: MapWidget(),
-                      ),
-                    ),
-                    header: ExploreHeader(
-                      tabController: _tabController,
-                    ),
-                    body: ExploreBody(
-                      tabController: _tabController,
-                      scrollControllers: _scrollControllers,
-                    ),
-                    footer: BottomSheetFooter(
-                      pageIndex: _pageIndex,
-                    ),
-                  )
-                : SizedBox.shrink(),
-          ),
-        );
+    return WillPopScope(
+      onWillPop: () {
+        return onBack(context);
       },
+      child: Scaffold(
+        // resizeToAvoidBottomInset: false,
+        endDrawer: DebugDrawer(),
+        body: CustomAnimatedSwitcher(
+          crossShrink: false,
+          child: height != 0
+              ? NestedBottomSheet(
+                  initialPosition: height - bottomHeight,
+                  background: Positioned(
+                    left: 0,
+                    top: 0,
+                    right: 0,
+                    bottom: bottomBarHeight,
+                    child: ValueListenableBuilder(
+                      valueListenable: _pageIndex,
+                      builder: (context, pageIndex, child) {
+                        return CustomAnimatedSwitcher(
+                          child: pageIndex == 0
+                              ? HistoryPage()
+                              : pageIndex == 2 ? AboutPage() : child,
+                        );
+                      },
+                      child: MapWidget(),
+                    ),
+                  ),
+                  header: ExploreHeader(
+                    tabController: _tabController,
+                  ),
+                  body: ExploreBody(
+                    tabController: _tabController,
+                    scrollControllers: _scrollControllers,
+                  ),
+                  footer: BottomSheetFooter(
+                    pageIndex: _pageIndex,
+                  ),
+                )
+              : SizedBox.shrink(),
+        ),
+      ),
     );
   }
 }

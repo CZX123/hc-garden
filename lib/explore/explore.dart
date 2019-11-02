@@ -31,8 +31,8 @@ class ExploreHeader extends StatelessWidget {
         Provider.of<BottomSheetNotifier>(context, listen: false);
     final animation = bottomSheetNotifier.animation;
     final animateTo = bottomSheetNotifier.animateTo;
-    const _trails = ['Jing Xian Trail', 'Kong Chian Trail', 'Kah Kee Trail'];
-    final _colors = [Colors.amber[600], Colors.pink, Colors.lightBlue];
+    const _trails = ['Kah Kee Trail', 'Kong Chian Trail', 'Jing Xian Trail'];
+    final _colors = [Colors.lightBlue, Colors.pink, Colors.amber[600]];
     final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
     final totalTranslation = offsetTranslation - topPadding;
@@ -41,12 +41,16 @@ class ExploreHeader extends StatelessWidget {
     return Selector<AppNotifier, int>(
       selector: (context, appNotifier) => appNotifier.state,
       builder: (context, state, child) {
-        return AnimatedOpacity(
-          opacity: state == 0 ? 1 : 0,
-          duration: Duration(milliseconds: state == 0 ? 400 : 200),
-          curve:
-              state == 0 ? Interval(0.5, 1, curve: Curves.ease) : Curves.ease,
-          child: child,
+        return IgnorePointer(
+          ignoring: state != 0,
+          ignoringSemantics: state != 0,
+          child: AnimatedOpacity(
+            opacity: state == 0 ? 1 : 0,
+            duration: Duration(milliseconds: state == 0 ? 400 : 200),
+            curve:
+                state == 0 ? Interval(0.5, 1, curve: Curves.ease) : Curves.ease,
+            child: child,
+          ),
         );
       },
       child: Stack(
@@ -143,14 +147,12 @@ class ExploreHeader extends StatelessWidget {
                                     child: Text(
                                       _trails[i].toUpperCase(),
                                       textAlign: TextAlign.center,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .body2
-                                          .copyWith(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            height: 1.5,
-                                          ),
+                                      style: TextStyle(
+                                        fontSize: 13.5,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.5,
+                                      ),
                                     ),
                                   ),
                                   onPressed: i == 0
@@ -158,10 +160,9 @@ class ExploreHeader extends StatelessWidget {
                                           Provider.of<MapNotifier>(context)
                                               .animateToPosition(
                                             LatLng(
-                                              1.324617,
-                                              103.80630,
+                                              1.326287,
+                                              103.80295,
                                             ),
-                                            17.5,
                                           );
                                         }
                                       : i == 1
@@ -179,9 +180,10 @@ class ExploreHeader extends StatelessWidget {
                                               Provider.of<MapNotifier>(context)
                                                   .animateToPosition(
                                                 LatLng(
-                                                  1.326287,
-                                                  103.80295,
+                                                  1.324617,
+                                                  103.80672,
                                                 ),
+                                                17.3,
                                               );
                                             },
                                 ),

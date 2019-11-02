@@ -13,6 +13,77 @@ class _MapWidgetState extends State<MapWidget> {
       context,
       listen: false,
     ).mapController = controller;
+    setState(() {}); // Needed to apply padding to map
+    controller.setMapStyle('''[
+      {
+        "featureType": "landscape.man_made",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "saturation": 20
+          },
+          {
+            "weight": 1
+          }
+        ]
+      },
+      {
+        "featureType": "landscape.man_made",
+        "elementType": "geometry.stroke",
+        "stylers": [
+          {
+            "lightness": -15
+          }
+        ]
+      },
+      {
+        "featureType": "poi.school",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "saturation": 20
+          },
+          {
+            "lightness": 30
+          }
+        ]
+      },
+      {
+        "featureType": "poi.school",
+        "elementType": "labels.icon",
+        "stylers": [
+          {
+            "color": "#009688"
+          }
+        ]
+      },
+      {
+        "featureType": "poi.school",
+        "elementType": "labels.text.fill",
+        "stylers": [
+          {
+            "color": "#009688"
+          }
+        ]
+      },
+      {
+        "featureType": "poi.business",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "poi.park",
+        "elementType": "labels.text",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      }
+    ]''');
   }
 
   @override
@@ -60,18 +131,20 @@ class _MapWidgetState extends State<MapWidget> {
                   ),
                 )
               : GoogleMap(
-                  rotateGesturesEnabled: false,
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top,
+                  ),
                   myLocationEnabled: true,
-                  cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-                    northeast: northEastBound,
-                    southwest: southWestBound,
-                  )),
+                  // cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+                  //   northeast: northEastBound,
+                  //   southwest: southWestBound,
+                  // )),
                   onMapCreated: _onMapCreated,
                   initialCameraPosition: CameraPosition(
                     target: bottomSheetCenter,
                     zoom: 17,
                   ),
-                  polygons: polygons,
+                  // polygons: polygons,
                   markers: markers,
                 ),
         );
@@ -81,6 +154,9 @@ class _MapWidgetState extends State<MapWidget> {
 }
 
 class MapNotifier extends ChangeNotifier {
+  // TODO: Do something with these information
+  bool permissionEnabled;
+  bool gpsOn;
   GoogleMapController mapController;
 
   void animateToLocation(TrailLocation location) {
@@ -88,10 +164,11 @@ class MapNotifier extends ChangeNotifier {
     // (need to wait for upcoming update for google maps plugin)
     // https://github.com/flutter/flutter/issues/33481
     mapController
-        .animateCamera(CameraUpdate.newLatLngZoom(location.coordinates, 18));
+        .animateCamera(CameraUpdate.newLatLngZoom(location.coordinates, 18.5));
   }
 
   void animateToPosition(LatLng coordinates, [double zoom]) {
-    mapController.animateCamera(CameraUpdate.newLatLngZoom(coordinates, zoom ?? 18));
+    mapController
+        .animateCamera(CameraUpdate.newLatLngZoom(coordinates, zoom ?? 18));
   }
 }

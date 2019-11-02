@@ -1,6 +1,5 @@
 import 'library.dart';
 
-// TODO: handle cases of incomplete data
 abstract class Entity {
   final int id;
   final String name;
@@ -11,7 +10,7 @@ abstract class Entity {
   final List<Map<int, int>> locations;
 
   Entity.fromJson(String key, dynamic parsedJson)
-      : this.id = int.parse(key.split('-').last),
+      : this.id = int.tryParse(key.split('-').last),
         this.name = parsedJson['name'],
         this.sciName = parsedJson['sciName'],
         this.description = parsedJson['description'],
@@ -73,7 +72,7 @@ class Trail {
   Trail({this.id, this.name, this.color});
   factory Trail.fromJson(String key, dynamic parsedJson) {
     return Trail(
-      id: int.parse(key.split('-').last),
+      id: int.tryParse(key.split('-').last),
       name: parsedJson['name'],
       color: parsedJson['color'],
     );
@@ -103,7 +102,7 @@ class TrailLocation {
     @required List<Fauna> faunaList,
   }) {
     return TrailLocation(
-      id: int.parse(key.split('-').last),
+      id: int.tryParse(key.split('-').last),
       name: parsedJson['title'],
       image: parsedJson['imageRef'],
       smallImage: parsedJson['smallImage'],

@@ -163,6 +163,7 @@ class NotchedAppBar extends StatelessWidget {
                             builder: (context, state, child) {
                               return IgnorePointer(
                                 ignoring: state != 0,
+                                ignoringSemantics: state != 0,
                                 child: AnimatedOpacity(
                                   opacity: state == 0 ? 1 : 0,
                                   duration: const Duration(milliseconds: 280),
@@ -270,6 +271,7 @@ class NotchedAppBar extends StatelessWidget {
                     },
                     child: IgnorePointer(
                       ignoring: value,
+                      ignoringSemantics: value,
                       child: AnimatedOpacity(
                         opacity: value ? 0 : 1,
                         duration: Duration(milliseconds: value ? 80 : 300),

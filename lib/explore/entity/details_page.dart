@@ -16,7 +16,6 @@ class EntityDetailsPage extends StatefulWidget {
 class _EntityDetailsPageState extends State<EntityDetailsPage> {
   final _scrollController = ScrollController();
 
-
   List<Widget> locations(
     BuildContext context,
     Map<Trail, List<TrailLocation>> trails,
@@ -99,7 +98,8 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
           children: <Widget>[
             ValueListenableBuilder(
               valueListenable:
-                  Provider.of<BottomSheetNotifier>(context, listen: false).animation,
+                  Provider.of<BottomSheetNotifier>(context, listen: false)
+                      .animation,
               builder: (context, value, child) {
                 double h = 0;
                 if (value < height - bottomHeight) {
@@ -186,7 +186,12 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                                     Provider.of<BottomSheetNotifier>(
                                       context,
                                       listen: false,
-                                    ).draggingDisabled = true;
+                                    )
+                                      ..draggingDisabled = true
+                                      ..animateTo(
+                                        0,
+                                        const Duration(milliseconds: 340),
+                                      );
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(
