@@ -96,7 +96,7 @@ packages:
     source: hosted
     version: "0.5.21+8"
   image:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: image
       url: "https://pub.dartlang.org"
