@@ -11,6 +11,7 @@ export 'package:flutter/physics.dart';
 export 'package:flutter/services.dart';
 export 'package:google_maps_flutter/google_maps_flutter.dart';
 export 'package:location/location.dart';
+export 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 export 'package:path_provider/path_provider.dart';
 export 'package:provider/provider.dart';
 export 'main.dart';

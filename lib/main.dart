@@ -259,6 +259,7 @@ class _MyHomePageState extends State<MyHomePage>
     if (!isOn) {
       isOn = await _location.requestService();
     }
+    if (isOn) setState(() {});
     Provider.of<MapNotifier>(context, listen: false).gpsOn = isOn;
   }
 

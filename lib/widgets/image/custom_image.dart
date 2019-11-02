@@ -76,6 +76,7 @@ class CustomImage extends StatefulWidget {
   final Duration fadeInDuration;
   final bool keepAlive;
   final bool saveInCache;
+  final void Function(double) onLoad;
   CustomImage(
     this.url, {
     Key key,
@@ -88,6 +89,7 @@ class CustomImage extends StatefulWidget {
     this.fadeInDuration: const Duration(milliseconds: 400),
     this.keepAlive: false,
     this.saveInCache: true,
+    this.onLoad,
   }) : super(key: key);
 
   _CustomImageState createState() => _CustomImageState();
@@ -108,12 +110,14 @@ class _CustomImageState extends State<CustomImage>
     final File file = File('${dir.path}/$filePath');
     if (file.existsSync()) {
       Uint8List bytes = file.readAsBytesSync();
-      if (mounted && (_imageProvider == null || networkError))
+      if (mounted && (_imageProvider == null || networkError)) {
         setState(() {
           networkError = false;
           fadeIn = false;
           _imageProvider = MemoryImage(bytes);
         });
+        onLoadCallback();
+      }
       if (widget.saveInCache) {
         var size = 0;
         imageMap.forEach((key, value) {
@@ -142,11 +146,13 @@ class _CustomImageState extends State<CustomImage>
       if (bytes.lengthInBytes == 0) {
         throw Exception('NetworkImage is an empty file: $resolved');
       }
-      if (mounted && _imageProvider == null)
+      if (mounted && _imageProvider == null) {
         setState(() {
           fadeIn = true;
           _imageProvider = MemoryImage(bytes);
         });
+        onLoadCallback();
+      }
       if (widget.saveInCache) {
         var size = 0;
         imageMap.forEach((key, value) {
@@ -170,6 +176,7 @@ class _CustomImageState extends State<CustomImage>
           _imageProvider =
               MemoryImage(widget.fallbackMemoryImage ?? kTransparentImage);
         });
+        onLoadCallback();
       }
     }
   }
@@ -182,13 +189,25 @@ class _CustomImageState extends State<CustomImage>
     if (widget.url == null) {
       _imageProvider =
           MemoryImage(widget.fallbackMemoryImage ?? kTransparentImage);
+      onLoadCallback();
     } else if (imageMap.containsKey(widget.url)) {
-      // If the provider already has the image ossciated with
+      // If the provider already has the image associated with
       _imageProvider = MemoryImage(imageMap[widget.url]);
+      onLoadCallback();
     } else {
       // These 2 functions below runs in parallel
       fetchImageFromStorage(imageMap);
       fetchImageFromNetwork(imageMap);
+    }
+  }
+
+  void onLoadCallback() {
+    if (widget.onLoad != null) {
+      decodeImageFromList(_imageProvider.bytes).then((image) {
+        if (mounted) {
+          widget.onLoad(image.width / image.height);
+        }
+      });
     }
   }
 
@@ -200,6 +219,7 @@ class _CustomImageState extends State<CustomImage>
       if (widget.url == null) {
         _imageProvider =
             MemoryImage(widget.fallbackMemoryImage ?? kTransparentImage);
+        onLoadCallback();
       } else {
         didUpdate = true;
       }
@@ -213,6 +233,7 @@ class _CustomImageState extends State<CustomImage>
           Provider.of<Map<String, Uint8List>>(context);
       if (imageMap.containsKey(widget.url)) {
         _imageProvider = MemoryImage(imageMap[widget.url]);
+        onLoadCallback();
       } else {
         fetchImageFromStorage(imageMap);
         fetchImageFromNetwork(imageMap);

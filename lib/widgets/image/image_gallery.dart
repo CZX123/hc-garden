@@ -75,7 +75,12 @@ class ImageGallery extends StatelessWidget {
 
 class ZoomableImage extends StatefulWidget {
   final String image;
-  const ZoomableImage({Key key, this.image}) : super(key: key);
+  final double maxScale;
+  const ZoomableImage({
+    Key key,
+    this.image,
+    this.maxScale = 5,
+  }) : super(key: key);
 
   @override
   _ZoomableImageState createState() => _ZoomableImageState();
@@ -85,76 +90,94 @@ enum ScaleDirection { inward, outward }
 
 class _ZoomableImageState extends State<ZoomableImage>
     with SingleTickerProviderStateMixin {
-  // bool _ended = false;
+  double _viewportHeight;
+  double _viewportWidth;
+  double _imageHeight;
+  double _imageWidth;
+  final _key = GlobalKey();
+  final _matrix = ValueNotifier(Matrix4.identity());
   AnimationController _animationController;
-  double _startingScale = 1.0;
-  // ScaleDirection _scaleDirection;
-  final _minScale = 1.0;
-  // final _maxScale = 5.0; TODO
-  final _maxScale = 1.0;
+
+  void onDoubleTap() {
+    // TODO: double tap to zoom
+  }
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      lowerBound: _minScale,
-      upperBound: _maxScale,
       vsync: this,
     );
   }
 
   @override
   void dispose() {
+    _matrix.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // final width = MediaQuery.of(context).size.width;
-    return GestureDetector(
-      // onScaleStart: (details) {
-      //   _ended = false;
-      // },
-      onScaleUpdate: (details) {
-        final _newValue = _startingScale * details.scale;
-        // if (_animationController.value < _newValue) {
-        //   _scaleDirection = ScaleDirection.inward;
-        // } else {
-        //   _scaleDirection = ScaleDirection.outward;
-        // }
-        _animationController.value = _newValue;
+    return MatrixGestureDetector(
+      shouldRotate: false,
+      onMatrixUpdate: (m, tm, sm, rm) {
+        if (_viewportWidth == null) {
+          m.setIdentity();
+          return;
+        }
+        if (m.getMaxScaleOnAxis() == 1) {
+          m.splatDiagonal(1);
+        } else if (m.getMaxScaleOnAxis() > widget.maxScale) {
+          m.setEntry(0, 0, widget.maxScale);
+          m.setEntry(1, 1, widget.maxScale);
+          m.setTranslation(_matrix.value.getTranslation());
+        }
+        final scale = m.getMaxScaleOnAxis();
+        final differenceX = _viewportWidth - _imageWidth * scale;
+        final differenceY = _viewportHeight - _imageHeight * scale;
+        final maxX = differenceX > 0
+            ? _viewportWidth / 2 * (1 - scale)
+            : (_imageWidth - _viewportWidth) * scale / 2;
+        final maxY = differenceY > 0
+            ? _viewportHeight / 2 * (1 - scale)
+            : (_imageHeight - _viewportHeight) * scale / 2;
+        final minX = min(differenceX, 0.0) + maxX;
+        final minY = min(differenceY, 0.0) + maxY;
+        double x = m.getTranslation().x;
+        double y = m.getTranslation().y;
+        x = min(maxX, max(x, minX));
+        y = min(maxY, max(y, minY));
+        m.setTranslationRaw(x, y, 0);
+        _matrix.value = m;
       },
-      onScaleEnd: (details) {
-        // print(_scaleDirection);
-        // if (_ended) return;
-        // _ended = true;
-        // final simulation = BoundedFrictionSimulation(
-        //   0.135,
-        //   _animationController.value,
-        //   (_scaleDirection == ScaleDirection.inward ? -1 : 1) *
-        //       details.velocity.pixelsPerSecond.distance /
-        //       width,
-        //   _minScale,
-        //   _maxScale,
-        // );
-        // _startingScale = simulation.finalX;
-        // _animationController.animateWith(simulation);
-        _startingScale = _animationController.value;
-      },
-      child: ValueListenableBuilder(
-        valueListenable: _animationController.view,
+      child: ValueListenableBuilder<Matrix4>(
+        valueListenable: _matrix,
         builder: (context, value, child) {
-          return Transform.scale(
-            scale: value,
+          return Transform(
+            transform: value,
             child: child,
           );
         },
         child: CustomImage(
           widget.image,
+          key: _key,
           fit: BoxFit.contain,
           placeholderColor: Theme.of(context).dividerColor,
           saveInCache: false,
+          onLoad: (ratio) {
+            _viewportHeight = _key.currentContext.size.height;
+            _viewportWidth = _key.currentContext.size.width;
+            final viewportRatio = _viewportWidth / _viewportHeight;
+            if (ratio > viewportRatio) {
+              // Image is wider
+              _imageWidth = _viewportWidth;
+              _imageHeight = _viewportWidth / ratio;
+            } else {
+              _imageHeight = _viewportHeight;
+              _imageWidth = _viewportHeight * ratio;
+            }
+          },
         ),
       ),
     );
