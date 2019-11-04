@@ -11,6 +11,47 @@ class TrailLocationOverviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    final topPadding = MediaQuery.of(context).padding.top;
+    final height = MediaQuery.of(context).size.height;
+    final orientation = MediaQuery.of(context).orientation;
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight
+    ]);
+    return Scaffold(
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                SystemChrome.setPreferredOrientations(
+                    [DeviceOrientation.portraitUp]);
+                return Navigator.maybePop(context);
+              },
+              tooltip: 'Back',
+            ),
+            Expanded(
+              child: Text(trailLocation.name),
+            ),
+            SizedBox(width: 48),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(top: topPadding),
+          constraints: BoxConstraints(
+            minHeight: height - 48,
+          ),
+          child: CustomImage(
+            trailLocation.image,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
   }
 }
