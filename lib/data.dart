@@ -276,12 +276,3 @@ class SearchNotifier extends ChangeNotifier {
     _keyboardAppear = focusNode.hasFocus;
   }
 }
-
-class SortNotifier extends ChangeNotifier {
-  List<Trail> _selectedTrails;
-  List<Trail> get selectedTrails => _selectedTrails;
-  set selectedTrails(List<Trail> selectedTrails) {
-    _selectedTrails = selectedTrails;
-    notifyListeners();
-  }
-}

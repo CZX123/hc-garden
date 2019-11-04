@@ -18,6 +18,7 @@ class _AboutPageState extends State<AboutPage> {
           slivers: <Widget>[
             SliverAppBar(
               actions: [const SizedBox.shrink()],
+              automaticallyImplyLeading: false,
               backgroundColor: Colors.transparent,
               expandedHeight: 96 + topPadding,
               flexibleSpace: FlexibleSpaceBar(

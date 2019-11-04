@@ -1,7 +1,7 @@
 import '../library.dart';
 
-const spacing = 4 * 8 + 16 + 20 + 4.0;
-const imageHeight = 24.0;
+const spacing = 4 * 8 + 16 + 8 + 4.0;
+const imageHeight = 40.0;
 const headingHeight = 28.0;
 const trailButtonHeight = 80.0;
 const entityButtonHeight = 108.0;
@@ -92,7 +92,7 @@ class ExploreHeader extends StatelessWidget {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.only(top: 20 + 12.0),
+              padding: const EdgeInsets.only(top: 16 + 12.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -103,9 +103,9 @@ class ExploreHeader extends StatelessWidget {
                     ).animate(anim),
                     child: AppLogo(),
                   ),
-                  const SizedBox(
-                    height: 8,
-                  ),
+                  // const SizedBox(
+                  //   height: 8,
+                  // ),
                   FadeTransition(
                     opacity: Tween<double>(
                       begin: (24 + imageHeight) / 12 - totalTranslation / 12,
@@ -229,11 +229,10 @@ class AppLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Image.asset(
           'assets/images/hci.png',
-          height: imageHeight - 2,
+          height: imageHeight - 12,
         ),
         const SizedBox(
           width: 12,
@@ -245,7 +244,7 @@ class AppLogo extends StatelessWidget {
               'Hwa Chong'.toUpperCase(),
               style: Theme.of(context).textTheme.title.copyWith(
                     color: Theme.of(context).hintColor,
-                    fontSize: imageHeight / 2,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     height: 1,
                   ),
@@ -255,7 +254,7 @@ class AppLogo extends StatelessWidget {
               style: Theme.of(context).textTheme.title.copyWith(
                     color: Theme.of(context).hintColor,
                     letterSpacing: 0.15,
-                    fontSize: imageHeight / 2,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     height: 1,
                   ),
@@ -263,10 +262,10 @@ class AppLogo extends StatelessWidget {
           ],
         ),
         const SizedBox(
-          width: 12,
+          width: 4,
         ),
         Image.asset(
-          'assets/images/app_logo.png',
+          'assets/images/app_logo/default.png',
           height: imageHeight,
         ),
       ],

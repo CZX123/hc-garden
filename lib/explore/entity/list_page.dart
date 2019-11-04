@@ -39,58 +39,75 @@ class EntityListPage extends StatelessWidget {
         }
         return false;
       },
-      child: Selector<SearchNotifier, String>(
-        selector: (context, searchNotifier) => searchNotifier.searchTerm,
-        builder: (context, searchTerm, child) {
-          List<Entity> _list = [];
-          entityList.forEach((entity) {
-            if (EntityListPage._isValid(entity, searchTerm)) {
-              _list.add(entity);
-            }
-          });
-          if (isFlora)
-            floraIcons.shuffle();
-          else
-            faunaIcons.shuffle();
-          return CustomAnimatedSwitcher(
-            child: _list.length == 0
-                ? Padding(
-                    key: ValueKey(searchTerm + '!'),
-                    padding: const EdgeInsets.fromLTRB(0, 16, 0, 64),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          isFlora ? floraIcons[0] : faunaIcons[0],
-                          size: 64,
-                          color: Theme.of(context).disabledColor,
+      child: Selector<SortNotifier, List<Trail>>(
+        selector: (context, sortNotifier) {
+          return sortNotifier.selectedTrails;
+        },
+        builder: (context, selectedTrails, child) {
+          List<Entity> updatedEntityList = entityList;
+          if (selectedTrails.length != 3) {
+            updatedEntityList = entityList.where((entity) {
+              return !entity.locations.every((location) {
+                return !selectedTrails.every((trail) {
+                  return trail.id != location.keys.first;
+                });
+              });
+            });
+          }
+          return Selector<SearchNotifier, String>(
+            selector: (context, searchNotifier) => searchNotifier.searchTerm,
+            builder: (context, searchTerm, child) {
+              List<Entity> _list = [];
+              updatedEntityList.forEach((entity) {
+                if (EntityListPage._isValid(entity, searchTerm)) {
+                  _list.add(entity);
+                }
+              });
+              if (isFlora)
+                floraIcons.shuffle();
+              else
+                faunaIcons.shuffle();
+              return CustomAnimatedSwitcher(
+                child: _list.length == 0
+                    ? Padding(
+                        key: ValueKey(searchTerm + '!'),
+                        padding: const EdgeInsets.fromLTRB(0, 16, 0, 64),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              isFlora ? floraIcons[0] : faunaIcons[0],
+                              size: 64,
+                              color: Theme.of(context).disabledColor,
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Text(
+                              'No matching ${isFlora ? 'flora' : 'fauna'}',
+                              style: Theme.of(context).textTheme.body1.copyWith(
+                                    color: Theme.of(context).disabledColor,
+                                  ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          'No matching ${isFlora ? 'flora' : 'fauna'}',
-                          style: Theme.of(context).textTheme.body1.copyWith(
-                                color: Theme.of(context).disabledColor,
-                              ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    key: ValueKey(searchTerm),
-                    padding: const EdgeInsets.fromLTRB(0, 16, 0, 96),
-                    controller: scrollController,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: _list.length,
-                    itemExtent: searchTerm.isEmpty ? 104 : 88,
-                    itemBuilder: (context, index) {
-                      return EntityListRow(
-                        searchTerm: searchTerm,
-                        entity: _list[index],
-                      );
-                    },
-                  ),
+                      )
+                    : ListView.builder(
+                        key: ValueKey(searchTerm),
+                        padding: const EdgeInsets.fromLTRB(0, 16, 0, 96),
+                        controller: scrollController,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: _list.length,
+                        itemExtent: searchTerm.isEmpty ? 104 : 88,
+                        itemBuilder: (context, index) {
+                          return EntityListRow(
+                            searchTerm: searchTerm,
+                            entity: _list[index],
+                          );
+                        },
+                      ),
+              );
+            },
           );
         },
       ),

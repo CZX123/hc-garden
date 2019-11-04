@@ -173,7 +173,9 @@ class NotchedAppBar extends StatelessWidget {
                             },
                             child: IconButton(
                               icon: const Icon(Icons.sort),
-                              onPressed: () {},
+                              onPressed: () {
+                                Scaffold.of(context).openEndDrawer();
+                              },
                               tooltip: 'Sort',
                             ),
                           ),

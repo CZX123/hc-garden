@@ -1,5 +1,4 @@
 import 'library.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -312,8 +311,8 @@ class _MyHomePageState extends State<MyHomePage>
         return onBack(context);
       },
       child: Scaffold(
-        // resizeToAvoidBottomInset: false,
-        endDrawer: DebugDrawer(),
+        drawer: DebugDrawer(),
+        endDrawer: SortingDrawer(),
         body: CustomAnimatedSwitcher(
           crossShrink: false,
           child: height != 0

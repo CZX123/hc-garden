@@ -58,6 +58,7 @@ flutter:
     - assets/images/fauna.jpg
     - assets/images/hci.png
     - assets/images/app_logo.png
+    - assets/images/app_logo/default.png
   fonts:
     - family: Manrope
       fonts:

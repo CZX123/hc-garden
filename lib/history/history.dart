@@ -17,6 +17,7 @@ class HistoryPage extends StatelessWidget {
         return CustomScrollView(
           slivers: <Widget>[
             SliverAppBar(
+              actions: [const SizedBox.shrink()],
               automaticallyImplyLeading: false,
               expandedHeight: 96 + topPadding,
               backgroundColor: Colors.transparent,
