@@ -41,27 +41,28 @@ class SortingDrawer extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          for (var trail in allTrails)
-                            ListTile(
-                              leading: AnimatedOpacity(
-                                opacity: selectedTrails.contains(trail) ? 1 : 0,
-                                duration: const Duration(milliseconds: 200),
-                                child: const Icon(Icons.check),
+                          ListTile(
+                            title: Text(
+                              'Trails',
+                              style: Theme.of(context).textTheme.subtitle.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+                          ),
+                          for (var trail in allTrails)
+                            CheckboxListTile(
+                              controlAffinity: ListTileControlAffinity.trailing,
+                              value: selectedTrails.contains(trail),
                               title: Text(trail.name),
-                              onTap: () {
+                              onChanged: (value) {
                                 final sortNotifier = Provider.of<SortNotifier>(
-                                    context,
-                                    listen: false);
-                                List<Trail> newTrails;
-                                if (selectedTrails.contains(trail)) {
-                                  newTrails =
-                                      List.from(sortNotifier.selectedTrails)
-                                        ..remove(trail);
-                                } else {
-                                  newTrails =
-                                      List.from(sortNotifier.selectedTrails)
-                                        ..add(trail);
+                                  context,
+                                  listen: false,
+                                );
+                                List<Trail> newTrails = List.from(sortNotifier.selectedTrails);
+                                newTrails.remove(trail);
+                                if (value) {
+                                  newTrails.add(trail);
                                 }
                                 sortNotifier.selectedTrails = newTrails;
                               },

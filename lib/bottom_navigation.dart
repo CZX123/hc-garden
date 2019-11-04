@@ -71,7 +71,7 @@ class BottomSheetFooter extends StatelessWidget {
                   },
                   items: [
                     const BottomNavigationBarItem(
-                      icon: Icon(Icons.history),
+                      icon: Icon(Icons.dvr),
                       title: Text('History'),
                     ),
                     const BottomNavigationBarItem(
