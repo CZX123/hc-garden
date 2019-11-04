@@ -112,7 +112,14 @@ class _MapWidgetState extends State<MapWidget> {
                     position: location.coordinates,
                     infoWindow: InfoWindow(
                       title: location.name,
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => TrailLocationOverviewPage(
+                            trail: trail, trailLocation: location
+                          )),
+                        );
+                      },
                     ),
                     icon: BitmapDescriptor.defaultMarkerWithHue(hues[i]),
                   ),

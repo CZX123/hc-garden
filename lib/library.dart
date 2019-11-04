@@ -21,6 +21,7 @@ export 'debug.dart';
 export 'about/about.dart';
 export 'explore/entity/details_page.dart';
 export 'explore/entity/list_page.dart';
+export 'explore/trail/location_overview_page.dart';
 export 'explore/explore.dart';
 export 'history/history.dart';
 export 'map/map.dart';
