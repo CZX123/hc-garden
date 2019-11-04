@@ -44,15 +44,24 @@ class EntityListPage extends StatelessWidget {
           return sortNotifier.selectedTrails;
         },
         builder: (context, selectedTrails, child) {
+          if (selectedTrails == null) {
+            selectedTrails = List.from(
+                Provider.of<FirebaseData>(context, listen: false)
+                    ?.trails
+                    ?.keys);
+            if (selectedTrails == null) return const SizedBox.shrink();
+            Provider.of<SortNotifier>(context, listen: false)
+                .updateSelectedTrailsDiscreetly(selectedTrails);
+          }
           List<Entity> updatedEntityList = entityList;
           if (selectedTrails.length != 3) {
             updatedEntityList = entityList.where((entity) {
               return !entity.locations.every((location) {
-                return !selectedTrails.every((trail) {
+                return selectedTrails.every((trail) {
                   return trail.id != location.keys.first;
                 });
               });
-            });
+            }).toList();
           }
           return Selector<SearchNotifier, String>(
             selector: (context, searchNotifier) => searchNotifier.searchTerm,
@@ -93,7 +102,8 @@ class EntityListPage extends StatelessWidget {
                         ),
                       )
                     : ListView.builder(
-                        key: ValueKey(searchTerm),
+                        key: ValueKey(
+                            searchTerm + updatedEntityList.length.toString()),
                         padding: const EdgeInsets.fromLTRB(0, 16, 0, 96),
                         controller: scrollController,
                         physics: NeverScrollableScrollPhysics(),
