@@ -242,34 +242,34 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
           children: <Widget>[
             Align(
               alignment: Alignment.bottomCenter,
-              child: Material(
-                type: MaterialType.transparency,
-                child: ValueListenableBuilder<double>(
-                  valueListenable: _animationController,
-                  builder: (context, value, child) {
-                    double elevation = 12;
-                    double radius = 28;
-                    double margin = 4;
-                    if (value > 0.5) {
-                      elevation = 24 * (1 - value);
-                      if (value < 15 / 16) {
-                        radius = 60 - 64 * value;
-                      } else {
-                        radius = 0;
-                        margin = 64 * (1 - value);
-                      }
+              child: ValueListenableBuilder<double>(
+                valueListenable: _animationController,
+                builder: (context, value, child) {
+                  double elevation = 12;
+                  double radius = 28;
+                  double margin = 4;
+                  if (value > 0.5) {
+                    elevation = 24 * (1 - value);
+                    if (value < 15 / 16) {
+                      radius = 60 - 64 * value;
+                    } else {
+                      radius = 0;
+                      margin = 64 * (1 - value);
                     }
-                    return PhysicalShape(
-                      color: Theme.of(context).canvasColor,
-                      elevation: elevation,
-                      clipper: BottomAppBarClipper(
-                        windowWidth: _width,
-                        notchMargin: margin,
-                        radius: radius,
-                      ),
-                      child: child,
-                    );
-                  },
+                  }
+                  return PhysicalShape(
+                    color: Theme.of(context).canvasColor,
+                    elevation: elevation,
+                    clipper: BottomAppBarClipper(
+                      windowWidth: _width,
+                      notchMargin: margin,
+                      radius: radius,
+                    ),
+                    child: child,
+                  );
+                },
+                child: Material(
+                  type: MaterialType.transparency,
                   child: SizedBox(
                     height: 48,
                     child: Row(
@@ -371,45 +371,48 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
                     ).animate(_animationController),
                     child: Align(
                       alignment: Alignment.center,
-                      child: Tooltip(
-                        message: 'Search',
-                        preferBelow: false,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(28),
-                          child: Container(
-                            height: 56,
-                            width: 56,
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.search,
-                              color: Colors.white,
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: Tooltip(
+                          message: 'Search',
+                          preferBelow: false,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(28),
+                            child: Container(
+                              height: 56,
+                              width: 56,
+                              alignment: Alignment.center,
+                              child: Icon(
+                                Icons.search,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          onTapDown: (_) {
-                            _fabPressController.forward();
-                          },
-                          onTap: () {
-                            _fabPressController.reverse();
-                            _animationController
-                                .animateTo(
-                              0,
-                              duration: const Duration(milliseconds: 200),
-                              curve: Curves.fastOutSlowIn,
-                            )
-                                .then((_) {
+                            onTapDown: (_) {
+                              _fabPressController.forward();
+                            },
+                            onTap: () {
+                              _fabPressController.reverse();
+                              _animationController
+                                  .animateTo(
+                                0,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.fastOutSlowIn,
+                              )
+                                  .then((_) {
+                                Provider.of<SearchNotifier>(
+                                  context,
+                                  listen: false,
+                                ).keyboardAppear = true;
+                              });
                               Provider.of<SearchNotifier>(
                                 context,
                                 listen: false,
-                              ).keyboardAppear = true;
-                            });
-                            Provider.of<SearchNotifier>(
-                              context,
-                              listen: false,
-                            ).isSearching = true;
-                          },
-                          onTapCancel: () {
-                            _fabPressController.reverse();
-                          },
+                              ).isSearching = true;
+                            },
+                            onTapCancel: () {
+                              _fabPressController.reverse();
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -543,7 +546,9 @@ class BottomAppBarClipper extends CustomClipper<Path> {
       radius: radius,
     );
     return CircularNotchedRectangle().getOuterPath(
-        Offset.zero & size, button.inflate(radius == 0 ? 0 : notchMargin));
+      Offset.zero & size,
+      button.inflate(notchMargin),
+    );
   }
 
   @override
