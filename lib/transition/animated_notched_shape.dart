@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import '../library.dart';
 
 class AnimatedNotchedShape extends ImplicitlyAnimatedWidget {
   final double elevation;
@@ -58,36 +58,5 @@ class AnimatedNotchedShapeState
       },
       child: widget.child,
     );
-  }
-}
-
-// The clipper for clipping the bottom app bar for the notched search fab
-class BottomAppBarClipper extends CustomClipper<Path> {
-  final double windowWidth;
-  final double notchMargin;
-  final double radius;
-  const BottomAppBarClipper({
-    @required this.windowWidth,
-    this.notchMargin = 4,
-    this.radius = 28,
-  })  : assert(windowWidth != null),
-        assert(notchMargin != null),
-        assert(radius != null);
-
-  @override
-  Path getClip(Size size) {
-    final Rect button = Rect.fromCircle(
-      center: Offset(windowWidth / 2, 0),
-      radius: radius,
-    );
-    return CircularNotchedRectangle()
-        .getOuterPath(Offset.zero & size, button.inflate(radius == 0 ? 0 : notchMargin));
-  }
-
-  @override
-  bool shouldReclip(BottomAppBarClipper oldClipper) {
-    return oldClipper.windowWidth != windowWidth ||
-        oldClipper.notchMargin != notchMargin ||
-        oldClipper.radius != radius;
   }
 }

@@ -143,7 +143,6 @@ class _EntityListRowState extends State<EntityListRow> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
     final thumbnail = ClipRRect(
       borderRadius: BorderRadius.circular(32),
@@ -212,19 +211,13 @@ class _EntityListRowState extends State<EntityListRow> {
               Provider.of<SearchNotifier>(context, listen: false);
           if (searchNotifier.keyboardAppear) {
             searchNotifier.keyboardAppear = false;
-            await Future.delayed(const Duration(milliseconds: 200));
+            await Future.delayed(const Duration(milliseconds: 100));
           }
-          Provider.of<AppNotifier>(context, listen: false)
-            ..state = 1
-            ..entity = widget.entity;
-          searchNotifier.isSearching = false;
-          Provider.of<BottomSheetNotifier>(context, listen: false)
-            ..snappingPositions.value = [
-              0,
-              height - 48 - 96 - 216 - 16,
-              height - 48 - 96,
-            ]
-            ..endCorrection = topPadding;
+          Provider.of<AppNotifier>(context, listen: false).changeState(
+            context,
+            1,
+            entity: widget.entity,
+          );
           final oldChild = Container(
             height: widget.searchTerm.isEmpty ? 104 : 88,
             padding: const EdgeInsets.symmetric(horizontal: 14),

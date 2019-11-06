@@ -182,7 +182,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                                     Provider.of<AppNotifier>(
                                       context,
                                       listen: false,
-                                    ).state = 2;
+                                    ).changeState(context, 2);
                                     Provider.of<BottomSheetNotifier>(
                                       context,
                                       listen: false,

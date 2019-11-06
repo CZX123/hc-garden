@@ -194,10 +194,12 @@ class _MyHomePageState extends State<MyHomePage>
     final state = appNotifier.state;
     final navigatorKey = appNotifier.navigatorKey;
     if (state == 0) {
+      if (navigatorKey.currentState.canPop()) {
+        // If something wrong happens
+        navigatorKey.currentState.pop();
+        return false;
+      }
       if (searchNotifier.isSearching) {
-        Future.delayed(const Duration(milliseconds: 400), () {
-          return searchNotifier.keyboardAppear = false;
-        });
         searchNotifier
           ..isSearching = false
           ..searchTerm = '';
@@ -212,29 +214,19 @@ class _MyHomePageState extends State<MyHomePage>
         bottomSheetNotifier.animateTo(0);
       } else if (navigatorKey.currentState.canPop()) {
         navigatorKey.currentState.pop();
-        appNotifier
-          ..state = 0
-          ..entity = null;
-        bottomSheetNotifier
-          ..activeScrollController = _scrollControllers[_tabController.index]
-          ..snappingPositions.value = [
-            0,
-            height - bottomHeight,
-            height - bottomBarHeight
-          ]
-          ..endCorrection = topPadding - offsetTranslation;
-        if (searchNotifier.searchTerm.isNotEmpty) {
-          Future.delayed(const Duration(milliseconds: 280), () {
-            searchNotifier.isSearching = true;
-          });
-        }
+        appNotifier.changeState(
+          context,
+          0,
+          activeScrollController: _scrollControllers[_tabController.index],
+        );
+        if (searchNotifier.searchTerm.isNotEmpty) searchNotifier.isSearching = true;
       }
       return false;
     } else if (state == 2) {
       // TODO: Replace with list of callbacks
       if (navigatorKey.currentState.canPop()) {
         navigatorKey.currentState.pop();
-        appNotifier.state = 1;
+        appNotifier.changeState(context, 1);
         bottomSheetNotifier.draggingDisabled = false;
         return false;
       }
@@ -247,7 +239,8 @@ class _MyHomePageState extends State<MyHomePage>
     if (!granted) {
       granted = await _location.requestPermission();
     }
-    Provider.of<MapNotifier>(context, listen: false).permissionEnabled = granted;
+    Provider.of<MapNotifier>(context, listen: false).permissionEnabled =
+        granted;
     if (granted) {
       checkGPS();
     }

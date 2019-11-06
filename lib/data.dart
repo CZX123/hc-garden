@@ -61,8 +61,11 @@ class FirebaseData {
   final List<HistoricalData> historicalDataList;
   final List<AboutPageData> aboutPageDataList;
   FirebaseData(
-      {this.floraList, this.faunaList, this.trails, this.historicalDataList, this.aboutPageDataList}
-  );
+      {this.floraList,
+      this.faunaList,
+      this.trails,
+      this.historicalDataList,
+      this.aboutPageDataList});
 }
 
 class Trail {
@@ -195,7 +198,7 @@ class AboutPageData {
   bool isExpanded = false;
   AboutPageData({this.body, this.id, this.quote, this.title, this.isExpanded});
 
-  factory AboutPageData.fromJson(String key, dynamic parsedJson){
+  factory AboutPageData.fromJson(String key, dynamic parsedJson) {
     return AboutPageData(
       body: parsedJson['body'],
       id: parsedJson['id'],
@@ -207,7 +210,8 @@ class AboutPageData {
 }
 
 class AppNotifier extends ChangeNotifier {
-  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>(); // key for navigator in explore body
+  GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>(); // key for navigator in explore body
 
   int _state = 0;
   int get state => _state;
@@ -218,6 +222,50 @@ class AppNotifier extends ChangeNotifier {
   // 0: Entity List Page
   // 1: Entity Details Page
   // 2: Image Gallery within Entity Details Page
+  void changeState(
+    BuildContext context,
+    int state, {
+    ScrollController activeScrollController,
+    Entity entity,
+  }) {
+    final height = MediaQuery.of(context).size.height;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+      context,
+      listen: false,
+    );
+    if (state == 0) {
+      _entity = null;
+      _state = 0;
+      notifyListeners();
+      bottomSheetNotifier
+        ..draggingDisabled = false
+        ..activeScrollController = activeScrollController
+        ..snappingPositions.value = [
+          0,
+          height - bottomHeight,
+          height - bottomBarHeight
+        ]
+        ..endCorrection = topPadding - offsetTranslation;
+    } else if (state == 1) {
+      _state = 1;
+      _entity = entity;
+      notifyListeners();
+      bottomSheetNotifier
+        ..draggingDisabled = false
+        ..snappingPositions.value = [
+          0,
+          height - 48 - 96 - 216 - 16,
+          height - 48 - 96,
+        ]
+        ..endCorrection = topPadding;
+      Provider.of<SearchNotifier>(context, listen: false).isSearching = false;
+    } else if (state == 2) {
+      _state = 2;
+      notifyListeners();
+      bottomSheetNotifier.draggingDisabled = true;
+    }
+  }
 
   Entity _entity;
   Entity get entity => _entity;
@@ -225,19 +273,6 @@ class AppNotifier extends ChangeNotifier {
     _entity = entity;
     notifyListeners();
   }
-
-  // void updateBackupLists(List<Flora> floraList, List<Fauna> faunaList) {
-  //   _backupFloraList = floraList;
-  //   _backupFaunaList = faunaList;
-  //   if (_floraList.isEmpty) notifyListeners();
-  // }
-
-  // void updateLists(List<Flora> floraList, List<Fauna> faunaList) {
-  //   updateBackupLists(floraList, faunaList);
-  //   _floraList = floraList;
-  //   _faunaList = faunaList;
-  //   notifyListeners();
-  // }
 
 }
 

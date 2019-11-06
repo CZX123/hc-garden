@@ -148,7 +148,7 @@ class ExploreHeader extends StatelessWidget {
                                       _trails[i].toUpperCase(),
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                        fontSize: 13.5,
+                                        fontSize: 13,
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                         height: 1.5,
