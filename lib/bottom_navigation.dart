@@ -240,68 +240,79 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
         child: Stack(
           overflow: Overflow.visible,
           children: <Widget>[
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: ValueListenableBuilder<double>(
-                valueListenable: _animationController,
-                builder: (context, value, child) {
-                  double elevation = 12;
-                  double radius = 28;
-                  double margin = 4;
-                  if (value > 0.5) {
-                    elevation = 24 * (1 - value);
-                    if (value < 15 / 16) {
-                      radius = 60 - 64 * value;
-                    } else {
-                      radius = 0;
-                      margin = 64 * (1 - value);
+            Selector<AppNotifier, bool>(
+              selector: (context, appNotifier) => appNotifier.state != 2,
+              builder: (context, value, child) {
+                return AnimatedTheme(
+                  data: value
+                      ? themeData
+                      : ThemeData.dark(),
+                  child: child,
+                );
+              },
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: ValueListenableBuilder<double>(
+                  valueListenable: _animationController,
+                  builder: (context, value, child) {
+                    double elevation = 12;
+                    double radius = 28;
+                    double margin = 4;
+                    if (value > 0.5) {
+                      elevation = 24 * (1 - value);
+                      if (value < 15 / 16) {
+                        radius = 60 - 64 * value;
+                      } else {
+                        radius = 0;
+                        margin = 64 * (1 - value);
+                      }
                     }
-                  }
-                  return PhysicalShape(
-                    color: Theme.of(context).canvasColor,
-                    elevation: elevation,
-                    clipper: BottomAppBarClipper(
-                      windowWidth: _width,
-                      notchMargin: margin,
-                      radius: radius,
-                    ),
-                    child: child,
-                  );
-                },
-                child: Material(
-                  type: MaterialType.transparency,
-                  child: SizedBox(
-                    height: 48,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: () => Navigator.maybePop(context),
-                          tooltip: 'Back',
-                        ),
-                        FadeTransition(
-                          opacity: Tween(
-                            begin: 2.5,
-                            end: -0.5,
-                          ).animate(_animationController),
-                          child: ValueListenableBuilder(
-                            valueListenable: _animationController,
-                            builder: (context, value, child) {
-                              return IgnorePointer(
-                                ignoring: value > .5,
-                                ignoringSemantics: value > .5,
-                                child: child,
-                              );
-                            },
-                            child: IconButton(
-                              icon: const Icon(Icons.sort),
-                              onPressed: Scaffold.of(context).openEndDrawer,
-                              tooltip: 'Sort',
+                    return PhysicalShape(
+                      color: Theme.of(context).canvasColor,
+                      elevation: elevation,
+                      clipper: BottomAppBarClipper(
+                        windowWidth: _width,
+                        notchMargin: margin,
+                        radius: radius,
+                      ),
+                      child: child,
+                    );
+                  },
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: SizedBox(
+                      height: 48,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: () => Navigator.maybePop(context),
+                            tooltip: 'Back',
+                          ),
+                          FadeTransition(
+                            opacity: Tween(
+                              begin: 2.5,
+                              end: -0.5,
+                            ).animate(_animationController),
+                            child: ValueListenableBuilder(
+                              valueListenable: _animationController,
+                              builder: (context, value, child) {
+                                return IgnorePointer(
+                                  ignoring: value > .5,
+                                  ignoringSemantics: value > .5,
+                                  child: child,
+                                );
+                              },
+                              child: IconButton(
+                                icon: const Icon(Icons.sort),
+                                onPressed: Scaffold.of(context).openEndDrawer,
+                                tooltip: 'Sort',
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -312,15 +323,25 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
               right: 0,
               height: 1,
               bottom: 47,
-              child: IgnorePointer(
-                child: FadeTransition(
-                  opacity: Tween(
-                    begin: -1.0,
-                    end: 1.0,
-                  ).animate(_animationController),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).dividerColor,
+              child: Selector<AppNotifier, bool>(
+                selector: (context, appNotifier) => appNotifier.state != 2,
+                builder: (context, value, child) {
+                  return AnimatedOpacity(
+                    opacity: value ? 1 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: child,
+                  );
+                },
+                child: IgnorePointer(
+                  child: FadeTransition(
+                    opacity: Tween(
+                      begin: -1.0,
+                      end: 1.0,
+                    ).animate(_animationController),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).dividerColor,
+                      ),
                     ),
                   ),
                 ),
@@ -540,9 +561,7 @@ class _SearchBarState extends State<SearchBar> {
                   color: Colors.white,
                   disabledColor: Colors.white30,
                   tooltip: 'Clear',
-                  onPressed: value.text.isEmpty
-                      ? null
-                      : controller.clear,
+                  onPressed: value.text.isEmpty ? null : controller.clear,
                 );
               },
             ),

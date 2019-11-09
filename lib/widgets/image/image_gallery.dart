@@ -13,73 +13,92 @@ class ImageGallery extends StatelessWidget {
   Widget build(BuildContext context) {
     final animation = ModalRoute.of(context).animation;
     final disableScroll = ValueNotifier(false);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 48),
-      child: FadeTransition(
-        opacity: Tween(
-          begin: 0.0,
-          end: 3.0,
+    return FadeTransition(
+      opacity: Tween(
+        begin: 0.0,
+        end: 3.0,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.fastOutSlowIn,
+      )),
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: Offset(0, .3),
+          end: Offset(0, 0),
         ).animate(CurvedAnimation(
           parent: animation,
           curve: Curves.fastOutSlowIn,
         )),
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: Offset(0, .3),
-            end: Offset(0, 0),
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.fastOutSlowIn,
-          )),
-          child: Material(
-            color: Colors.black,
-            clipBehavior: Clip.hardEdge,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset(0, -.25),
-                end: Offset(0, 0),
+        child: Material(
+          color: Colors.black,
+          clipBehavior: Clip.hardEdge,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(0, -.25),
+              end: Offset(0, 0),
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.fastOutSlowIn,
+            )),
+            child: FadeTransition(
+              opacity: Tween(
+                begin: -1.0,
+                end: 2.0,
               ).animate(CurvedAnimation(
                 parent: animation,
                 curve: Curves.fastOutSlowIn,
               )),
-              // child: PhotoViewGallery.builder(
-              //   builder: (context, index) {
-              //     return PhotoViewGalleryPageOptions(
-              //       imageProvider: NetworkImage(images[index]),
-              //       minScale: PhotoViewComputedScale.contained,
-              //       maxScale: PhotoViewComputedScale.covered,
-              //     );
-              //   },
-              //   itemCount: images.length,
-              // ),
-              child: FadeTransition(
-                opacity: Tween(
-                  begin: -1.0,
-                  end: 2.0,
-                ).animate(CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.fastOutSlowIn,
-                )),
-                child: ValueListenableBuilder(
-                  valueListenable: disableScroll,
-                  builder: (context, value, child) {
-                    return PageView(
-                      controller: PageController(
-                        initialPage: images.indexOf(initialImage),
-                      ),
-                      physics: value
-                          ? NeverScrollableScrollPhysics()
-                          : ScrollPhysics(),
-                      children: <Widget>[
-                        for (var image in images)
-                          ZoomableImage(
-                            image: image,
-                            disableScroll: disableScroll,
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: images.length == 1
+                        ? ZoomableImage(
+                            image: initialImage,
+                          )
+                        : ValueListenableBuilder(
+                            valueListenable: disableScroll,
+                            builder: (context, value, child) {
+                              return PageView(
+                                controller: PageController(
+                                  initialPage: images.indexOf(initialImage),
+                                ),
+                                physics: value
+                                    ? NeverScrollableScrollPhysics()
+                                    : ScrollPhysics(),
+                                children: <Widget>[
+                                  for (var image in images)
+                                    ZoomableImage(
+                                      image: image,
+                                      disableScroll: disableScroll,
+                                    ),
+                                ],
+                              );
+                            },
                           ),
-                      ],
-                    );
-                  },
-                ),
+                  ),
+                  Theme(
+                    data: ThemeData.dark(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: kElevationToShadow[8],
+                      ),
+                      child: Material(
+                        elevation: 0,
+                        child: SizedBox(
+                          height: 48,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: IconButton(
+                              icon: const Icon(Icons.arrow_back),
+                              onPressed: () => Navigator.maybePop(context),
+                              tooltip: 'Back',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -97,7 +116,7 @@ class ZoomableImage extends StatefulWidget {
     Key key,
     @required this.image,
     this.maxScale = 5,
-    @required this.disableScroll,
+    this.disableScroll,
   }) : super(key: key);
 
   @override
@@ -133,13 +152,12 @@ class _ZoomableImageState extends State<ZoomableImage>
   }
 
   void onDoubleTap() {
-    // TODO: double tap to zoom
     _matrixTween = Matrix4Tween(
       begin: Matrix4.identity(),
     );
     _zoomTextAppear.value = true;
     if (_matrix.value.getMaxScaleOnAxis() <= 1.001) {
-      widget.disableScroll.value = true;
+      widget.disableScroll?.value = true;
       _matrixTween.end = Matrix4.identity()
         ..setEntry(0, 0, 3)
         ..setEntry(1, 1, 3)
@@ -151,7 +169,7 @@ class _ZoomableImageState extends State<ZoomableImage>
       _animationController.value = 0;
       _animationController.forward();
     } else {
-      widget.disableScroll.value = false;
+      widget.disableScroll?.value = false;
       _matrixTween.end = _matrix.value;
       _animationController.value = 1;
       _animationController.reverse();
@@ -165,6 +183,7 @@ class _ZoomableImageState extends State<ZoomableImage>
     onUpdate: (oldVal, newVal) => newVal / oldVal,
   );
 
+  // TODO: Make image easier to zoom
   void onScaleStart(ScaleStartDetails details) {
     translationUpdater.value = details.focalPoint;
     scaleUpdater.value = 1.0;
@@ -199,9 +218,9 @@ class _ZoomableImageState extends State<ZoomableImage>
 
     final scale = scaleUpdater.value * _startingScale;
     if (scale > 1.001) {
-      widget.disableScroll.value = true;
+      widget.disableScroll?.value = true;
     } else {
-      widget.disableScroll.value = false;
+      widget.disableScroll?.value = false;
     }
     final differenceX = _viewportWidth - _imageWidth * scale;
     final differenceY = _viewportHeight - _imageHeight * scale;

@@ -114,7 +114,12 @@ class HcGardenApp extends StatelessWidget {
               platform:
                   debugInfo.isIOS ? TargetPlatform.iOS : TargetPlatform.android,
             ),
-            home: const MyHomePage(title: 'HC Garden'),
+            onGenerateRoute: (settings) {
+              if (settings.isInitialRoute) return PageRouteBuilder(
+                pageBuilder: (context, _,  __) => const MyHomePage(title: 'HC Garden'),
+              );
+              return null;
+            },
             debugShowMaterialGrid: debugInfo.debugShowMaterialGrid,
             showPerformanceOverlay: debugInfo.showPerformanceOverlay,
             checkerboardRasterCacheImages:
