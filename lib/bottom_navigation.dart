@@ -285,10 +285,20 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
                             begin: 2.5,
                             end: -0.5,
                           ).animate(_animationController),
-                          child: IconButton(
-                            icon: const Icon(Icons.sort),
-                            onPressed: Scaffold.of(context).openEndDrawer,
-                            tooltip: 'Sort',
+                          child: ValueListenableBuilder(
+                            valueListenable: _animationController,
+                            builder: (context, value, child) {
+                              return IgnorePointer(
+                                ignoring: value > .5,
+                                ignoringSemantics: value > .5,
+                                child: child,
+                              );
+                            },
+                            child: IconButton(
+                              icon: const Icon(Icons.sort),
+                              onPressed: Scaffold.of(context).openEndDrawer,
+                              tooltip: 'Sort',
+                            ),
                           ),
                         ),
                       ],
@@ -369,49 +379,60 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
                       begin: -0.5,
                       end: 2.5,
                     ).animate(_animationController),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Material(
-                        type: MaterialType.transparency,
-                        child: Tooltip(
-                          message: 'Search',
-                          preferBelow: false,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(28),
-                            child: Container(
-                              height: 56,
-                              width: 56,
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Icons.search,
-                                color: Colors.white,
+                    child: ValueListenableBuilder(
+                      valueListenable: _animationController,
+                      builder: (context, value, child) {
+                        return IgnorePointer(
+                          ignoring: value < .25,
+                          ignoringSemantics: value < .25,
+                          child: child,
+                        );
+                      },
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: Tooltip(
+                            message: 'Search',
+                            preferBelow: false,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(28),
+                              child: Container(
+                                height: 56,
+                                width: 56,
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  Icons.search,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            onTapDown: (_) {
-                              _fabPressController.forward();
-                            },
-                            onTap: () {
-                              _fabPressController.reverse();
-                              _animationController
-                                  .animateTo(
-                                0,
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.fastOutSlowIn,
-                              )
-                                  .then((_) {
+                              onTapDown: (_) {
+                                _fabPressController.forward();
+                              },
+                              onTap: () {
+                                _fabPressController.reverse();
+                                if (_state != 0) return;
+                                _animationController
+                                    .animateTo(
+                                  0,
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.fastOutSlowIn,
+                                )
+                                    .then((_) {
+                                  Provider.of<SearchNotifier>(
+                                    context,
+                                    listen: false,
+                                  ).keyboardAppear = true;
+                                });
                                 Provider.of<SearchNotifier>(
                                   context,
                                   listen: false,
-                                ).keyboardAppear = true;
-                              });
-                              Provider.of<SearchNotifier>(
-                                context,
-                                listen: false,
-                              ).isSearching = true;
-                            },
-                            onTapCancel: () {
-                              _fabPressController.reverse();
-                            },
+                                ).isSearching = true;
+                              },
+                              onTapCancel: () {
+                                _fabPressController.reverse();
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -511,12 +532,18 @@ class _SearchBarState extends State<SearchBar> {
             bottom: 0,
             height: 48,
             width: 48,
-            child: IconButton(
-              icon: const Icon(Icons.clear),
-              color: Colors.white,
-              tooltip: 'Clear',
-              onPressed: () {
-                controller.clear();
+            child: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller,
+              builder: (context, value, child) {
+                return IconButton(
+                  icon: const Icon(Icons.clear),
+                  color: Colors.white,
+                  disabledColor: Colors.white30,
+                  tooltip: 'Clear',
+                  onPressed: value.text.isEmpty
+                      ? null
+                      : controller.clear,
+                );
               },
             ),
           ),
