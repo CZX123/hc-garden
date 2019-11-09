@@ -94,9 +94,9 @@ class EntityListPage extends StatelessWidget {
                             ),
                             Text(
                               'No matching ${isFlora ? 'flora' : 'fauna'}',
-                              style: Theme.of(context).textTheme.body1.copyWith(
-                                    color: Theme.of(context).disabledColor,
-                                  ),
+                              style: TextStyle(
+                                color: Theme.of(context).disabledColor,
+                              ),
                             ),
                           ],
                         ),
@@ -170,9 +170,7 @@ class _EntityListRowState extends State<EntityListRow> {
               padding: const EdgeInsets.only(bottom: 4),
               child: Text(
                 widget.entity.description,
-                style: Theme.of(context).textTheme.caption.copyWith(
-                      height: 1.5,
-                    ),
+                style: Theme.of(context).textTheme.caption,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 3,
               ),
@@ -182,10 +180,7 @@ class _EntityListRowState extends State<EntityListRow> {
               padding: const EdgeInsets.only(bottom: 4),
               child: Text(
                 widget.entity.sciName,
-                style: Theme.of(context).textTheme.caption.copyWith(
-                      fontSize: 15,
-                      fontStyle: FontStyle.italic,
-                    ),
+                style: Theme.of(context).textTheme.body2,
               ),
             ),
         ],

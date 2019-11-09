@@ -4,6 +4,9 @@ const northEastBound = const LatLng(1.328278, 103.807815);
 const southWestBound = const LatLng(1.324095, 103.800954);
 const center = const LatLng(1.326580, 103.804453);
 const bottomSheetCenter = const LatLng(1.325080, 103.804453);
+const kktrail = const LatLng(1.326987, 103.80295);
+const kctrail = const LatLng(1.326026, 103.80420);
+const jxtrail = const LatLng(1.325317, 103.80672);
 Set<Polygon> polygons = {
   Polygon(
     polygonId: PolygonId("salt centre"),
@@ -109,3 +112,73 @@ Set<Polygon> polygons = {
     strokeWidth: 0,
   ),
 };
+const mapStyle = '''[
+  {
+    "featureType": "landscape.man_made",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "saturation": 20
+      },
+      {
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "featureType": "landscape.man_made",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "lightness": -15
+      }
+    ]
+  },
+  {
+    "featureType": "poi.school",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "saturation": 20
+      },
+      {
+        "lightness": 30
+      }
+    ]
+  },
+  {
+    "featureType": "poi.school",
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "color": "#009688"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.school",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#009688"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  }
+]''';

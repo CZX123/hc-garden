@@ -31,7 +31,7 @@ class ExploreHeader extends StatelessWidget {
         Provider.of<BottomSheetNotifier>(context, listen: false);
     final animation = bottomSheetNotifier.animation;
     final animateTo = bottomSheetNotifier.animateTo;
-    const _trails = ['Kah Kee Trail', 'Kong Chian Trail', 'Jing Xian Trail'];
+    const _trails = ['Kah Kee\nTrail', 'Kong Chian\nTrail', 'Jing Xian\nTrail'];
     final _colors = [Colors.lightBlue, Colors.pink, Colors.amber[600]];
     final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
@@ -113,7 +113,7 @@ class ExploreHeader extends StatelessWidget {
                     ).animate(anim),
                     child: Text(
                       'Explore HC Garden',
-                      style: Theme.of(context).textTheme.title.copyWith(
+                      style: Theme.of(context).textTheme.display1.copyWith(
                             height: headingHeight / 20,
                           ),
                     ),
@@ -147,42 +147,32 @@ class ExploreHeader extends StatelessWidget {
                                     child: Text(
                                       _trails[i].toUpperCase(),
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        height: 1.5,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline
+                                          .copyWith(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                          ),
                                     ),
                                   ),
                                   onPressed: i == 0
                                       ? () {
                                           Provider.of<MapNotifier>(context)
-                                              .animateToPosition(
-                                            LatLng(
-                                              1.326287,
-                                              103.80295,
-                                            ),
-                                          );
+                                              .animateToPosition(kktrail);
                                         }
                                       : i == 1
                                           ? () {
                                               Provider.of<MapNotifier>(context)
                                                   .animateToPosition(
-                                                LatLng(
-                                                  1.325326,
-                                                  103.80420,
-                                                ),
+                                                kctrail,
                                                 17.8,
                                               );
                                             }
                                           : () {
                                               Provider.of<MapNotifier>(context)
                                                   .animateToPosition(
-                                                LatLng(
-                                                  1.324617,
-                                                  103.80672,
-                                                ),
+                                                jxtrail,
                                                 17.3,
                                               );
                                             },
@@ -242,22 +232,22 @@ class AppLogo extends StatelessWidget {
           children: <Widget>[
             Text(
               'Hwa Chong'.toUpperCase(),
-              style: Theme.of(context).textTheme.title.copyWith(
-                    color: Theme.of(context).hintColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    height: 1,
-                  ),
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                height: 1,
+              ),
             ),
             Text(
               'Institution'.toUpperCase(),
-              style: Theme.of(context).textTheme.title.copyWith(
-                    color: Theme.of(context).hintColor,
-                    letterSpacing: 0.15,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    height: 1,
-                  ),
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                letterSpacing: 0.15,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                height: 1,
+              ),
             ),
           ],
         ),
@@ -349,12 +339,10 @@ class FloraFaunaTabBar extends StatelessWidget {
                             child: Text(
                               i == 0 ? 'FLORA' : 'FAUNA',
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                height: 1.5,
-                              ),
+                              style:
+                                  Theme.of(context).textTheme.headline.copyWith(
+                                        color: Colors.white,
+                                      ),
                             ),
                           ),
                           onPressed: () {

@@ -109,14 +109,12 @@ class HcGardenApp extends StatelessWidget {
       child: Consumer<DebugNotifier>(
         builder: (context, debugInfo, child) {
           return MaterialApp(
-            title: 'Nested Bottom Sheet',
-            theme: ThemeData(
+            title: 'HC Garden',
+            theme: themeData.copyWith(
               platform:
                   debugInfo.isIOS ? TargetPlatform.iOS : TargetPlatform.android,
-              fontFamily: 'Manrope',
-              primarySwatch: Colors.green,
             ),
-            home: MyHomePage(title: 'Nested Bottom Sheet'),
+            home: const MyHomePage(title: 'HC Garden'),
             debugShowMaterialGrid: debugInfo.debugShowMaterialGrid,
             showPerformanceOverlay: debugInfo.showPerformanceOverlay,
             checkerboardRasterCacheImages:
@@ -132,9 +130,8 @@ class HcGardenApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
   final String title;
+  const MyHomePage({Key key, this.title}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -219,7 +216,8 @@ class _MyHomePageState extends State<MyHomePage>
           0,
           activeScrollController: _scrollControllers[_tabController.index],
         );
-        if (searchNotifier.searchTerm.isNotEmpty) searchNotifier.isSearching = true;
+        if (searchNotifier.searchTerm.isNotEmpty)
+          searchNotifier.isSearching = true;
       }
       return false;
     } else if (state == 2) {

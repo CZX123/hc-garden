@@ -44,22 +44,27 @@ class SortingDrawer extends StatelessWidget {
                           ListTile(
                             title: Text(
                               'Trails',
-                              style: Theme.of(context).textTheme.subtitle.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style:
+                                  Theme.of(context).textTheme.subtitle.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
                             ),
                           ),
                           for (var trail in allTrails)
                             CheckboxListTile(
                               controlAffinity: ListTileControlAffinity.trailing,
                               value: selectedTrails.contains(trail),
-                              title: Text(trail.name),
+                              title: Text(
+                                trail.name.split('(').first.trimRight(),
+                                style: Theme.of(context).textTheme.body1,
+                              ),
                               onChanged: (value) {
                                 final sortNotifier = Provider.of<SortNotifier>(
                                   context,
                                   listen: false,
                                 );
-                                List<Trail> newTrails = List.from(sortNotifier.selectedTrails);
+                                List<Trail> newTrails =
+                                    List.from(sortNotifier.selectedTrails);
                                 newTrails.remove(trail);
                                 if (value) {
                                   newTrails.add(trail);

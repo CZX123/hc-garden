@@ -8,82 +8,95 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> {
+  GoogleMapController _mapController;
+  final _padding = ValueNotifier(EdgeInsets.zero);
+  bool _init = false;
+  AppNotifier _appNotifier;
+  BottomSheetNotifier _bottomSheetNotifier;
+  int _state;
+  double _height;
+
+  void stateListener() {
+    if (_appNotifier.state == _state || _appNotifier.state == 2) return;
+    if (_appNotifier.state == 1) {
+      _bottomSheetNotifier.animation.removeListener(animListener);
+      _padding.value = _padding.value.copyWith(
+        bottom: 48.0 + 96.0 - bottomBarHeight,
+      );
+    } else {
+      _bottomSheetNotifier.animation.addListener(animListener);
+      animListener();
+    }
+    _state = _appNotifier.state;
+  }
+
+  void animListener() {
+    if (_bottomSheetNotifier.animation.value >= _height - bottomHeight + 8) {
+      if (_padding.value.bottom != 0) {
+        _padding.value = _padding.value.copyWith(
+          bottom: 0,
+        );
+        // _mapController?.getScreenCoordinate(center)?.then((c) {
+        //   print(c);
+        //   print((bottomHeight - bottomBarHeight) /
+        //       -2 *
+        //       MediaQuery.of(context).devicePixelRatio);
+        // });
+        // _mapController?.animateCamera(CameraUpdate.scrollBy(
+        //   0,
+        //   (bottomHeight - bottomBarHeight) /
+        //       -2 *
+        //       MediaQuery.of(context).devicePixelRatio,
+        // ));
+      }
+    } else if (_padding.value.bottom != bottomHeight - bottomBarHeight) {
+      _padding.value = _padding.value.copyWith(
+        bottom: bottomHeight - bottomBarHeight,
+      );
+      // _mapController?.animateCamera(CameraUpdate.scrollBy(
+      //   0,
+      //   (bottomHeight - bottomBarHeight) / 2,
+      // ));
+    }
+  }
+
   void _onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
     Provider.of<MapNotifier>(
       context,
       listen: false,
-    ).mapController = controller;
+    ).mapController = _mapController;
     setState(() {}); // Needed to apply padding to map
-    controller.setMapStyle('''[
-      {
-        "featureType": "landscape.man_made",
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "saturation": 20
-          },
-          {
-            "weight": 1
-          }
-        ]
-      },
-      {
-        "featureType": "landscape.man_made",
-        "elementType": "geometry.stroke",
-        "stylers": [
-          {
-            "lightness": -15
-          }
-        ]
-      },
-      {
-        "featureType": "poi.school",
-        "elementType": "geometry",
-        "stylers": [
-          {
-            "saturation": 20
-          },
-          {
-            "lightness": 30
-          }
-        ]
-      },
-      {
-        "featureType": "poi.school",
-        "elementType": "labels.icon",
-        "stylers": [
-          {
-            "color": "#009688"
-          }
-        ]
-      },
-      {
-        "featureType": "poi.school",
-        "elementType": "labels.text.fill",
-        "stylers": [
-          {
-            "color": "#009688"
-          }
-        ]
-      },
-      {
-        "featureType": "poi.business",
-        "stylers": [
-          {
-            "visibility": "off"
-          }
-        ]
-      },
-      {
-        "featureType": "poi.park",
-        "elementType": "labels.text",
-        "stylers": [
-          {
-            "visibility": "off"
-          }
-        ]
-      }
-    ]''');
+    _padding.value = _padding.value.copyWith(
+      top: MediaQuery.of(context).padding.top,
+    );
+    stateListener();
+    controller.setMapStyle(mapStyle);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _height = MediaQuery.of(context).size.height;
+    if (!_init) {
+      _appNotifier = Provider.of<AppNotifier>(
+        context,
+        listen: false,
+      )..addListener(stateListener);
+      _bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+        context,
+        listen: false,
+      );
+      stateListener();
+      _init = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _appNotifier.removeListener(stateListener);
+    _bottomSheetNotifier.animation.removeListener(animListener);
+    super.dispose();
   }
 
   @override
@@ -115,9 +128,9 @@ class _MapWidgetState extends State<MapWidget> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => TrailLocationOverviewPage(
-                            trail: trail, trailLocation: location
-                          )),
+                          MaterialPageRoute(
+                              builder: (context) => TrailLocationOverviewPage(
+                                  trail: trail, trailLocation: location)),
                         );
                       },
                     ),
@@ -137,22 +150,25 @@ class _MapWidgetState extends State<MapWidget> {
                     color: Theme.of(context).dividerColor,
                   ),
                 )
-              : GoogleMap(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top,
-                  ),
-                  myLocationEnabled: true,
-                  // cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-                  //   northeast: northEastBound,
-                  //   southwest: southWestBound,
-                  // )),
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: bottomSheetCenter,
-                    zoom: 17,
-                  ),
-                  // polygons: polygons,
-                  markers: markers,
+              : ValueListenableBuilder<EdgeInsets>(
+                  valueListenable: _padding,
+                  builder: (context, value, child) {
+                    return GoogleMap(
+                      padding: value,
+                      myLocationEnabled: true,
+                      // cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+                      //   northeast: northEastBound,
+                      //   southwest: southWestBound,
+                      // )),
+                      onMapCreated: _onMapCreated,
+                      initialCameraPosition: CameraPosition(
+                        target: bottomSheetCenter,
+                        zoom: 16.8,
+                      ),
+                      // polygons: polygons,
+                      markers: markers,
+                    );
+                  },
                 ),
         );
       },

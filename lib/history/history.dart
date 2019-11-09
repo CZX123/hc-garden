@@ -25,11 +25,7 @@ class HistoryPage extends StatelessWidget {
                 centerTitle: true,
                 title: Text(
                   'Historical Photos',
-                  style: Theme.of(context).textTheme.title.copyWith(
-                        color: Colors.brown,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.display2,
                 ),
               ),
             ),

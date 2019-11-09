@@ -210,8 +210,8 @@ class AboutPageData {
 }
 
 class AppNotifier extends ChangeNotifier {
-  GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>(); // key for navigator in explore body
+  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  List<VoidCallback> popCallbacks = [];
 
   int _state = 0;
   int get state => _state;
@@ -219,14 +219,17 @@ class AppNotifier extends ChangeNotifier {
     _state = state;
     notifyListeners();
   }
+
   // 0: Entity List Page
-  // 1: Entity Details Page
+  // 1: Could be any page (EntityDetails or LocationOverview), manage stack
   // 2: Image Gallery within Entity Details Page
   void changeState(
     BuildContext context,
     int state, {
     ScrollController activeScrollController,
     Entity entity,
+    TrailLocation location,
+    VoidCallback onPop,
   }) {
     final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
@@ -249,7 +252,9 @@ class AppNotifier extends ChangeNotifier {
         ..endCorrection = topPadding - offsetTranslation;
     } else if (state == 1) {
       _state = 1;
-      _entity = entity;
+      if (entity != null) _entity = entity;
+      if (location != null) _location = location;
+      if (onPop != null) popCallbacks.add(onPop);
       notifyListeners();
       bottomSheetNotifier
         ..draggingDisabled = false
@@ -271,6 +276,13 @@ class AppNotifier extends ChangeNotifier {
   Entity get entity => _entity;
   set entity(Entity entity) {
     _entity = entity;
+    notifyListeners();
+  }
+
+  TrailLocation _location;
+  TrailLocation get location => _location;
+  set location(TrailLocation location) {
+    _location = location;
     notifyListeners();
   }
 

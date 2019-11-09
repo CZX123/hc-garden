@@ -25,11 +25,7 @@ class _AboutPageState extends State<AboutPage> {
                 centerTitle: true,
                 title: Text(
                   'About',
-                  style: Theme.of(context).textTheme.display1.copyWith(
-                        color: Colors.brown,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.display2,
                 ),
               ),
             ),

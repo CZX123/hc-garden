@@ -35,7 +35,9 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
         leading: Icon(Icons.location_on),
         title: Text(
           '${location.name}',
-          style: Theme.of(context).textTheme.subtitle,
+          style: Theme.of(context).textTheme.body1.copyWith(
+                height: 1.3,
+              ),
         ),
         onTap: () {
           _scrollController.animateTo(
@@ -134,20 +136,11 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                     children: <Widget>[
                       Text(
                         widget.entity.name,
-                        style: Theme.of(context).textTheme.title.copyWith(
-                              height: 1,
-                            ),
-                      ),
-                      const SizedBox(
-                        height: 8,
+                        style: Theme.of(context).textTheme.display1,
                       ),
                       Text(
                         widget.entity.sciName,
-                        style: Theme.of(context).textTheme.subhead.copyWith(
-                              height: 1,
-                              color: Theme.of(context).hintColor,
-                              fontStyle: FontStyle.italic,
-                            ),
+                        style: Theme.of(context).textTheme.body2,
                       ),
                     ],
                   ),
@@ -216,16 +209,17 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: Text(
-                widget.entity.description,
-                style: TextStyle(
-                  fontSize: 14.5,
-                ),
-                textAlign: TextAlign.justify,
-              ),
+            const SizedBox(
+              height: 8,
             ),
+            for (var para in widget.entity.description.split('\n'))
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: Text(
+                  para,
+                  textAlign: TextAlign.justify,
+                ),
+              ),
             const SizedBox(
               height: 8,
             ),
