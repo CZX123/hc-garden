@@ -5,11 +5,11 @@ import 'library.dart';
 
 final ThemeData themeData = ThemeData(
   fontFamily: 'Manrope',
-  primaryColor: Colors.green,
-  primaryColorDark: Color(0xFF357A3A),
-  primaryColorLight: Color(0xFF5FDE65),
+  primaryColor: Color(0xFF27B50E),
+  // primaryColorDark: Color(0xFF357A3A),
+  // primaryColorLight: Color(0xFF5FDE65),
   primaryColorBrightness: Brightness.dark,
-  accentColor: Color(0xFFAF4F4C), // Light reddish-brown
+  accentColor: Color(0xFF27B50E), // Light reddish-brown
   accentColorBrightness: Brightness.dark,
   textTheme: textTheme.merge(lightThemeText),
 );
@@ -17,16 +17,14 @@ final ThemeData themeData = ThemeData(
 final ThemeData darkThemeData = ThemeData(
   brightness: Brightness.dark,
   fontFamily: 'Manrope',
-  primaryColor: Colors.green[700],
-  // primaryColorDark: Color(0xFF357A3A),
-  // primaryColorLight: Color(0xFF5FDE65),
+  primaryColor: Colors.grey[800],
   primaryColorBrightness: Brightness.dark,
-  accentColor: Colors.greenAccent,
-  accentColorBrightness: Brightness.light,
-  canvasColor: Colors.blueGrey[900],
-  bottomAppBarColor: Colors.blueGrey[800],
+  accentColor: Colors.lightGreenAccent[400],
+  accentColorBrightness: Brightness.dark,
+  canvasColor: Colors.grey[900],
+  bottomAppBarColor: Colors.grey[850],
   textTheme: textTheme.merge(darkThemeText),
-  toggleableActiveColor: Colors.greenAccent[400],
+  toggleableActiveColor: Colors.lightGreenAccent[400],
 );
 
 const TextTheme textTheme = TextTheme(
@@ -94,7 +92,7 @@ const TextTheme lightThemeText = TextTheme(
 
 const TextTheme darkThemeText = TextTheme(
   display2: TextStyle(
-    color: Color(0xFFDBFFDD), // Very light green
+    color: Color(0xFFF5730F), // Very light green
   ),
   display1: TextStyle(
     color: Colors.white,

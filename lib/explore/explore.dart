@@ -33,11 +33,80 @@ class ExploreHeader extends StatelessWidget {
     final animateTo = bottomSheetNotifier.animateTo;
     const _trails = ['Kah Kee\nTrail', 'Kong Chian\nTrail', 'Jing Xian\nTrail'];
     final _colors = [Colors.lightBlue, Colors.pink, Colors.amber[600]];
+    final _textColors = [Colors.lightBlueAccent, Colors.redAccent, Colors.orangeAccent];
     final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
     final totalTranslation = offsetTranslation - topPadding;
     final anim = Tween<double>(begin: 0, end: 1 / (height - bottomHeight))
         .animate(animation);
+    List<Widget> trailButtons = [];
+    for (int i = 0; i < 3; i++) {
+      trailButtons.add(Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: Consumer<ThemeNotifier>(
+            builder: (context, themeNotifier, child) {
+              final textStyle = TextStyle(
+                fontFamily: 'Manrope',
+                fontSize: 13,
+                height: 1.5,
+                fontWeight: FontWeight.bold,
+              );
+              return AnimatedTheme(
+                data: themeNotifier.value
+                    ? darkThemeData.copyWith(
+                        buttonColor: Colors.grey[850],
+                        textTheme: TextTheme(
+                          body1: textStyle.copyWith(
+                            color: _textColors[i],
+                          ),
+                        ),
+                      )
+                    : themeData.copyWith(
+                        buttonColor: _colors[i],
+                        textTheme: TextTheme(
+                          body1: textStyle.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                child: child,
+              );
+            },
+            child: Builder(builder: (context) {
+              return FlatButton(
+                colorBrightness: Brightness.dark,
+                color: Theme.of(context).buttonColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Container(
+                  height: trailButtonHeight,
+                  alignment: Alignment.center,
+                  child: Text(
+                    _trails[i].toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                ),
+                onPressed: () {
+                  if (i == 0) {
+                    Provider.of<MapNotifier>(context)
+                        .animateToPosition(kktrail);
+                  } else if (i == 1) {
+                    Provider.of<MapNotifier>(context)
+                        .animateToPosition(kctrail, 17.8);
+                  } else {
+                    Provider.of<MapNotifier>(context)
+                        .animateToPosition(jxtrail, 17.3);
+                  }
+                },
+              );
+            }),
+          ),
+        ),
+      ));
+    }
     return Selector<AppNotifier, int>(
       selector: (context, appNotifier) => appNotifier.state,
       builder: (context, state, child) {
@@ -130,56 +199,7 @@ class ExploreHeader extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: Row(
-                        children: <Widget>[
-                          for (var i = 0; i < _trails.length; i++)
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: FlatButton(
-                                  colorBrightness: Brightness.dark,
-                                  color: _colors[i],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Container(
-                                    height: trailButtonHeight,
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      _trails[i].toUpperCase(),
-                                      textAlign: TextAlign.center,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline
-                                          .copyWith(
-                                            color: Colors.white,
-                                            fontSize: 13,
-                                          ),
-                                    ),
-                                  ),
-                                  onPressed: i == 0
-                                      ? () {
-                                          Provider.of<MapNotifier>(context)
-                                              .animateToPosition(kktrail);
-                                        }
-                                      : i == 1
-                                          ? () {
-                                              Provider.of<MapNotifier>(context)
-                                                  .animateToPosition(
-                                                kctrail,
-                                                17.8,
-                                              );
-                                            }
-                                          : () {
-                                              Provider.of<MapNotifier>(context)
-                                                  .animateToPosition(
-                                                jxtrail,
-                                                17.3,
-                                              );
-                                            },
-                                ),
-                              ),
-                            ),
-                        ],
+                        children: trailButtons,
                       ),
                     ),
                   ),
@@ -480,7 +500,7 @@ class ExploreBody extends StatelessWidget {
                   top: 0,
                   right: 0,
                   left: 0,
-                  child: WhiteGradient(),
+                  child: TopGradient(),
                 ),
               ],
             ),
@@ -499,12 +519,12 @@ class ExploreBody extends StatelessWidget {
 }
 
 // This is just for a much smoother gradient
-class WhiteGradient extends StatelessWidget {
-  const WhiteGradient({Key key}) : super(key: key);
+class TopGradient extends StatelessWidget {
+  const TopGradient({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).canvasColor;
+    final color = Theme.of(context).scaffoldBackgroundColor;
     return IgnorePointer(
       child: Container(
         height: 32,

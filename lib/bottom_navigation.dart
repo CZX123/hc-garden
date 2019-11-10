@@ -241,85 +241,88 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
         child: Stack(
           overflow: Overflow.visible,
           children: <Widget>[
-            Selector2<AppNotifier, ThemeNotifier, bool>(
-              selector: (context, appNotifier, themeNotifier) {
-                return appNotifier.state == 2 || themeNotifier.value;
-              },
-              builder: (context, value, child) {
-                return AnimatedTheme(
-                  data: value ? darkThemeData : themeData,
-                  child: child,
-                );
-              },
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: ValueListenableBuilder<double>(
-                  valueListenable: _animationController,
-                  builder: (context, value, child) {
-                    double elevation = 12;
-                    double radius = 28;
-                    double margin = 4;
-                    if (value > 0.5) {
-                      elevation = 24 * (1 - value);
-                      if (value < 15 / 16) {
-                        radius = 60 - 64 * value;
-                      } else {
-                        radius = 0;
-                        margin = 64 * (1 - value);
+            Material(
+              type: MaterialType.transparency,
+              child: Selector2<AppNotifier, ThemeNotifier, bool>(
+                selector: (context, appNotifier, themeNotifier) {
+                  return appNotifier.state == 2 || themeNotifier.value;
+                },
+                builder: (context, value, child) {
+                  return AnimatedTheme(
+                    data: value ? darkThemeData : themeData,
+                    child: child,
+                  );
+                },
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ValueListenableBuilder<double>(
+                    valueListenable: _animationController,
+                    builder: (context, value, child) {
+                      double elevation = 12;
+                      double radius = 28;
+                      double margin = 4;
+                      if (value > 0.5) {
+                        elevation = 24 * (1 - value);
+                        if (value < 15 / 16) {
+                          radius = 60 - 64 * value;
+                        } else {
+                          radius = 0;
+                          margin = 64 * (1 - value);
+                        }
                       }
-                    }
-                    return PhysicalShape(
-                      color: Theme.of(context).bottomAppBarColor,
-                      elevation: elevation,
-                      clipper: BottomAppBarClipper(
-                        windowWidth: _width,
-                        notchMargin: margin,
-                        radius: radius,
-                      ),
-                      child: child,
-                    );
-                  },
-                  child: Material(
-                    color: Colors.transparent,
-                    elevation: 0,
-                    child: SizedBox(
-                      height: 48,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Tooltip(
-                            message: 'Back',
-                            preferBelow: false,
-                            child: IconButton(
-                              icon: const Icon(Icons.arrow_back),
-                              onPressed: () => Navigator.maybePop(context),
+                      return PhysicalShape(
+                        color: Theme.of(context).bottomAppBarColor,
+                        elevation: elevation,
+                        clipper: BottomAppBarClipper(
+                          windowWidth: _width,
+                          notchMargin: margin,
+                          radius: radius,
+                        ),
+                        child: child,
+                      );
+                    },
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: SizedBox(
+                        height: 48,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Tooltip(
+                              message: 'Back',
+                              preferBelow: false,
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: () => Navigator.maybePop(context),
+                              ),
                             ),
-                          ),
-                          FadeTransition(
-                            opacity: Tween(
-                              begin: 2.5,
-                              end: -0.5,
-                            ).animate(_animationController),
-                            child: ValueListenableBuilder(
-                              valueListenable: _animationController,
-                              builder: (context, value, child) {
-                                return IgnorePointer(
-                                  ignoring: value > .5,
-                                  ignoringSemantics: value > .5,
-                                  child: child,
-                                );
-                              },
-                              child: Tooltip(
-                                message: 'Sort',
-                                preferBelow: false,
-                                child: IconButton(
-                                  icon: const Icon(Icons.sort),
-                                  onPressed: Scaffold.of(context).openEndDrawer,
+                            FadeTransition(
+                              opacity: Tween(
+                                begin: 2.5,
+                                end: -0.5,
+                              ).animate(_animationController),
+                              child: ValueListenableBuilder(
+                                valueListenable: _animationController,
+                                builder: (context, value, child) {
+                                  return IgnorePointer(
+                                    ignoring: value > .5,
+                                    ignoringSemantics: value > .5,
+                                    child: child,
+                                  );
+                                },
+                                child: Tooltip(
+                                  message: 'Sort',
+                                  preferBelow: false,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.sort),
+                                    onPressed:
+                                        Scaffold.of(context).openEndDrawer,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -430,9 +433,19 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
                                 height: 56,
                                 width: 56,
                                 alignment: Alignment.center,
-                                child: Icon(
-                                  Icons.search,
-                                  color: Colors.white,
+                                child: Consumer<ThemeNotifier>(
+                                  builder: (context, themeNotifier, child) {
+                                    return AnimatedSwitcher(
+                                      duration: kThemeAnimationDuration,
+                                      child: Icon(
+                                        Icons.search,
+                                        key: ValueKey(themeNotifier.value),
+                                        color: themeNotifier.value
+                                            ? Theme.of(context).accentColor
+                                            : Colors.white,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                               onTapDown: (_) {
@@ -530,7 +543,7 @@ class _SearchBarState extends State<SearchBar> {
               preferBelow: false,
               child: IconButton(
                 icon: const Icon(Icons.arrow_back),
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 onPressed: () {
                   Navigator.maybePop(context);
                   controller.clear();
@@ -547,14 +560,16 @@ class _SearchBarState extends State<SearchBar> {
               focusNode: focusNode,
               controller: controller,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
-              cursorColor: Colors.white30,
+              cursorColor:
+                  Theme.of(context).colorScheme.onPrimary.withOpacity(.3),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Search',
                 hintStyle: TextStyle(
-                  color: Colors.white30,
+                  color:
+                      Theme.of(context).colorScheme.onPrimary.withOpacity(.3),
                 ),
               ),
             ),
@@ -572,8 +587,9 @@ class _SearchBarState extends State<SearchBar> {
                 builder: (context, value, child) {
                   return IconButton(
                     icon: const Icon(Icons.clear),
-                    color: Colors.white,
-                    disabledColor: Colors.white30,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    disabledColor:
+                        Theme.of(context).colorScheme.onPrimary.withOpacity(.3),
                     onPressed: value.text.isEmpty ? null : controller.clear,
                   );
                 },

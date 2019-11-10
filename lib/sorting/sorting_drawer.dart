@@ -54,6 +54,7 @@ class SortingDrawer extends StatelessWidget {
                               title: Text(
                                 trail.name.split('(').first.trimRight(),
                               ),
+                              checkColor: Theme.of(context).canvasColor,
                               onChanged: (value) {
                                 final sortNotifier = Provider.of<SortNotifier>(
                                   context,

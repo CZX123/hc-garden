@@ -214,6 +214,7 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
                       animation: contentOffset,
                       builder: (context, child) {
                         return Material(
+                          color: Theme.of(context).bottomAppBarColor,
                           elevation:
                               animation.status == AnimationStatus.reverse ||
                                       contentOffset.value.dy == -topDistance

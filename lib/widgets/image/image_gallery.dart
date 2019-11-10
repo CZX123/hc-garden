@@ -89,6 +89,7 @@ class ImageGallery extends StatelessWidget {
                       ),
                       child: Material(
                         elevation: 0,
+                        color: Theme.of(context).bottomAppBarColor,
                         child: SizedBox(
                           height: 48,
                           child: Align(
@@ -341,7 +342,6 @@ class _ZoomableImageState extends State<ZoomableImage>
               widget.image,
               key: _key,
               fit: BoxFit.contain,
-              placeholderColor: Theme.of(context).dividerColor,
               saveInCache: false,
               onLoad: (ratio) {
                 _viewportHeight = _key.currentContext.size.height;

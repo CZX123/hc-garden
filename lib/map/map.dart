@@ -18,8 +18,10 @@ class _MapWidgetState extends State<MapWidget> {
   double _height;
 
   void themeListener() {
-    if (_themeNotifier.value) _mapController.setMapStyle(darkMapStyle);
-    else _mapController.setMapStyle(mapStyle);
+    if (_themeNotifier.value)
+      _mapController.setMapStyle(darkMapStyle);
+    else
+      _mapController.setMapStyle(mapStyle);
   }
 
   void stateListener() {
@@ -112,6 +114,7 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Provider.of<ThemeNotifier>(context).value;
     return Selector<FirebaseData, Map<Trail, List<TrailLocation>>>(
       selector: (context, firebaseData) => firebaseData.trails,
       builder: (context, trails, child) {
@@ -125,9 +128,9 @@ class _MapWidgetState extends State<MapWidget> {
               );
             for (var trail in trailList) {
               final hues = [
-                42.0,
-                340.0,
-                199.0,
+                isDark ? 30.0 : 42.0,
+                isDark ? 352.0 : 340.0,
+                isDark ? 210.0 : 199.0,
               ];
               for (var location in trails[trail]) {
                 markers.add(
