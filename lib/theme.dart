@@ -11,7 +11,22 @@ final ThemeData themeData = ThemeData(
   primaryColorBrightness: Brightness.dark,
   accentColor: Color(0xFFAF4F4C), // Light reddish-brown
   accentColorBrightness: Brightness.dark,
-  textTheme: textTheme,
+  textTheme: textTheme.merge(lightThemeText),
+);
+
+final ThemeData darkThemeData = ThemeData(
+  brightness: Brightness.dark,
+  fontFamily: 'Manrope',
+  primaryColor: Colors.green[700],
+  // primaryColorDark: Color(0xFF357A3A),
+  // primaryColorLight: Color(0xFF5FDE65),
+  primaryColorBrightness: Brightness.dark,
+  accentColor: Colors.greenAccent,
+  accentColorBrightness: Brightness.light,
+  canvasColor: Colors.blueGrey[900],
+  bottomAppBarColor: Colors.blueGrey[800],
+  textTheme: textTheme.merge(darkThemeText),
+  toggleableActiveColor: Colors.greenAccent[400],
 );
 
 const TextTheme textTheme = TextTheme(
@@ -19,14 +34,12 @@ const TextTheme textTheme = TextTheme(
   display2: TextStyle(
     height: 1.2,
     fontSize: 22,
-    color: Color(0xFF7A3735), // Dark reddish-brown
     fontWeight: FontWeight.bold,
   ),
   // 'Explore HC Garden' and entity name in details page
   display1: TextStyle(
     fontSize: 20,
     height: 1.2,
-    color: Colors.black87,
   ),
   // title: TextStyle(
   //   fontWeight: FontWeight.bold,
@@ -48,18 +61,45 @@ const TextTheme textTheme = TextTheme(
   ),
   subtitle: TextStyle(
     fontSize: 14.2,
+    fontWeight: FontWeight.bold,
     height: 1.7,
   ),
   // Main paragraph text
   body1: TextStyle(
     fontSize: 14.2,
-    height: 1.7,
+  ),
+  body2: TextStyle(
+    fontSize: 14.2,
   ),
   // For latin names
-  body2: TextStyle(
-    color: Colors.black54,
+  overline: TextStyle(
     fontSize: 15.5,
-    height: 1.7,
     fontStyle: FontStyle.italic,
+    height: 1.7,
+    letterSpacing: 0.05,
+  ),
+);
+
+const TextTheme lightThemeText = TextTheme(
+  display2: TextStyle(
+    color: Color(0xFF7A3735), // Dark reddish-brown
+  ),
+  display1: TextStyle(
+    color: Colors.black87,
+  ),
+  overline: TextStyle(
+    color: Colors.black54,
+  ),
+);
+
+const TextTheme darkThemeText = TextTheme(
+  display2: TextStyle(
+    color: Color(0xFFDBFFDD), // Very light green
+  ),
+  display1: TextStyle(
+    color: Colors.white,
+  ),
+  overline: TextStyle(
+    color: Colors.white70,
   ),
 );

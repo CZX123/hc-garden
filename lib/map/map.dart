@@ -13,8 +13,14 @@ class _MapWidgetState extends State<MapWidget> {
   bool _init = false;
   AppNotifier _appNotifier;
   BottomSheetNotifier _bottomSheetNotifier;
+  ThemeNotifier _themeNotifier;
   int _state;
   double _height;
+
+  void themeListener() {
+    if (_themeNotifier.value) _mapController.setMapStyle(darkMapStyle);
+    else _mapController.setMapStyle(mapStyle);
+  }
 
   void stateListener() {
     if (_appNotifier.state == _state || _appNotifier.state == 2) return;
@@ -71,7 +77,7 @@ class _MapWidgetState extends State<MapWidget> {
       top: MediaQuery.of(context).padding.top,
     );
     stateListener();
-    controller.setMapStyle(mapStyle);
+    themeListener();
   }
 
   @override
@@ -87,6 +93,10 @@ class _MapWidgetState extends State<MapWidget> {
         context,
         listen: false,
       );
+      _themeNotifier = Provider.of<ThemeNotifier>(
+        context,
+        listen: false,
+      )..addListener(themeListener);
       stateListener();
       _init = true;
     }
@@ -96,6 +106,7 @@ class _MapWidgetState extends State<MapWidget> {
   void dispose() {
     _appNotifier.removeListener(stateListener);
     _bottomSheetNotifier.animation.removeListener(animListener);
+    _themeNotifier.removeListener(themeListener);
     super.dispose();
   }
 

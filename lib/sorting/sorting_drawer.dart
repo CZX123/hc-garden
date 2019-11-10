@@ -44,10 +44,7 @@ class SortingDrawer extends StatelessWidget {
                           ListTile(
                             title: Text(
                               'Trails',
-                              style:
-                                  Theme.of(context).textTheme.subtitle.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                              style: Theme.of(context).textTheme.subtitle,
                             ),
                           ),
                           for (var trail in allTrails)
@@ -56,7 +53,6 @@ class SortingDrawer extends StatelessWidget {
                               value: selectedTrails.contains(trail),
                               title: Text(
                                 trail.name.split('(').first.trimRight(),
-                                style: Theme.of(context).textTheme.body1,
                               ),
                               onChanged: (value) {
                                 final sortNotifier = Provider.of<SortNotifier>(

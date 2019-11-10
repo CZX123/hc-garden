@@ -56,6 +56,7 @@ class BottomSheetFooter extends StatelessWidget {
                   boxShadow: kElevationToShadow[8],
                 ),
                 child: BottomNavigationBar(
+                  backgroundColor: Theme.of(context).bottomAppBarColor,
                   elevation: 0,
                   currentIndex: value,
                   onTap: (index) {
@@ -240,13 +241,13 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
         child: Stack(
           overflow: Overflow.visible,
           children: <Widget>[
-            Selector<AppNotifier, bool>(
-              selector: (context, appNotifier) => appNotifier.state != 2,
+            Selector2<AppNotifier, ThemeNotifier, bool>(
+              selector: (context, appNotifier, themeNotifier) {
+                return appNotifier.state == 2 || themeNotifier.value;
+              },
               builder: (context, value, child) {
                 return AnimatedTheme(
-                  data: value
-                      ? themeData
-                      : ThemeData.dark(),
+                  data: value ? darkThemeData : themeData,
                   child: child,
                 );
               },
@@ -268,7 +269,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
                       }
                     }
                     return PhysicalShape(
-                      color: Theme.of(context).canvasColor,
+                      color: Theme.of(context).bottomAppBarColor,
                       elevation: elevation,
                       clipper: BottomAppBarClipper(
                         windowWidth: _width,
@@ -279,16 +280,20 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
                     );
                   },
                   child: Material(
-                    type: MaterialType.transparency,
+                    color: Colors.transparent,
+                    elevation: 0,
                     child: SizedBox(
                       height: 48,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: () => Navigator.maybePop(context),
-                            tooltip: 'Back',
+                          Tooltip(
+                            message: 'Back',
+                            preferBelow: false,
+                            child: IconButton(
+                              icon: const Icon(Icons.arrow_back),
+                              onPressed: () => Navigator.maybePop(context),
+                            ),
                           ),
                           FadeTransition(
                             opacity: Tween(
@@ -304,10 +309,13 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
                                   child: child,
                                 );
                               },
-                              child: IconButton(
-                                icon: const Icon(Icons.sort),
-                                onPressed: Scaffold.of(context).openEndDrawer,
-                                tooltip: 'Sort',
+                              child: Tooltip(
+                                message: 'Sort',
+                                preferBelow: false,
+                                child: IconButton(
+                                  icon: const Icon(Icons.sort),
+                                  onPressed: Scaffold.of(context).openEndDrawer,
+                                ),
                               ),
                             ),
                           ),
@@ -517,14 +525,17 @@ class _SearchBarState extends State<SearchBar> {
             bottom: 0,
             height: 48,
             width: 48,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              color: Colors.white,
-              tooltip: 'Back',
-              onPressed: () {
-                Navigator.maybePop(context);
-                controller.clear();
-              },
+            child: Tooltip(
+              message: 'Back',
+              preferBelow: false,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                color: Colors.white,
+                onPressed: () {
+                  Navigator.maybePop(context);
+                  controller.clear();
+                },
+              ),
             ),
           ),
           Positioned(
@@ -553,17 +564,20 @@ class _SearchBarState extends State<SearchBar> {
             bottom: 0,
             height: 48,
             width: 48,
-            child: ValueListenableBuilder<TextEditingValue>(
-              valueListenable: controller,
-              builder: (context, value, child) {
-                return IconButton(
-                  icon: const Icon(Icons.clear),
-                  color: Colors.white,
-                  disabledColor: Colors.white30,
-                  tooltip: 'Clear',
-                  onPressed: value.text.isEmpty ? null : controller.clear,
-                );
-              },
+            child: Tooltip(
+              message: 'Clear',
+              preferBelow: false,
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: controller,
+                builder: (context, value, child) {
+                  return IconButton(
+                    icon: const Icon(Icons.clear),
+                    color: Colors.white,
+                    disabledColor: Colors.white30,
+                    onPressed: value.text.isEmpty ? null : controller.clear,
+                  );
+                },
+              ),
             ),
           ),
         ],

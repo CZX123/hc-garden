@@ -140,7 +140,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                       ),
                       Text(
                         widget.entity.sciName,
-                        style: Theme.of(context).textTheme.body2,
+                        style: Theme.of(context).textTheme.overline,
                       ),
                     ],
                   ),

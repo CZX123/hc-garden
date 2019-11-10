@@ -1,5 +1,9 @@
 import 'library.dart';
 
+class ThemeNotifier extends ValueNotifier<bool> {
+  ThemeNotifier(bool value) : super(value);
+}
+
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(HcGardenApp());
@@ -13,6 +17,9 @@ class HcGardenApp extends StatelessWidget {
         // Custom cache for all images in the app
         Provider<Map<String, Uint8List>>.value(
           value: {},
+        ),
+        ChangeNotifierProvider(
+          builder: (context) => ThemeNotifier(false),
         ),
         // All Firebase data
         StreamProvider.value(
@@ -106,27 +113,37 @@ class HcGardenApp extends StatelessWidget {
           value: getApplicationDocumentsDirectory(),
         ),
       ],
-      child: Consumer<DebugNotifier>(
-        builder: (context, debugInfo, child) {
-          return MaterialApp(
-            title: 'HC Garden',
-            theme: themeData.copyWith(
-              platform:
-                  debugInfo.isIOS ? TargetPlatform.iOS : TargetPlatform.android,
-            ),
-            onGenerateRoute: (settings) {
-              if (settings.isInitialRoute) return PageRouteBuilder(
-                pageBuilder: (context, _,  __) => const MyHomePage(title: 'HC Garden'),
+      child: Consumer<ThemeNotifier>(
+        builder: (context, themeNotifier, child) {
+          return Consumer<DebugNotifier>(
+            builder: (context, debugInfo, child) {
+              return MaterialApp(
+                title: 'HC Garden',
+                theme:
+                    (themeNotifier.value ? darkThemeData : themeData).copyWith(
+                  platform: debugInfo.isIOS
+                      ? TargetPlatform.iOS
+                      : TargetPlatform.android,
+                ),
+                onGenerateRoute: (settings) {
+                  if (settings.isInitialRoute)
+                    return PageRouteBuilder(
+                      pageBuilder: (context, _, __) =>
+                          const MyHomePage(title: 'HC Garden'),
+                    );
+                  return null;
+                },
+                debugShowMaterialGrid: debugInfo.debugShowMaterialGrid,
+                showPerformanceOverlay: debugInfo.showPerformanceOverlay,
+                checkerboardRasterCacheImages:
+                    debugInfo.checkerboardRasterCacheImages,
+                checkerboardOffscreenLayers:
+                    debugInfo.checkerboardOffscreenLayers,
+                showSemanticsDebugger: debugInfo.showSemanticsDebugger,
+                debugShowCheckedModeBanner:
+                    debugInfo.debugShowCheckedModeBanner,
               );
-              return null;
             },
-            debugShowMaterialGrid: debugInfo.debugShowMaterialGrid,
-            showPerformanceOverlay: debugInfo.showPerformanceOverlay,
-            checkerboardRasterCacheImages:
-                debugInfo.checkerboardRasterCacheImages,
-            checkerboardOffscreenLayers: debugInfo.checkerboardOffscreenLayers,
-            showSemanticsDebugger: debugInfo.showSemanticsDebugger,
-            debugShowCheckedModeBanner: debugInfo.debugShowCheckedModeBanner,
           );
         },
       ),

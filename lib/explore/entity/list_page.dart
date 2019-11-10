@@ -180,7 +180,7 @@ class _EntityListRowState extends State<EntityListRow> {
               padding: const EdgeInsets.only(bottom: 4),
               child: Text(
                 widget.entity.sciName,
-                style: Theme.of(context).textTheme.body2,
+                style: Theme.of(context).textTheme.overline,
               ),
             ),
         ],

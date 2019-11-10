@@ -1,5 +1,10 @@
 import '../../library.dart';
 
+// TODO:
+// Make images easier to zoom
+// Investigate why zoomed in images, when pressing back are very laggy
+// Add some flinging upon translation
+
 class ImageGallery extends StatelessWidget {
   final String initialImage;
   final List<String> images;
@@ -77,7 +82,7 @@ class ImageGallery extends StatelessWidget {
                           ),
                   ),
                   Theme(
-                    data: ThemeData.dark(),
+                    data: darkThemeData,
                     child: Container(
                       decoration: BoxDecoration(
                         boxShadow: kElevationToShadow[8],
@@ -183,7 +188,6 @@ class _ZoomableImageState extends State<ZoomableImage>
     onUpdate: (oldVal, newVal) => newVal / oldVal,
   );
 
-  // TODO: Make image easier to zoom
   void onScaleStart(ScaleStartDetails details) {
     translationUpdater.value = details.focalPoint;
     scaleUpdater.value = 1.0;

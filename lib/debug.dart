@@ -95,7 +95,8 @@ class _DebugDrawerState extends State<DebugDrawer> {
                 SwitchListTile(
                   title: const Text('Checkerboard Offscreen Layers'),
                   value: debugInfo.checkerboardOffscreenLayers,
-                  onChanged: (_) => debugInfo.toggleCheckerboardOffscreenLayers(),
+                  onChanged: (_) =>
+                      debugInfo.toggleCheckerboardOffscreenLayers(),
                 ),
                 SwitchListTile(
                   title: const Text('Show Semantics Debugger'),
@@ -119,6 +120,15 @@ class _DebugDrawerState extends State<DebugDrawer> {
                   title: const Text('Toggle iOS'),
                   value: debugInfo.isIOS,
                   onChanged: (_) => debugInfo.toggleIOS(),
+                ),
+                Consumer<ThemeNotifier>(
+                  builder: (context, themeNotifier, child) {
+                    return SwitchListTile(
+                      title: const Text('Dark Theme'),
+                      value: themeNotifier.value,
+                      onChanged: (value) => themeNotifier.value = value,
+                    );
+                  },
                 ),
               ],
             );
