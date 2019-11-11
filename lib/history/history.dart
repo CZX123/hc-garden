@@ -17,11 +17,8 @@ class HistoryPage extends StatelessWidget {
         child: Selector<FirebaseData, List<HistoricalData>>(
           selector: (context, firebaseData) => firebaseData.historicalDataList,
           builder: (context, historicalDataList, child) {
-            final newImages = historicalDataList.map((h) {
-              if (h.image.isEmpty) return '';
-              var split = h.image.split('.');
-              final end = '.' + split.removeLast();
-              return split.join('.') + 'h' + end;
+            final newImages = historicalDataList.map((h){
+              return lowerRes(h.image);
             }).toList();
             return CustomScrollView(
               slivers: <Widget>[

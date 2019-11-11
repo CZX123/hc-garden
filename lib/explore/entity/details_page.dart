@@ -78,12 +78,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
     final topPadding = MediaQuery.of(context).padding.top;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    List<String> newImages = [];
-    for (var image in widget.entity.images) {
-      var split = image.split('.');
-      final end = '.' + split.removeLast();
-      newImages.add(split.join('.') + 'h' + end);
-    }
+    final newImages = widget.entity.images.map(lowerRes).toList();
     return NotificationListener(
       onNotification: (notification) {
         if (notification is ScrollUpdateNotification &&

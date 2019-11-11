@@ -209,6 +209,13 @@ class AboutPageData {
   }
 }
 
+String lowerRes(String image){
+  if (image.isEmpty) return '';
+  var split = image.split('.');
+  final end = '.' + split.removeLast();
+  return split.join('.') + 'h' + end;
+}
+
 class AppNotifier extends ChangeNotifier {
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   List<VoidCallback> popCallbacks = [];

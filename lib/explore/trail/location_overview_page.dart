@@ -64,7 +64,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
           child: Stack(
             children: <Widget>[
               CustomImage(
-                widget.trailLocation.image,
+                lowerRes(widget.trailLocation.image),
                 fit: BoxFit.contain,
                 onLoad: (double aspectRatio) {
                   setState(() {
@@ -80,9 +80,11 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
+                      color: Colors.white38,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.yellow
+                        color: Colors.yellow,
+                        width: 2.0,
                       ),
                     ),
                   ),
