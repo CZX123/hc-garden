@@ -209,7 +209,7 @@ class AboutPageData {
   }
 }
 
-String lowerRes(String image){
+String lowerRes(String image) {
   if (image.isEmpty) return '';
   var split = image.split('.');
   final end = '.' + split.removeLast();
@@ -248,16 +248,17 @@ class AppNotifier extends ChangeNotifier {
     );
     if (state == 0) {
       _entity = null;
+      _trail = trail;
       _state = 0;
       if (rebuild) notifyListeners();
-      _trail = trail;
       bottomSheetNotifier
         ..draggingDisabled = false
-        ..activeScrollController = activeScrollController
+        ..activeScrollController =
+            activeScrollController ?? bottomSheetNotifier.activeScrollController
         ..snappingPositions.value = [
           0,
           height - bottomHeight,
-          if (trail == null) height - bottomBarHeight else height - 48 - 96,
+          if (trail == null) height - bottomBarHeight else height - 48 - 76,
         ]
         ..endCorrection =
             trail == null ? topPadding - offsetTranslation : topPadding;

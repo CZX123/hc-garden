@@ -21,13 +21,10 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_init) {
-      Provider.of<AppNotifier>(context).changeState(
+      Provider.of<BottomSheetNotifier>(
         context,
-        0,
-        activeScrollController: _scrollController,
-        trail: widget.trail,
-        rebuild: false,
-      );
+        listen: false,
+      ).activeScrollController = _scrollController;
       _init = true;
     }
   }
@@ -37,30 +34,31 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
     final animation = ModalRoute.of(context).animation;
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
-    return ScaleTransition(
-      scale: Tween(
-        begin: 0.96,
+    return FadeTransition(
+      opacity: Tween(
+        begin: -1.0,
         end: 1.0,
-      ).animate(CurvedAnimation(
-        parent: animation,
-        curve: Curves.fastOutSlowIn,
-      )),
-      child: FadeTransition(
-        opacity: Tween(
-          begin: -1.0,
-          end: 1.0,
-        ).animate(animation),
-        child: Material(
-          type: MaterialType.transparency,
+      ).animate(animation),
+      child: Material(
+        color: Theme.of(context).bottomAppBarColor,
+        child: ScaleTransition(
+          scale: Tween(
+            begin: 0.96,
+            end: 1.0,
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn,
+          )),
           child: SingleChildScrollView(
             controller: _scrollController,
             physics: NeverScrollableScrollPhysics(),
             child: Column(
               children: <Widget>[
                 ValueListenableBuilder(
-                  valueListenable:
-                      Provider.of<BottomSheetNotifier>(context, listen: false)
-                          .animation,
+                  valueListenable: Provider.of<BottomSheetNotifier>(
+                    context,
+                    listen: false,
+                  ).animation,
                   builder: (context, value, child) {
                     double h = 0;
                     if (value < height - bottomHeight) {
@@ -76,40 +74,11 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
                   style: Theme.of(context).textTheme.display1,
                 ),
                 SizedBox(
-                  height: 24,
+                  height: 20,
                 ),
                 for (var location in widget.trailLocations)
-                  InkWell(
-                    child: Container(
-                      height: 64,
-                      child: Row(
-                        children: <Widget>[
-                          const SizedBox(
-                            width: 16,
-                          ),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: CustomImage(
-                              location.smallImage,
-                              height: 40,
-                              width: 40,
-                              placeholderColor: Theme.of(context).dividerColor,
-                              fadeInDuration: const Duration(milliseconds: 300),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 16,
-                          ),
-                          Expanded(
-                            child: Text(
-                              location.name,
-                              style: Theme.of(context).textTheme.subhead,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    onTap: () {},
+                  LocationListRow(
+                    location: location,
                   ),
                 SizedBox(
                   height: 64,
@@ -119,6 +88,70 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class LocationListRow extends StatelessWidget {
+  final TrailLocation location;
+  const LocationListRow({Key key, @required this.location}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var names = location.entityPositions
+        .map((position) => position.entity.name)
+        .toList()
+          ..shuffle();
+    names = names.sublist(0, min(5, names.length));
+    return InkWell(
+      child: Container(
+        height: 88,
+        child: Row(
+          children: <Widget>[
+            const SizedBox(
+              width: 14,
+            ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(32),
+              child: CustomImage(
+                location.smallImage,
+                height: 64,
+                width: 64,
+                placeholderColor: Theme.of(context).dividerColor,
+                fadeInDuration: const Duration(milliseconds: 300),
+              ),
+            ),
+            const SizedBox(
+              width: 16,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    location.name,
+                    style: Theme.of(context).textTheme.subhead,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      names.join(', '),
+                      style: Theme.of(context).textTheme.caption,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(
+              width: 14,
+            ),
+          ],
+        ),
+      ),
+      onTap: () {},
     );
   }
 }

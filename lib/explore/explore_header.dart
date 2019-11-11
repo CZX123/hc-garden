@@ -84,17 +84,6 @@ class ExploreHeader extends StatelessWidget {
                   animation: anim,
                   tabController: tabController,
                 ),
-                FadeTransition(
-                  opacity: Tween<double>(
-                    begin: 12 / 12 - totalTranslation / 12,
-                    end: 12 / 12,
-                  ).animate(anim),
-                  child: Container(
-                    height: 8,
-                    width: double.infinity,
-                    color: Theme.of(context).canvasColor,
-                  ),
-                ),
               ],
             ),
           ),
@@ -166,57 +155,12 @@ class TrailButtonsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
-    final firebaseData = Provider.of<FirebaseData>(context, listen: false);
     const _trails = ['Kah Kee\nTrail', 'Kong Chian\nTrail', 'Jing Xian\nTrail'];
     final _colors = [Colors.lightBlue, Colors.pink, Colors.amber[600]];
     final _textColors = [
       Colors.lightBlueAccent,
       Colors.redAccent,
       Colors.orangeAccent,
-    ];
-    final _callbacks = [
-      () {
-        final trail = firebaseData.trails.keys.firstWhere((trail) {
-          return trail.name.contains('Kah Kee');
-        });
-        Navigator.push(context, PageRouteBuilder(
-          pageBuilder: (context, _, __) {
-            return TrailDetailsPage(
-              trail: trail,
-              trailLocations: firebaseData.trails[trail],
-            );
-          },
-        ));
-        mapNotifier.animateToPosition(kktrail);
-      },
-      () {
-        final trail = firebaseData.trails.keys.firstWhere((trail) {
-          return trail.name.contains('Kong Chian');
-        });
-        Navigator.push(context, PageRouteBuilder(
-          pageBuilder: (context, _, __) {
-            return TrailDetailsPage(
-              trail: trail,
-              trailLocations: firebaseData.trails[trail],
-            );
-          },
-        ));
-        mapNotifier.animateToPosition(kctrail, 17.8);
-      },
-      () {
-        final trail = firebaseData.trails.keys.firstWhere((trail) {
-          return trail.name.contains('Jing Xian');
-        });
-        Navigator.push(context, PageRouteBuilder(
-          pageBuilder: (context, _, __) {
-            return TrailDetailsPage(
-              trail: trail,
-              trailLocations: firebaseData.trails[trail],
-            );
-          },
-        ));
-        mapNotifier.animateToPosition(jxtrail, 17.3);
-      },
     ];
 
     return FadeTransition(
@@ -230,7 +174,26 @@ class TrailButtonsRow extends StatelessWidget {
                 color: _colors[i],
                 textColor: _textColors[i],
                 trailName: _trails[i],
-                onPressed: _callbacks[i],
+                onPressed: () {
+                  final firebaseData = Provider.of<FirebaseData>(context, listen: false);
+                  final trail = firebaseData.trails.keys.firstWhere((trail) {
+                    return trail.name.contains(_trails[i].substring(0, 5));
+                  });
+                  Navigator.push(context, PageRouteBuilder(
+                    pageBuilder: (context, _, __) {
+                      return TrailDetailsPage(
+                        trail: trail,
+                        trailLocations: firebaseData.trails[trail],
+                      );
+                    },
+                  ));
+                  Provider.of<AppNotifier>(context).changeState(
+                    context,
+                    0,
+                    trail: trail,
+                  );
+                  mapNotifier.animateToPosition(trailCoordinates[i]);
+                },
               ),
           ],
         ),

@@ -216,7 +216,6 @@ class _MyHomePageState extends State<MyHomePage>
             context,
             0,
             activeScrollController: _scrollControllers[_tabController.index],
-            rebuild: false,
           );
         }
         navigatorKey.currentState.pop();

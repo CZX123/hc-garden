@@ -7,6 +7,7 @@ const bottomSheetCenter = const LatLng(1.325080, 103.804453);
 const kktrail = const LatLng(1.326987, 103.80295);
 const kctrail = const LatLng(1.326026, 103.80420);
 const jxtrail = const LatLng(1.325317, 103.80672);
+const trailCoordinates = [kktrail, kctrail, jxtrail];
 Set<Polygon> polygons = {
   Polygon(
     polygonId: PolygonId("salt centre"),

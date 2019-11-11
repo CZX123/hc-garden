@@ -14,10 +14,14 @@ class BottomSheetFooter extends StatelessWidget {
       context,
       listen: false,
     );
-    final animateTo = bottomSheetNotifier.animateTo;
-    final animation = bottomSheetNotifier.animation;
+    final anim = Tween<double>(
+      begin: 0,
+      end: 1 / (height - bottomHeight),
+    ).animate(bottomSheetNotifier.animation);
     return Stack(
       children: <Widget>[
+        // Notched Bottom App Bar for Entity List Page
+        AnimatedNotchedAppBar(bottomSheetAnimation: anim),
         // 3 Button Bottom Navigation
         Selector<AppNotifier, int>(
           selector: (context, appNotifier) => appNotifier.state,
@@ -26,19 +30,19 @@ class BottomSheetFooter extends StatelessWidget {
               left: 0,
               right: 0,
               bottom: 0,
-              child: AnimatedBuilder(
-                animation: animation,
-                builder: (context, child) {
+              child: ValueListenableBuilder(
+                valueListenable: anim,
+                builder: (context, value, child) {
                   Offset offset;
                   if (state != 0) {
-                    offset = Offset(0, 128);
-                  } else if (animation.value > height - bottomHeight) {
+                    offset = Offset(0, bottomBarHeight * 2);
+                  } else if (value > 1) {
                     offset = Offset(0, 0);
                   } else {
-                    offset = Offset(0,
-                        128 - animation.value / (height - bottomHeight) * 128);
+                    offset = Offset(0, bottomBarHeight * 2 * (1 - value));
                   }
-                  if (offset.dy == 128) return const SizedBox.shrink();
+                  if (offset.dy == bottomBarHeight * 2)
+                    return const SizedBox.shrink();
                   return Transform.translate(
                     offset: offset,
                     child: child,
@@ -48,51 +52,63 @@ class BottomSheetFooter extends StatelessWidget {
               ),
             );
           },
-          child: ValueListenableBuilder(
-            valueListenable: pageIndex,
+          child: Selector<AppNotifier, bool>(
+            selector: (context, appNotifier) => appNotifier.trail != null,
             builder: (context, value, child) {
-              return Container(
-                decoration: BoxDecoration(
-                  boxShadow: kElevationToShadow[8],
-                ),
-                child: BottomNavigationBar(
-                  backgroundColor: Theme.of(context).bottomAppBarColor,
-                  elevation: 0,
-                  currentIndex: value,
-                  onTap: (index) {
-                    if (index == 1) {
-                      bottomSheetNotifier.draggingDisabled = false;
-                      animateTo(height - bottomHeight);
-                    } else {
-                      bottomSheetNotifier.draggingDisabled = true;
-                      animateTo(
-                        height - bottomBarHeight,
-                        const Duration(milliseconds: 240),
-                      );
-                    }
-                    pageIndex.value = index;
-                  },
-                  items: [
-                    const BottomNavigationBarItem(
-                      icon: Icon(Icons.dvr),
-                      title: Text('History'),
-                    ),
-                    const BottomNavigationBarItem(
-                      icon: Icon(Icons.map),
-                      title: Text('Explore'),
-                    ),
-                    const BottomNavigationBarItem(
-                      icon: Icon(Icons.info),
-                      title: Text('About'),
-                    ),
-                  ],
-                ),
+              return AnimatedContainer(
+                curve: Curves.fastOutSlowIn,
+                duration: const Duration(milliseconds: 300),
+                transform: Matrix4.translationValues(
+                    0, value ? bottomBarHeight * 2 : 0, 0),
+                child: child,
               );
             },
+            child: ValueListenableBuilder(
+              valueListenable: pageIndex,
+              builder: (context, value, child) {
+                return Container(
+                  decoration: BoxDecoration(
+                    boxShadow: kElevationToShadow[8],
+                  ),
+                  child: BottomNavigationBar(
+                    backgroundColor: Theme.of(context).bottomAppBarColor,
+                    elevation: 0,
+                    currentIndex: value,
+                    onTap: (index) {
+                      if (index == 1) {
+                        bottomSheetNotifier
+                          ..draggingDisabled = false
+                          ..animateTo(height - bottomHeight);
+                      } else {
+                        bottomSheetNotifier
+                          ..draggingDisabled = true
+                          ..animateTo(
+                            height - bottomBarHeight,
+                            const Duration(milliseconds: 240),
+                          );
+                      }
+                      pageIndex.value = index;
+                    },
+                    items: [
+                      const BottomNavigationBarItem(
+                        icon: Icon(Icons.dvr),
+                        title: Text('History'),
+                      ),
+                      const BottomNavigationBarItem(
+                        icon: Icon(Icons.map),
+                        title: Text('Explore'),
+                      ),
+                      const BottomNavigationBarItem(
+                        icon: Icon(Icons.info),
+                        title: Text('About'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
-        // Notched Bottom App Bar for Entity List Page
-        AnimatedNotchedAppBar(bottomSheetAnimation: animation),
       ],
     );
   }
@@ -120,7 +136,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
   AnimationController _fabPressController;
 
   void stateListener() {
-    if (_state == _appNotifier.state || _appNotifier.state == 2) return;
+    if (_appNotifier.state == 2) return;
     if (_appNotifier.state == 1) {
       _animationController.animateTo(
         1,
@@ -130,17 +146,35 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
         curve: Curves.fastOutSlowIn,
       );
     } else if (_appNotifier.state == 0) {
-      if (_searchNotifier.searchTerm.isEmpty) {
+      if (_appNotifier.trail != null) {
         _animationController.animateTo(
-          0.5,
-          duration: const Duration(milliseconds: 250),
+          1,
+          duration: Duration(milliseconds: 50),
           curve: Curves.fastOutSlowIn,
         );
+      } else if (_searchNotifier.searchTerm.isEmpty) {
+        final height = MediaQuery.of(context).size.height;
+        final hidden = Provider.of<BottomSheetNotifier>(
+              context,
+              listen: false,
+            ).animation.value >
+            (height - bottomHeight) / 2;
+        _animationController.animateTo(
+          0.5,
+          duration: Duration(milliseconds: 250),
+          curve: hidden ? Interval(.5, 1) : Curves.fastOutSlowIn,
+        );
       } else {
+        final height = MediaQuery.of(context).size.height;
+        final hidden = Provider.of<BottomSheetNotifier>(
+              context,
+              listen: false,
+            ).animation.value >
+            (height - bottomHeight) / 2;
         _animationController.animateTo(
           0,
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.fastOutSlowIn,
+          duration: Duration(milliseconds: 350),
+          curve: hidden ? Interval(.5, 1) : Curves.fastOutSlowIn,
         );
       }
     }
@@ -211,7 +245,6 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
 
   @override
   Widget build(BuildContext context) {
-    final _height = MediaQuery.of(context).size.height;
     final _width = MediaQuery.of(context).size.width;
     final rectTween = MaterialRectArcTween(
       begin: Rect.fromLTWH(0, 28, _width, 48),
@@ -222,19 +255,29 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
     );
     return SizedBox(
       height: 76,
-      child: ValueListenableBuilder(
-        valueListenable: widget.bottomSheetAnimation,
-        builder: (context, value, child) {
-          Offset offset = Offset(0, 0);
-          if (_state == 0) {
-            if (value > _height - 382) {
-              offset = Offset(0, 152);
-            } else {
-              offset = Offset(0, value / (_height - 382) * 152);
-            }
-          }
-          return Transform.translate(
-            offset: offset,
+      child: Selector<AppNotifier, bool>(
+        selector: (context, appNotifier) => appNotifier.trail != null,
+        builder: (context, hasTrail, child) {
+          return ValueListenableBuilder(
+            valueListenable: widget.bottomSheetAnimation,
+            builder: (context, value, child) {
+              Duration d = const Duration(milliseconds: 300);
+              double y = 0;
+              if (!hasTrail && _state == 0) {
+                if (value >= .5) {
+                  y = 76;
+                } else {
+                  d = Duration.zero;
+                  y = value * 152;
+                }
+              }
+              return AnimatedContainer(
+                curve: Curves.fastOutSlowIn,
+                duration: d,
+                transform: Matrix4.translationValues(0, y, 0),
+                child: child,
+              );
+            },
             child: child,
           );
         },
