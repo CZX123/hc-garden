@@ -10,19 +10,20 @@ class TrailLocationOverviewPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _TrailLocationOverviewPageState createState() => _TrailLocationOverviewPageState();
+  _TrailLocationOverviewPageState createState() =>
+      _TrailLocationOverviewPageState();
 }
 
 class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
-  
   double aspectRatio;
-  
+  static const double sizeScaling = 550;
+
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    //final orientation = MediaQuery.of(context).orientation;
+    final orientation = MediaQuery.of(context).orientation;
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.landscapeLeft,
@@ -56,7 +57,8 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.only(top: topPadding),
+          padding: EdgeInsets.only(
+              top: orientation == Orientation.landscape ? 0 : topPadding),
           constraints: BoxConstraints(
             minHeight: height - 48,
           ),
@@ -72,22 +74,17 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                   });
                 },
               ),
-              for (var entityPosition in widget.trailLocation.entityPositions) 
+              for (var entityPosition in widget.trailLocation.entityPositions)
                 new Positioned(
-                  left: entityPosition.left*width,
-                  top: imageHeight==null ? height : entityPosition.top*imageHeight,
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: Colors.white38,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.yellow,
-                        width: 2.0,
-                      ),
-                    ),
-                  ),
+                  left: entityPosition.left * width -
+                      (entityPosition.size / sizeScaling) * width / 2,
+                  top: aspectRatio == null
+                      ? height
+                      : entityPosition.top * (width / aspectRatio) -
+                          (entityPosition.size / sizeScaling) * width / 2,
+                  width: (entityPosition.size / sizeScaling) * width,
+                  height: (entityPosition.size / sizeScaling) * width,
+                  child: AnimatedPulseCircle(),
                 ),
             ],
           ),
@@ -104,11 +101,44 @@ class AnimatedPulseCircle extends StatefulWidget {
   _AnimatedPulseCircleState createState() => _AnimatedPulseCircleState();
 }
 
-class _AnimatedPulseCircleState extends State<AnimatedPulseCircle> {
+class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
+    with SingleTickerProviderStateMixin {
+  Animation<double> animation;
+  AnimationController controller;
+
+  void listener(AnimationStatus status) {
+    if (status == AnimationStatus.completed)
+      controller.reverse();
+    else if (status == AnimationStatus.dismissed) controller.forward();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+        duration: const Duration(milliseconds: 700), vsync: this)
+      ..addStatusListener(listener);
+    animation = Tween<double>(begin: 0.85, end: 1).animate(CurvedAnimation(
+      parent: controller,
+      curve: Curves.easeInOutQuad,
+    ));
+    controller.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-       child: Text("idk"),
+    return ScaleTransition(
+      scale: animation,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(.2),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.lightGreenAccent,
+            width: 2.0,
+          ),
+        ),
+      ),
     );
   }
 }
