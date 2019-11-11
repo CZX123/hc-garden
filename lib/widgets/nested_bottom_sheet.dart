@@ -73,7 +73,6 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   Drag _scrollDrag;
   ScrollHoldController _scrollHold;
   bool _scrolling;
-  ValueNotifier<bool> _isScrolledNotifier = ValueNotifier(false);
 
   void animateTo(double end, [Duration duration]) {
     if (end == _animationController.value) return;
@@ -348,11 +347,17 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
                             if (notification is ScrollUpdateNotification &&
                                 notification.depth == 1) {
                               if (notification.metrics.pixels <= 5 &&
-                                  _isScrolledNotifier.value == true) {
-                                _isScrolledNotifier.value = false;
+                                  _bottomSheetNotifier
+                                          .isScrolledNotifier.value ==
+                                      true) {
+                                _bottomSheetNotifier.isScrolledNotifier.value =
+                                    false;
                               } else if (notification.metrics.pixels > 5 &&
-                                  _isScrolledNotifier.value == false)
-                                _isScrolledNotifier.value = true;
+                                  _bottomSheetNotifier
+                                          .isScrolledNotifier.value ==
+                                      false)
+                                _bottomSheetNotifier.isScrolledNotifier.value =
+                                    true;
                             }
                             return null;
                           },
@@ -395,7 +400,9 @@ class BottomSheetNotifier extends ChangeNotifier {
   bool _draggingDisabled = false;
   bool get draggingDisabled => _draggingDisabled;
   set draggingDisabled(bool draggingDisabled) {
-    _draggingDisabled = draggingDisabled;
-    notifyListeners();
+    if (_draggingDisabled != draggingDisabled) {
+      _draggingDisabled = draggingDisabled;
+      notifyListeners();
+    }
   }
 }

@@ -104,8 +104,8 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                       .animation,
               builder: (context, value, child) {
                 double h = 0;
-                if (value < height - bottomHeight) {
-                  h = (1 - value / (height - bottomHeight)) * topPadding;
+                if (value < height - 376) {
+                  h = (1 - value / (height - 376)) * topPadding;
                   if (value > 1) widget.newTopPadding.value = h + 16;
                 }
                 return SizedBox(

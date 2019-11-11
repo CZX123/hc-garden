@@ -19,7 +19,8 @@ class _MapWidgetState extends State<MapWidget> {
 
   void themeListener() {
     if (_themeNotifier.value)
-      _mapController.setMapStyle(darkMapStyle);
+      // _mapController.setMapStyle(darkMapStyle);
+      _mapController.setMapStyle(mapStyle);
     else
       _mapController.setMapStyle(mapStyle);
   }

@@ -18,406 +18,6 @@ const offsetTranslation = bottomHeight -
     entityButtonHeight -
     bottomBarHeight; // without topPadding
 
-class ExploreHeader extends StatelessWidget {
-  final TabController tabController;
-  const ExploreHeader({
-    Key key,
-    @required this.tabController,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final bottomSheetNotifier =
-        Provider.of<BottomSheetNotifier>(context, listen: false);
-    final animation = bottomSheetNotifier.animation;
-    final animateTo = bottomSheetNotifier.animateTo;
-    const _trails = ['Kah Kee\nTrail', 'Kong Chian\nTrail', 'Jing Xian\nTrail'];
-    final _colors = [Colors.lightBlue, Colors.pink, Colors.amber[600]];
-    final _textColors = [Colors.lightBlueAccent, Colors.redAccent, Colors.orangeAccent];
-    final height = MediaQuery.of(context).size.height;
-    final topPadding = MediaQuery.of(context).padding.top;
-    final totalTranslation = offsetTranslation - topPadding;
-    final anim = Tween<double>(begin: 0, end: 1 / (height - bottomHeight))
-        .animate(animation);
-    List<Widget> trailButtons = [];
-    for (int i = 0; i < 3; i++) {
-      trailButtons.add(Expanded(
-        child: Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: Consumer<ThemeNotifier>(
-            builder: (context, themeNotifier, child) {
-              final textStyle = TextStyle(
-                fontFamily: 'Manrope',
-                fontSize: 13,
-                height: 1.5,
-                fontWeight: FontWeight.bold,
-              );
-              return AnimatedTheme(
-                data: themeNotifier.value
-                    ? darkThemeData.copyWith(
-                        buttonColor: Colors.grey[850],
-                        textTheme: TextTheme(
-                          body1: textStyle.copyWith(
-                            color: _textColors[i],
-                          ),
-                        ),
-                      )
-                    : themeData.copyWith(
-                        buttonColor: _colors[i],
-                        textTheme: TextTheme(
-                          body1: textStyle.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                child: child,
-              );
-            },
-            child: Builder(builder: (context) {
-              return FlatButton(
-                colorBrightness: Brightness.dark,
-                color: Theme.of(context).buttonColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Container(
-                  height: trailButtonHeight,
-                  alignment: Alignment.center,
-                  child: Text(
-                    _trails[i].toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.body1,
-                  ),
-                ),
-                onPressed: () {
-                  if (i == 0) {
-                    Provider.of<MapNotifier>(context)
-                        .animateToPosition(kktrail);
-                  } else if (i == 1) {
-                    Provider.of<MapNotifier>(context)
-                        .animateToPosition(kctrail, 17.8);
-                  } else {
-                    Provider.of<MapNotifier>(context)
-                        .animateToPosition(jxtrail, 17.3);
-                  }
-                },
-              );
-            }),
-          ),
-        ),
-      ));
-    }
-    return Selector<AppNotifier, int>(
-      selector: (context, appNotifier) => appNotifier.state,
-      builder: (context, state, child) {
-        return IgnorePointer(
-          ignoring: state != 0,
-          ignoringSemantics: state != 0,
-          child: AnimatedOpacity(
-            opacity: state == 0 ? 1 : 0,
-            duration: Duration(milliseconds: state == 0 ? 400 : 200),
-            curve:
-                state == 0 ? Interval(0.5, 1, curve: Curves.ease) : Curves.ease,
-            child: child,
-          ),
-        );
-      },
-      child: Stack(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.only(top: 8),
-            height: 12,
-            child: FadeTransition(
-              opacity: Tween<double>(
-                begin: 0,
-                end: (height - bottomHeight) / topPadding,
-              ).animate(anim),
-              child: Container(
-                height: 4,
-                width: 24,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).dividerColor,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-          ),
-          ValueListenableBuilder(
-            valueListenable: anim,
-            builder: (context, value, child) {
-              Offset offset;
-              if (value > 1) {
-                offset = Offset(0, 0);
-              } else {
-                offset = Offset(
-                  0,
-                  (value - 1) * totalTranslation,
-                );
-              }
-              return Transform.translate(
-                offset: offset,
-                child: child,
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(top: 16 + 12.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  FadeTransition(
-                    opacity: Tween<double>(
-                      begin: 16 / 12 - totalTranslation / 12,
-                      end: 16 / 12,
-                    ).animate(anim),
-                    child: AppLogo(),
-                  ),
-                  // const SizedBox(
-                  //   height: 8,
-                  // ),
-                  FadeTransition(
-                    opacity: Tween<double>(
-                      begin: (24 + imageHeight) / 12 - totalTranslation / 12,
-                      end: (24 + imageHeight) / 12,
-                    ).animate(anim),
-                    child: Text(
-                      'Explore HC Garden',
-                      style: Theme.of(context).textTheme.display1.copyWith(
-                            height: headingHeight / 20,
-                          ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  FadeTransition(
-                    opacity: Tween<double>(
-                      begin: (40 + imageHeight + headingHeight) / 40 -
-                          totalTranslation / 40,
-                      end: (40 + imageHeight + headingHeight) / 40,
-                    ).animate(anim),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Row(
-                        children: trailButtons,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  FloraFaunaTabBar(
-                    animateTo: animateTo,
-                    animation: animation,
-                    tabController: tabController,
-                  ),
-                  FadeTransition(
-                    opacity: Tween<double>(
-                      begin: 12 / 12 - totalTranslation / 12,
-                      end: 12 / 12,
-                    ).animate(anim),
-                    child: Container(
-                      height: 8,
-                      width: double.infinity,
-                      color: Theme.of(context).canvasColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class AppLogo extends StatelessWidget {
-  const AppLogo({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Image.asset(
-          'assets/images/hci.png',
-          height: imageHeight - 12,
-        ),
-        const SizedBox(
-          width: 12,
-        ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Hwa Chong'.toUpperCase(),
-              style: TextStyle(
-                color: Theme.of(context).hintColor,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                height: 1,
-              ),
-            ),
-            Text(
-              'Institution'.toUpperCase(),
-              style: TextStyle(
-                color: Theme.of(context).hintColor,
-                letterSpacing: 0.15,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                height: 1,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(
-          width: 4,
-        ),
-        Image.asset(
-          'assets/images/app_logo/default.png',
-          height: imageHeight,
-        ),
-      ],
-    );
-  }
-}
-
-class FloraFaunaTabBar extends StatelessWidget {
-  final Function(double) animateTo;
-  final Animation<double> animation;
-  final TabController tabController;
-  const FloraFaunaTabBar({
-    Key key,
-    @required this.animateTo,
-    @required this.animation,
-    @required this.tabController,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-    final anim = Tween<double>(
-      begin: 0,
-      end: 1 / (height - bottomHeight),
-    ).animate(animation);
-    final tabIndicatorWidth = 72.0;
-    final firstTabOffset = (width - 24) / 4 + 8 - tabIndicatorWidth / 2;
-    final secondTabOffset = (width - 24) / 4 * 3 + 16 - tabIndicatorWidth / 2;
-    return Material(
-      color: Theme.of(context).canvasColor,
-      child: Stack(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Row(
-              children: <Widget>[
-                for (var i = 0; i < 2; i++)
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(
-                              i == 0
-                                  ? 'assets/images/flora.jpg'
-                                  : 'assets/images/fauna.jpg',
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: FlatButton(
-                          colorBrightness: Brightness.dark,
-                          color: Colors.black38,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ValueListenableBuilder(
-                            valueListenable: anim,
-                            builder: (context, value, child) {
-                              double y = 0;
-                              double cardHeight = entityButtonHeight;
-                              if (value < 1) {
-                                cardHeight = entityButtonHeightCollapsed +
-                                    (entityButtonHeight -
-                                            entityButtonHeightCollapsed) *
-                                        value;
-                                y = (value - 1) * 3;
-                              }
-                              return Container(
-                                height: cardHeight,
-                                alignment: Alignment.center,
-                                child: Transform.translate(
-                                  offset: Offset(0, y),
-                                  child: child,
-                                ),
-                              );
-                            },
-                            child: Text(
-                              i == 0 ? 'FLORA' : 'FAUNA',
-                              textAlign: TextAlign.center,
-                              style:
-                                  Theme.of(context).textTheme.headline.copyWith(
-                                        color: Colors.white,
-                                      ),
-                            ),
-                          ),
-                          onPressed: () {
-                            if (animation.value < height - bottomHeight) {
-                              tabController.animateTo(i);
-                            } else {
-                              tabController.animateTo(
-                                i,
-                                duration: const Duration(
-                                  milliseconds: 1,
-                                ),
-                              );
-                            }
-                            animateTo(0);
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          Positioned(
-            left: 0,
-            bottom: 18,
-            height: 2,
-            width: tabIndicatorWidth,
-            child: FadeTransition(
-              opacity: Tween<double>(
-                begin: 1,
-                end: -1,
-              ).animate(anim),
-              child: IgnorePointer(
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: Offset(firstTabOffset / tabIndicatorWidth, 0),
-                    end: Offset(secondTabOffset / tabIndicatorWidth, 0),
-                  ).animate(tabController.animation),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(69),
-                      boxShadow: kElevationToShadow[1],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class ExploreBody extends StatelessWidget {
   final TabController tabController;
   final List<ScrollController> scrollControllers;
@@ -429,91 +29,158 @@ class ExploreBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomSheetNotifier =
-        Provider.of<BottomSheetNotifier>(context, listen: false);
-    final animation = bottomSheetNotifier.animation;
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+      context,
+      listen: false,
+    );
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
+    final anim = Tween<double>(
+      begin: 0,
+      end: 1 / (height - bottomHeight),
+    ).animate(bottomSheetNotifier.animation);
+
     final initialRoute = FadeOutPageRoute<void>(
       builder: (context) {
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (context, child) {
-            Offset offset;
-            if (animation.value > height - bottomHeight)
-              offset = Offset(
-                0,
-                bottomHeight -
-                    bottomBarHeight -
-                    entityButtonHeightCollapsed -
-                    16 -
-                    topPadding,
-              );
-            else
-              offset = Offset(
-                0,
-                animation.value *
-                    (bottomHeight -
+        return Stack(
+          children: <Widget>[
+            ValueListenableBuilder(
+              valueListenable: anim,
+              builder: (context, value, child) {
+                Offset offset;
+                if (value > 1)
+                  offset = Offset(
+                    0,
+                    bottomHeight -
                         bottomBarHeight -
                         entityButtonHeightCollapsed -
                         16 -
-                        topPadding) /
-                    (height - bottomHeight),
-              );
-            return Transform.translate(
-              offset: offset,
-              child: child,
-            );
-          },
-          child: Container(
-            padding: EdgeInsets.only(top: topPadding + 72),
-            height: height + 128,
-            child: Stack(
-              fit: StackFit.passthrough,
-              children: <Widget>[
-                TabBarView(
-                  controller: tabController,
+                        topPadding,
+                  );
+                else
+                  offset = Offset(
+                    0,
+                    value *
+                        (bottomHeight -
+                            bottomBarHeight -
+                            entityButtonHeightCollapsed -
+                            16 -
+                            topPadding),
+                  );
+                return Transform.translate(
+                  offset: offset,
+                  child: child,
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.only(top: topPadding + 72),
+                height: height + 128,
+                child: Stack(
+                  fit: StackFit.passthrough,
                   children: <Widget>[
-                    Selector<FirebaseData, List<Flora>>(
-                      selector: (context, firebaseData) =>
-                          firebaseData.floraList,
-                      builder: (context, floraList, child) {
-                        return EntityListPage(
-                          entityList: floraList,
-                          scrollController: scrollControllers[0],
-                        );
-                      },
+                    TabBarView(
+                      controller: tabController,
+                      children: <Widget>[
+                        Selector<FirebaseData, List<Flora>>(
+                          selector: (context, firebaseData) =>
+                              firebaseData.floraList,
+                          builder: (context, floraList, child) {
+                            return EntityListPage(
+                              entityList: floraList,
+                              scrollController: scrollControllers[0],
+                            );
+                          },
+                        ),
+                        Selector<FirebaseData, List<Fauna>>(
+                          selector: (context, firebaseData) =>
+                              firebaseData.faunaList,
+                          builder: (context, faunaList, child) {
+                            return EntityListPage(
+                              entityList: faunaList,
+                              scrollController: scrollControllers[1],
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                    Selector<FirebaseData, List<Fauna>>(
-                      selector: (context, firebaseData) =>
-                          firebaseData.faunaList,
-                      builder: (context, faunaList, child) {
-                        return EntityListPage(
-                          entityList: faunaList,
-                          scrollController: scrollControllers[1],
-                        );
-                      },
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      left: 0,
+                      child: TopGradient(),
                     ),
                   ],
                 ),
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  left: 0,
-                  child: TopGradient(),
-                ),
-              ],
+              ),
             ),
-          ),
+            ExploreHeader(
+              tabController: tabController,
+            ),
+          ],
         );
       },
     );
-    return Navigator(
-      key: Provider.of<AppNotifier>(context, listen: false).navigatorKey,
-      onGenerateRoute: (settings) {
-        if (settings.name == Navigator.defaultRouteName) return initialRoute;
-        return null;
-      },
+    return Stack(
+      children: <Widget>[
+        Navigator(
+          key: Provider.of<AppNotifier>(context, listen: false).navigatorKey,
+          onGenerateRoute: (settings) {
+            if (settings.name == Navigator.defaultRouteName)
+              return initialRoute;
+            return null;
+          },
+        ),
+        Selector<AppNotifier, bool>(
+          selector: (context, appNotifier) => appNotifier.state == 0,
+          builder: (context, value, child) {
+            return AnimatedOpacity(
+              opacity: value ? 1 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: child,
+            );
+          },
+          child: BottomSheetHandle(
+            opacity: Tween<double>(
+              begin: 0,
+              end: (height - bottomHeight) / topPadding,
+            ).animate(anim),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class BottomSheetHandle extends StatelessWidget {
+  final Animation<double> opacity;
+  final EdgeInsets padding;
+  const BottomSheetHandle({
+    Key key,
+    @required this.opacity,
+    this.padding = const EdgeInsets.only(top: 8),
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Padding(
+        padding: padding,
+        child: FadeTransition(
+          opacity: opacity,
+          child: Container(
+            alignment: Alignment.center,
+            height: 4,
+            child: Container(
+              height: 4,
+              width: 24,
+              decoration: BoxDecoration(
+                color: Theme.of(context).dividerColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -602,6 +602,42 @@ class _SearchBarState extends State<SearchBar> {
   }
 }
 
+class SearchNotifier extends ChangeNotifier {
+  bool _isSearching = false;
+  bool get isSearching => _isSearching;
+  set isSearching(bool isSearching) {
+    if (isSearching == _isSearching) return;
+    _isSearching = isSearching;
+    notifyListeners();
+  }
+
+  String _searchTerm = '';
+  String get searchTerm => _searchTerm;
+  set searchTerm(String searchTerm) {
+    _searchTerm = searchTerm;
+    notifyListeners();
+  }
+
+  FocusNode focusNode;
+
+  bool _keyboardAppear = false;
+  bool get keyboardAppear => _keyboardAppear;
+  set keyboardAppear(bool keyboardAppear) {
+    if (_keyboardAppear == keyboardAppear) return;
+    _keyboardAppear = keyboardAppear;
+    if (focusNode == null) return;
+    if (keyboardAppear)
+      focusNode.requestFocus();
+    else
+      focusNode.unfocus();
+    notifyListeners();
+  }
+
+  void keyboardAppearFromFocus() {
+    _keyboardAppear = focusNode.hasFocus;
+  }
+}
+
 // The clipper for clipping the bottom app bar for the notched search fab
 class BottomAppBarClipper extends CustomClipper<Path> {
   final double windowWidth;

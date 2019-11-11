@@ -13,10 +13,6 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 - Search should be unified for both flora and fauna
 - Search should perhaps highlight the searchTerm within the name for clarity
 
-### Entity Details Page
-- Image gallery widget (expand photo in image scrollview)
-- Improve interaction with map (focus on marker)
-
 ### Sorting
 - Sorting by trails, distance
 - Different types of fauna

@@ -63,18 +63,27 @@ class FadeOutTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final Animation<double> opacityOut = Tween<double>(
+    final Animation<double> scaleOut = Tween(
       begin: 1.0,
-      end: 0.0,
+      end: .98,
+    ).animate(CurvedAnimation(
+      parent: secondaryAnimation,
+      curve: Curves.fastOutSlowIn,
+    ));
+    final Animation<double> opacityOut = Tween(
+      begin: 1.0,
+      end: -1.0,
     ).animate(secondaryAnimation);
 
     return Material(
-      child: FadeTransition(
-        opacity: animation,
+      child: ScaleTransition(
+        scale: scaleOut,
         child: FadeTransition(
-          opacity: opacityOut,
-          child: child,
+          opacity: animation,
+          child: FadeTransition(
+            opacity: opacityOut,
+            child: child,
+          ),
         ),
       ),
     );

@@ -1,9 +1,5 @@
 import 'library.dart';
 
-class ThemeNotifier extends ValueNotifier<bool> {
-  ThemeNotifier(bool value) : super(value);
-}
-
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(HcGardenApp());
@@ -215,6 +211,14 @@ class _MyHomePageState extends State<MyHomePage>
     if (state == 0) {
       if (navigatorKey.currentState.canPop()) {
         // If something wrong happens
+        if (appNotifier.trail != null) {
+          appNotifier.changeState(
+            context,
+            0,
+            activeScrollController: _scrollControllers[_tabController.index],
+            rebuild: false,
+          );
+        }
         navigatorKey.currentState.pop();
         return false;
       }
@@ -243,7 +247,6 @@ class _MyHomePageState extends State<MyHomePage>
       }
       return false;
     } else if (state == 2) {
-      // TODO: Replace with list of callbacks
       if (navigatorKey.currentState.canPop()) {
         navigatorKey.currentState.pop();
         appNotifier.changeState(context, 1);
@@ -289,6 +292,12 @@ class _MyHomePageState extends State<MyHomePage>
       length: 2,
       vsync: this,
     )..addListener(tabListener);
+    SharedPreferences.getInstance().then((prefs) {
+      Provider.of<ThemeNotifier>(
+        context,
+        listen: false,
+      ).value = prefs.getBool('isDark') ?? false;
+    });
   }
 
   @override
@@ -347,9 +356,6 @@ class _MyHomePageState extends State<MyHomePage>
                       },
                       child: MapWidget(),
                     ),
-                  ),
-                  header: ExploreHeader(
-                    tabController: _tabController,
                   ),
                   body: ExploreBody(
                     tabController: _tabController,

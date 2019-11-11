@@ -1,15 +1,23 @@
 import 'library.dart';
 
-// TODO: Create dark theme
-// https://colors.muz.li/palette/4caf50/357a3a/dbffdd/af4f4c/7a3735
+class ThemeNotifier extends ValueNotifier<bool> {
+  ThemeNotifier(bool value) : super(value);
+  @override
+  set value(bool newValue) {
+    if (super.value != newValue) {
+      SharedPreferences.getInstance().then((prefs) {
+        prefs.setBool('isDark', newValue);
+      });
+      super.value = newValue;
+    }
+  }
+}
 
 final ThemeData themeData = ThemeData(
   fontFamily: 'Manrope',
-  primaryColor: Color(0xFF27B50E),
-  // primaryColorDark: Color(0xFF357A3A),
-  // primaryColorLight: Color(0xFF5FDE65),
+  primaryColor: Color(0xFF27B50E), // Green
   primaryColorBrightness: Brightness.dark,
-  accentColor: Color(0xFF27B50E), // Light reddish-brown
+  accentColor: Color(0xFF27B50E),
   accentColorBrightness: Brightness.dark,
   textTheme: textTheme.merge(lightThemeText),
 );
@@ -51,7 +59,6 @@ const TextTheme textTheme = TextTheme(
   // Used for each entity's name in entity list page
   subhead: TextStyle(
     fontSize: 16,
-    height: 1.7,
   ),
   // Used for each entity's description in entity list page
   caption: TextStyle(
@@ -60,7 +67,6 @@ const TextTheme textTheme = TextTheme(
   subtitle: TextStyle(
     fontSize: 14.2,
     fontWeight: FontWeight.bold,
-    height: 1.7,
   ),
   // Main paragraph text
   body1: TextStyle(
@@ -73,7 +79,7 @@ const TextTheme textTheme = TextTheme(
   overline: TextStyle(
     fontSize: 15.5,
     fontStyle: FontStyle.italic,
-    height: 1.7,
+    height: 1.5,
     letterSpacing: 0.05,
   ),
 );

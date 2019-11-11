@@ -228,8 +228,10 @@ class AppNotifier extends ChangeNotifier {
     int state, {
     ScrollController activeScrollController,
     Entity entity,
+    Trail trail,
     TrailLocation location,
     VoidCallback onPop,
+    bool rebuild = true,
   }) {
     final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
@@ -240,22 +242,24 @@ class AppNotifier extends ChangeNotifier {
     if (state == 0) {
       _entity = null;
       _state = 0;
-      notifyListeners();
+      if (rebuild) notifyListeners();
+      _trail = trail;
       bottomSheetNotifier
         ..draggingDisabled = false
         ..activeScrollController = activeScrollController
         ..snappingPositions.value = [
           0,
           height - bottomHeight,
-          height - bottomBarHeight
+          if (trail == null) height - bottomBarHeight else height - 48 - 96,
         ]
-        ..endCorrection = topPadding - offsetTranslation;
+        ..endCorrection =
+            trail == null ? topPadding - offsetTranslation : topPadding;
     } else if (state == 1) {
       _state = 1;
       if (entity != null) _entity = entity;
       if (location != null) _location = location;
       if (onPop != null) popCallbacks.add(onPop);
-      notifyListeners();
+      if (rebuild) notifyListeners();
       bottomSheetNotifier
         ..draggingDisabled = false
         ..snappingPositions.value = [
@@ -267,7 +271,7 @@ class AppNotifier extends ChangeNotifier {
       Provider.of<SearchNotifier>(context, listen: false).isSearching = false;
     } else if (state == 2) {
       _state = 2;
-      notifyListeners();
+      if (rebuild) notifyListeners();
       bottomSheetNotifier.draggingDisabled = true;
     }
   }
@@ -279,47 +283,17 @@ class AppNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  Trail _trail;
+  Trail get trail => _trail;
+  set trail(Trail trail) {
+    _trail = trail;
+    notifyListeners();
+  }
+
   TrailLocation _location;
   TrailLocation get location => _location;
   set location(TrailLocation location) {
     _location = location;
     notifyListeners();
-  }
-
-}
-
-class SearchNotifier extends ChangeNotifier {
-  bool _isSearching = false;
-  bool get isSearching => _isSearching;
-  set isSearching(bool isSearching) {
-    if (isSearching == _isSearching) return;
-    _isSearching = isSearching;
-    notifyListeners();
-  }
-
-  String _searchTerm = '';
-  String get searchTerm => _searchTerm;
-  set searchTerm(String searchTerm) {
-    _searchTerm = searchTerm;
-    notifyListeners();
-  }
-
-  FocusNode focusNode;
-
-  bool _keyboardAppear = false;
-  bool get keyboardAppear => _keyboardAppear;
-  set keyboardAppear(bool keyboardAppear) {
-    if (_keyboardAppear == keyboardAppear) return;
-    _keyboardAppear = keyboardAppear;
-    if (focusNode == null) return;
-    if (keyboardAppear)
-      focusNode.requestFocus();
-    else
-      focusNode.unfocus();
-    notifyListeners();
-  }
-
-  void keyboardAppearFromFocus() {
-    _keyboardAppear = focusNode.hasFocus;
   }
 }
