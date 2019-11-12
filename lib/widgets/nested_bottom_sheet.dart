@@ -130,7 +130,9 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     }
 
     // Check if the scroll view is scrollable in the first place
-    if (controller.hasClients && controller.position.maxScrollExtent > 0) {
+    if (controller != null &&
+        controller.hasClients &&
+        controller.position.maxScrollExtent > 0) {
       // simulate a hold on the scroll view
       _scrollHold = controller.position.hold(removeHold);
     }
@@ -140,7 +142,9 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   void dragStart(DragStartDetails details) {
     final controller = _bottomSheetNotifier.activeScrollController;
     // Check if the [SingleChildScrollView] is scrollable in the first place
-    if (controller.hasClients && controller.position.maxScrollExtent > 0) {
+    if (controller != null &&
+        controller.hasClients &&
+        controller.position.maxScrollExtent > 0) {
       // simulate a scroll on the [SingleChildScrollView]
       _scrollDrag = controller.position.drag(details, removeDrag);
     }
@@ -150,7 +154,8 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   void dragUpdate(DragUpdateDetails details) {
     final controller = _bottomSheetNotifier.activeScrollController;
     // Scrolling the inner scroll view
-    if (controller.hasClients &&
+    if (controller != null &&
+        controller.hasClients &&
         _animationController.value == _sortedPositions.first &&
         (details.primaryDelta < 0 || controller.offset > 0)) {
       if (_scrollDrag == null) {
@@ -264,7 +269,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       _animationController = AnimationController(
         vsync: this,
         lowerBound: _sortedPositions.first,
-        upperBound: height,
+        upperBound: double.infinity,
         value: _initialPosition,
       );
       _bottomSheetNotifier

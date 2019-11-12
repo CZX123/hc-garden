@@ -34,7 +34,6 @@ class ExploreBody extends StatelessWidget {
       listen: false,
     );
     final topPadding = MediaQuery.of(context).padding.top;
-    final totalTranslation = offsetTranslation - topPadding;
     final height = MediaQuery.of(context).size.height;
     final anim = Tween<double>(
       begin: 0,
@@ -43,87 +42,9 @@ class ExploreBody extends StatelessWidget {
 
     final initialRoute = FadeOutPageRoute<void>(
       builder: (context) {
-        return Stack(
-          children: <Widget>[
-            FadeTransition(
-              opacity: Tween<double>(
-                begin: totalTranslation / 12,
-                end: 0,
-              ).animate(anim),
-              child: ValueListenableBuilder(
-                valueListenable: anim,
-                builder: (context, value, child) {
-                  Offset offset;
-                  if (value > 1)
-                    offset = Offset(
-                      0,
-                      bottomHeight -
-                          bottomBarHeight -
-                          entityButtonHeightCollapsed -
-                          16 -
-                          topPadding,
-                    );
-                  else
-                    offset = Offset(
-                      0,
-                      value *
-                          (bottomHeight -
-                              bottomBarHeight -
-                              entityButtonHeightCollapsed -
-                              16 -
-                              topPadding),
-                    );
-                  return Transform.translate(
-                    offset: offset,
-                    child: child,
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.only(top: topPadding + 72),
-                  height: height + 128,
-                  child: Stack(
-                    fit: StackFit.passthrough,
-                    children: <Widget>[
-                      TabBarView(
-                        controller: tabController,
-                        children: <Widget>[
-                          Selector<FirebaseData, List<Flora>>(
-                            selector: (context, firebaseData) =>
-                                firebaseData.floraList,
-                            builder: (context, floraList, child) {
-                              return EntityListPage(
-                                entityList: floraList,
-                                scrollController: scrollControllers[0],
-                              );
-                            },
-                          ),
-                          Selector<FirebaseData, List<Fauna>>(
-                            selector: (context, firebaseData) =>
-                                firebaseData.faunaList,
-                            builder: (context, faunaList, child) {
-                              return EntityListPage(
-                                entityList: faunaList,
-                                scrollController: scrollControllers[1],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        left: 0,
-                        child: TopGradient(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            ExploreHeader(
-              tabController: tabController,
-            ),
-          ],
+        return ExplorePage(
+          tabController: tabController,
+          scrollControllers: scrollControllers,
         );
       },
     );
@@ -154,6 +75,116 @@ class ExploreBody extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class ExplorePage extends StatelessWidget {
+  final TabController tabController;
+  final List<ScrollController> scrollControllers;
+  const ExplorePage({
+    Key key,
+    @required this.tabController,
+    @required this.scrollControllers,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+      context,
+      listen: false,
+    );
+    final topPadding = MediaQuery.of(context).padding.top;
+    final totalTranslation = offsetTranslation - topPadding;
+    final height = MediaQuery.of(context).size.height;
+    final anim = Tween<double>(
+      begin: 0,
+      end: 1 / (height - bottomHeight),
+    ).animate(bottomSheetNotifier.animation);
+    return Material(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Stack(
+        children: <Widget>[
+          FadeTransition(
+            opacity: Tween<double>(
+              begin: totalTranslation / 12,
+              end: 0,
+            ).animate(anim),
+            child: ValueListenableBuilder(
+              valueListenable: anim,
+              builder: (context, value, child) {
+                Offset offset;
+                if (value > 1)
+                  offset = Offset(
+                    0,
+                    bottomHeight -
+                        bottomBarHeight -
+                        entityButtonHeightCollapsed -
+                        16 -
+                        topPadding,
+                  );
+                else
+                  offset = Offset(
+                    0,
+                    value *
+                        (bottomHeight -
+                            bottomBarHeight -
+                            entityButtonHeightCollapsed -
+                            16 -
+                            topPadding),
+                  );
+                return Transform.translate(
+                  offset: offset,
+                  child: child,
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.only(top: topPadding + 72),
+                height: height + 128,
+                child: Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    TabBarView(
+                      controller: tabController,
+                      children: <Widget>[
+                        Selector<FirebaseData, List<Flora>>(
+                          selector: (context, firebaseData) =>
+                              firebaseData.floraList,
+                          builder: (context, floraList, child) {
+                            return EntityListPage(
+                              entityList: floraList,
+                              scrollController: scrollControllers[0],
+                            );
+                          },
+                        ),
+                        Selector<FirebaseData, List<Fauna>>(
+                          selector: (context, firebaseData) =>
+                              firebaseData.faunaList,
+                          builder: (context, faunaList, child) {
+                            return EntityListPage(
+                              entityList: faunaList,
+                              scrollController: scrollControllers[1],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      left: 0,
+                      child: TopGradient(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          ExploreHeader(
+            tabController: tabController,
+          ),
+        ],
+      ),
     );
   }
 }

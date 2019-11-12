@@ -15,8 +15,32 @@ class TrailLocationOverviewPage extends StatefulWidget {
 }
 
 class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
+  final _scrollController = ScrollController();
   double aspectRatio;
   static const double sizeScaling = 550;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    if (appNotifier.state == 1 &&
+        appNotifier.entity == null &&
+        appNotifier.location == null) {
+      appNotifier.changeState(
+        context,
+        1,
+        location: widget.trailLocation,
+        activeScrollController: _scrollController,
+        rebuild: false,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,35 +54,38 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
       DeviceOrientation.landscapeRight,
     ]);
     return Scaffold(
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                SystemChrome.setPreferredOrientations(
-                    [DeviceOrientation.portraitUp]);
-                return Navigator.maybePop(context);
-              },
-              tooltip: 'Back',
-            ),
-            Expanded(
-              child: Text(
-                widget.trailLocation.name,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-            ),
-            SizedBox(width: 48),
-          ],
-        ),
-      ),
+      // bottomNavigationBar: BottomAppBar(
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     children: <Widget>[
+      //       IconButton(
+      //         icon: const Icon(Icons.arrow_back),
+      //         onPressed: () {
+      //           SystemChrome.setPreferredOrientations(
+      //               [DeviceOrientation.portraitUp]);
+      //           return Navigator.maybePop(context);
+      //         },
+      //         tooltip: 'Back',
+      //       ),
+      //       Expanded(
+      //         child: Text(
+      //           widget.trailLocation.name,
+      //           textAlign: TextAlign.center,
+      //           overflow: TextOverflow.ellipsis,
+      //           maxLines: 1,
+      //         ),
+      //       ),
+      //       SizedBox(width: 48),
+      //     ],
+      //   ),
+      // ),
       body: SingleChildScrollView(
+        controller: _scrollController,
+        physics: NeverScrollableScrollPhysics(),
         child: Container(
           padding: EdgeInsets.only(
-              top: orientation == Orientation.landscape ? 0 : topPadding),
+            top: orientation == Orientation.landscape ? 0 : topPadding,
+          ),
           constraints: BoxConstraints(
             minHeight: height - 48,
           ),
@@ -84,7 +111,25 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                           (entityPosition.size / sizeScaling) * width / 2,
                   width: (entityPosition.size / sizeScaling) * width,
                   height: (entityPosition.size / sizeScaling) * width,
-                  child: AnimatedPulseCircle(),
+                  child: InkWell(
+                    child: AnimatedPulseCircle(),
+                    onTap: () {
+                      Provider.of<AppNotifier>(context, listen: false)
+                          .changeState(
+                        context,
+                        1,
+                      );
+                      final newTopPadding = ValueNotifier(topPadding + 16);
+                      Navigator.of(context).push(
+                        FadingPageRoute(
+                          builder: (context) => EntityDetailsPage(
+                            newTopPadding: newTopPadding,
+                            entity: entityPosition.entity,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
             ],
           ),
@@ -123,6 +168,15 @@ class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
       curve: Curves.easeInOutQuad,
     ));
     controller.forward();
+  }
+
+  @override
+  void dispose() {
+    // @TS, remember to dispose!
+    controller
+      ..removeStatusListener(listener)
+      ..dispose();
+    super.dispose();
   }
 
   @override

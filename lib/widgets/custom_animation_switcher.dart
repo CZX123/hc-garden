@@ -31,7 +31,11 @@ class CustomAnimatedSwitcher extends StatelessWidget {
     );
     if (crossShrink) {
       return ScaleTransition(
-        scale: Tween<double>(begin: .97, end: 1).animate(animation),
+        scale: Tween<double>(begin: .97, end: 1).animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.linear,
+          reverseCurve: Interval(0, .001),
+        )),
         child: element,
       );
     }

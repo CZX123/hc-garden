@@ -19,10 +19,10 @@ class _MapWidgetState extends State<MapWidget> {
 
   void themeListener() {
     if (_themeNotifier.value)
-      // _mapController.setMapStyle(darkMapStyle);
-      _mapController.setMapStyle(mapStyle);
+      // TODO: _mapController.setMapStyle(darkMapStyle);
+      _mapController?.setMapStyle(mapStyle);
     else
-      _mapController.setMapStyle(mapStyle);
+      _mapController?.setMapStyle(mapStyle);
   }
 
   void stateListener() {
@@ -141,12 +141,21 @@ class _MapWidgetState extends State<MapWidget> {
                     infoWindow: InfoWindow(
                       title: location.name,
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => TrailLocationOverviewPage(
-                                  trail: trail, trailLocation: location)),
-                        );
+                        Provider.of<AppNotifier>(context, listen: false)
+                          ..navigatorKey.currentState.push(
+                            FadeOutPageRoute(
+                              builder: (context) {
+                                return TrailLocationOverviewPage(
+                                  trail: trail,
+                                  trailLocation: location,
+                                );
+                              },
+                            ),
+                          )
+                          ..changeState(
+                            context,
+                            1,
+                          );
                       },
                     ),
                     icon: BitmapDescriptor.defaultMarkerWithHue(hues[i]),

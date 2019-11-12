@@ -211,7 +211,6 @@ class _EntityListRowState extends State<EntityListRow> {
           Provider.of<AppNotifier>(context, listen: false).changeState(
             context,
             1,
-            entity: widget.entity,
           );
           final oldChild = Container(
             height: widget.searchTerm.isEmpty ? 104 : 88,

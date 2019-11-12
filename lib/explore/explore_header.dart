@@ -175,12 +175,15 @@ class TrailButtonsRow extends StatelessWidget {
                 textColor: _textColors[i],
                 trailName: _trails[i],
                 onPressed: () {
-                  final firebaseData = Provider.of<FirebaseData>(context, listen: false);
+                  final firebaseData =
+                      Provider.of<FirebaseData>(context, listen: false);
                   final trail = firebaseData.trails.keys.firstWhere((trail) {
                     return trail.name.contains(_trails[i].substring(0, 5));
                   });
-                  Navigator.push(context, PageRouteBuilder(
-                    pageBuilder: (context, _, __) {
+                  // https://github.com/flutter/flutter/issues/41680
+                  // Secondary animation will not run, will soon be fixed
+                  Navigator.pushReplacement(context, FadeOutPageRoute(
+                    builder: (context) {
                       return TrailDetailsPage(
                         trail: trail,
                         trailLocations: firebaseData.trails[trail],

@@ -41,8 +41,6 @@ class BottomSheetFooter extends StatelessWidget {
                   } else {
                     offset = Offset(0, bottomBarHeight * 2 * (1 - value));
                   }
-                  if (offset.dy == bottomBarHeight * 2)
-                    return const SizedBox.shrink();
                   return Transform.translate(
                     offset: offset,
                     child: child,
@@ -53,13 +51,19 @@ class BottomSheetFooter extends StatelessWidget {
             );
           },
           child: Selector<AppNotifier, bool>(
-            selector: (context, appNotifier) => appNotifier.trail != null,
+            selector: (context, appNotifier) =>
+                appNotifier.trail != null ||
+                appNotifier.location != null ||
+                appNotifier.entity != null,
             builder: (context, value, child) {
               return AnimatedContainer(
                 curve: Curves.fastOutSlowIn,
                 duration: const Duration(milliseconds: 300),
                 transform: Matrix4.translationValues(
-                    0, value ? bottomBarHeight * 2 : 0, 0),
+                  0,
+                  value ? bottomBarHeight * 2 : 0,
+                  0,
+                ),
                 child: child,
               );
             },
@@ -256,14 +260,17 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
     return SizedBox(
       height: 76,
       child: Selector<AppNotifier, bool>(
-        selector: (context, appNotifier) => appNotifier.trail != null,
-        builder: (context, hasTrail, child) {
+        selector: (context, appNotifier) =>
+            appNotifier.trail != null ||
+            appNotifier.location != null ||
+            appNotifier.entity != null,
+        builder: (context, appear, child) {
           return ValueListenableBuilder(
             valueListenable: widget.bottomSheetAnimation,
             builder: (context, value, child) {
               Duration d = const Duration(milliseconds: 300);
               double y = 0;
-              if (!hasTrail && _state == 0) {
+              if (!appear && _state == 0) {
                 if (value >= .5) {
                   y = 76;
                 } else {

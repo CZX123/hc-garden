@@ -218,7 +218,6 @@ String lowerRes(String image) {
 
 class AppNotifier extends ChangeNotifier {
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  List<VoidCallback> popCallbacks = [];
 
   int _state = 0;
   int get state => _state;
@@ -248,6 +247,7 @@ class AppNotifier extends ChangeNotifier {
     );
     if (state == 0) {
       _entity = null;
+      _location = null;
       _trail = trail;
       _state = 0;
       if (rebuild) notifyListeners();
@@ -264,17 +264,18 @@ class AppNotifier extends ChangeNotifier {
             trail == null ? topPadding - offsetTranslation : topPadding;
     } else if (state == 1) {
       _state = 1;
-      if (entity != null) _entity = entity;
-      if (location != null) _location = location;
-      if (onPop != null) popCallbacks.add(onPop);
+      _entity = entity;
+      _location = location;
       if (rebuild) notifyListeners();
       bottomSheetNotifier
         ..draggingDisabled = false
         ..snappingPositions.value = [
           0,
-          height - 48 - 96 - 216 - 16,
+          height - 48 - 96 - 218 - 16,
           height - 48 - 96,
         ]
+        ..activeScrollController =
+            activeScrollController ?? bottomSheetNotifier.activeScrollController
         ..endCorrection = topPadding;
       Provider.of<SearchNotifier>(context, listen: false).isSearching = false;
     } else if (state == 2) {

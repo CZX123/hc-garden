@@ -31,61 +31,46 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final animation = ModalRoute.of(context).animation;
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
-    return FadeTransition(
-      opacity: Tween(
-        begin: -1.0,
-        end: 1.0,
-      ).animate(animation),
-      child: Material(
-        color: Theme.of(context).bottomAppBarColor,
-        child: ScaleTransition(
-          scale: Tween(
-            begin: 0.96,
-            end: 1.0,
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.fastOutSlowIn,
-          )),
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            physics: NeverScrollableScrollPhysics(),
-            child: Column(
-              children: <Widget>[
-                ValueListenableBuilder(
-                  valueListenable: Provider.of<BottomSheetNotifier>(
-                    context,
-                    listen: false,
-                  ).animation,
-                  builder: (context, value, child) {
-                    double h = 0;
-                    if (value < height - bottomHeight) {
-                      h = (1 - value / (height - bottomHeight)) * topPadding;
-                    }
-                    return SizedBox(
-                      height: h + 32,
-                    );
-                  },
-                ),
-                Text(
-                  widget.trail.name,
-                  style: Theme.of(context).textTheme.display1,
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                for (var location in widget.trailLocations)
-                  LocationListRow(
-                    location: location,
-                  ),
-                SizedBox(
-                  height: 64,
-                ),
-              ],
+    return Material(
+      color: Theme.of(context).bottomAppBarColor,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        physics: NeverScrollableScrollPhysics(),
+        child: Column(
+          children: <Widget>[
+            ValueListenableBuilder(
+              valueListenable: Provider.of<BottomSheetNotifier>(
+                context,
+                listen: false,
+              ).animation,
+              builder: (context, value, child) {
+                double h = 0;
+                if (value < height - bottomHeight) {
+                  h = (1 - value / (height - bottomHeight)) * topPadding;
+                }
+                return SizedBox(
+                  height: h + 32,
+                );
+              },
             ),
-          ),
+            Text(
+              widget.trail.name,
+              style: Theme.of(context).textTheme.display1,
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            for (var location in widget.trailLocations)
+              LocationListRow(
+                trail: widget.trail,
+                location: location,
+              ),
+            SizedBox(
+              height: 64,
+            ),
+          ],
         ),
       ),
     );
@@ -93,19 +78,24 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
 }
 
 class LocationListRow extends StatelessWidget {
+  final Trail trail;
   final TrailLocation location;
-  const LocationListRow({Key key, @required this.location}) : super(key: key);
+  const LocationListRow(
+      {Key key, @required this.trail, @required this.location})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var names = location.entityPositions
-        .map((position) => position.entity.name)
-        .toList()
-          ..shuffle();
-    names = names.sublist(0, min(5, names.length));
+        .map((position) => position.entity?.name)
+        .where((name) => name != null)
+        .toList();
+    //names = names.sublist(0, min(5, names.length));
     return InkWell(
       child: Container(
-        height: 88,
+        padding: EdgeInsets.symmetric(
+          vertical: 16,
+        ),
         child: Row(
           children: <Widget>[
             const SizedBox(
@@ -132,6 +122,7 @@ class LocationListRow extends StatelessWidget {
                   Text(
                     location.name,
                     style: Theme.of(context).textTheme.subhead,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
@@ -139,7 +130,7 @@ class LocationListRow extends StatelessWidget {
                       names.join(', '),
                       style: Theme.of(context).textTheme.caption,
                       overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
+                      maxLines: 3,
                     ),
                   )
                 ],
@@ -151,7 +142,23 @@ class LocationListRow extends StatelessWidget {
           ],
         ),
       ),
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          FadeOutPageRoute(
+            builder: (context) {
+              return TrailLocationOverviewPage(
+                trail: trail,
+                trailLocation: location,
+              );
+            },
+          ),
+        );
+        Provider.of<AppNotifier>(context, listen: false).changeState(
+          context,
+          1,
+        );
+      },
     );
   }
 }

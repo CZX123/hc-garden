@@ -209,15 +209,24 @@ class _MyHomePageState extends State<MyHomePage>
     final state = appNotifier.state;
     final navigatorKey = appNotifier.navigatorKey;
     if (state == 0) {
+      if (appNotifier.trail != null) {
+        appNotifier.changeState(
+          context,
+          0,
+          activeScrollController: _scrollControllers[_tabController.index],
+        );
+        navigatorKey.currentState.pushReplacement(FadeOutPageRoute(
+          builder: (context) {
+            return ExplorePage(
+              tabController: _tabController,
+              scrollControllers: _scrollControllers,
+            );
+          },
+        ));
+        return false;
+      }
       if (navigatorKey.currentState.canPop()) {
         // If something wrong happens
-        if (appNotifier.trail != null) {
-          appNotifier.changeState(
-            context,
-            0,
-            activeScrollController: _scrollControllers[_tabController.index],
-          );
-        }
         navigatorKey.currentState.pop();
         return false;
       }
@@ -232,17 +241,36 @@ class _MyHomePageState extends State<MyHomePage>
       }
       return true;
     } else if (state == 1) {
-      if (animation.value > 10) {
-        bottomSheetNotifier.animateTo(0);
-      } else if (navigatorKey.currentState.canPop()) {
+      // if (animation.value > 10) {
+      //   bottomSheetNotifier.animateTo(0);
+      if (navigatorKey.currentState.canPop()) {
         navigatorKey.currentState.pop();
-        appNotifier.changeState(
-          context,
-          0,
-          activeScrollController: _scrollControllers[_tabController.index],
-        );
-        if (searchNotifier.searchTerm.isNotEmpty)
-          searchNotifier.isSearching = true;
+        if (!navigatorKey.currentState.canPop()) {
+          SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+          appNotifier.changeState(
+            context,
+            0,
+            activeScrollController: _scrollControllers[_tabController.index],
+            trail: appNotifier.trail,
+          );
+          if (searchNotifier.searchTerm.isNotEmpty)
+            searchNotifier.isSearching = true;
+        } else if (appNotifier.location != null) {
+          SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+          appNotifier.changeState(
+            context,
+            1,
+            location: null,
+            entity: appNotifier.entity,
+          );
+        } else if (appNotifier.entity != null) {
+          appNotifier.changeState(
+            context,
+            1,
+            entity: null,
+            location: appNotifier.location,
+          );
+        }
       }
       return false;
     } else if (state == 2) {

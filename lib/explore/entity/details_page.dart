@@ -62,9 +62,18 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (Provider.of<AppNotifier>(context, listen: false).state == 1)
-      Provider.of<BottomSheetNotifier>(context, listen: false)
-          .activeScrollController = _scrollController;
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    if (appNotifier.state == 1 &&
+        appNotifier.location == null &&
+        appNotifier.entity == null) {
+      appNotifier.changeState(
+        context,
+        1,
+        entity: widget.entity,
+        activeScrollController: _scrollController,
+        rebuild: false,
+      );
+    }
   }
 
   @override
@@ -99,8 +108,8 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                       .animation,
               builder: (context, value, child) {
                 double h = 0;
-                if (value < height - 376) {
-                  h = (1 - value / (height - 376)) * topPadding;
+                if (value < height - 378) {
+                  h = (1 - value / (height - 378)) * topPadding;
                   if (value > 1) widget.newTopPadding.value = h + 16;
                 }
                 return SizedBox(
@@ -143,7 +152,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
               ),
             ),
             Container(
-              height: 216,
+              height: 218,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
                 scrollDirection: Axis.horizontal,
@@ -156,7 +165,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                           children: <Widget>[
                             CustomImage(
                               image,
-                              height: 216,
+                              height: 218,
                               width: newImages.length == 1 ? width - 32 : 324,
                               fit: BoxFit.cover,
                               placeholderColor: Theme.of(context).dividerColor,
