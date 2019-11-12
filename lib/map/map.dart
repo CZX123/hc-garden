@@ -141,9 +141,10 @@ class _MapWidgetState extends State<MapWidget> {
                     infoWindow: InfoWindow(
                       title: location.name,
                       onTap: () {
+                        _bottomSheetNotifier.animateTo(0);
                         Provider.of<AppNotifier>(context, listen: false)
                           ..navigatorKey.currentState.push(
-                            FadeOutPageRoute(
+                            CrossFadePageRoute(
                               builder: (context) {
                                 return TrailLocationOverviewPage(
                                   trail: trail,

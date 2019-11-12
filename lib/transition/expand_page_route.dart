@@ -1,21 +1,25 @@
 import '../library.dart';
 
 class ExpandPageRoute<T> extends PageRoute<T> {
-  final ValueNotifier<double> newTopPadding;
-  final ValueNotifier<double> oldTopPadding;
+  final ValueNotifier<Offset> startContentOffset;
+  final ValueNotifier<Offset> endContentOffset;
   final WidgetBuilder builder;
-  final GlobalKey sourceKey;
+  final Rect sourceRect;
   final Widget oldChild;
   final Widget persistentOldChild;
+  final double entityRowOffset;
+  final ScrollController oldScrollController;
 
   ExpandPageRoute({
-    @required this.newTopPadding,
-    @required this.oldTopPadding,
     @required this.builder,
-    this.transitionDuration = const Duration(milliseconds: 360),
-    @required this.sourceKey,
+    @required this.sourceRect,
     this.oldChild,
     this.persistentOldChild,
+    this.startContentOffset,
+    this.endContentOffset,
+    this.transitionDuration = const Duration(milliseconds: 360),
+    this.entityRowOffset,
+    this.oldScrollController,
     RouteSettings settings,
   })  : assert(builder != null),
         assert(transitionDuration != null),
@@ -39,9 +43,6 @@ class ExpandPageRoute<T> extends PageRoute<T> {
     return Builder(builder: builder);
   }
 
-  Rect _sourceRect;
-  Widget _oldChild;
-
   @override
   Widget buildTransitions(
     BuildContext context,
@@ -49,58 +50,18 @@ class ExpandPageRoute<T> extends PageRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    if (_sourceRect == null) {
-      final RenderBox box = sourceKey.currentContext.findRenderObject();
-      _sourceRect = box.localToGlobal(Offset.zero) & box.size;
-    }
-    _oldChild = oldChild;
-    if (_oldChild == null) {
-      _oldChild = sourceKey.currentWidget;
-      if (_oldChild is ListTile) {
-        final widget = _oldChild as ListTile;
-        _oldChild = Material(
-          type: MaterialType.transparency,
-          child: ListTile(
-            onTap: () => null,
-            trailing: widget.trailing,
-            title: widget.title,
-            contentPadding: widget.contentPadding,
-            isThreeLine: widget.isThreeLine,
-            subtitle: widget.subtitle,
-            leading: widget.leading,
-            dense: widget.dense,
-            enabled: widget.enabled,
-            onLongPress: () => null,
-            selected: widget.selected,
-          ),
-        );
-      } else if (_oldChild is Container) {
-        final widget = _oldChild as Container;
-        _oldChild = Container(
-          alignment: widget.alignment,
-          padding: widget.padding,
-          decoration: widget.decoration,
-          foregroundDecoration: widget.foregroundDecoration,
-          width: _sourceRect.width,
-          height: _sourceRect.height,
-          constraints: widget.constraints,
-          margin: widget.margin,
-          transform: widget.transform,
-          child: widget.child,
-        );
-      }
-    }
     return ExpandItemPageTransition(
-      oldTopPadding: oldTopPadding,
-      newTopPadding: newTopPadding,
-      sourceKey: sourceKey,
-      sourceRect: _sourceRect,
-      oldChild: _oldChild,
+      sourceRect: sourceRect,
+      oldChild: oldChild,
       persistentOldChild: persistentOldChild,
       animation: animation,
       secondaryAnimation: secondaryAnimation,
       child: child,
+      startContentOffset: startContentOffset,
+      endContentOffset: endContentOffset,
       transitionDuration: transitionDuration,
+      entityRowOffset: entityRowOffset,
+      oldScrollController: oldScrollController,
     );
   }
 
@@ -108,25 +69,24 @@ class ExpandPageRoute<T> extends PageRoute<T> {
   bool get maintainState => true;
 }
 
-// Borrowed from https://github.com/flschweiger/reply
 class ExpandItemPageTransition extends StatefulWidget {
   const ExpandItemPageTransition({
     Key key,
-    @required this.newTopPadding,
-    @required this.oldTopPadding,
-    @required this.sourceKey,
-    @required this.sourceRect,
-    @required this.oldChild,
+    this.sourceRect,
+    this.oldChild,
     this.persistentOldChild,
-    @required this.animation,
-    @required this.secondaryAnimation,
-    @required this.child,
+    this.animation,
+    this.secondaryAnimation,
+    this.child,
+    this.startContentOffset,
+    this.endContentOffset,
     this.transitionDuration,
+    this.entityRowOffset,
+    this.oldScrollController,
   }) : super(key: key);
 
-  final ValueNotifier<double> newTopPadding;
-  final ValueNotifier<double> oldTopPadding;
-  final GlobalKey sourceKey;
+  final ValueNotifier<Offset> startContentOffset;
+  final ValueNotifier<Offset> endContentOffset;
   final Rect sourceRect;
   final Widget oldChild;
   final Widget persistentOldChild;
@@ -134,6 +94,8 @@ class ExpandItemPageTransition extends StatefulWidget {
   final Animation<double> secondaryAnimation;
   final Widget child;
   final Duration transitionDuration;
+  final double entityRowOffset;
+  final ScrollController oldScrollController;
 
   @override
   _ExpandItemPageTransitionState createState() =>
@@ -143,12 +105,27 @@ class ExpandItemPageTransition extends StatefulWidget {
 class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
   @override
   Widget build(BuildContext context) {
-    final animation = ModalRoute.of(context).animation;
-    final secondaryAnimation = ModalRoute.of(context).secondaryAnimation;
-    final topDistance = widget.newTopPadding.value - widget.oldTopPadding.value;
+    final animation = widget.animation;
+    final secondaryAnimation = widget.secondaryAnimation;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
+        final height = constraints.biggest.height;
+        final width = constraints.biggest.width;
+        final topPadding = MediaQuery.of(context).padding.top;
+        final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+          context,
+          listen: false,
+        );
+        final anim = Tween<double>(
+          begin: 0,
+          end: 1 / (height - bottomHeight),
+        ).animate(bottomSheetNotifier.animation);
+        final topSpaceTween = Tween(
+          begin: entityButtonHeightCollapsed + 24 + topPadding,
+          end: bottomHeight - bottomBarHeight + 8,
+        );
+
         final positionAnimation = CurvedAnimation(
           parent: animation,
           curve: Curves.fastOutSlowIn,
@@ -156,18 +133,19 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
 
         final itemPosition = RelativeRectTween(
           begin: RelativeRect.fromLTRB(
-            0,
-            widget.sourceRect.top,
-            0,
-            constraints.biggest.height - widget.sourceRect.bottom,
+            widget.sourceRect.left,
+            widget.entityRowOffset -
+                widget.oldScrollController.offset +
+                topSpaceTween.evaluate(anim),
+            width - widget.sourceRect.right,
+            height -
+                (widget.entityRowOffset -
+                    widget.oldScrollController.offset +
+                    topSpaceTween.evaluate(anim)) -
+                widget.sourceRect.height,
           ),
           end: RelativeRect.fill,
         ).animate(positionAnimation);
-
-        // final Animation<double> fadeMaterialBackground = CurvedAnimation(
-        //   parent: animation,
-        //   curve: const Interval(0, .2, curve: Curves.ease),
-        // );
 
         final fadeOldContent = Tween(
           begin: 1.0,
@@ -180,18 +158,24 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
         );
 
         final contentOffset = Tween<Offset>(
-          begin: Offset(0, -topDistance),
+          begin:
+              widget.startContentOffset.value - widget.endContentOffset.value,
           end: Offset.zero,
         ).animate(positionAnimation);
 
         final oldChildOffset = Tween<Offset>(
           begin: Offset.zero,
-          end: Offset(0, topDistance),
+          end: widget.endContentOffset.value - widget.startContentOffset.value,
         ).animate(positionAnimation);
 
         final fadeContent = CurvedAnimation(
           parent: animation,
           curve: const Interval(.1, .8, curve: Curves.ease),
+        );
+
+        final fadeMaterial = CurvedAnimation(
+          parent: animation,
+          curve: const Interval(0, .4, curve: Curves.ease),
         );
 
         return Stack(
@@ -210,22 +194,37 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
                 ),
                 child: Stack(
                   children: <Widget>[
+                    FadeTransition(
+                      opacity: fadeMaterial,
+                      child: Material(
+                        color: Theme.of(context).bottomAppBarColor,
+                        animationDuration: widget.transitionDuration,
+                        child: SizedBox(
+                          width: width,
+                          height: height,
+                        ),
+                      ),
+                    ),
                     AnimatedBuilder(
                       animation: contentOffset,
                       builder: (context, child) {
-                        return Material(
-                          color: Theme.of(context).bottomAppBarColor,
-                          elevation:
-                              animation.status == AnimationStatus.reverse ||
-                                      contentOffset.value.dy == -topDistance
-                                  ? 0
-                                  : 3,
-                          animationDuration: widget.transitionDuration,
-                          child: Transform.translate(
-                            offset: contentOffset.value,
-                            child: child,
-                          ),
+                        return Transform.translate(
+                          offset: contentOffset.value,
+                          child: child,
                         );
+                        // return Material(
+                        //   color: Theme.of(context).bottomAppBarColor,
+                        //   elevation:
+                        //       animation.status == AnimationStatus.reverse ||
+                        //               animation.value == 0
+                        //           ? 0
+                        //           : 3,
+                        //   animationDuration: widget.transitionDuration,
+                        //   child: Transform.translate(
+                        //     offset: contentOffset.value,
+                        //     child: child,
+                        //   ),
+                        // );
                       },
                       child: FadeTransition(
                         opacity: fadeContent,
@@ -243,27 +242,7 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
                         ),
                       ),
                     ),
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      right: 0,
-                      child: IgnorePointer(
-                        child: AnimatedBuilder(
-                          animation: oldChildOffset,
-                          child: FadeTransition(
-                            opacity: fadeOldContent,
-                            child: widget.oldChild,
-                          ),
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: oldChildOffset.value,
-                              child: child,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    if (widget.persistentOldChild != null)
+                    if (widget.oldChild != null)
                       Positioned(
                         left: 0,
                         top: 0,
@@ -271,15 +250,36 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
                         child: IgnorePointer(
                           child: AnimatedBuilder(
                             animation: oldChildOffset,
-                            child: widget.persistentOldChild,
                             builder: (context, child) {
-                              if (oldChildOffset.value.dy == topDistance)
+                              return Transform.translate(
+                                offset: oldChildOffset.value,
+                                child: child,
+                              );
+                            },
+                            child: FadeTransition(
+                              opacity: fadeOldContent,
+                              child: widget.oldChild,
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (widget.persistentOldChild != null)
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        child: IgnorePointer(
+                          child: AnimatedBuilder(
+                            animation: animation,
+                            builder: (context, child) {
+                              if (animation.value == 1)
                                 return SizedBox.shrink();
                               return Transform.translate(
                                 offset: oldChildOffset.value,
                                 child: child,
                               );
                             },
+                            child: widget.persistentOldChild,
                           ),
                         ),
                       ),

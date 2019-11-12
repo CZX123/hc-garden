@@ -215,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage>
           0,
           activeScrollController: _scrollControllers[_tabController.index],
         );
-        navigatorKey.currentState.pushReplacement(FadeOutPageRoute(
+        navigatorKey.currentState.pushReplacement(CrossFadePageRoute(
           builder: (context) {
             return ExplorePage(
               tabController: _tabController,
@@ -237,6 +237,13 @@ class _MyHomePageState extends State<MyHomePage>
         return false;
       } else if (animation.value < height - bottomHeight) {
         bottomSheetNotifier.animateTo(height - bottomHeight);
+        return false;
+      }
+      if (_pageIndex.value != 1) {
+        _pageIndex.value = 1;
+        bottomSheetNotifier
+          ..draggingDisabled = false
+          ..animateTo(height - bottomHeight);
         return false;
       }
       return true;

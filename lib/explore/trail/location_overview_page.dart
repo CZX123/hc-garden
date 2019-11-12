@@ -119,11 +119,10 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                         context,
                         1,
                       );
-                      final newTopPadding = ValueNotifier(topPadding + 16);
-                      Navigator.of(context).push(
-                        FadingPageRoute(
+                      Navigator.push(
+                        context,
+                        CrossFadePageRoute(
                           builder: (context) => EntityDetailsPage(
-                            newTopPadding: newTopPadding,
                             entity: entityPosition.entity,
                           ),
                         ),

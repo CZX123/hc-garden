@@ -145,7 +145,7 @@ class LocationListRow extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          FadeOutPageRoute(
+          CrossFadePageRoute(
             builder: (context) {
               return TrailLocationOverviewPage(
                 trail: trail,

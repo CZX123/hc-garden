@@ -1,24 +1,30 @@
 import '../library.dart';
 
-class FadeOutPageRoute<T> extends PageRoute<T> {
+class CrossFadePageRoute<T> extends PageRoute<T> {
   final WidgetBuilder builder;
+  final Color scrimColor;
+  final String scrimLabel;
+  final bool fadeOut;
+  @override
+  final Duration transitionDuration;
 
-  FadeOutPageRoute({
+  CrossFadePageRoute({
     @required this.builder,
     this.transitionDuration = const Duration(milliseconds: 300),
+    this.scrimColor,
+    this.scrimLabel,
+    this.fadeOut = true,
     RouteSettings settings,
   })  : assert(builder != null),
+        assert(fadeOut != null),
         assert(transitionDuration != null),
         super(settings: settings);
 
   @override
-  final Duration transitionDuration;
+  Color get barrierColor => scrimColor;
 
   @override
-  Color get barrierColor => null;
-
-  @override
-  String get barrierLabel => null;
+  String get barrierLabel => scrimLabel;
 
   @override
   Widget buildPage(
@@ -36,9 +42,10 @@ class FadeOutPageRoute<T> extends PageRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return FadeOutTransition(
+    return CrossFadeTransition(
       animation: animation,
       secondaryAnimation: secondaryAnimation,
+      fadeOut: fadeOut,
       child: child,
     );
   }
@@ -47,24 +54,25 @@ class FadeOutPageRoute<T> extends PageRoute<T> {
   bool get maintainState => true;
 }
 
-// Borrowed from https://github.com/flschweiger/reply
-class FadeOutTransition extends StatelessWidget {
-  const FadeOutTransition({
+class CrossFadeTransition extends StatelessWidget {
+  const CrossFadeTransition({
     Key key,
     @required this.animation,
     @required this.secondaryAnimation,
     @required this.child,
+    @required this.fadeOut,
   })  : assert(child != null),
         super(key: key);
 
   final Animation<double> animation;
   final Animation<double> secondaryAnimation;
   final Widget child;
+  final bool fadeOut;
 
   @override
   Widget build(BuildContext context) {
     final Animation<double> scaleIn = Tween(
-      begin: .96,
+      begin: .94,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: animation,
@@ -74,19 +82,20 @@ class FadeOutTransition extends StatelessWidget {
       begin: -1.0,
       end: 1.0,
     ).animate(animation);
-    final Animation<double> opacityOut = Tween(
-      begin: 1.0,
-      end: -1.0,
-    ).animate(secondaryAnimation);
 
     return ScaleTransition(
       scale: scaleIn,
       child: FadeTransition(
         opacity: opacityIn,
-        child: FadeTransition(
-          opacity: opacityOut,
-          child: child,
-        ),
+        child: fadeOut
+            ? FadeTransition(
+                opacity: Tween(
+                  begin: 1.0,
+                  end: -1.0,
+                ).animate(secondaryAnimation),
+                child: child,
+              )
+            : child,
       ),
     );
   }

@@ -182,7 +182,7 @@ class TrailButtonsRow extends StatelessWidget {
                   });
                   // https://github.com/flutter/flutter/issues/41680
                   // Secondary animation will not run, will soon be fixed
-                  Navigator.pushReplacement(context, FadeOutPageRoute(
+                  Navigator.pushReplacement(context, CrossFadePageRoute(
                     builder: (context) {
                       return TrailDetailsPage(
                         trail: trail,

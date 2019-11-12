@@ -40,7 +40,7 @@ class ExploreBody extends StatelessWidget {
       end: 1 / (height - bottomHeight),
     ).animate(bottomSheetNotifier.animation);
 
-    final initialRoute = FadeOutPageRoute<void>(
+    final initialRoute = CrossFadePageRoute<void>(
       builder: (context) {
         return ExplorePage(
           tabController: tabController,

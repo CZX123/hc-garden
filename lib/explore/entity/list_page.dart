@@ -113,6 +113,8 @@ class EntityListPage extends StatelessWidget {
                           return EntityListRow(
                             searchTerm: searchTerm,
                             entity: _list[index],
+                            index: index,
+                            scrollController: scrollController,
                           );
                         },
                       ),
@@ -128,10 +130,14 @@ class EntityListPage extends StatelessWidget {
 class EntityListRow extends StatefulWidget {
   final String searchTerm;
   final Entity entity;
+  final int index;
+  final ScrollController scrollController; // For getting scroll position
   const EntityListRow({
     Key key,
     @required this.searchTerm,
     @required this.entity,
+    @required this.index,
+    @required this.scrollController,
   }) : super(key: key);
 
   @override
@@ -139,11 +145,27 @@ class EntityListRow extends StatefulWidget {
 }
 
 class _EntityListRowState extends State<EntityListRow> {
-  final _key = GlobalKey();
+  final hidden = ValueNotifier(false);
+  Animation<double> secondaryAnimation;
+
+  void listener() {
+    if (secondaryAnimation?.isDismissed ?? false) {
+      if (mounted) hidden.value = false;
+      secondaryAnimation.removeListener(listener);
+    }
+  }
+
+  @override
+  void dispose() {
+    hidden.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final rowHeight = widget.searchTerm.isEmpty ? 104.0 : 88.0;
     final topPadding = MediaQuery.of(context).padding.top;
+    final width = MediaQuery.of(context).size.width;
     final thumbnail = ClipRRect(
       borderRadius: BorderRadius.circular(32),
       child: CustomImage(
@@ -187,18 +209,26 @@ class _EntityListRowState extends State<EntityListRow> {
       ),
     );
     return Container(
-      key: _key,
       child: InkWell(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-          child: Row(
-            children: <Widget>[
-              thumbnail,
-              const SizedBox(
-                width: 16,
-              ),
-              rightColumn,
-            ],
+        child: ValueListenableBuilder(
+          valueListenable: hidden,
+          builder: (context, value, child) {
+            return Visibility(
+              visible: !value,
+              child: child,
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+            child: Row(
+              children: <Widget>[
+                thumbnail,
+                const SizedBox(
+                  width: 16,
+                ),
+                rightColumn,
+              ],
+            ),
           ),
         ),
         onTap: () async {
@@ -213,7 +243,7 @@ class _EntityListRowState extends State<EntityListRow> {
             1,
           );
           final oldChild = Container(
-            height: widget.searchTerm.isEmpty ? 104 : 88,
+            height: rowHeight,
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(
               children: <Widget>[
@@ -225,7 +255,7 @@ class _EntityListRowState extends State<EntityListRow> {
             ),
           );
           final persistentOldChild = Container(
-            height: widget.searchTerm.isEmpty ? 104 : 88,
+            height: rowHeight,
             padding: const EdgeInsets.only(left: 14),
             child: Row(
               children: <Widget>[
@@ -233,22 +263,28 @@ class _EntityListRowState extends State<EntityListRow> {
               ],
             ),
           );
-          final oldTopPadding =
-              ValueNotifier(((widget.searchTerm.isEmpty ? 104 : 88) - 64) / 2);
-          final newTopPadding = ValueNotifier(topPadding + 16);
-          Navigator.of(context).push(
+          final startContentOffset =
+              ValueNotifier(Offset(0, (rowHeight - 64) / 2));
+          final endContentOffset = ValueNotifier(Offset(0, topPadding + 16));
+          final sourceRect = Rect.fromLTWH(0, 69, width, rowHeight);
+          hidden.value = true;
+          await Navigator.of(context).push(
             ExpandPageRoute<void>(
-              oldTopPadding: oldTopPadding,
-              newTopPadding: newTopPadding,
               builder: (context) => EntityDetailsPage(
-                newTopPadding: newTopPadding,
+                endContentOffset: endContentOffset,
                 entity: widget.entity,
               ),
-              sourceKey: _key,
+              sourceRect: sourceRect,
               oldChild: oldChild,
+              startContentOffset: startContentOffset,
+              endContentOffset: endContentOffset,
               persistentOldChild: persistentOldChild,
+              entityRowOffset: rowHeight * widget.index,
+              oldScrollController: widget.scrollController,
             ),
           );
+          secondaryAnimation = ModalRoute.of(context).secondaryAnimation
+            ..addListener(listener);
         },
       ),
     );

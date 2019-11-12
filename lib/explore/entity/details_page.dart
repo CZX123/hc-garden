@@ -1,11 +1,11 @@
 import '../../library.dart';
 
 class EntityDetailsPage extends StatefulWidget {
-  final ValueNotifier<double> newTopPadding;
+  final ValueNotifier<Offset> endContentOffset;
   final Entity entity;
   const EntityDetailsPage({
     Key key,
-    @required this.newTopPadding,
+    this.endContentOffset,
     @required this.entity,
   }) : super(key: key);
 
@@ -88,160 +88,170 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final newImages = widget.entity.images.map(lowerRes).toList();
-    return NotificationListener(
-      onNotification: (notification) {
-        if (notification is ScrollUpdateNotification &&
-            notification.depth == 0) {
-          widget.newTopPadding.value -= notification.scrollDelta;
-        }
-        return false;
-      },
-      child: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        controller: _scrollController,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            ValueListenableBuilder(
-              valueListenable:
-                  Provider.of<BottomSheetNotifier>(context, listen: false)
-                      .animation,
-              builder: (context, value, child) {
-                double h = 0;
-                if (value < height - 378) {
-                  h = (1 - value / (height - 378)) * topPadding;
-                  if (value > 1) widget.newTopPadding.value = h + 16;
-                }
-                return SizedBox(
-                  height: h,
-                );
-              },
+    final child = SingleChildScrollView(
+      physics: NeverScrollableScrollPhysics(),
+      controller: _scrollController,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          ValueListenableBuilder(
+            valueListenable: Provider.of<BottomSheetNotifier>(
+              context,
+              listen: false,
+            ).animation,
+            builder: (context, value, child) {
+              double h = 0;
+              if (value < height - 378) {
+                h = (1 - value / (height - 378)) * topPadding;
+                if (value > 1)
+                  widget.endContentOffset?.value = Offset(0, h + 16);
+              }
+              return SizedBox(
+                height: h,
+              );
+            },
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(14, 16, 14, 16),
+            child: Row(
+              children: <Widget>[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: CustomImage(
+                    widget.entity.smallImage,
+                    height: 64,
+                    width: 64,
+                    placeholderColor: Theme.of(context).dividerColor,
+                    fadeInDuration: null,
+                  ),
+                ),
+                const SizedBox(
+                  width: 16,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      widget.entity.name,
+                      style: Theme.of(context).textTheme.display1,
+                    ),
+                    Text(
+                      widget.entity.sciName,
+                      style: Theme.of(context).textTheme.overline,
+                    ),
+                  ],
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(14, 16, 14, 16),
+          ),
+          Container(
+            height: 218,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+              scrollDirection: Axis.horizontal,
               child: Row(
                 children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(32),
-                    child: CustomImage(
-                      widget.entity.smallImage,
-                      height: 64,
-                      width: 64,
-                      placeholderColor: Theme.of(context).dividerColor,
-                      fadeInDuration: null,
+                  for (var image in newImages)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Stack(
+                        children: <Widget>[
+                          CustomImage(
+                            image,
+                            height: 218,
+                            width: newImages.length == 1 ? width - 32 : 324,
+                            fit: BoxFit.cover,
+                            placeholderColor: Theme.of(context).dividerColor,
+                            saveInCache: false,
+                          ),
+                          Positioned.fill(
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: InkWell(
+                                onTap: () {
+                                  Provider.of<AppNotifier>(
+                                    context,
+                                    listen: false,
+                                  ).changeState(context, 2);
+                                  Provider.of<BottomSheetNotifier>(
+                                    context,
+                                    listen: false,
+                                  )
+                                    ..draggingDisabled = true
+                                    ..animateTo(
+                                      0,
+                                      const Duration(milliseconds: 340),
+                                    );
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, _, __) {
+                                        return ImageGallery(
+                                          images: newImages,
+                                          initialImage: image,
+                                        );
+                                      },
+                                      transitionDuration:
+                                          const Duration(milliseconds: 340),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        widget.entity.name,
-                        style: Theme.of(context).textTheme.display1,
-                      ),
-                      Text(
-                        widget.entity.sciName,
-                        style: Theme.of(context).textTheme.overline,
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
-            Container(
-              height: 218,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: <Widget>[
-                    for (var image in newImages)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Stack(
-                          children: <Widget>[
-                            CustomImage(
-                              image,
-                              height: 218,
-                              width: newImages.length == 1 ? width - 32 : 324,
-                              fit: BoxFit.cover,
-                              placeholderColor: Theme.of(context).dividerColor,
-                              saveInCache: false,
-                            ),
-                            Positioned.fill(
-                              child: Material(
-                                type: MaterialType.transparency,
-                                child: InkWell(
-                                  onTap: () {
-                                    Provider.of<AppNotifier>(
-                                      context,
-                                      listen: false,
-                                    ).changeState(context, 2);
-                                    Provider.of<BottomSheetNotifier>(
-                                      context,
-                                      listen: false,
-                                    )
-                                      ..draggingDisabled = true
-                                      ..animateTo(
-                                        0,
-                                        const Duration(milliseconds: 340),
-                                      );
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, _, __) {
-                                          return ImageGallery(
-                                            images: newImages,
-                                            initialImage: image,
-                                          );
-                                        },
-                                        transitionDuration:
-                                            const Duration(milliseconds: 340),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          for (var para in widget.entity.description.split('\n'))
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Text(
+                para,
+                textAlign: TextAlign.justify,
               ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
-            for (var para in widget.entity.description.split('\n'))
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: Text(
-                  para,
-                  textAlign: TextAlign.justify,
-                ),
-              ),
-            const SizedBox(
-              height: 8,
-            ),
-            Selector<FirebaseData, Map<Trail, List<TrailLocation>>>(
-              selector: (context, firebaseData) => firebaseData.trails,
-              builder: (context, trails, child) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: locations(context, trails),
-                );
-              },
-            ),
-            const SizedBox(
-              height: 64,
-            ),
-          ],
-        ),
+          const SizedBox(
+            height: 8,
+          ),
+          Selector<FirebaseData, Map<Trail, List<TrailLocation>>>(
+            selector: (context, firebaseData) => firebaseData.trails,
+            builder: (context, trails, child) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: locations(context, trails),
+              );
+            },
+          ),
+          const SizedBox(
+            height: 64,
+          ),
+        ],
       ),
+    );
+    return Material(
+      // color: Theme.of(context).bottomAppBarColor,
+      type: MaterialType.transparency,
+      child: widget.endContentOffset != null
+          ? NotificationListener(
+              onNotification: (notification) {
+                if (notification is ScrollUpdateNotification &&
+                    notification.depth == 0) {
+                  widget.endContentOffset.value -=
+                      Offset(0, notification.scrollDelta);
+                }
+                return false;
+              },
+              child: child,
+            )
+          : child,
     );
   }
 }
