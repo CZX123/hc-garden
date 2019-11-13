@@ -165,6 +165,7 @@ class _EntityListRowState extends State<EntityListRow> {
   Widget build(BuildContext context) {
     final rowHeight = widget.searchTerm.isEmpty ? 104.0 : 88.0;
     final topPadding = MediaQuery.of(context).padding.top;
+    final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final thumbnail = ClipRRect(
       borderRadius: BorderRadius.circular(32),
@@ -208,85 +209,94 @@ class _EntityListRowState extends State<EntityListRow> {
         ],
       ),
     );
-    return Container(
-      child: InkWell(
-        child: ValueListenableBuilder(
-          valueListenable: hidden,
-          builder: (context, value, child) {
-            return Visibility(
-              visible: !value,
-              child: child,
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-            child: Row(
-              children: <Widget>[
-                thumbnail,
-                const SizedBox(
-                  width: 16,
-                ),
-                rightColumn,
-              ],
-            ),
+    return InkWell(
+      child: ValueListenableBuilder(
+        valueListenable: hidden,
+        builder: (context, value, child) {
+          return Visibility(
+            visible: !value,
+            child: child,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+          child: Row(
+            children: <Widget>[
+              thumbnail,
+              const SizedBox(
+                width: 16,
+              ),
+              rightColumn,
+            ],
           ),
         ),
-        onTap: () async {
-          final searchNotifier =
-              Provider.of<SearchNotifier>(context, listen: false);
-          if (searchNotifier.keyboardAppear) {
-            searchNotifier.keyboardAppear = false;
-            await Future.delayed(const Duration(milliseconds: 100));
-          }
-          Provider.of<AppNotifier>(context, listen: false).changeState(
-            context,
-            1,
-          );
-          final oldChild = Container(
-            height: rowHeight,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Row(
-              children: <Widget>[
-                const SizedBox(
-                  width: 80,
-                ),
-                rightColumn,
-              ],
-            ),
-          );
-          final persistentOldChild = Container(
-            height: rowHeight,
-            padding: const EdgeInsets.only(left: 14),
-            child: Row(
-              children: <Widget>[
-                thumbnail,
-              ],
-            ),
-          );
-          final startContentOffset =
-              ValueNotifier(Offset(0, (rowHeight - 64) / 2));
-          final endContentOffset = ValueNotifier(Offset(0, topPadding + 16));
-          final sourceRect = Rect.fromLTWH(0, 69, width, rowHeight);
-          hidden.value = true;
-          await Navigator.of(context).push(
-            ExpandPageRoute<void>(
-              builder: (context) => EntityDetailsPage(
-                endContentOffset: endContentOffset,
-                entity: widget.entity,
-              ),
-              sourceRect: sourceRect,
-              oldChild: oldChild,
-              startContentOffset: startContentOffset,
-              endContentOffset: endContentOffset,
-              persistentOldChild: persistentOldChild,
-              entityRowOffset: rowHeight * widget.index,
-              oldScrollController: widget.scrollController,
-            ),
-          );
-          secondaryAnimation = ModalRoute.of(context).secondaryAnimation
-            ..addListener(listener);
-        },
       ),
+      onTap: () async {
+        final searchNotifier =
+            Provider.of<SearchNotifier>(context, listen: false);
+        if (searchNotifier.keyboardAppear) {
+          searchNotifier.keyboardAppear = false;
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+        Provider.of<AppNotifier>(context, listen: false).changeState(
+          context,
+          1,
+        );
+        final oldChild = Container(
+          height: rowHeight,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Row(
+            children: <Widget>[
+              const SizedBox(
+                width: 80,
+              ),
+              rightColumn,
+            ],
+          ),
+        );
+        final persistentOldChild = Container(
+          height: rowHeight,
+          padding: const EdgeInsets.only(left: 14),
+          child: Row(
+            children: <Widget>[
+              thumbnail,
+            ],
+          ),
+        );
+        final startContentOffset =
+            ValueNotifier(Offset(0, (rowHeight - 64) / 2));
+        final endContentOffset = ValueNotifier(Offset(0, topPadding + 16));
+        final sourceRect = Rect.fromLTWH(0, 69, width, rowHeight);
+        final anim = Tween<double>(
+          begin: 0,
+          end: 1 / (height - bottomHeight),
+        ).animate(
+          Provider.of<BottomSheetNotifier>(context, listen: false).animation,
+        );
+        final topSpace = Tween(
+          begin: entityButtonHeightCollapsed + 24 + topPadding,
+          end: bottomHeight - bottomBarHeight + 8,
+        ).animate(anim);
+        hidden.value = true;
+        await Navigator.of(context).push(
+          ExpandPageRoute<void>(
+            builder: (context) => EntityDetailsPage(
+              endContentOffset: endContentOffset,
+              entity: widget.entity,
+            ),
+            sourceRect: sourceRect,
+            oldChild: oldChild,
+            startContentOffset: startContentOffset,
+            endContentOffset: endContentOffset,
+            persistentOldChild: persistentOldChild,
+            rowOffset: rowHeight * widget.index,
+            oldScrollController: widget.scrollController,
+            topSpace: topSpace,
+          ),
+        );
+        secondaryAnimation = ModalRoute.of(context).secondaryAnimation
+          ..addListener(listener);
+      },
     );
   }
 }

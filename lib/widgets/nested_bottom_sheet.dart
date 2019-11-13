@@ -295,10 +295,6 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       begin: Offset(0, _sortedPositions.first / height / range),
       end: Offset(0, _sortedPositions.last / height / range),
     ).animate(_animationController);
-    final shape = ShapeBorderTween(
-      begin: RoundedRectangleBorder(),
-      end: widget.shape.scale(1 / _sortedPositions[1]),
-    ).animate(_animationController);
     return Stack(
       children: <Widget>[
         if (widget.background != null) widget.background,
@@ -333,6 +329,10 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
                   child: AnimatedBuilder(
                     animation: _animationController,
                     builder: (context, child) {
+                      final shape = ShapeBorderTween(
+                        begin: RoundedRectangleBorder(),
+                        end: widget.shape.scale(1 / _sortedPositions[1]),
+                      ).animate(_animationController);
                       return PhysicalShape(
                         color: widget.color ?? Theme.of(context).canvasColor,
                         clipper: ShapeBorderClipper(

@@ -128,19 +128,27 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                 const SizedBox(
                   width: 16,
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      widget.entity.name,
-                      style: Theme.of(context).textTheme.display1,
-                    ),
-                    Text(
-                      widget.entity.sciName,
-                      style: Theme.of(context).textTheme.overline,
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        widget.entity.name,
+                        style: Theme.of(context).textTheme.subhead.copyWith(
+                              fontSize: 18,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      Text(
+                        widget.entity.sciName,
+                        style: Theme.of(context).textTheme.overline,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -237,7 +245,6 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
       ),
     );
     return Material(
-      // color: Theme.of(context).bottomAppBarColor,
       type: MaterialType.transparency,
       child: widget.endContentOffset != null
           ? NotificationListener(

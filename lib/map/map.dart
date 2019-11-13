@@ -62,6 +62,7 @@ class _MapWidgetState extends State<MapWidget> {
       _padding.value = _padding.value.copyWith(
         bottom: bottomHeight - bottomBarHeight,
       );
+
       // _mapController?.animateCamera(CameraUpdate.scrollBy(
       //   0,
       //   (bottomHeight - bottomBarHeight) / 2,
@@ -141,22 +142,30 @@ class _MapWidgetState extends State<MapWidget> {
                     infoWindow: InfoWindow(
                       title: location.name,
                       onTap: () {
-                        _bottomSheetNotifier.animateTo(0);
-                        Provider.of<AppNotifier>(context, listen: false)
-                          ..navigatorKey.currentState.push(
-                            CrossFadePageRoute(
-                              builder: (context) {
-                                return TrailLocationOverviewPage(
-                                  trail: trail,
-                                  trailLocation: location,
-                                );
-                              },
-                            ),
-                          )
-                          ..changeState(
-                            context,
-                            1,
-                          );
+                        final appNotifier = Provider.of<AppNotifier>(
+                          context,
+                          listen: false,
+                        );
+                        if (appNotifier.location != location) {
+                          appNotifier
+                            ..navigatorKey.currentState.push(
+                              CrossFadePageRoute(
+                                builder: (context) {
+                                  return Material(
+                                    color: Theme.of(context).bottomAppBarColor,
+                                    child: TrailLocationOverviewPage(
+                                      trail: trail,
+                                      trailLocation: location,
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                            ..changeState(
+                              context,
+                              1,
+                            );
+                        }
                       },
                     ),
                     icon: BitmapDescriptor.defaultMarkerWithHue(hues[i]),

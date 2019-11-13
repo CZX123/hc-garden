@@ -215,6 +215,7 @@ class _MyHomePageState extends State<MyHomePage>
           0,
           activeScrollController: _scrollControllers[_tabController.index],
         );
+        bottomSheetNotifier.animateTo(height - bottomHeight);
         navigatorKey.currentState.pushReplacement(CrossFadePageRoute(
           builder: (context) {
             return ExplorePage(
@@ -260,6 +261,10 @@ class _MyHomePageState extends State<MyHomePage>
             activeScrollController: _scrollControllers[_tabController.index],
             trail: appNotifier.trail,
           );
+          if (appNotifier.trail == null &&
+              bottomSheetNotifier.animation.value > height - bottomHeight) {
+            bottomSheetNotifier.animateTo(height - bottomHeight);
+          }
           if (searchNotifier.searchTerm.isNotEmpty)
             searchNotifier.isSearching = true;
         } else if (appNotifier.location != null) {
