@@ -23,8 +23,8 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
     final height = MediaQuery.of(context).size.height;
     List<Widget> children = [];
     for (var loc in widget.entity.locations) {
-      final trailId = loc.keys.first;
-      final locationId = loc.values.first;
+      final int trailId = loc[0];
+      final int locationId = loc[1];
       final trail = trails.keys.firstWhere((trail) {
         return trail.id == trailId;
       });

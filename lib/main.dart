@@ -56,6 +56,7 @@ class HcGardenApp extends StatelessWidget {
                   trails[trail].add(TrailLocation.fromJson(
                     key,
                     value,
+                    trail: trail,
                     floraList: floraList,
                     faunaList: faunaList,
                   ));

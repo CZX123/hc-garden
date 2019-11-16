@@ -291,20 +291,20 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
         child: Stack(
           overflow: Overflow.visible,
           children: <Widget>[
-            Material(
-              type: MaterialType.transparency,
-              child: Selector2<AppNotifier, ThemeNotifier, bool>(
-                selector: (context, appNotifier, themeNotifier) {
-                  return appNotifier.state == 2 || themeNotifier.value;
-                },
-                builder: (context, value, child) {
-                  return AnimatedTheme(
-                    data: value ? darkThemeData : themeData,
-                    child: child,
-                  );
-                },
-                child: Align(
-                  alignment: Alignment.bottomCenter,
+            Selector2<AppNotifier, ThemeNotifier, bool>(
+              selector: (context, appNotifier, themeNotifier) {
+                return appNotifier.state == 2 || themeNotifier.value;
+              },
+              builder: (context, value, child) {
+                return AnimatedTheme(
+                  data: value ? darkThemeData : themeData,
+                  child: child,
+                );
+              },
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Material(
+                  type: MaterialType.transparency,
                   child: ValueListenableBuilder<double>(
                     valueListenable: _animationController,
                     builder: (context, value, child) {

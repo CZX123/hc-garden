@@ -58,7 +58,7 @@ class EntityListPage extends StatelessWidget {
             updatedEntityList = entityList.where((entity) {
               return !entity.locations.every((location) {
                 return selectedTrails.every((trail) {
-                  return trail.id != location.keys.first;
+                  return trail.id != location[0];
                 });
               });
             }).toList();
@@ -68,7 +68,7 @@ class EntityListPage extends StatelessWidget {
             builder: (context, searchTerm, child) {
               List<Entity> _list = [];
               updatedEntityList.forEach((entity) {
-                if (EntityListPage._isValid(entity, searchTerm)) {
+                if (_isValid(entity, searchTerm)) {
                   _list.add(entity);
                 }
               });

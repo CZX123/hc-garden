@@ -1,12 +1,10 @@
 import '../../library.dart';
 
 class TrailLocationOverviewPage extends StatefulWidget {
-  final Trail trail;
   final TrailLocation trailLocation;
   final ValueNotifier<Offset> endContentOffset;
   const TrailLocationOverviewPage({
     Key key,
-    @required this.trail,
     @required this.trailLocation,
     this.endContentOffset,
   }) : super(key: key);
@@ -19,7 +17,7 @@ class TrailLocationOverviewPage extends StatefulWidget {
 class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   final _scrollController = ScrollController();
   double aspectRatio;
-  static const double sizeScaling = 550;
+  static const double sizeScaling = 500;
 
   @override
   void didChangeDependencies() {

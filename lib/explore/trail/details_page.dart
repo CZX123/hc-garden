@@ -21,10 +21,15 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
     super.didChangeDependencies();
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     if (appNotifier.state == 0 && appNotifier.trail == widget.trail) {
-      Provider.of<BottomSheetNotifier>(
+      final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
         context,
         listen: false,
-      ).activeScrollController = _scrollController;
+      );
+      bottomSheetNotifier.activeScrollController = _scrollController;
+      if (_scrollController.hasClients &&
+          bottomSheetNotifier.animation.value > 10) {
+        _scrollController.jumpTo(0);
+      }
     }
   }
 
@@ -71,7 +76,6 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     return LocationListRow(
-                      trail: widget.trail,
                       location: widget.trailLocations[index],
                       index: index,
                       scrollController: _scrollController,
@@ -90,13 +94,11 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
 }
 
 class LocationListRow extends StatefulWidget {
-  final Trail trail;
   final TrailLocation location;
   final int index;
   final ScrollController scrollController; // For getting scroll position
   const LocationListRow({
     Key key,
-    @required this.trail,
     @required this.location,
     @required this.index,
     @required this.scrollController,
@@ -233,7 +235,6 @@ class _LocationListRowState extends State<LocationListRow> {
           ExpandPageRoute(
             builder: (context) {
               return TrailLocationOverviewPage(
-                trail: widget.trail,
                 trailLocation: widget.location,
                 endContentOffset: endContentOffset,
               );

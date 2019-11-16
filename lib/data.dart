@@ -1,5 +1,19 @@
 import 'library.dart';
 
+class Tuple<A, B> {
+  final A item1;
+  final B item2;
+  const Tuple(this.item1, this.item2);
+  operator [](int i) {
+    if (i == 0)
+      return item1;
+    else if (i == 1)
+      return item2;
+    else
+      throw RangeError.range(i, 0, 1);
+  }
+}
+
 abstract class Entity {
   final int id;
   final String name;
@@ -7,24 +21,24 @@ abstract class Entity {
   final String description;
   final String smallImage;
   final List<String> images;
-  final List<Map<int, int>> locations;
+  final List<Tuple<int, int>> locations;
 
   Entity.fromJson(String key, dynamic parsedJson)
-      : this.id = int.tryParse(key.split('-').last),
-        this.name = parsedJson['name'],
-        this.sciName = parsedJson['sciName'],
-        this.description = parsedJson['description'],
-        this.smallImage = parsedJson['smallImage'],
-        this.images = List<String>.from(parsedJson['imageRef']),
-        this.locations =
+      : id = int.tryParse(key.split('-').last),
+        name = parsedJson['name'],
+        sciName = parsedJson['sciName'],
+        description = parsedJson['description'],
+        smallImage = parsedJson['smallImage'],
+        images = List<String>.from(parsedJson['imageRef']),
+        locations =
             List.from(parsedJson['locations'].split(',')).where((value) {
           return value != null && value.isNotEmpty;
         }).map((value) {
           final split = value.split('/');
-          return {
-            int.tryParse(split.first.split('-').last):
-                int.tryParse(split.last.split('-').last)
-          };
+          return Tuple(
+            int.tryParse(split.first.split('-').last),
+            int.tryParse(split.last.split('-').last),
+          );
         }).toList();
 
   @override
@@ -38,12 +52,12 @@ class Fauna extends Entity {
   final List<LatLng> area;
   final LatLng coordinates;
   Fauna.fromJson(String key, dynamic parsedJson)
-      : this.area = parsedJson.containsKey('area')
+      : area = parsedJson.containsKey('area')
             ? List.from(parsedJson['area']).map((position) {
                 return LatLng(position['latitude'], position['longitude']);
               }).toList()
             : null,
-        this.coordinates = parsedJson.containsKey('latitude')
+        coordinates = parsedJson.containsKey('latitude')
             ? LatLng(parsedJson['latitude'], parsedJson['longitude'])
             : null,
         super.fromJson(key, parsedJson);
@@ -60,12 +74,13 @@ class FirebaseData {
   final Map<Trail, List<TrailLocation>> trails;
   final List<HistoricalData> historicalDataList;
   final List<AboutPageData> aboutPageDataList;
-  FirebaseData(
-      {this.floraList,
-      this.faunaList,
-      this.trails,
-      this.historicalDataList,
-      this.aboutPageDataList});
+  FirebaseData({
+    this.floraList,
+    this.faunaList,
+    this.trails,
+    this.historicalDataList,
+    this.aboutPageDataList,
+  });
 }
 
 class Trail {
@@ -85,13 +100,15 @@ class Trail {
 // A TrailLocation is a point on the trail
 class TrailLocation {
   final int id;
+  final Trail trail;
   final String name;
   final String image;
   final String smallImage;
   final LatLng coordinates;
   final List<EntityPosition> entityPositions;
-  TrailLocation({
+  const TrailLocation({
     this.id,
+    this.trail,
     this.name,
     this.image,
     this.smallImage,
@@ -101,11 +118,13 @@ class TrailLocation {
   factory TrailLocation.fromJson(
     String key,
     dynamic parsedJson, {
+    @required Trail trail,
     @required List<Flora> floraList,
     @required List<Fauna> faunaList,
   }) {
     return TrailLocation(
       id: int.tryParse(key.split('-').last),
+      trail: trail,
       name: parsedJson['title'],
       image: parsedJson['imageRef'],
       smallImage: parsedJson['smallImage'],
@@ -245,10 +264,24 @@ class AppNotifier extends ChangeNotifier {
       context,
       listen: false,
     );
+    final mapNotifier = Provider.of<MapNotifier>(
+      context,
+      listen: false,
+    );
     if (state == 0) {
       _entity = null;
       _location = null;
       _trail = trail;
+      if (trail == null) {
+        mapNotifier.animateBackToCenter(_state == 1 &&
+            (bottomSheetNotifier.animation.value < 8 ||
+                bottomSheetNotifier.animation.value >
+                    height - bottomHeight + 8));
+      } else {
+        mapNotifier.animateToTrail(
+          Provider.of<FirebaseData>(context, listen: false).trails[trail],
+        );
+      }
       _state = 0;
       if (rebuild) notifyListeners();
       bottomSheetNotifier
@@ -267,6 +300,14 @@ class AppNotifier extends ChangeNotifier {
       _entity = entity;
       _location = location;
       if (rebuild) notifyListeners();
+      if (entity != null) {
+        mapNotifier.animateToEntity(
+          entity,
+          Provider.of<FirebaseData>(context, listen: false).trails,
+        );
+      } else if (location != null) {
+        mapNotifier.animateToLocation(location);
+      }
       bottomSheetNotifier
         ..draggingDisabled = false
         ..snappingPositions.value = [

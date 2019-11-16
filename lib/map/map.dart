@@ -7,14 +7,13 @@ class MapWidget extends StatefulWidget {
   _MapWidgetState createState() => _MapWidgetState();
 }
 
-class _MapWidgetState extends State<MapWidget> {
+class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   GoogleMapController _mapController;
   final _padding = ValueNotifier(EdgeInsets.zero);
   bool _init = false;
   AppNotifier _appNotifier;
   BottomSheetNotifier _bottomSheetNotifier;
   ThemeNotifier _themeNotifier;
-  int _state;
   double _height;
 
   void themeListener() {
@@ -25,22 +24,10 @@ class _MapWidgetState extends State<MapWidget> {
       _mapController?.setMapStyle(mapStyle);
   }
 
-  void stateListener() {
-    if (_appNotifier.state == _state || _appNotifier.state == 2) return;
-    if (_appNotifier.state == 1) {
-      _bottomSheetNotifier.animation.removeListener(animListener);
-      _padding.value = _padding.value.copyWith(
-        bottom: 48.0 + 96.0 - bottomBarHeight,
-      );
-    } else {
-      _bottomSheetNotifier.animation.addListener(animListener);
-      animListener();
-    }
-    _state = _appNotifier.state;
-  }
-
   void animListener() {
-    if (_bottomSheetNotifier.animation.value >= _height - bottomHeight + 8) {
+    if (_appNotifier.state == 2) return;
+    if (_bottomSheetNotifier.animation.value > _height - bottomHeight + 8 ||
+        _appNotifier.state == 1 && _bottomSheetNotifier.animation.value < 8) {
       if (_padding.value.bottom != 0) {
         _padding.value = _padding.value.copyWith(
           bottom: 0,
@@ -80,8 +67,26 @@ class _MapWidgetState extends State<MapWidget> {
     _padding.value = _padding.value.copyWith(
       top: MediaQuery.of(context).padding.top,
     );
-    stateListener();
+    animListener();
     themeListener();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Needed because of a bug with Google Maps not showing, after going back from recents
+      // Don't know if it works just yet
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {});
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -92,23 +97,23 @@ class _MapWidgetState extends State<MapWidget> {
       _appNotifier = Provider.of<AppNotifier>(
         context,
         listen: false,
-      )..addListener(stateListener);
+      );
       _bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
         context,
         listen: false,
-      );
+      )..animation.addListener(animListener);
       _themeNotifier = Provider.of<ThemeNotifier>(
         context,
         listen: false,
       )..addListener(themeListener);
-      stateListener();
+      animListener();
       _init = true;
     }
   }
 
   @override
   void dispose() {
-    _appNotifier.removeListener(stateListener);
+    WidgetsBinding.instance.removeObserver(this);
     _bottomSheetNotifier.animation.removeListener(animListener);
     _themeNotifier.removeListener(themeListener);
     super.dispose();
@@ -154,7 +159,6 @@ class _MapWidgetState extends State<MapWidget> {
                                   return Material(
                                     color: Theme.of(context).bottomAppBarColor,
                                     child: TrailLocationOverviewPage(
-                                      trail: trail,
                                       trailLocation: location,
                                     ),
                                   );
@@ -215,17 +219,84 @@ class MapNotifier extends ChangeNotifier {
   bool permissionEnabled;
   bool gpsOn;
   GoogleMapController mapController;
+  Set<Marker> _markers;
+  Set<Marker> get markers => _markers;
 
-  void animateToLocation(TrailLocation location) {
+  void setMarkers(Set<Marker> markers, {bool notify = true}) {
+    _markers = markers;
+    if (notify ?? true) notifyListeners();
+  }
+
+  void _animateToPoint(LatLng point, double zoom) {
+    mapController.animateCamera(CameraUpdate.newLatLngZoom(point, zoom));
+  }
+
+  void _animateToPoints(List<LatLng> points, double padding) {
+    if (points?.isEmpty ?? true) return;
+    else if (points.length == 1) {
+      return _animateToPoint(points.first, 18.5);
+    }
+    double minLat = points.first.latitude;
+    double maxLat = points.first.latitude;
+    double minLng = points.first.longitude;
+    double maxLng = points.first.longitude;
+    for (final point in points.sublist(1)) {
+      if (point.latitude < minLat) {
+        minLat = point.latitude;
+      } else if (point.latitude > maxLat) {
+        maxLat = point.latitude;
+      }
+      if (point.longitude < minLng) {
+        minLng = point.longitude;
+      } else if (point.longitude > maxLng) {
+        maxLng = point.longitude;
+      }
+    }
+    mapController.animateCamera(CameraUpdate.newLatLngBounds(
+      LatLngBounds(
+        northeast: LatLng(maxLat, maxLng),
+        southwest: LatLng(minLat, minLng),
+      ),
+      padding,
+    ));
+  }
+
+  /// Animate back to default map of HC Garden
+  void animateBackToCenter([bool shiftedUpwards = false]) {
+    _animateToPoint(shiftedUpwards ? bottomSheetCenter : center, 16.8);
+  }
+
+  /// Moves the map to a specific location on a trail
+  void animateToLocation(TrailLocation location, [double zoom = 18.5]) {
     // TODO: Focus on the specific marker as well
     // (need to wait for upcoming update for google maps plugin)
     // https://github.com/flutter/flutter/issues/33481
-    mapController
-        .animateCamera(CameraUpdate.newLatLngZoom(location.coordinates, 18.5));
+    _animateToPoint(location.coordinates, zoom ?? 18.5);
   }
 
-  void animateToPosition(LatLng coordinates, [double zoom]) {
-    mapController
-        .animateCamera(CameraUpdate.newLatLngZoom(coordinates, zoom ?? 18));
+  /// Moves the map to the bounding box of all locations of the entity
+  void animateToEntity(
+    Entity entity,
+    Map<Trail, List<TrailLocation>> trails, [
+    double padding = 36,
+  ]) {
+    final points = entity.locations.map((tuple) {
+      final int trailId = tuple[0];
+      final int locationId = tuple[1];
+      final trail = trails.keys.firstWhere((trail) {
+        return trail.id == trailId;
+      });
+      final location = trails[trail].firstWhere((loc) {
+        return loc.id == locationId;
+      });
+      return location.coordinates;
+    }).toList();
+    _animateToPoints(points, padding ?? 36);
+  }
+
+  /// Moves the map to the bounding box of a trail
+  void animateToTrail(List<TrailLocation> locations, [double padding = 36]) {
+    final points = locations.map((location) => location.coordinates).toList();
+    _animateToPoints(points, padding ?? 36);
   }
 }
