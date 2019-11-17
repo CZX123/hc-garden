@@ -27,7 +27,8 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   void animListener() {
     if (_appNotifier.state == 2) return;
     if (_bottomSheetNotifier.animation.value > _height - bottomHeight + 8 ||
-        _appNotifier.state == 1 && _bottomSheetNotifier.animation.value < 8) {
+        _appNotifier.hasEntity.value &&
+            _bottomSheetNotifier.animation.value < 8) {
       if (_padding.value.bottom != 0) {
         _padding.value = _padding.value.copyWith(
           bottom: 0,
@@ -97,7 +98,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
       _appNotifier = Provider.of<AppNotifier>(
         context,
         listen: false,
-      );
+      )..hasEntity.addListener(animListener);
       _bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
         context,
         listen: false,
@@ -114,6 +115,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _appNotifier.hasEntity.removeListener(animListener);
     _bottomSheetNotifier.animation.removeListener(animListener);
     _themeNotifier.removeListener(themeListener);
     super.dispose();
@@ -232,7 +234,8 @@ class MapNotifier extends ChangeNotifier {
   }
 
   void _animateToPoints(List<LatLng> points, double padding) {
-    if (points?.isEmpty ?? true) return;
+    if (points?.isEmpty ?? true)
+      return;
     else if (points.length == 1) {
       return _animateToPoint(points.first, 18.5);
     }

@@ -269,6 +269,7 @@ class AppNotifier extends ChangeNotifier {
       listen: false,
     );
     if (state == 0) {
+      hasEntity.value = false;
       _entity = null;
       _location = null;
       _trail = trail;
@@ -298,6 +299,7 @@ class AppNotifier extends ChangeNotifier {
     } else if (state == 1) {
       _state = 1;
       _entity = entity;
+      hasEntity.value = entity != null;
       _location = location;
       if (rebuild) notifyListeners();
       if (entity != null) {
@@ -325,6 +327,9 @@ class AppNotifier extends ChangeNotifier {
       bottomSheetNotifier.draggingDisabled = true;
     }
   }
+
+  // Needed for map to correctly apply padding when bottom sheet is fully expanded
+  final hasEntity = ValueNotifier(false);
 
   Entity _entity;
   Entity get entity => _entity;
