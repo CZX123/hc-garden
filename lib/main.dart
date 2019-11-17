@@ -5,7 +5,72 @@ void main() {
   runApp(HcGardenApp());
 }
 
-class HcGardenApp extends StatelessWidget {
+class HcGardenApp extends StatefulWidget {
+  @override
+  _HcGardenAppState createState() => _HcGardenAppState();
+}
+
+class _HcGardenAppState extends State<HcGardenApp> {
+  final _location = Location();
+  final _themeNotifier = ThemeNotifier(false);
+  final _mapNotifier = MapNotifier();
+
+  void checkPermission() async {
+    var granted = await _location.hasPermission();
+    if (!granted) {
+      granted = await _location.requestPermission();
+    }
+    _mapNotifier.permissionEnabled = granted;
+    if (granted) {
+      checkGPS();
+    }
+  }
+
+  void checkGPS() async {
+    var isOn = await _location.serviceEnabled();
+    if (!isOn) {
+      isOn = await _location.requestService();
+    }
+    _mapNotifier.gpsOn = isOn;
+    if (isOn) _mapNotifier.rebuildMap();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      _themeNotifier.value = prefs.getBool('isDark') ?? false;
+    });
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(),
+      'assets/images/google_maps/yellow_marker.png',
+    ).then((descriptor) {
+      _mapNotifier.darkThemeMarkerIcons.insert(0, descriptor);
+    });
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(),
+      'assets/images/google_maps/pink_marker.png',
+    ).then((descriptor) {
+      _mapNotifier.darkThemeMarkerIcons.insert(
+        _mapNotifier.darkThemeMarkerIcons.isEmpty ? 0 : 1,
+        descriptor,
+      );
+    });
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(),
+      'assets/images/google_maps/blue_marker.png',
+    ).then((descriptor) {
+      _mapNotifier.darkThemeMarkerIcons.add(descriptor);
+    });
+  }
+
+  @override
+  void dispose() {
+    _themeNotifier.dispose();
+    _mapNotifier.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -14,8 +79,11 @@ class HcGardenApp extends StatelessWidget {
         Provider<Map<String, Uint8List>>.value(
           value: {},
         ),
-        ChangeNotifierProvider(
-          builder: (context) => ThemeNotifier(false),
+        FutureProvider.value(
+          value: getApplicationDocumentsDirectory(),
+        ),
+        ChangeNotifierProvider.value(
+          value: _themeNotifier,
         ),
         // All Firebase data
         StreamProvider.value(
@@ -103,11 +171,8 @@ class HcGardenApp extends StatelessWidget {
         ChangeNotifierProvider(
           builder: (context) => SortNotifier(),
         ),
-        ChangeNotifierProvider(
-          builder: (context) => MapNotifier(),
-        ),
-        FutureProvider.value(
-          value: getApplicationDocumentsDirectory(),
+        ChangeNotifierProvider.value(
+          value: _mapNotifier,
         ),
       ],
       child: Consumer<ThemeNotifier>(
@@ -332,12 +397,6 @@ class _MyHomePageState extends State<MyHomePage>
       length: 2,
       vsync: this,
     )..addListener(tabListener);
-    SharedPreferences.getInstance().then((prefs) {
-      Provider.of<ThemeNotifier>(
-        context,
-        listen: false,
-      ).value = prefs.getBool('isDark') ?? false;
-    });
   }
 
   @override

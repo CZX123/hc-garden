@@ -8,20 +8,30 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
+  bool _isDark = false;
   GoogleMapController _mapController;
   final _padding = ValueNotifier(EdgeInsets.zero);
   bool _init = false;
   AppNotifier _appNotifier;
   BottomSheetNotifier _bottomSheetNotifier;
   ThemeNotifier _themeNotifier;
+  MapNotifier _mapNotifier;
   double _height;
+
+  void rebuild() {
+    setState(() {});
+  }
 
   void themeListener() {
     if (_themeNotifier.value)
-      // TODO: _mapController.setMapStyle(darkMapStyle);
-      _mapController?.setMapStyle(mapStyle);
+      _mapController?.setMapStyle(darkMapStyle);
+      	// _mapController?.setMapStyle(mapStyle);
     else
       _mapController?.setMapStyle(mapStyle);
+    if (_isDark != _themeNotifier.value) {
+      _isDark = _themeNotifier.value;
+      rebuild();
+    }
   }
 
   void animListener() {
@@ -64,7 +74,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
       context,
       listen: false,
     ).mapController = _mapController;
-    setState(() {}); // Needed to apply padding to map
+    rebuild(); // Needed to apply padding to map
     _padding.value = _padding.value.copyWith(
       top: MediaQuery.of(context).padding.top,
     );
@@ -77,10 +87,8 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       // Needed because of a bug with Google Maps not showing, after going back from recents
-      // Don't know if it works just yet
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {});
-      });
+      // Don't know if this works consistently, 200 ms randomly chosen
+      Future.delayed(const Duration(milliseconds: 200), rebuild);
     }
   }
 
@@ -107,6 +115,10 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
         context,
         listen: false,
       )..addListener(themeListener);
+      _mapNotifier = Provider.of<MapNotifier>(
+        context,
+        listen: false,
+      )..rebuildNotifier.addListener(rebuild);
       animListener();
       _init = true;
     }
@@ -118,12 +130,12 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     _appNotifier.hasEntity.removeListener(animListener);
     _bottomSheetNotifier.animation.removeListener(animListener);
     _themeNotifier.removeListener(themeListener);
+    _mapNotifier.rebuildNotifier.removeListener(rebuild);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Provider.of<ThemeNotifier>(context).value;
     return Selector<FirebaseData, Map<Trail, List<TrailLocation>>>(
       selector: (context, firebaseData) => firebaseData.trails,
       builder: (context, trails, child) {
@@ -136,11 +148,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                 (a, b) => a.id.compareTo(b.id),
               );
             for (var trail in trailList) {
-              final hues = [
-                isDark ? 30.0 : 42.0,
-                isDark ? 352.0 : 340.0,
-                isDark ? 210.0 : 199.0,
-              ];
+              final hues = [38.0, 340.0, 199.0];
               for (var location in trails[trail]) {
                 markers.add(
                   Marker(
@@ -174,7 +182,9 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                         }
                       },
                     ),
-                    icon: BitmapDescriptor.defaultMarkerWithHue(hues[i]),
+                    icon: _isDark
+                        ? _mapNotifier.darkThemeMarkerIcons[i]
+                        : BitmapDescriptor.defaultMarkerWithHue(hues[i]),
                   ),
                 );
               }
@@ -201,9 +211,12 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                       //   southwest: southWestBound,
                       // )),
                       onMapCreated: _onMapCreated,
+                      // onCameraMove: (position) {
+                      //   print(position);
+                      // },
                       initialCameraPosition: CameraPosition(
                         target: bottomSheetCenter,
-                        zoom: 16.8,
+                        zoom: 16.4,
                       ),
                       // polygons: polygons,
                       markers: markers,
@@ -217,16 +230,22 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
 }
 
 class MapNotifier extends ChangeNotifier {
-  // TODO: Do something with these information
+  // todo: Do something with these information
   bool permissionEnabled;
   bool gpsOn;
+  final rebuildNotifier = ValueNotifier(false);
   GoogleMapController mapController;
+  List<BitmapDescriptor> darkThemeMarkerIcons = [];
   Set<Marker> _markers;
   Set<Marker> get markers => _markers;
 
   void setMarkers(Set<Marker> markers, {bool notify = true}) {
     _markers = markers;
     if (notify ?? true) notifyListeners();
+  }
+
+  void rebuildMap() {
+    rebuildNotifier.value = !rebuildNotifier.value;
   }
 
   void _animateToPoint(LatLng point, double zoom) {
@@ -266,7 +285,7 @@ class MapNotifier extends ChangeNotifier {
 
   /// Animate back to default map of HC Garden
   void animateBackToCenter([bool shiftedUpwards = false]) {
-    _animateToPoint(shiftedUpwards ? bottomSheetCenter : center, 16.8);
+    _animateToPoint(shiftedUpwards ? bottomSheetCenter : center, 16.4);
   }
 
   /// Moves the map to a specific location on a trail

@@ -1,6 +1,6 @@
 import '../../library.dart';
 
-// TODO:
+// todo:
 // Make images easier to zoom
 // Investigate why zoomed in images, when pressing back are very laggy
 // Add some flinging upon translation
@@ -87,20 +87,24 @@ class ImageGallery extends StatelessWidget {
                       decoration: BoxDecoration(
                         boxShadow: kElevationToShadow[8],
                       ),
-                      child: Material(
-                        elevation: 0,
-                        color: Theme.of(context).bottomAppBarColor,
-                        child: SizedBox(
-                          height: 48,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: IconButton(
-                              icon: const Icon(Icons.arrow_back),
-                              onPressed: () => Navigator.maybePop(context),
-                              tooltip: 'Back',
+                      child: Builder(
+                        builder: (context) {
+                          return Material(
+                            elevation: 0,
+                            color: Theme.of(context).bottomAppBarColor,
+                            child: SizedBox(
+                              height: 48,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_back),
+                                  onPressed: () => Navigator.maybePop(context),
+                                  tooltip: 'Back',
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        }
                       ),
                     ),
                   ),

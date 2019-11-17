@@ -156,11 +156,11 @@ class TrailButtonsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
     const _trails = ['Kah Kee\nTrail', 'Kong Chian\nTrail', 'Jing Xian\nTrail'];
-    final _colors = [Colors.lightBlue, Colors.pink, Colors.amber[600]];
+    final _colors = [Colors.lightBlue, Colors.pink, Colors.amber[700]];
     final _textColors = [
-      Colors.lightBlueAccent,
-      Colors.redAccent,
-      Colors.orangeAccent,
+      Color(0xFF00C3FF),
+      Color(0xFFFF668C),
+      Color(0xFFFFBF00),
     ];
 
     return FadeTransition(
@@ -235,7 +235,7 @@ class TrailButton extends StatelessWidget {
             return AnimatedTheme(
               data: themeNotifier.value
                   ? darkThemeData.copyWith(
-                      buttonColor: Colors.grey[800],
+                      buttonColor: Color(0xFF383838),
                       textTheme: TextTheme(
                         body1: textStyle.copyWith(
                           color: textColor,
