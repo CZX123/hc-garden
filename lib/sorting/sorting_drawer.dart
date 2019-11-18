@@ -38,37 +38,90 @@ class SortingDrawer extends StatelessWidget {
                         }
                       }
                       return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          ListTile(
-                            title: Text(
-                              'Trails',
-                              style: Theme.of(context).textTheme.subtitle,
-                            ),
+                          Selector<MapNotifier, CustomMapType>(
+                            selector: (context, m) => m.mapType,
+                            builder: (context, mapType, child) {
+
+                              void onChanged(CustomMapType newType) {
+                                Provider.of<MapNotifier>(context, listen: false)
+                                    .mapType = newType;
+                              }
+
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  ListTile(
+                                    title: Text(
+                                      'Map Type',
+                                      style:
+                                          Theme.of(context).textTheme.subtitle,
+                                    ),
+                                  ),
+                                  RadioListTile<CustomMapType>(
+                                    controlAffinity:
+                                        ListTileControlAffinity.trailing,
+                                    groupValue: mapType,
+                                    value: CustomMapType.normal,
+                                    title: const Text('Normal'),
+                                    onChanged: onChanged,
+                                  ),
+                                  RadioListTile<CustomMapType>(
+                                    controlAffinity:
+                                        ListTileControlAffinity.trailing,
+                                    groupValue: mapType,
+                                    value: CustomMapType.dark,
+                                    title: const Text('Dark'),
+                                    onChanged: onChanged,
+                                  ),
+                                  RadioListTile<CustomMapType>(
+                                    controlAffinity:
+                                        ListTileControlAffinity.trailing,
+                                    groupValue: mapType,
+                                    value: CustomMapType.satellite,
+                                    title: const Text('Satellite'),
+                                    onChanged: onChanged,
+                                  ),
+                                ],
+                              );
+                            },
                           ),
-                          for (var trail in allTrails)
-                            CheckboxListTile(
-                              controlAffinity: ListTileControlAffinity.trailing,
-                              value: selectedTrails.contains(trail),
-                              title: Text(
-                                trail.name.split('(').first.trimRight(),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              ListTile(
+                                title: Text(
+                                  'Filter',
+                                  style: Theme.of(context).textTheme.subtitle,
+                                ),
                               ),
-                              checkColor: Theme.of(context).canvasColor,
-                              onChanged: (value) {
-                                final sortNotifier = Provider.of<SortNotifier>(
-                                  context,
-                                  listen: false,
-                                );
-                                List<Trail> newTrails =
-                                    List.from(sortNotifier.selectedTrails);
-                                newTrails.remove(trail);
-                                if (value) {
-                                  newTrails.add(trail);
-                                }
-                                sortNotifier.selectedTrails = newTrails;
-                              },
-                            ),
+                              for (var trail in allTrails)
+                                CheckboxListTile(
+                                  controlAffinity:
+                                      ListTileControlAffinity.trailing,
+                                  value: selectedTrails.contains(trail),
+                                  title: Text(
+                                    trail.name.split('(').first.trimRight(),
+                                  ),
+                                  checkColor: Theme.of(context).canvasColor,
+                                  onChanged: (value) {
+                                    final sortNotifier =
+                                        Provider.of<SortNotifier>(
+                                      context,
+                                      listen: false,
+                                    );
+                                    List<Trail> newTrails =
+                                        List.from(sortNotifier.selectedTrails);
+                                    newTrails.remove(trail);
+                                    if (value) {
+                                      newTrails.add(trail);
+                                    }
+                                    sortNotifier.selectedTrails = newTrails;
+                                  },
+                                ),
+                            ],
+                          ),
                         ],
                       );
                     },

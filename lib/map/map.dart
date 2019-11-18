@@ -8,30 +8,15 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
-  bool _isDark = false;
   GoogleMapController _mapController;
   final _padding = ValueNotifier(EdgeInsets.zero);
   bool _init = false;
   AppNotifier _appNotifier;
   BottomSheetNotifier _bottomSheetNotifier;
-  ThemeNotifier _themeNotifier;
-  MapNotifier _mapNotifier;
   double _height;
 
   void rebuild() {
     setState(() {});
-  }
-
-  void themeListener() {
-    if (_themeNotifier.value)
-      _mapController?.setMapStyle(darkMapStyle);
-      	// _mapController?.setMapStyle(mapStyle);
-    else
-      _mapController?.setMapStyle(mapStyle);
-    if (_isDark != _themeNotifier.value) {
-      _isDark = _themeNotifier.value;
-      rebuild();
-    }
   }
 
   void animListener() {
@@ -69,17 +54,16 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   }
 
   void _onMapCreated(GoogleMapController controller) {
+    final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
     _mapController = controller;
-    Provider.of<MapNotifier>(
-      context,
-      listen: false,
-    ).mapController = _mapController;
+    mapNotifier.mapController = _mapController;
+    _mapController.setMapStyle(
+        mapNotifier.mapType == CustomMapType.dark ? darkMapStyle : mapStyle);
     rebuild(); // Needed to apply padding to map
     _padding.value = _padding.value.copyWith(
       top: MediaQuery.of(context).padding.top,
     );
     animListener();
-    themeListener();
   }
 
   @override
@@ -111,14 +95,6 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
         context,
         listen: false,
       )..animation.addListener(animListener);
-      _themeNotifier = Provider.of<ThemeNotifier>(
-        context,
-        listen: false,
-      )..addListener(themeListener);
-      _mapNotifier = Provider.of<MapNotifier>(
-        context,
-        listen: false,
-      )..rebuildNotifier.addListener(rebuild);
       animListener();
       _init = true;
     }
@@ -129,13 +105,12 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _appNotifier.hasEntity.removeListener(animListener);
     _bottomSheetNotifier.animation.removeListener(animListener);
-    _themeNotifier.removeListener(themeListener);
-    _mapNotifier.rebuildNotifier.removeListener(rebuild);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final mapNotifier = Provider.of<MapNotifier>(context);
     return Selector<FirebaseData, Map<Trail, List<TrailLocation>>>(
       selector: (context, firebaseData) => firebaseData.trails,
       builder: (context, trails, child) {
@@ -182,8 +157,8 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                         }
                       },
                     ),
-                    icon: _isDark
-                        ? _mapNotifier.darkThemeMarkerIcons[i]
+                    icon: mapNotifier.mapType == CustomMapType.dark
+                        ? mapNotifier.darkThemeMarkerIcons[i]
                         : BitmapDescriptor.defaultMarkerWithHue(hues[i]),
                   ),
                 );
@@ -206,6 +181,9 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                     return GoogleMap(
                       padding: value,
                       myLocationEnabled: true,
+                      mapType: mapNotifier.mapType == CustomMapType.satellite
+                          ? MapType.hybrid
+                          : MapType.normal,
                       // cameraTargetBounds: CameraTargetBounds(LatLngBounds(
                       //   northeast: northEastBound,
                       //   southwest: southWestBound,
@@ -229,23 +207,43 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   }
 }
 
+enum CustomMapType {
+  normal,
+  satellite,
+  dark,
+}
+
 class MapNotifier extends ChangeNotifier {
   // todo: Do something with these information
   bool permissionEnabled;
   bool gpsOn;
-  final rebuildNotifier = ValueNotifier(false);
   GoogleMapController mapController;
   List<BitmapDescriptor> darkThemeMarkerIcons = [];
+
+  CustomMapType _mapType = CustomMapType.normal;
+  CustomMapType get mapType => _mapType;
+  set mapType(CustomMapType mapType) {
+    if (mapType != _mapType) {
+      _mapType = mapType;
+      mapController.setMapStyle(
+        mapType == CustomMapType.dark ? darkMapStyle : mapStyle,
+      );
+      SharedPreferences.getInstance().then((prefs) {
+        prefs.setInt('mapType', CustomMapType.values.indexOf(mapType));
+      });
+      notifyListeners();
+    }
+  }
+
   Set<Marker> _markers;
   Set<Marker> get markers => _markers;
-
   void setMarkers(Set<Marker> markers, {bool notify = true}) {
     _markers = markers;
     if (notify ?? true) notifyListeners();
   }
 
   void rebuildMap() {
-    rebuildNotifier.value = !rebuildNotifier.value;
+    notifyListeners();
   }
 
   void _animateToPoint(LatLng point, double zoom) {

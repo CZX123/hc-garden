@@ -40,6 +40,7 @@ class _HcGardenAppState extends State<HcGardenApp> {
     super.initState();
     SharedPreferences.getInstance().then((prefs) {
       _themeNotifier.value = prefs.getBool('isDark') ?? false;
+      _mapNotifier.mapType = CustomMapType.values[prefs.getInt('mapType') ?? 0];
     });
     BitmapDescriptor.fromAssetImage(
       ImageConfiguration(),
