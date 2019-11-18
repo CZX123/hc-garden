@@ -24,7 +24,7 @@ class ExploreHeader extends StatelessWidget {
     return Stack(
       children: <Widget>[
         const SizedBox(
-          height: 12,
+          height: 16,
         ),
         ValueListenableBuilder(
           valueListenable: anim,
@@ -53,6 +53,9 @@ class ExploreHeader extends StatelessWidget {
                     begin: 16 / 12 - totalTranslation / 12,
                     end: 16 / 12,
                   ).animate(anim),
+                ),
+                const SizedBox(
+                  height: 8,
                 ),
                 FadeTransition(
                   opacity: Tween<double>(
@@ -106,7 +109,7 @@ class AppLogo extends StatelessWidget {
         children: <Widget>[
           Image.asset(
             'assets/images/hci.png',
-            height: imageHeight - 12,
+            height: imageHeight,
           ),
           const SizedBox(
             width: 12,
@@ -136,7 +139,7 @@ class AppLogo extends StatelessWidget {
             ],
           ),
           const SizedBox(
-            width: 4,
+            width: 12,
           ),
           Image.asset(
             'assets/images/app_logo/default.png',

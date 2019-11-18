@@ -1,7 +1,7 @@
 import '../library.dart';
 
-const spacing = 4 * 8 + 16 + 8 + 4.0;
-const imageHeight = 40.0;
+const spacing = 4 * 8 + 16 + 12 + 8 + 4.0;
+const imageHeight = 28.0;
 const headingHeight = 28.0;
 const trailButtonHeight = 80.0;
 const entityButtonHeight = 108.0;

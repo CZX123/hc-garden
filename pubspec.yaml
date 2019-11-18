@@ -38,7 +38,7 @@ flutter_icons:
   android: true
   ios: true
   adaptive_icon_foreground: assets/images/app_logo/foreground.png
-  adaptive_icon_background: '#FFFFFF'
+  adaptive_icon_background: assets/images/app_logo/background.png
 
 
 # For information on the generic Dart part of this file, see the
