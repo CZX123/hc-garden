@@ -106,9 +106,13 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
-                          widget.trailLocation.entityPositions
-                              .map((position) => position.entity?.name)
-                              .where((name) => name != null)
+                          (widget.trailLocation.entityPositions
+                                  .where((position) => position.entity != null)
+                                  .toList()
+                                    ..sort((a, b) {
+                                      return a.left.compareTo(b.left);
+                                    }))
+                              .map((position) => position.entity.name)
                               .toList()
                               .join(', '),
                           style: Theme.of(context).textTheme.caption.copyWith(

@@ -130,9 +130,13 @@ class _LocationListRowState extends State<LocationListRow> {
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    var names = widget.location.entityPositions
-        .map((position) => position.entity?.name)
-        .where((name) => name != null)
+    var names = (widget.location.entityPositions
+            .where((position) => position.entity != null)
+            .toList()
+              ..sort((a, b) {
+                return a.left.compareTo(b.left);
+              }))
+        .map((position) => position.entity.name)
         .toList();
     final child = Container(
       height: 84,
