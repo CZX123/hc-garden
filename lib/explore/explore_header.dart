@@ -141,9 +141,12 @@ class AppLogo extends StatelessWidget {
           const SizedBox(
             width: 12,
           ),
-          Image.asset(
-            'assets/images/app_logo/default.png',
-            height: imageHeight,
+          Transform.scale(
+            scale: 1.1,
+            child: Image.asset(
+              'assets/images/app_logo/default.png',
+              height: imageHeight,
+            ),
           ),
         ],
       ),

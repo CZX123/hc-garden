@@ -225,7 +225,7 @@ class MapNotifier extends ChangeNotifier {
   set mapType(CustomMapType mapType) {
     if (mapType != _mapType) {
       _mapType = mapType;
-      mapController.setMapStyle(
+      mapController?.setMapStyle(
         mapType == CustomMapType.dark ? darkMapStyle : mapStyle,
       );
       SharedPreferences.getInstance().then((prefs) {

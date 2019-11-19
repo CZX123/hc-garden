@@ -4,53 +4,48 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 ## TODOs
 
-### Branding
-- App Icon
-- App Loading Screen
-- App Logo should be bigger
+### High Priority
 
-### Search
+#### Firebase Data (TS)
+- Filter out invalid data from Firebase (e.g. MISSING INFO)
+- Ensure app does not crash, and no red screen of death within the app
+- Sort the data for trails better
+
+#### Map Markers
+- Green markers depending on which page the user is on to show the current location(s)
+- Going to location should also focus on the marker (need wait for package update)
+- Marker window should also contain image (need wait for package update)
+
+#### Onboarding (TS?)
+- Onboarding tutorial on how to use the apps
+	- Overlays, ability to skip, able to access from settings
+
+#### Sorting
+- Sorting by distance (TS)
+- Different types of fauna
+
+### Medium Priority
+
+#### History Screen
+- Update to new design as suggested by Dr Chia
+
+### Low Priority
+
+#### Search
 - Search should be unified for both flora and fauna
 - Search should perhaps highlight the searchTerm within the name for clarity
 
-### Sorting
-- Sorting by trails, distance
-- Different types of fauna
-
-### Onboarding
-- Onboarding tutorial on how to use the app
-	- Overlays, ability to skip, able to access from settings
-
-### Trails
-- TrailDetailsScreen: List of locations in a trail
-- TrailLocationOverviewScreen: Image with animated circles
-- Linking between map marker and TrailLocationOverviewScreen
-	- Require careful organisation of the Navigator stack
-
-### Other Screens
-- ~~HistoryScreen~~
-- ~~Introduction, CommitteeMessage, Acknowledgements, References~~
-
-### Map
-- Going to location from EntityDetailsPage should also focus on the marker (need wait for package update)
-- Marker window should also contain image (need wait for package update)
-- Highlight buildings on map, correct colour selection
+#### Map
+- Highlight buildings on map, correct colour selection (high school/college)
+- Improved dark theme
 
 ## Bugs
 
 ### High Priority
-
-- ScrollController bug when switching between entity list and details page after searching
-- ~~Map Widget frequently gets stuck~~ _Not solveable_
+- Map bottom padding sometimes does not update when collapsing the bottom sheet
 
 ### Medium Priority
-
 - Images in EntityListPage sometimes flicker when opening entity's DetailsPage
-- Slight flicker/lag when opening and closing keyboard, making search slightly unsightly
-
-### Low Priority
-
-- Improve hero animation when going back from details page to EntityListPage
 
 ## Future Improvements
 
@@ -63,4 +58,4 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 - Web support
 
 ### Far Future
-- Should there be a Google Maps for Dart SDK in the future, migrate to it asap. The native Google Maps view is filled with bugs.
+- Should there be a Google Maps for Dart SDK in the future, migrate to it asap.
