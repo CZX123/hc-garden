@@ -86,76 +86,8 @@ class _HcGardenAppState extends State<HcGardenApp> {
         ChangeNotifierProvider.value(
           value: _themeNotifier,
         ),
-        // All Firebase data
-        StreamProvider.value(
-          initialData: FirebaseData(
-            floraList: [],
-            faunaList: [],
-            trails: {},
-            historicalDataList: [],
-            aboutPageDataList: [],
-          ),
-          value: FirebaseDatabase.instance.reference().onValue.map(
-            (event) {
-              if (event.snapshot.value == null) {
-                throw Exception('Value is empty!');
-              }
-
-              // Add list of entities
-              final parsedJson =
-                  Map<String, dynamic>.from(event.snapshot.value);
-              List<Flora> floraList = [];
-              List<Fauna> faunaList = [];
-              parsedJson['flora&fauna'].forEach((key, value) {
-                if (key.contains('flora')) {
-                  floraList.add(Flora.fromJson(key, value));
-                } else {
-                  faunaList.add(Fauna.fromJson(key, value));
-                }
-              });
-              floraList.sort((a, b) => a.name.compareTo(b.name));
-              faunaList.sort((a, b) => a.name.compareTo(b.name));
-
-              // Add trails and locations
-              Map<Trail, List<TrailLocation>> trails = {};
-              parsedJson['map'].forEach((key, value) {
-                final trail = Trail.fromJson(key, value);
-                trails[trail] = [];
-                value['route'].forEach((key, value) {
-                  trails[trail].add(TrailLocation.fromJson(
-                    key,
-                    value,
-                    trail: trail,
-                    floraList: floraList,
-                    faunaList: faunaList,
-                  ));
-                });
-              });
-
-              List<HistoricalData> historicalDataList = [];
-              parsedJson['historical'].forEach((key, value) {
-                historicalDataList.add(HistoricalData.fromJson(key, value));
-              });
-              historicalDataList.sort((a, b) => a.id.compareTo(b.id));
-
-              List<AboutPageData> aboutPageDataList = [];
-              parsedJson['about'].forEach((key, value) {
-                aboutPageDataList.add(AboutPageData.fromJson(key, value));
-              });
-              aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
-
-              // TODO: handle cases of invalid data
-              // i.e. filter those whose data fields are null out
-
-              return FirebaseData(
-                floraList: floraList,
-                faunaList: faunaList,
-                trails: trails,
-                historicalDataList: historicalDataList,
-                aboutPageDataList: aboutPageDataList,
-              );
-            },
-          ),
+        ChangeNotifierProvider.value(
+          value: _mapNotifier,
         ),
         ChangeNotifierProvider(
           builder: (context) => DebugNotifier(),
@@ -171,9 +103,6 @@ class _HcGardenAppState extends State<HcGardenApp> {
         ),
         ChangeNotifierProvider(
           builder: (context) => SortNotifier(),
-        ),
-        ChangeNotifierProvider.value(
-          value: _mapNotifier,
         ),
       ],
       child: Consumer<ThemeNotifier>(
@@ -231,6 +160,7 @@ class _MyHomePageState extends State<MyHomePage>
     ScrollController(),
     ScrollController(),
   ];
+  Stream<FirebaseData> _stream;
   double topPadding;
   double height;
 
@@ -269,33 +199,24 @@ class _MyHomePageState extends State<MyHomePage>
 
   Future<bool> onBack(BuildContext context) async {
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
-    final bottomSheetNotifier =
-        Provider.of<BottomSheetNotifier>(context, listen: false);
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+      context,
+      listen: false,
+    );
     final searchNotifier = Provider.of<SearchNotifier>(context, listen: false);
     final animation = bottomSheetNotifier.animation;
     final state = appNotifier.state;
-    final navigatorKey = appNotifier.navigatorKey;
     if (state == 0) {
-      if (appNotifier.trail != null) {
-        appNotifier.changeState(
-          context,
-          0,
-          activeScrollController: _scrollControllers[_tabController.index],
-        );
-        bottomSheetNotifier.animateTo(height - bottomHeight);
-        navigatorKey.currentState.pushReplacement(CrossFadePageRoute(
-          builder: (context) {
-            return ExplorePage(
-              tabController: _tabController,
-              scrollControllers: _scrollControllers,
-            );
-          },
-        ));
+      if (appNotifier.routes.isNotEmpty) {
+        appNotifier.pop(context);
+        bottomSheetNotifier
+          ..activeScrollController = _scrollControllers[_tabController.index]
+          ..animateTo(height - bottomHeight);
         return false;
       }
-      if (navigatorKey.currentState.canPop()) {
-        // If something wrong happens
-        navigatorKey.currentState.pop();
+      // If something wrong happens, navigator somehow still can be popped
+      if (appNotifier.navigatorKey.currentState.canPop()) {
+        appNotifier.navigatorKey.currentState.pop();
         return false;
       }
       if (searchNotifier.isSearching) {
@@ -315,52 +236,19 @@ class _MyHomePageState extends State<MyHomePage>
         return false;
       }
       return true;
-    } else if (state == 1) {
-      // if (animation.value > 10) {
-      //   bottomSheetNotifier.animateTo(0);
-      if (navigatorKey.currentState.canPop()) {
-        navigatorKey.currentState.pop();
-        if (!navigatorKey.currentState.canPop()) {
-          SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-          appNotifier.changeState(
-            context,
-            0,
-            activeScrollController: _scrollControllers[_tabController.index],
-            trail: appNotifier.trail,
-          );
-          if (appNotifier.trail == null &&
-              bottomSheetNotifier.animation.value > height - bottomHeight) {
-            bottomSheetNotifier.animateTo(height - bottomHeight);
-          }
-          if (searchNotifier.searchTerm.isNotEmpty)
-            searchNotifier.isSearching = true;
-        } else if (appNotifier.location != null) {
-          SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-          appNotifier.changeState(
-            context,
-            1,
-            location: null,
-            entity: appNotifier.entity,
-          );
-        } else if (appNotifier.entity != null) {
-          appNotifier.changeState(
-            context,
-            1,
-            entity: null,
-            location: appNotifier.location,
-          );
+    } else {
+      appNotifier.pop(context);
+      if (appNotifier.routes.isEmpty) {
+        bottomSheetNotifier.activeScrollController =
+            _scrollControllers[_tabController.index];
+        if (state == 1 && animation.value > height - bottomHeight) {
+          bottomSheetNotifier.animateTo(height - bottomHeight);
         }
+        if (searchNotifier.searchTerm.isNotEmpty)
+          searchNotifier.isSearching = true;
       }
       return false;
-    } else if (state == 2) {
-      if (navigatorKey.currentState.canPop()) {
-        navigatorKey.currentState.pop();
-        appNotifier.changeState(context, 1);
-        bottomSheetNotifier.draggingDisabled = false;
-        return false;
-      }
     }
-    return true;
   }
 
   void checkPermission() async {
@@ -398,6 +286,114 @@ class _MyHomePageState extends State<MyHomePage>
       length: 2,
       vsync: this,
     )..addListener(tabListener);
+    _stream = FirebaseDatabase.instance.reference().onValue.map((event) {
+      if (event.snapshot.value == null) {
+        throw Exception('Value is empty!');
+      }
+
+      // Add list of entities
+      final parsedJson = Map<String, dynamic>.from(event.snapshot.value);
+      List<Flora> floraList = [];
+      List<Fauna> faunaList = [];
+      parsedJson['flora&fauna'].forEach((key, value) {
+        if (key.contains('flora')) {
+          floraList.add(Flora.fromJson(key, value));
+        } else {
+          faunaList.add(Fauna.fromJson(key, value));
+        }
+      });
+      floraList.sort((a, b) => a.name.compareTo(b.name));
+      faunaList.sort((a, b) => a.name.compareTo(b.name));
+
+      Set<Marker> mapMarkers = {};
+      final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
+      final hues = [38.0, 340.0, 199.0];
+
+      // Add trails and locations
+      Map<Trail, List<TrailLocation>> trails = {};
+      parsedJson['map'].forEach((key, value) {
+        final trail = Trail.fromJson(key, value);
+        trails[trail] = [];
+        value['route'].forEach((key, value) {
+          final location = TrailLocation.fromJson(
+            key,
+            value,
+            trail: trail,
+            floraList: floraList,
+            faunaList: faunaList,
+          );
+          trails[trail].add(location);
+          mapMarkers.add(
+            Marker(
+              markerId: MarkerId('${trail.id} ${location.id}'),
+              position: location.coordinates,
+              infoWindow: InfoWindow(
+                title: location.name,
+                onTap: () {
+                  final appNotifier = Provider.of<AppNotifier>(
+                    context,
+                    listen: false,
+                  );
+                  if (appNotifier.routes.isNotEmpty &&
+                      appNotifier.routes.last.data is TrailLocation &&
+                      appNotifier.routes.last.data == location) {
+                    Provider.of<BottomSheetNotifier>(
+                      context,
+                      listen: false,
+                    ).animateTo(0);
+                  } else {
+                    appNotifier.push(
+                      context: context,
+                      route: CrossFadePageRoute(
+                        builder: (context) {
+                          return Material(
+                            color: Theme.of(context).bottomAppBarColor,
+                            child: TrailLocationOverviewPage(
+                              trailLocation: location,
+                            ),
+                          );
+                        },
+                      ),
+                      routeInfo: RouteInfo(
+                        name: location.name,
+                        data: location,
+                      ),
+                    );
+                  }
+                },
+              ),
+              icon: mapNotifier.mapType == CustomMapType.dark
+                  ? mapNotifier.darkThemeMarkerIcons[trail.id - 1]
+                  : BitmapDescriptor.defaultMarkerWithHue(hues[trail.id - 1]),
+            ),
+          );
+        });
+      });
+      mapNotifier.setMarkers(mapMarkers, notify: false);
+
+      List<HistoricalData> historicalDataList = [];
+      parsedJson['historical'].forEach((key, value) {
+        historicalDataList.add(HistoricalData.fromJson(key, value));
+      });
+      historicalDataList.sort((a, b) => a.id.compareTo(b.id));
+
+      List<AboutPageData> aboutPageDataList = [];
+      parsedJson['about'].forEach((key, value) {
+        aboutPageDataList.add(AboutPageData.fromJson(key, value));
+      });
+      aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
+
+      // TODO: handle cases of invalid data
+      // i.e. filter those whose data fields are null out
+
+      return FirebaseData(
+        floraList: floraList,
+        faunaList: faunaList,
+        trails: trails,
+        historicalDataList: historicalDataList,
+        aboutPageDataList: aboutPageDataList,
+      );
+    });
   }
 
   @override
@@ -428,45 +424,57 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        return onBack(context);
-      },
+    return StreamProvider.value(
+      initialData: FirebaseData(
+        floraList: [],
+        faunaList: [],
+        trails: {},
+        historicalDataList: [],
+        aboutPageDataList: [],
+      ),
+      value: _stream,
       child: Scaffold(
         drawer: DebugDrawer(),
         endDrawer: SortingDrawer(),
-        body: CustomAnimatedSwitcher(
-          crossShrink: false,
-          child: height != 0
-              ? NestedBottomSheet(
-                  initialPosition: height - bottomHeight,
-                  background: Positioned(
-                    left: 0,
-                    top: 0,
-                    right: 0,
-                    bottom: bottomBarHeight,
-                    child: ValueListenableBuilder(
-                      valueListenable: _pageIndex,
-                      builder: (context, pageIndex, child) {
-                        return CustomAnimatedSwitcher(
-                          child: pageIndex == 0
-                              ? HistoryPage()
-                              : pageIndex == 2 ? AboutPage() : child,
-                        );
-                      },
-                      child: MapWidget(),
-                    ),
-                  ),
-                  body: ExploreBody(
-                    tabController: _tabController,
-                    scrollControllers: _scrollControllers,
-                  ),
-                  footer: BottomSheetFooter(
-                    pageIndex: _pageIndex,
-                  ),
-                )
-              : SizedBox.shrink(),
-        ),
+        body: Builder(builder: (context) {
+          return WillPopScope(
+            onWillPop: () {
+              return onBack(context);
+            },
+            child: CustomAnimatedSwitcher(
+              crossShrink: false,
+              child: height != 0
+                  ? NestedBottomSheet(
+                      initialPosition: height - bottomHeight,
+                      background: Positioned(
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        bottom: bottomBarHeight,
+                        child: ValueListenableBuilder(
+                          valueListenable: _pageIndex,
+                          builder: (context, pageIndex, child) {
+                            return CustomAnimatedSwitcher(
+                              child: pageIndex == 0
+                                  ? HistoryPage()
+                                  : pageIndex == 2 ? AboutPage() : child,
+                            );
+                          },
+                          child: MapWidget(),
+                        ),
+                      ),
+                      body: ExploreBody(
+                        tabController: _tabController,
+                        scrollControllers: _scrollControllers,
+                      ),
+                      footer: BottomSheetFooter(
+                        pageIndex: _pageIndex,
+                      ),
+                    )
+                  : SizedBox.shrink(),
+            ),
+          );
+        }),
       ),
     );
   }

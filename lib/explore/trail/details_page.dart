@@ -14,18 +14,26 @@ class TrailDetailsPage extends StatefulWidget {
 }
 
 class _TrailDetailsPageState extends State<TrailDetailsPage> {
+  bool _init = false;
   final _scrollController = ScrollController();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
-    if (appNotifier.state == 0 && appNotifier.trail == widget.trail) {
+    if (!_init) {
+      appNotifier.updateScrollController(
+        context: context,
+        data: widget.trail,
+        scrollController: _scrollController,
+      );
+      _init = true;
+    }
+    if (appNotifier.state == 0 && appNotifier.routes.isNotEmpty) {
       final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
         context,
         listen: false,
       );
-      bottomSheetNotifier.activeScrollController = _scrollController;
       if (_scrollController.hasClients &&
           bottomSheetNotifier.animation.value > 10) {
         _scrollController.jumpTo(0);
@@ -204,20 +212,16 @@ class _LocationListRowState extends State<LocationListRow> {
     );
     return InkWell(
       child: ValueListenableBuilder(
-        valueListenable: hidden,
+        valueListenable: ModalRoute.of(context).secondaryAnimation,
         builder: (context, value, child) {
           return Visibility(
-            visible: !value,
+            visible: value == 0 || !hidden.value,
             child: child,
           );
         },
         child: child,
       ),
       onTap: () async {
-        Provider.of<AppNotifier>(context, listen: false).changeState(
-          context,
-          1,
-        );
         final sourceRect = Rect.fromLTWH(0, 69, width, 84);
         final anim = Tween<double>(
           begin: 0,
@@ -234,9 +238,9 @@ class _LocationListRowState extends State<LocationListRow> {
           Offset(0, (1 - anim.value) * topPadding + 16),
         );
         hidden.value = true;
-        await Navigator.push(
-          context,
-          ExpandPageRoute(
+        await Provider.of<AppNotifier>(context, listen: false).push(
+          context: context,
+          route: ExpandPageRoute(
             builder: (context) {
               return TrailLocationOverviewPage(
                 trailLocation: widget.location,
@@ -250,6 +254,10 @@ class _LocationListRowState extends State<LocationListRow> {
             oldScrollController: widget.scrollController,
             topSpace: topSpace,
             persistentOldChild: child,
+          ),
+          routeInfo: RouteInfo(
+            name: widget.location.name,
+            data: widget.location,
           ),
         );
         secondaryAnimation = ModalRoute.of(context).secondaryAnimation

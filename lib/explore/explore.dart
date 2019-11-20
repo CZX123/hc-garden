@@ -18,7 +18,7 @@ const offsetTranslation = bottomHeight -
     entityButtonHeight -
     bottomBarHeight; // without topPadding
 
-class ExploreBody extends StatelessWidget {
+class ExploreBody extends StatefulWidget {
   final TabController tabController;
   final List<ScrollController> scrollControllers;
   const ExploreBody({
@@ -26,6 +26,30 @@ class ExploreBody extends StatelessWidget {
     @required this.tabController,
     @required this.scrollControllers,
   }) : super(key: key);
+
+  @override
+  _ExploreBodyState createState() => _ExploreBodyState();
+}
+
+class _ExploreBodyState extends State<ExploreBody> {
+  HeroController _heroController;
+  List<NavigatorObserver> _navigatorObservers = [];
+
+  RectTween _createRectTween(Rect begin, Rect end) {
+    return MaterialRectArcTween(begin: begin, end: end);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _heroController = HeroController(createRectTween: _createRectTween);
+    _navigatorObservers.add(_heroController);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +67,8 @@ class ExploreBody extends StatelessWidget {
     final initialRoute = CrossFadePageRoute<void>(
       builder: (context) {
         return ExplorePage(
-          tabController: tabController,
-          scrollControllers: scrollControllers,
+          tabController: widget.tabController,
+          scrollControllers: widget.scrollControllers,
         );
       },
     );
@@ -57,6 +81,7 @@ class ExploreBody extends StatelessWidget {
               return initialRoute;
             return null;
           },
+          observers: _navigatorObservers,
         ),
         Selector<AppNotifier, bool>(
           selector: (context, appNotifier) => appNotifier.state == 0,

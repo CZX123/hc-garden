@@ -17,7 +17,7 @@ class HistoryPage extends StatelessWidget {
         child: Selector<FirebaseData, List<HistoricalData>>(
           selector: (context, firebaseData) => firebaseData.historicalDataList,
           builder: (context, historicalDataList, child) {
-            final newImages = historicalDataList.map((h){
+            final newImages = historicalDataList.map((h) {
               return lowerRes(h.image);
             }).toList();
             return CustomScrollView(
@@ -62,13 +62,13 @@ class HistoryPage extends StatelessWidget {
                                         Navigator.push(
                                           context,
                                           PageRouteBuilder(
+                                            opaque: false,
                                             pageBuilder: (context, _, __) {
                                               return ImageGallery(
-                                                images: newImages
-                                                    .where((image) {
-                                                      return image.isNotEmpty;
-                                                    })
-                                                    .toList(),
+                                                images:
+                                                    newImages.where((image) {
+                                                  return image.isNotEmpty;
+                                                }).toList(),
                                                 initialImage: newImages[index],
                                               );
                                             },

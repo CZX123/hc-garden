@@ -15,6 +15,7 @@ class TrailLocationOverviewPage extends StatefulWidget {
 }
 
 class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
+  bool _init = false;
   final _scrollController = ScrollController();
   double aspectRatio;
   static const double sizeScaling = 500;
@@ -22,17 +23,13 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
-    if (appNotifier.state == 1 &&
-        appNotifier.entity == null &&
-        appNotifier.location == null) {
-      appNotifier.changeState(
-        context,
-        1,
-        location: widget.trailLocation,
-        activeScrollController: _scrollController,
-        rebuild: false,
+    if (!_init) {
+      Provider.of<AppNotifier>(context, listen: false).updateScrollController(
+        context: context,
+        data: widget.trailLocation,
+        scrollController: _scrollController,
       );
+      _init = true;
     }
   }
 
@@ -49,11 +46,6 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
     final width = MediaQuery.of(context).size.width;
     final animation =
         Provider.of<BottomSheetNotifier>(context, listen: false).animation;
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
     final child = SingleChildScrollView(
       controller: _scrollController,
       physics: NeverScrollableScrollPhysics(),
@@ -172,20 +164,19 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                     height: (entityPosition.size / sizeScaling) * width,
                     child: AnimatedPulseCircle(
                       onTap: () {
-                        Provider.of<AppNotifier>(context, listen: false)
-                            .changeState(
-                          context,
-                          1,
-                        );
-                        Navigator.push(
-                          context,
-                          CrossFadePageRoute(
+                        Provider.of<AppNotifier>(context, listen: false).push(
+                          context: context,
+                          route: CrossFadePageRoute(
                             builder: (context) => Material(
                               color: Theme.of(context).bottomAppBarColor,
                               child: EntityDetailsPage(
                                 entity: entityPosition.entity,
                               ),
                             ),
+                          ),
+                          routeInfo: RouteInfo(
+                            name: entityPosition.entity.name,
+                            data: entityPosition.entity,
                           ),
                         );
                       },

@@ -1,5 +1,25 @@
 import '../library.dart';
 
+class MapPadding extends ChangeNotifier implements ValueListenable<EdgeInsets> {
+  MapPadding(this._value);
+  EdgeInsets _value = EdgeInsets.zero;
+  @override
+  EdgeInsets get value => _value;
+  void setValue(EdgeInsets newValue, {bool rebuild = true}) {
+    if (_value == newValue) return;
+    _value = newValue;
+    if (rebuild) notifyListeners();
+  }
+
+  void setBottom(double bottom, {bool rebuild = true}) {
+    if (_value.bottom == bottom) return;
+    _value = value.copyWith(
+      bottom: bottom,
+    );
+    if (rebuild) notifyListeners();
+  }
+}
+
 class MapWidget extends StatefulWidget {
   const MapWidget({Key key}) : super(key: key);
 
@@ -9,11 +29,12 @@ class MapWidget extends StatefulWidget {
 
 class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   GoogleMapController _mapController;
-  final _padding = ValueNotifier(EdgeInsets.zero);
+  final _padding = MapPadding(EdgeInsets.zero);
   bool _init = false;
   AppNotifier _appNotifier;
   BottomSheetNotifier _bottomSheetNotifier;
   double _height;
+  bool _previousHasEntity = false;
 
   void rebuild() {
     setState(() {});
@@ -24,26 +45,26 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     if (_bottomSheetNotifier.animation.value > _height - bottomHeight + 8 ||
         _appNotifier.hasEntity.value &&
             _bottomSheetNotifier.animation.value < 8) {
-      if (_padding.value.bottom != 0) {
-        _padding.value = _padding.value.copyWith(
-          bottom: 0,
-        );
-        // _mapController?.getScreenCoordinate(center)?.then((c) {
-        //   print(c);
-        //   print((bottomHeight - bottomBarHeight) /
-        //       -2 *
-        //       MediaQuery.of(context).devicePixelRatio);
-        // });
-        // _mapController?.animateCamera(CameraUpdate.scrollBy(
-        //   0,
-        //   (bottomHeight - bottomBarHeight) /
-        //       -2 *
-        //       MediaQuery.of(context).devicePixelRatio,
-        // ));
-      }
-    } else if (_padding.value.bottom != bottomHeight - bottomBarHeight) {
-      _padding.value = _padding.value.copyWith(
-        bottom: bottomHeight - bottomBarHeight,
+      _padding.setBottom(
+        0,
+        rebuild: _appNotifier.hasEntity.value == _previousHasEntity,
+      );
+      // _mapController?.getScreenCoordinate(center)?.then((c) {
+      //   print(c);
+      //   print((bottomHeight - bottomBarHeight) /
+      //       -2 *
+      //       MediaQuery.of(context).devicePixelRatio);
+      // });
+      // _mapController?.animateCamera(CameraUpdate.scrollBy(
+      //   0,
+      //   (bottomHeight - bottomBarHeight) /
+      //       -2 *
+      //       MediaQuery.of(context).devicePixelRatio,
+      // ));
+    } else {
+      _padding.setBottom(
+        bottomHeight - bottomBarHeight,
+        rebuild: _appNotifier.hasEntity.value == _previousHasEntity,
       );
 
       // _mapController?.animateCamera(CameraUpdate.scrollBy(
@@ -51,6 +72,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
       //   (bottomHeight - bottomBarHeight) / 2,
       // ));
     }
+    _previousHasEntity = _appNotifier.hasEntity.value;
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -60,9 +82,9 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     _mapController.setMapStyle(
         mapNotifier.mapType == CustomMapType.dark ? darkMapStyle : mapStyle);
     rebuild(); // Needed to apply padding to map
-    _padding.value = _padding.value.copyWith(
+    _padding.setValue(_padding.value.copyWith(
       top: MediaQuery.of(context).padding.top,
-    );
+    ));
     animListener();
   }
 
@@ -71,8 +93,8 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       // Needed because of a bug with Google Maps not showing, after going back from recents
-      // Don't know if this works consistently, 200 ms randomly chosen
-      Future.delayed(const Duration(milliseconds: 200), rebuild);
+      // Don't know if this works consistently, 1s randomly chosen
+      Future.delayed(const Duration(seconds: 1), rebuild);
     }
   }
 
@@ -91,6 +113,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
         context,
         listen: false,
       )..hasEntity.addListener(animListener);
+      _previousHasEntity = _appNotifier.hasEntity.value;
       _bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
         context,
         listen: false,
@@ -111,98 +134,41 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final mapNotifier = Provider.of<MapNotifier>(context);
-    return Selector<FirebaseData, Map<Trail, List<TrailLocation>>>(
-      selector: (context, firebaseData) => firebaseData.trails,
-      builder: (context, trails, child) {
-        Set<Marker> markers = {};
-        if (trails.isNotEmpty) {
-          if (markers.isEmpty) {
-            int i = 0;
-            final trailList = trails.keys.toList()
-              ..sort(
-                (a, b) => a.id.compareTo(b.id),
-              );
-            for (var trail in trailList) {
-              final hues = [38.0, 340.0, 199.0];
-              for (var location in trails[trail]) {
-                markers.add(
-                  Marker(
-                    markerId: MarkerId('${trail.id} ${location.id}'),
-                    position: location.coordinates,
-                    infoWindow: InfoWindow(
-                      title: location.name,
-                      onTap: () {
-                        final appNotifier = Provider.of<AppNotifier>(
-                          context,
-                          listen: false,
-                        );
-                        if (appNotifier.location != location) {
-                          appNotifier
-                            ..navigatorKey.currentState.push(
-                              CrossFadePageRoute(
-                                builder: (context) {
-                                  return Material(
-                                    color: Theme.of(context).bottomAppBarColor,
-                                    child: TrailLocationOverviewPage(
-                                      trailLocation: location,
-                                    ),
-                                  );
-                                },
-                              ),
-                            )
-                            ..changeState(
-                              context,
-                              1,
-                            );
-                        }
-                      },
-                    ),
-                    icon: mapNotifier.mapType == CustomMapType.dark
-                        ? mapNotifier.darkThemeMarkerIcons[i]
-                        : BitmapDescriptor.defaultMarkerWithHue(hues[i]),
+    final markers = mapNotifier.markers;
+    return CustomAnimatedSwitcher(
+      crossShrink: false,
+      child: markers?.isEmpty ?? true
+          ? DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).dividerColor,
+              ),
+            )
+          : ValueListenableBuilder<EdgeInsets>(
+              valueListenable: _padding,
+              builder: (context, value, child) {
+                return GoogleMap(
+                  padding: value,
+                  myLocationEnabled: true,
+                  mapType: mapNotifier.mapType == CustomMapType.satellite
+                      ? MapType.hybrid
+                      : MapType.normal,
+                  // cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+                  //   northeast: northEastBound,
+                  //   southwest: southWestBound,
+                  // )),
+                  onMapCreated: _onMapCreated,
+                  // onCameraMove: (position) {
+                  //   print(position);
+                  // },
+                  initialCameraPosition: CameraPosition(
+                    target: bottomSheetCenter,
+                    zoom: 16.4,
                   ),
+                  // polygons: polygons,
+                  markers: markers,
                 );
-              }
-              i++;
-            }
-          }
-        }
-        return CustomAnimatedSwitcher(
-          crossShrink: false,
-          child: trails.isEmpty || markers.isEmpty
-              ? DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).dividerColor,
-                  ),
-                )
-              : ValueListenableBuilder<EdgeInsets>(
-                  valueListenable: _padding,
-                  builder: (context, value, child) {
-                    return GoogleMap(
-                      padding: value,
-                      myLocationEnabled: true,
-                      mapType: mapNotifier.mapType == CustomMapType.satellite
-                          ? MapType.hybrid
-                          : MapType.normal,
-                      // cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-                      //   northeast: northEastBound,
-                      //   southwest: southWestBound,
-                      // )),
-                      onMapCreated: _onMapCreated,
-                      // onCameraMove: (position) {
-                      //   print(position);
-                      // },
-                      initialCameraPosition: CameraPosition(
-                        target: bottomSheetCenter,
-                        zoom: 16.4,
-                      ),
-                      // polygons: polygons,
-                      markers: markers,
-                    );
-                  },
-                ),
-        );
-      },
+              },
+            ),
     );
   }
 }

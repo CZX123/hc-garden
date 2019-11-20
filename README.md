@@ -43,6 +43,12 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 - Highlight buildings on map, correct colour selection (high school/college) (Galen)
 - Improved dark theme
 
+#### Offline Mode
+- Users can still use the app offline
+
+#### Image Zooming
+- Make use of upcoming pan and zoom widget (https://github.com/flutter/flutter/issues/12878)
+
 ## Bugs
 
 ### High Priority
@@ -55,7 +61,7 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 ### Possible
 - Images should not use a new cache, but somehow utilise ImageCache instead. Make use of ImageProvider to place images directly in ImageCache.
-- ExpandPageRouteTransition can be simplified greatly, and also figure out how to properly use Heroes to animate the Entity thumbnail to the DetailsPage. (Update: finally found out why heroes do not work: https://github.com/flutter/flutter/issues/25261)
+- ExpandPageRouteTransition can be simplified greatly, and also figure out how to properly use Heroes to animate the Entity thumbnail to the DetailsPage. (Update: finally found out why heroes do not work: https://github.com/flutter/flutter/issues/25261, heroes now work!)
 
 ### Possible but very hard
 - Tablet support

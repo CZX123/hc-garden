@@ -187,22 +187,21 @@ class TrailButtonsRow extends StatelessWidget {
                     return trail.name.contains(_trails[i].substring(0, 5));
                   });
                   final trailLocations = firebaseData.trails[trail];
-                  // https://github.com/flutter/flutter/issues/41680
-                  // Secondary animation will not run, will soon be fixed
-                  Navigator.pushReplacement(context, CrossFadePageRoute(
-                    builder: (context) {
-                      return TrailDetailsPage(
-                        trail: trail,
-                        trailLocations: trailLocations,
-                      );
-                    },
-                  ));
-                  Provider.of<AppNotifier>(context).changeState(
-                    context,
-                    0,
-                    trail: trail,
+                  Provider.of<AppNotifier>(context).push(
+                    context: context,
+                    route: CrossFadePageRoute(
+                      builder: (context) {
+                        return TrailDetailsPage(
+                          trail: trail,
+                          trailLocations: trailLocations,
+                        );
+                      },
+                    ),
+                    routeInfo: RouteInfo(
+                      name: trail.name,
+                      data: trail,
+                    ),
                   );
-                  mapNotifier.animateToTrail(trailLocations);
                 },
               ),
           ],

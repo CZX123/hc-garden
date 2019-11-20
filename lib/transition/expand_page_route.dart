@@ -10,6 +10,7 @@ class ExpandPageRoute<T> extends PageRoute<T> {
   final double rowOffset;
   final ScrollController oldScrollController;
   final ValueListenable<double> topSpace;
+  final bool isOpaque;
 
   ExpandPageRoute({
     @required this.builder,
@@ -22,6 +23,7 @@ class ExpandPageRoute<T> extends PageRoute<T> {
     @required this.rowOffset,
     @required this.oldScrollController,
     @required this.topSpace,
+    this.isOpaque = false,
     RouteSettings settings,
   })  : assert(builder != null),
         assert(transitionDuration != null),
@@ -29,6 +31,9 @@ class ExpandPageRoute<T> extends PageRoute<T> {
 
   @override
   final Duration transitionDuration;
+
+  @override
+  bool get opaque => isOpaque;
 
   @override
   Color get barrierColor => null;

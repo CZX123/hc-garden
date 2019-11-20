@@ -20,6 +20,7 @@ class EntityListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('$this rebuilt');
     final floraIcons = [
       Icons.nature_people,
       Icons.filter_vintage,
@@ -211,10 +212,10 @@ class _EntityListRowState extends State<EntityListRow> {
     );
     return InkWell(
       child: ValueListenableBuilder(
-        valueListenable: hidden,
+        valueListenable: ModalRoute.of(context).secondaryAnimation,
         builder: (context, value, child) {
           return Visibility(
-            visible: !value,
+            visible: value == 0 || !hidden.value,
             child: child,
           );
         },
@@ -238,10 +239,6 @@ class _EntityListRowState extends State<EntityListRow> {
           searchNotifier.keyboardAppear = false;
           await Future.delayed(const Duration(milliseconds: 100));
         }
-        Provider.of<AppNotifier>(context, listen: false).changeState(
-          context,
-          1,
-        );
         final oldChild = Container(
           height: rowHeight,
           padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -277,9 +274,10 @@ class _EntityListRowState extends State<EntityListRow> {
           begin: entityButtonHeightCollapsed + 24 + topPadding,
           end: bottomHeight - bottomBarHeight + 8,
         ).animate(anim);
-        hidden.value = true;
-        await Navigator.of(context).push(
-          ExpandPageRoute<void>(
+        Provider.of<AppNotifier>(context, listen: false)
+            .push(
+          context: context,
+          route: ExpandPageRoute(
             builder: (context) => EntityDetailsPage(
               endContentOffset: endContentOffset,
               entity: widget.entity,
@@ -293,9 +291,16 @@ class _EntityListRowState extends State<EntityListRow> {
             oldScrollController: widget.scrollController,
             topSpace: topSpace,
           ),
-        );
-        secondaryAnimation = ModalRoute.of(context).secondaryAnimation
-          ..addListener(listener);
+          routeInfo: RouteInfo(
+            name: widget.entity.name,
+            data: widget.entity,
+          ),
+        )
+            .then((_) {
+          secondaryAnimation = ModalRoute.of(context).secondaryAnimation
+            ..addListener(listener);
+        });
+        hidden.value = true;
       },
     );
   }

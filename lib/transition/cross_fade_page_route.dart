@@ -5,6 +5,7 @@ class CrossFadePageRoute<T> extends PageRoute<T> {
   final Color scrimColor;
   final String scrimLabel;
   final bool fadeOut;
+  final bool isOpaque;
   @override
   final Duration transitionDuration;
 
@@ -14,11 +15,15 @@ class CrossFadePageRoute<T> extends PageRoute<T> {
     this.scrimColor,
     this.scrimLabel,
     this.fadeOut = true,
+    this.isOpaque = false,
     RouteSettings settings,
   })  : assert(builder != null),
         assert(fadeOut != null),
         assert(transitionDuration != null),
         super(settings: settings);
+
+  @override
+  bool get opaque => isOpaque;
 
   @override
   Color get barrierColor => scrimColor;

@@ -14,6 +14,7 @@ class EntityDetailsPage extends StatefulWidget {
 }
 
 class _EntityDetailsPageState extends State<EntityDetailsPage> {
+  bool _init = false;
   final _scrollController = ScrollController();
 
   List<Widget> locations(
@@ -62,17 +63,13 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
-    if (appNotifier.state == 1 &&
-        appNotifier.location == null &&
-        appNotifier.entity == null) {
-      appNotifier.changeState(
-        context,
-        1,
-        entity: widget.entity,
-        activeScrollController: _scrollController,
-        rebuild: false,
+    if (!_init) {
+      Provider.of<AppNotifier>(context, listen: false).updateScrollController(
+        context: context,
+        data: widget.entity,
+        scrollController: _scrollController,
       );
+      _init = true;
     }
   }
 
@@ -181,19 +178,10 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                                   Provider.of<AppNotifier>(
                                     context,
                                     listen: false,
-                                  ).changeState(context, 2);
-                                  Provider.of<BottomSheetNotifier>(
-                                    context,
-                                    listen: false,
-                                  )
-                                    ..draggingDisabled = true
-                                    ..animateTo(
-                                      0,
-                                      const Duration(milliseconds: 340),
-                                    );
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
+                                  ).push(
+                                    context: context,
+                                    route: PageRouteBuilder(
+                                      opaque: false,
                                       pageBuilder: (context, _, __) {
                                         return ImageGallery(
                                           images: newImages,
@@ -203,6 +191,8 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                                       transitionDuration:
                                           const Duration(milliseconds: 340),
                                     ),
+                                    routeInfo: RouteInfo(name: 'Gallery'),
+                                    disableDragging: true,
                                   );
                                 },
                               ),

@@ -51,10 +51,7 @@ class BottomSheetFooter extends StatelessWidget {
             );
           },
           child: Selector<AppNotifier, bool>(
-            selector: (context, appNotifier) =>
-                appNotifier.trail != null ||
-                appNotifier.location != null ||
-                appNotifier.entity != null,
+            selector: (context, appNotifier) => appNotifier.routes.isNotEmpty,
             builder: (context, value, child) {
               return AnimatedContainer(
                 curve: Curves.fastOutSlowIn,
@@ -150,7 +147,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
         curve: Curves.fastOutSlowIn,
       );
     } else if (_appNotifier.state == 0) {
-      if (_appNotifier.trail != null) {
+      if (_appNotifier.routes.isNotEmpty) {
         _animationController.animateTo(
           1,
           duration: Duration(milliseconds: 50),
@@ -260,10 +257,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
     return SizedBox(
       height: 76,
       child: Selector<AppNotifier, bool>(
-        selector: (context, appNotifier) =>
-            appNotifier.trail != null ||
-            appNotifier.location != null ||
-            appNotifier.entity != null,
+        selector: (context, appNotifier) => appNotifier.routes.isNotEmpty,
         builder: (context, appear, child) {
           return ValueListenableBuilder(
             valueListenable: widget.bottomSheetAnimation,
