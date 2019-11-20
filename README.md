@@ -6,9 +6,13 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 ### High Priority
 
+#### Trail Location Overview Page
+- Better animated circles (TS)
+- Zooming of image/Ability to expand image size
+
 #### Firebase Data (TS)
 - Filter out invalid data from Firebase (e.g. MISSING INFO)
-- Ensure app does not crash, and no red screen of death within the app
+- Ensure app is resilient even if there is invalid data and no red screen of death within the app
 - Sort the data for trails better
 
 #### Map Markers
@@ -36,7 +40,7 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 - Search should perhaps highlight the searchTerm within the name for clarity
 
 #### Map
-- Highlight buildings on map, correct colour selection (high school/college)
+- Highlight buildings on map, correct colour selection (high school/college) (Galen)
 - Improved dark theme
 
 ## Bugs
@@ -51,7 +55,7 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 ### Possible
 - Images should not use a new cache, but somehow utilise ImageCache instead. Make use of ImageProvider to place images directly in ImageCache.
-- ExpandPageRouteTransition can be simplified greatly, and also figure out how to properly use Heroes to animate the Entity thumbnail to the DetailsPage.
+- ExpandPageRouteTransition can be simplified greatly, and also figure out how to properly use Heroes to animate the Entity thumbnail to the DetailsPage. (Update: finally found out why heroes do not work: https://github.com/flutter/flutter/issues/25261)
 
 ### Possible but very hard
 - Tablet support
