@@ -288,10 +288,19 @@ class MapNotifier extends ChangeNotifier {
     _markers = markers;
     notifyListeners();
   }
-  // void setMarkers(Set<Marker> markers, {bool notify = true}) {
-  //   _markers = markers;
-  //   if (notify ?? true) notifyListeners();
-  // }
+
+  void _replaceWithGreenMarker(
+    Map<MarkerId, Marker> markers,
+    MarkerId markerId,
+  ) {
+    isDefaultMarkers = false;
+    greenMarkers.add(markerId);
+    markers[markerId] = markers[markerId].copyWith(
+      iconParam: mapType == CustomMapType.dark
+          ? darkThemeMarkerIcons.last
+          : BitmapDescriptor.defaultMarkerWithHue(90),
+    );
+  }
 
   void rebuildMap() {
     notifyListeners();
@@ -435,18 +444,5 @@ class MapNotifier extends ChangeNotifier {
   /// Stop any map movement. This is used when markers are tapped to prevent map from moving to the marker.
   void stopAnimating() {
     mapController.moveCamera(CameraUpdate.newCameraPosition(cameraPosition));
-  }
-
-  void _replaceWithGreenMarker(
-    Map<MarkerId, Marker> markers,
-    MarkerId markerId,
-  ) {
-    isDefaultMarkers = false;
-    greenMarkers.add(markerId);
-    markers[markerId] = markers[markerId].copyWith(
-      iconParam: mapType == CustomMapType.dark
-          ? darkThemeMarkerIcons.last
-          : BitmapDescriptor.defaultMarkerWithHue(90),
-    );
   }
 }

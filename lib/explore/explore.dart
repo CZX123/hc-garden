@@ -127,7 +127,7 @@ class ExplorePage extends StatelessWidget {
       end: 1 / (height - bottomHeight),
     ).animate(bottomSheetNotifier.animation);
     return Material(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: Theme.of(context).canvasColor,
       child: Stack(
         children: <Widget>[
           FadeTransition(
@@ -254,7 +254,7 @@ class TopGradient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).scaffoldBackgroundColor;
+    final color = Theme.of(context).canvasColor;
     return IgnorePointer(
       child: Container(
         height: 32,

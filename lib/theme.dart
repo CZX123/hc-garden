@@ -19,6 +19,7 @@ final ThemeData themeData = ThemeData(
   primaryColorBrightness: Brightness.dark,
   accentColor: Color(0xFF27B50E),
   accentColorBrightness: Brightness.dark,
+  scaffoldBackgroundColor: Colors.grey[100],
   textTheme: textTheme.merge(lightThemeText),
 );
 
@@ -29,6 +30,8 @@ final ThemeData darkThemeData = ThemeData(
   primaryColorBrightness: Brightness.dark,
   accentColor: Colors.lightGreenAccent[400],
   accentColorBrightness: Brightness.dark,
+  cardColor: Colors.grey[900],
+  scaffoldBackgroundColor: Color(0xFF121212),
   canvasColor: Colors.grey[900],
   bottomAppBarColor: Colors.grey[850],
   textTheme: textTheme.merge(darkThemeText),
