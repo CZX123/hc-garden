@@ -340,9 +340,6 @@ class AppNotifier extends ChangeNotifier {
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   List<RouteInfo> routes = [];
 
-  /// Needed for map to correctly apply padding when bottom sheet is fully expanded
-  final hasEntity = ValueNotifier(false);
-
   int _state = 0;
 
   /// 0: [EntityListPage] or [TrailDetailsPage]
@@ -433,7 +430,6 @@ class AppNotifier extends ChangeNotifier {
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
     if (isHome || routeInfo.data is Trail) {
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-      hasEntity.value = false;
       _state = 0;
       bottomSheetNotifier.snappingPositions.value = [
         0,
@@ -463,7 +459,6 @@ class AppNotifier extends ChangeNotifier {
       ];
       final adjusted = bottomSheetNotifier.animation.value < height - 48 - 96;
       if (routeInfo.data is Entity) {
-        hasEntity.value = true;
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
         Provider.of<SearchNotifier>(context, listen: false).isSearching = false;
         mapNotifier.animateToEntity(
