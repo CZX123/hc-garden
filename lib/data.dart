@@ -31,7 +31,7 @@ abstract class DataObject {
 }
 
 /// An [Entity] is a super class of a [Flora] or a [Fauna]
-abstract class Entity extends DataObject {
+abstract class Entity implements DataObject {
   final int id;
   final String name;
   final String sciName;
@@ -134,16 +134,14 @@ class FirebaseData {
   });
 }
 
-class Trail extends DataObject {
+class Trail implements DataObject {
   final int id;
   final String name;
-  final String color;
-  const Trail({this.id, this.name, this.color});
+  const Trail({this.id, this.name});
   factory Trail.fromJson(String key, dynamic parsedJson) {
     return Trail(
       id: int.tryParse(key.split('-').last),
       name: parsedJson['name'],
-      color: parsedJson['color'],
     );
   }
 
@@ -151,16 +149,15 @@ class Trail extends DataObject {
     return identical(this, other) ||
         other is Trail &&
             id == other.id &&
-            name == other.name &&
-            color == other.color;
+            name == other.name;
   }
 
   @override
-  int get hashCode => hashValues(id, name, color);
+  int get hashCode => hashValues(id, name);
 }
 
 /// A TrailLocation is a point on the trail
-class TrailLocation extends DataObject {
+class TrailLocation implements DataObject {
   final int id;
   final Trail trail;
   final String name;
@@ -335,6 +332,7 @@ class RouteInfo {
   }
 }
 
+/// The main notifier in charge of app state, and pushing and popping routes within the bottom sheet
 class AppNotifier extends ChangeNotifier {
   // Both routes and navigator stack are kept in sync with each other
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -474,6 +472,7 @@ class AppNotifier extends ChangeNotifier {
         mapNotifier.animateToLocation(
           location: routeInfo.data as TrailLocation,
           adjusted: adjusted,
+          changeMarkerColor: true,
         );
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,

@@ -15,7 +15,7 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 - Sort the data for trails better
 
 #### Map Markers
-- Green markers depending on which page the user is on to show the current location(s)
+- ~~Green markers depending on which page the user is on to show the current location(s)~~ ✔️
 - Going to location should also focus on the marker (need wait for package update)
 - Marker window should also contain image (need wait for package update)
 

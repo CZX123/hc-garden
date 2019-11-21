@@ -3,10 +3,10 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 3478.8 5676.2" style="enable-background:new 0 0 3478.8 5676.2;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#133039;stroke:#999999;stroke-width:50;stroke-miterlimit:10;}
-	.st1{fill:#00C3FF;}
+	.st0{fill:#263913;stroke:#999999;stroke-width:50;stroke-miterlimit:10;}
+	.st1{fill:#80FF00;}
 </style>
-<title>blue_marker</title>
+<title>pin</title>
 <path class="st0" d="M1739.4,16C787.2,16,16,787.2,16,1739.4C16,3038,1466.3,3714.4,1637.7,5568c5.2,51.7,49.1,92.2,101.7,92.2
 	s97.4-40.5,101.7-92.2c171.5-1853.5,1621.7-2530,1621.7-3828.6C3462.8,787.2,2691.6,16,1739.4,16z"/>
 <circle class="st1" cx="1739.4" cy="1739.4" r="603.2"/>

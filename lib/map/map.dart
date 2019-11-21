@@ -132,7 +132,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                 mapNotifier.cameraPosition = position;
               },
               initialCameraPosition: _initialCameraPosition,
-              markers: mapNotifier.markers,
+              markers: mapNotifier.markers.values.toSet(),
             ),
     );
   }
@@ -143,8 +143,8 @@ Marker generateMarker({
   Trail trail,
   TrailLocation location,
 }) {
-  final hues = [38.0, 340.0, 199.0];
   final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
+  final hues = MapNotifier.hues;
   return Marker(
     onTap: mapNotifier.stopAnimating,
     markerId: MarkerId('${trail.id} ${location.id}'),
@@ -201,6 +201,7 @@ class MapNotifier extends ChangeNotifier {
   bool permissionEnabled;
   bool gpsOn;
   GoogleMapController mapController;
+  static const hues = [38.0, 340.0, 199.0];
   List<BitmapDescriptor> darkThemeMarkerIcons = [];
   CameraPosition cameraPosition;
 
@@ -219,23 +220,78 @@ class MapNotifier extends ChangeNotifier {
   CustomMapType get mapType => _mapType;
   set mapType(CustomMapType mapType) {
     if (mapType != _mapType) {
-      _mapType = mapType;
-      mapController?.setMapStyle(
-        mapType == CustomMapType.dark ? darkMapStyle : mapStyle,
-      );
+      if (mapType == CustomMapType.dark) {
+        mapController?.setMapStyle(darkMapStyle);
+        for (var id in defaultMarkers?.keys ?? []) {
+          defaultMarkers[id] = defaultMarkers[id].copyWith(
+            iconParam:
+                darkThemeMarkerIcons[int.parse(id.value.split(' ').first) - 1],
+          );
+        }
+        for (var id in markers?.keys ?? []) {
+          markers[id] = markers[id].copyWith(
+            iconParam: greenMarkers.contains(id)
+                ? darkThemeMarkerIcons.last
+                : darkThemeMarkerIcons[
+                    int.parse(id.value.split(' ').first) - 1],
+          );
+        }
+      } else {
+        if (mapType == CustomMapType.normal) {
+          mapController?.setMapStyle(mapStyle);
+        }
+        if (_mapType == CustomMapType.dark) {
+          for (var id in defaultMarkers?.keys ?? []) {
+            defaultMarkers[id] = defaultMarkers[id].copyWith(
+              iconParam: BitmapDescriptor.defaultMarkerWithHue(
+                hues[int.parse(id.value.split(' ').first) - 1],
+              ),
+            );
+          }
+          for (var id in markers?.keys ?? []) {
+            markers[id] = markers[id].copyWith(
+              iconParam: BitmapDescriptor.defaultMarkerWithHue(
+                greenMarkers.contains(id)
+                    ? 90
+                    : hues[int.parse(id.value.split(' ').first) - 1],
+              ),
+            );
+          }
+        }
+      }
       SharedPreferences.getInstance().then((prefs) {
         prefs.setInt('mapType', CustomMapType.values.indexOf(mapType));
       });
+      _mapType = mapType;
       notifyListeners();
     }
   }
 
-  Set<Marker> _markers;
-  Set<Marker> get markers => _markers;
-  void setMarkers(Set<Marker> markers, {bool notify = true}) {
-    _markers = markers;
-    if (notify ?? true) notifyListeners();
+  List<MarkerId> greenMarkers = [];
+  bool isDefaultMarkers = false;
+
+  Map<MarkerId, Marker> _defaultMarkers;
+  Map<MarkerId, Marker> get defaultMarkers => _defaultMarkers;
+  set defaultMarkers(Map<MarkerId, Marker> defaultMarkers) {
+    _defaultMarkers = defaultMarkers;
+    if (_markers == null) {
+      markers = _defaultMarkers;
+      isDefaultMarkers = true;
+    }
   }
+
+  Map<MarkerId, Marker> _markers;
+  Map<MarkerId, Marker> get markers => _markers;
+
+  /// This will also call [notifyListeners]
+  set markers(Map<MarkerId, Marker> markers) {
+    _markers = markers;
+    notifyListeners();
+  }
+  // void setMarkers(Set<Marker> markers, {bool notify = true}) {
+  //   _markers = markers;
+  //   if (notify ?? true) notifyListeners();
+  // }
 
   void rebuildMap() {
     notifyListeners();
@@ -307,6 +363,11 @@ class MapNotifier extends ChangeNotifier {
 
   /// Animate back to default map of HC Garden
   void animateBackToCenter({bool adjusted = false}) {
+    if (!isDefaultMarkers) {
+      greenMarkers = [];
+      markers = defaultMarkers;
+      isDefaultMarkers = true;
+    }
     _animateToPoint(center, 16.4, adjusted);
   }
 
@@ -315,7 +376,15 @@ class MapNotifier extends ChangeNotifier {
     TrailLocation location,
     double zoom = 18.5,
     bool adjusted = false,
+    bool changeMarkerColor = false,
   }) {
+    if (changeMarkerColor) {
+      final newMarkers = Map<MarkerId, Marker>.from(defaultMarkers);
+      greenMarkers = [];
+      final markerId = MarkerId('${location.trail.id} ${location.id}');
+      _replaceWithGreenMarker(newMarkers, markerId);
+      markers = newMarkers;
+    }
     // TODO: Focus on the specific marker as well
     // (need to wait for upcoming update for google maps plugin)
     // https://github.com/flutter/flutter/issues/33481
@@ -324,14 +393,18 @@ class MapNotifier extends ChangeNotifier {
 
   /// Moves the map to the bounding box of all locations of the entity
   void animateToEntity({
-    Entity entity,
-    Map<Trail, List<TrailLocation>> trails,
+    @required Entity entity,
+    @required Map<Trail, List<TrailLocation>> trails,
+    @required Size mapSize,
     bool adjusted = false,
-    Size mapSize,
   }) {
+    greenMarkers = [];
+    final newMarkers = Map<MarkerId, Marker>.from(defaultMarkers);
     final points = entity.locations.map((tuple) {
       final int trailId = tuple[0];
       final int locationId = tuple[1];
+      final markerId = MarkerId('$trailId $locationId');
+      _replaceWithGreenMarker(newMarkers, markerId);
       final trail = trails.keys.firstWhere((trail) {
         return trail.id == trailId;
       });
@@ -340,6 +413,7 @@ class MapNotifier extends ChangeNotifier {
       });
       return location.coordinates;
     }).toList();
+    markers = newMarkers;
     _animateToPoints(points, adjusted, mapSize);
   }
 
@@ -349,6 +423,11 @@ class MapNotifier extends ChangeNotifier {
     bool adjusted = false,
     Size mapSize,
   }) {
+    if (!isDefaultMarkers) {
+      greenMarkers = [];
+      markers = defaultMarkers;
+      isDefaultMarkers = true;
+    }
     final points = locations.map((location) => location.coordinates).toList();
     _animateToPoints(points, adjusted, mapSize);
   }
@@ -356,5 +435,18 @@ class MapNotifier extends ChangeNotifier {
   /// Stop any map movement. This is used when markers are tapped to prevent map from moving to the marker.
   void stopAnimating() {
     mapController.moveCamera(CameraUpdate.newCameraPosition(cameraPosition));
+  }
+
+  void _replaceWithGreenMarker(
+    Map<MarkerId, Marker> markers,
+    MarkerId markerId,
+  ) {
+    isDefaultMarkers = false;
+    greenMarkers.add(markerId);
+    markers[markerId] = markers[markerId].copyWith(
+      iconParam: mapType == CustomMapType.dark
+          ? darkThemeMarkerIcons.last
+          : BitmapDescriptor.defaultMarkerWithHue(90),
+    );
   }
 }

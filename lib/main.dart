@@ -61,6 +61,15 @@ class _HcGardenAppState extends State<HcGardenApp> {
       ImageConfiguration(),
       'assets/images/google_maps/blue_marker.png',
     ).then((descriptor) {
+      _mapNotifier.darkThemeMarkerIcons.insert(
+        min(2, _mapNotifier.darkThemeMarkerIcons.length),
+        descriptor,
+      );
+    });
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(),
+      'assets/images/google_maps/green_marker.png',
+    ).then((descriptor) {
       _mapNotifier.darkThemeMarkerIcons.add(descriptor);
     });
   }
@@ -305,7 +314,7 @@ class _MyHomePageState extends State<MyHomePage>
       floraList.sort((a, b) => a.name.compareTo(b.name));
       faunaList.sort((a, b) => a.name.compareTo(b.name));
 
-      Set<Marker> mapMarkers = {};
+      Map<MarkerId, Marker> mapMarkers = {};
 
       // Add trails and locations
       Map<Trail, List<TrailLocation>> trails = {};
@@ -321,14 +330,14 @@ class _MyHomePageState extends State<MyHomePage>
             faunaList: faunaList,
           );
           trails[trail].add(location);
-          mapMarkers.add(generateMarker(
+          mapMarkers[MarkerId('${trail.id} ${location.id}')] = generateMarker(
             context: context,
             trail: trail,
             location: location,
-          ));
+          );
         });
       });
-      Provider.of<MapNotifier>(context, listen: false).setMarkers(mapMarkers, notify: false);
+      Provider.of<MapNotifier>(context, listen: false).defaultMarkers = mapMarkers;
 
       List<HistoricalData> historicalDataList = [];
       parsedJson['historical'].forEach((key, value) {
