@@ -8,7 +8,6 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 #### Trail Location Overview Page
 - Better animated circles (TS)
-- Zooming of image/Ability to expand image size
 
 #### Firebase Data (TS)
 - Filter out invalid data from Firebase (e.g. MISSING INFO)
@@ -33,6 +32,9 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 #### History Screen
 - Update to new design as suggested by Dr Chia
 
+#### About Screen
+- Update to whatever new design suggested
+
 ### Low Priority
 
 #### Search
@@ -48,6 +50,9 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 #### Image Zooming
 - Make use of upcoming pan and zoom widget (https://github.com/flutter/flutter/issues/12878)
+
+#### Trail Location Overview Page
+- Zooming of image/Ability to expand image size (Quite hard)
 
 ## Bugs
 

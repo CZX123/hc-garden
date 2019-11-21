@@ -21,77 +21,70 @@ class ExploreHeader extends StatelessWidget {
       end: 1 / (height - bottomHeight),
     ).animate(bottomSheetNotifier.animation);
 
-    return Stack(
-      children: <Widget>[
-        const SizedBox(
-          height: 16,
-        ),
-        ValueListenableBuilder(
-          valueListenable: anim,
-          builder: (context, value, child) {
-            Offset offset;
-            if (value > 1) {
-              offset = Offset(0, 0);
-            } else {
-              offset = Offset(
-                0,
-                (value - 1) * totalTranslation,
-              );
-            }
-            return Transform.translate(
-              offset: offset,
-              child: child,
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(top: 16 + 12.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                AppLogo(
-                  opacity: Tween<double>(
-                    begin: 16 / 12 - totalTranslation / 12,
-                    end: 16 / 12,
-                  ).animate(anim),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                FadeTransition(
-                  opacity: Tween<double>(
-                    begin: (24 + imageHeight) / 12 - totalTranslation / 12,
-                    end: (24 + imageHeight) / 12,
-                  ).animate(anim),
-                  child: Text(
-                    'Explore HC Garden',
-                    style: Theme.of(context).textTheme.display1.copyWith(
-                          height: headingHeight / 20,
-                        ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                TrailButtonsRow(
-                  opacity: Tween<double>(
-                    begin: (40 + imageHeight + headingHeight) / 40 -
-                        totalTranslation / 40,
-                    end: (40 + imageHeight + headingHeight) / 40,
-                  ).animate(anim),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                FloraFaunaTabBar(
-                  animateTo: bottomSheetNotifier.animateTo,
-                  animation: anim,
-                  tabController: tabController,
-                ),
-              ],
+    return ValueListenableBuilder(
+      valueListenable: anim,
+      builder: (context, value, child) {
+        Offset offset;
+        if (value > 1) {
+          offset = Offset(0, 0);
+        } else {
+          offset = Offset(
+            0,
+            (value - 1) * totalTranslation,
+          );
+        }
+        return Transform.translate(
+          offset: offset,
+          child: child,
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20 + 12.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            AppLogo(
+              opacity: Tween<double>(
+                begin: 16 / 12 - totalTranslation / 12,
+                end: 16 / 12,
+              ).animate(anim),
             ),
-          ),
+            const SizedBox(
+              height: 8,
+            ),
+            FadeTransition(
+              opacity: Tween<double>(
+                begin: (24 + imageHeight) / 12 - totalTranslation / 12,
+                end: (24 + imageHeight) / 12,
+              ).animate(anim),
+              child: Text(
+                'Explore HC Garden',
+                style: Theme.of(context).textTheme.display1.copyWith(
+                      height: headingHeight / 20,
+                    ),
+              ),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            TrailButtonsRow(
+              opacity: Tween<double>(
+                begin: (40 + imageHeight + headingHeight) / 40 -
+                    totalTranslation / 40,
+                end: (40 + imageHeight + headingHeight) / 40,
+              ).animate(anim),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            FloraFaunaTabBar(
+              animateTo: bottomSheetNotifier.animateTo,
+              animation: anim,
+              tabController: tabController,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -160,7 +153,6 @@ class TrailButtonsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
     const _trails = ['Kah Kee\nTrail', 'Kong Chian\nTrail', 'Jing Xian\nTrail'];
     final _colors = [Colors.lightBlue, Colors.pink, Colors.amber[700]];
     final _textColors = [

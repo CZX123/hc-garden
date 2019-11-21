@@ -306,8 +306,6 @@ class _MyHomePageState extends State<MyHomePage>
       faunaList.sort((a, b) => a.name.compareTo(b.name));
 
       Set<Marker> mapMarkers = {};
-      final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
-      final hues = [38.0, 340.0, 199.0];
 
       // Add trails and locations
       Map<Trail, List<TrailLocation>> trails = {};
@@ -323,53 +321,14 @@ class _MyHomePageState extends State<MyHomePage>
             faunaList: faunaList,
           );
           trails[trail].add(location);
-          mapMarkers.add(
-            Marker(
-              markerId: MarkerId('${trail.id} ${location.id}'),
-              position: location.coordinates,
-              infoWindow: InfoWindow(
-                title: location.name,
-                onTap: () {
-                  final appNotifier = Provider.of<AppNotifier>(
-                    context,
-                    listen: false,
-                  );
-                  if (appNotifier.routes.isNotEmpty &&
-                      appNotifier.routes.last.data is TrailLocation &&
-                      appNotifier.routes.last.data == location) {
-                    Provider.of<BottomSheetNotifier>(
-                      context,
-                      listen: false,
-                    ).animateTo(0);
-                  } else {
-                    appNotifier.push(
-                      context: context,
-                      route: CrossFadePageRoute(
-                        builder: (context) {
-                          return Material(
-                            color: Theme.of(context).bottomAppBarColor,
-                            child: TrailLocationOverviewPage(
-                              trailLocation: location,
-                            ),
-                          );
-                        },
-                      ),
-                      routeInfo: RouteInfo(
-                        name: location.name,
-                        data: location,
-                      ),
-                    );
-                  }
-                },
-              ),
-              icon: mapNotifier.mapType == CustomMapType.dark
-                  ? mapNotifier.darkThemeMarkerIcons[trail.id - 1]
-                  : BitmapDescriptor.defaultMarkerWithHue(hues[trail.id - 1]),
-            ),
-          );
+          mapMarkers.add(generateMarker(
+            context: context,
+            trail: trail,
+            location: location,
+          ));
         });
       });
-      mapNotifier.setMarkers(mapMarkers, notify: false);
+      Provider.of<MapNotifier>(context, listen: false).setMarkers(mapMarkers, notify: false);
 
       List<HistoricalData> historicalDataList = [];
       parsedJson['historical'].forEach((key, value) {

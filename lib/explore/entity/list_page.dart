@@ -20,7 +20,6 @@ class EntityListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('$this rebuilt');
     final floraIcons = [
       Icons.nature_people,
       Icons.filter_vintage,

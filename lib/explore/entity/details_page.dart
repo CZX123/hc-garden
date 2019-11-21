@@ -53,7 +53,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
           Provider.of<MapNotifier>(
             context,
             listen: false,
-          ).animateToLocation(location);
+          ).animateToLocation(location: location);
         },
       ));
     }

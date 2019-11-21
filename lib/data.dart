@@ -344,6 +344,7 @@ class AppNotifier extends ChangeNotifier {
   final hasEntity = ValueNotifier(false);
 
   int _state = 0;
+
   /// 0: [EntityListPage] or [TrailDetailsPage]
   ///
   /// 1: [EntityDetailsPage] or [TrailLocationOverviewPage]
@@ -427,6 +428,7 @@ class AppNotifier extends ChangeNotifier {
       return;
     }
     final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     final topPadding = MediaQuery.of(context).padding.top;
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
     if (isHome || routeInfo.data is Trail) {
@@ -439,14 +441,17 @@ class AppNotifier extends ChangeNotifier {
         isHome ? height - bottomBarHeight : height - 48 - 76,
       ];
       if (isHome) {
-        mapNotifier.animateBackToCenter(_state == 1 &&
-            (bottomSheetNotifier.animation.value < 8 ||
-                bottomSheetNotifier.animation.value >
-                    height - bottomHeight + 8));
+        mapNotifier.animateBackToCenter(adjusted: true);
       } else {
+        final adjusted = bottomSheetNotifier.animation.value < height - 48 - 96;
         mapNotifier.animateToTrail(
-          Provider.of<FirebaseData>(context, listen: false)
+          locations: Provider.of<FirebaseData>(context, listen: false)
               .trails[routeInfo.data],
+          adjusted: adjusted,
+          mapSize: Size(
+            width,
+            adjusted ? height - bottomHeight : height - 62,
+          ),
         );
       }
     } else {
@@ -456,16 +461,25 @@ class AppNotifier extends ChangeNotifier {
         height - 48 - 96 - 218 - 16,
         height - 48 - 96,
       ];
+      final adjusted = bottomSheetNotifier.animation.value < height - 48 - 96;
       if (routeInfo.data is Entity) {
         hasEntity.value = true;
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
         Provider.of<SearchNotifier>(context, listen: false).isSearching = false;
         mapNotifier.animateToEntity(
-          routeInfo.data,
-          Provider.of<FirebaseData>(context, listen: false).trails,
+          entity: routeInfo.data,
+          trails: Provider.of<FirebaseData>(context, listen: false).trails,
+          adjusted: adjusted,
+          mapSize: Size(
+            width,
+            adjusted ? height - bottomHeight : height - 62,
+          ),
         );
       } else {
-        mapNotifier.animateToLocation(routeInfo.data as TrailLocation);
+        mapNotifier.animateToLocation(
+          location: routeInfo.data as TrailLocation,
+          adjusted: adjusted,
+        );
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
           DeviceOrientation.landscapeLeft,

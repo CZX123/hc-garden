@@ -1,13 +1,8 @@
 import '../library.dart';
 
-const northEastBound = const LatLng(1.328278, 103.807815);
-const southWestBound = const LatLng(1.324095, 103.800954);
+// const northEastBound = const LatLng(1.328278, 103.807815);
+// const southWestBound = const LatLng(1.324095, 103.800954);
 const center = const LatLng(1.326580, 103.805239);
-const bottomSheetCenter = const LatLng(1.325080, 103.805239);
-const kktrail = const LatLng(1.326987, 103.80295);
-const kctrail = const LatLng(1.326026, 103.80420);
-const jxtrail = const LatLng(1.325317, 103.80672);
-const trailCoordinates = [kktrail, kctrail, jxtrail];
 Set<Polygon> polygons = {
   Polygon(
     polygonId: PolygonId("salt centre"),

@@ -73,6 +73,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   Drag _scrollDrag;
   ScrollHoldController _scrollHold;
   bool _scrolling;
+  bool _isLandscape = false;
 
   void animateTo(double end, [Duration duration]) {
     if (end == _animationController.value) return;
@@ -154,10 +155,11 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   void dragUpdate(DragUpdateDetails details) {
     final controller = _bottomSheetNotifier.activeScrollController;
     // Scrolling the inner scroll view
-    if (controller != null &&
-        controller.hasClients &&
-        _animationController.value == _sortedPositions.first &&
-        (details.primaryDelta < 0 || controller.offset > 0)) {
+    if (_isLandscape ||
+        controller != null &&
+            controller.hasClients &&
+            _animationController.value == _sortedPositions.first &&
+            (details.primaryDelta < 0 || controller.offset > 0)) {
       if (_scrollDrag == null) {
         _scrollDrag = controller.position.drag(
           DragStartDetails(
@@ -254,6 +256,12 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (MediaQuery.of(context).orientation == Orientation.landscape) {
+      _isLandscape = true;
+      animateTo(0);
+    } else {
+      _isLandscape = false;
+    }
     if (!_init) {
       final height = MediaQuery.of(context).size.height;
       if (height == 0) return;

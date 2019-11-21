@@ -1,25 +1,5 @@
 import '../library.dart';
 
-class MapPadding extends ChangeNotifier implements ValueListenable<EdgeInsets> {
-  MapPadding(this._value);
-  EdgeInsets _value = EdgeInsets.zero;
-  @override
-  EdgeInsets get value => _value;
-  void setValue(EdgeInsets newValue, {bool rebuild = true}) {
-    if (_value == newValue) return;
-    _value = newValue;
-    if (rebuild) notifyListeners();
-  }
-
-  void setBottom(double bottom, {bool rebuild = true}) {
-    if (_value.bottom == bottom) return;
-    _value = value.copyWith(
-      bottom: bottom,
-    );
-    if (rebuild) notifyListeners();
-  }
-}
-
 class MapWidget extends StatefulWidget {
   const MapWidget({Key key}) : super(key: key);
 
@@ -28,51 +8,47 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
-  GoogleMapController _mapController;
-  final _padding = MapPadding(EdgeInsets.zero);
   bool _init = false;
-  AppNotifier _appNotifier;
-  BottomSheetNotifier _bottomSheetNotifier;
-  double _height;
-  bool _previousHasEntity = false;
+  GoogleMapController _mapController;
+  CameraPosition _initialCameraPosition;
+  static const _initialZoom = 16.4;
+
+  /// When map is first built, it does not have the top padding, so the initial camera position will also have to account for [topPaddingAdjustment]
+  double get topPaddingAdjustment {
+    final topPadding = MediaQuery.of(context).padding.top;
+    const circumference = 2 * pi * 6378137;
+    final metresPerPixel =
+        156543.03392 * cos(center.latitude * pi / 180) / pow(2, _initialZoom);
+    final _height = topPadding / 2 * metresPerPixel;
+    return _height / circumference * 360;
+  }
+
+  // LatLngBounds _getBounds(LatLng center, double zoom) {
+  //   const circumference = 2 * pi * 6378137;
+  //   final metresPerPixel =
+  //       156543.03392 * cos(center.latitude * pi / 180) / pow(2, zoom);
+  //   final width = MediaQuery.of(context).size.width / 2 * metresPerPixel;
+  //   final height = (MediaQuery.of(context).size.height -
+  //           MediaQuery.of(context).padding.top -
+  //           62) /
+  //       2 *
+  //       metresPerPixel;
+  //   var latAngle = height / circumference * 360;
+  //   var lngAngle = width / circumference * 360;
+  //   return LatLngBounds(
+  //     northeast: LatLng(
+  //       center.latitude + latAngle,
+  //       center.longitude + lngAngle,
+  //     ),
+  //     southwest: LatLng(
+  //       center.latitude - latAngle,
+  //       center.longitude - lngAngle,
+  //     ),
+  //   );
+  // }
 
   void rebuild() {
     setState(() {});
-  }
-
-  void animListener() {
-    if (_appNotifier.state == 2) return;
-    if (_bottomSheetNotifier.animation.value > _height - bottomHeight + 8 ||
-        _appNotifier.hasEntity.value &&
-            _bottomSheetNotifier.animation.value < 8) {
-      _padding.setBottom(
-        0,
-        rebuild: _appNotifier.hasEntity.value == _previousHasEntity,
-      );
-      // _mapController?.getScreenCoordinate(center)?.then((c) {
-      //   print(c);
-      //   print((bottomHeight - bottomBarHeight) /
-      //       -2 *
-      //       MediaQuery.of(context).devicePixelRatio);
-      // });
-      // _mapController?.animateCamera(CameraUpdate.scrollBy(
-      //   0,
-      //   (bottomHeight - bottomBarHeight) /
-      //       -2 *
-      //       MediaQuery.of(context).devicePixelRatio,
-      // ));
-    } else {
-      _padding.setBottom(
-        bottomHeight - bottomBarHeight,
-        rebuild: _appNotifier.hasEntity.value == _previousHasEntity,
-      );
-
-      // _mapController?.animateCamera(CameraUpdate.scrollBy(
-      //   0,
-      //   (bottomHeight - bottomBarHeight) / 2,
-      // ));
-    }
-    _previousHasEntity = _appNotifier.hasEntity.value;
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -81,11 +57,8 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     mapNotifier.mapController = _mapController;
     _mapController.setMapStyle(
         mapNotifier.mapType == CustomMapType.dark ? darkMapStyle : mapStyle);
-    rebuild(); // Needed to apply padding to map
-    _padding.setValue(_padding.value.copyWith(
-      top: MediaQuery.of(context).padding.top,
-    ));
-    animListener();
+    // Needed to correctly apply padding
+    rebuild();
   }
 
   @override
@@ -107,18 +80,23 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _height = MediaQuery.of(context).size.height;
     if (!_init) {
-      _appNotifier = Provider.of<AppNotifier>(
-        context,
-        listen: false,
-      )..hasEntity.addListener(animListener);
-      _previousHasEntity = _appNotifier.hasEntity.value;
-      _bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
-        context,
-        listen: false,
-      )..animation.addListener(animListener);
-      animListener();
+      final mapNotifier = Provider.of<MapNotifier>(context);
+      final adjustAmount = mapNotifier._getAdjustAmount(_initialZoom);
+      _initialCameraPosition = CameraPosition(
+        target: LatLng(
+          center.latitude - adjustAmount + topPaddingAdjustment,
+          center.longitude,
+        ),
+        zoom: _initialZoom,
+      );
+      mapNotifier.cameraPosition = CameraPosition(
+        target: LatLng(
+          center.latitude - adjustAmount,
+          center.longitude,
+        ),
+        zoom: _initialZoom,
+      );
       _init = true;
     }
   }
@@ -126,51 +104,90 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _appNotifier.hasEntity.removeListener(animListener);
-    _bottomSheetNotifier.animation.removeListener(animListener);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final mapNotifier = Provider.of<MapNotifier>(context);
-    final markers = mapNotifier.markers;
     return CustomAnimatedSwitcher(
       crossShrink: false,
-      child: markers?.isEmpty ?? true
+      child: mapNotifier.markers?.isEmpty ?? true
           ? DecoratedBox(
               decoration: BoxDecoration(
                 color: Theme.of(context).dividerColor,
               ),
             )
-          : ValueListenableBuilder<EdgeInsets>(
-              valueListenable: _padding,
-              builder: (context, value, child) {
-                return GoogleMap(
-                  padding: value,
-                  myLocationEnabled: true,
-                  mapType: mapNotifier.mapType == CustomMapType.satellite
-                      ? MapType.hybrid
-                      : MapType.normal,
-                  // cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-                  //   northeast: northEastBound,
-                  //   southwest: southWestBound,
-                  // )),
-                  onMapCreated: _onMapCreated,
-                  // onCameraMove: (position) {
-                  //   print(position);
-                  // },
-                  initialCameraPosition: CameraPosition(
-                    target: bottomSheetCenter,
-                    zoom: 16.4,
-                  ),
-                  // polygons: polygons,
-                  markers: markers,
-                );
+          : GoogleMap(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top,
+              ),
+              myLocationEnabled: true,
+              mapType: mapNotifier.mapType == CustomMapType.satellite
+                  ? MapType.hybrid
+                  : MapType.normal,
+              rotateGesturesEnabled: false,
+              onMapCreated: _onMapCreated,
+              onCameraMove: (position) {
+                mapNotifier.cameraPosition = position;
               },
+              initialCameraPosition: _initialCameraPosition,
+              markers: mapNotifier.markers,
             ),
     );
   }
+}
+
+Marker generateMarker({
+  BuildContext context,
+  Trail trail,
+  TrailLocation location,
+}) {
+  final hues = [38.0, 340.0, 199.0];
+  final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
+  return Marker(
+    onTap: mapNotifier.stopAnimating,
+    markerId: MarkerId('${trail.id} ${location.id}'),
+    position: location.coordinates,
+    infoWindow: InfoWindow(
+      title: location.name,
+      onTap: () {
+        final appNotifier = Provider.of<AppNotifier>(
+          context,
+          listen: false,
+        );
+        if (appNotifier.routes.isNotEmpty &&
+            appNotifier.routes.last.data is TrailLocation &&
+            appNotifier.routes.last.data == location) {
+          Provider.of<BottomSheetNotifier>(
+            context,
+            listen: false,
+          ).animateTo(0);
+        } else {
+          appNotifier.push(
+            context: context,
+            route: CrossFadePageRoute(
+              builder: (context) {
+                return Material(
+                  color: Theme.of(context).bottomAppBarColor,
+                  child: TrailLocationOverviewPage(
+                    trailLocation: location,
+                  ),
+                );
+              },
+            ),
+            routeInfo: RouteInfo(
+              name: location.name,
+              data: location,
+            ),
+          );
+        }
+      },
+    ),
+    icon: mapNotifier.mapType == CustomMapType.dark
+        ? mapNotifier.darkThemeMarkerIcons[trail.id - 1]
+        : BitmapDescriptor.defaultMarkerWithHue(hues[trail.id - 1]),
+  );
 }
 
 enum CustomMapType {
@@ -185,6 +202,18 @@ class MapNotifier extends ChangeNotifier {
   bool gpsOn;
   GoogleMapController mapController;
   List<BitmapDescriptor> darkThemeMarkerIcons = [];
+  CameraPosition cameraPosition;
+
+  /// Translation needed to move the map up if bottom sheet is half expanded. (+ve values)
+  double _getAdjustAmount(double zoom) {
+    const circumference = 2 * pi * 6378137;
+    final metresPerPixel =
+        156543.03392 * cos(center.latitude * pi / 180) / pow(2, zoom);
+    // height of bottom sheet in metres, based on the map
+    final height = (bottomHeight - bottomBarHeight) / 2 * metresPerPixel;
+    final angle = height / circumference * 360;
+    return angle;
+  }
 
   CustomMapType _mapType = CustomMapType.normal;
   CustomMapType get mapType => _mapType;
@@ -212,15 +241,41 @@ class MapNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _animateToPoint(LatLng point, double zoom) {
-    mapController.animateCamera(CameraUpdate.newLatLngZoom(point, zoom));
+  void _animateToPoint(LatLng point, double zoom, [bool adjusted = false]) {
+    mapController.animateCamera(CameraUpdate.newLatLngZoom(
+      adjusted
+          ? LatLng(
+              point.latitude - _getAdjustAmount(zoom),
+              point.longitude,
+            )
+          : point,
+      zoom,
+    ));
   }
 
-  void _animateToPoints(List<LatLng> points, double padding) {
+  double _getZoomFromBounds(LatLngBounds bounds, Size mapSize) {
+    final centerLat =
+        (bounds.northeast.latitude + bounds.southwest.latitude) / 2;
+    const circumference = 2 * pi * 6378137;
+    final latAngle = (bounds.northeast.latitude - bounds.southwest.latitude);
+    final lngAngle = (bounds.northeast.longitude - bounds.southwest.longitude);
+    final height = latAngle * circumference / 360;
+    final width = lngAngle * circumference / 360;
+    final metresPerPixel = max(width / mapSize.width, height / mapSize.height);
+    final zoom =
+        log(156543.03392 * cos(centerLat * pi / 180) / metresPerPixel) / log(2);
+    return zoom;
+  }
+
+  void _animateToPoints(
+    List<LatLng> points, [
+    bool adjusted = false,
+    Size mapSize,
+  ]) {
     if (points?.isEmpty ?? true)
       return;
     else if (points.length == 1) {
-      return _animateToPoint(points.first, 18.5);
+      return _animateToPoint(points.first, 18.5, adjusted);
     }
     double minLat = points.first.latitude;
     double maxLat = points.first.latitude;
@@ -238,34 +293,42 @@ class MapNotifier extends ChangeNotifier {
         maxLng = point.longitude;
       }
     }
-    mapController.animateCamera(CameraUpdate.newLatLngBounds(
-      LatLngBounds(
-        northeast: LatLng(maxLat, maxLng),
-        southwest: LatLng(minLat, minLng),
-      ),
-      padding,
-    ));
+    final bounds = LatLngBounds(
+      northeast: LatLng(maxLat, maxLng),
+      southwest: LatLng(minLat, minLng),
+    );
+    final center = LatLng(
+      (minLat + maxLat) / 2 + 0.00008,
+      (minLng + maxLng) / 2,
+    );
+    final zoom = min(_getZoomFromBounds(bounds, mapSize) * .98, 19.0);
+    _animateToPoint(center, zoom, adjusted);
   }
 
   /// Animate back to default map of HC Garden
-  void animateBackToCenter([bool shiftedUpwards = false]) {
-    _animateToPoint(shiftedUpwards ? bottomSheetCenter : center, 16.4);
+  void animateBackToCenter({bool adjusted = false}) {
+    _animateToPoint(center, 16.4, adjusted);
   }
 
   /// Moves the map to a specific location on a trail
-  void animateToLocation(TrailLocation location, [double zoom = 18.5]) {
+  void animateToLocation({
+    TrailLocation location,
+    double zoom = 18.5,
+    bool adjusted = false,
+  }) {
     // TODO: Focus on the specific marker as well
     // (need to wait for upcoming update for google maps plugin)
     // https://github.com/flutter/flutter/issues/33481
-    _animateToPoint(location.coordinates, zoom ?? 18.5);
+    _animateToPoint(location.coordinates, zoom ?? 18.5, adjusted);
   }
 
   /// Moves the map to the bounding box of all locations of the entity
-  void animateToEntity(
+  void animateToEntity({
     Entity entity,
-    Map<Trail, List<TrailLocation>> trails, [
-    double padding = 36,
-  ]) {
+    Map<Trail, List<TrailLocation>> trails,
+    bool adjusted = false,
+    Size mapSize,
+  }) {
     final points = entity.locations.map((tuple) {
       final int trailId = tuple[0];
       final int locationId = tuple[1];
@@ -277,12 +340,21 @@ class MapNotifier extends ChangeNotifier {
       });
       return location.coordinates;
     }).toList();
-    _animateToPoints(points, padding ?? 36);
+    _animateToPoints(points, adjusted, mapSize);
   }
 
   /// Moves the map to the bounding box of a trail
-  void animateToTrail(List<TrailLocation> locations, [double padding = 36]) {
+  void animateToTrail({
+    List<TrailLocation> locations,
+    bool adjusted = false,
+    Size mapSize,
+  }) {
     final points = locations.map((location) => location.coordinates).toList();
-    _animateToPoints(points, padding ?? 36);
+    _animateToPoints(points, adjusted, mapSize);
+  }
+
+  /// Stop any map movement. This is used when markers are tapped to prevent map from moving to the marker.
+  void stopAnimating() {
+    mapController.moveCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 }
