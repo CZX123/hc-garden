@@ -15,21 +15,11 @@ class TrailDetailsPage extends StatefulWidget {
 
 class _TrailDetailsPageState extends State<TrailDetailsPage> {
   bool _init = false;
+  AppNotifier _appNotifier;
   final _scrollController = ScrollController();
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
-    if (!_init) {
-      appNotifier.updateScrollController(
-        context: context,
-        data: widget.trail,
-        scrollController: _scrollController,
-      );
-      _init = true;
-    }
-    if (appNotifier.state == 0 && appNotifier.routes.isNotEmpty) {
+  void stateListener() {
+    if (_appNotifier.state == 0 && _appNotifier.routes.isNotEmpty) {
       final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
         context,
         listen: false,
@@ -39,6 +29,26 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
         _scrollController.jumpTo(0);
       }
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _appNotifier = Provider.of<AppNotifier>(context, listen: false)..addListener(stateListener);
+    if (!_init) {
+      _appNotifier.updateScrollController(
+        context: context,
+        data: widget.trail,
+        scrollController: _scrollController,
+      );
+      _init = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _appNotifier.removeListener(stateListener);
+    super.dispose();
   }
 
   @override
@@ -121,7 +131,9 @@ class _LocationListRowState extends State<LocationListRow> {
   Animation<double> secondaryAnimation;
 
   void listener() {
-    if (secondaryAnimation?.isDismissed ?? false) {
+    if (secondaryAnimation.value > 0) {
+      hidden.value = true;
+    } else if (secondaryAnimation.isDismissed) {
       if (mounted) hidden.value = false;
       secondaryAnimation.removeListener(listener);
     }
@@ -211,17 +223,17 @@ class _LocationListRowState extends State<LocationListRow> {
       ),
     );
     return InkWell(
-      child: ValueListenableBuilder(
-        valueListenable: ModalRoute.of(context).secondaryAnimation,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: hidden,
         builder: (context, value, child) {
           return Visibility(
-            visible: value == 0 || !hidden.value,
+            visible: !value,
             child: child,
           );
         },
         child: child,
       ),
-      onTap: () async {
+      onTap: () {
         final sourceRect = Rect.fromLTWH(0, 69, width, 84);
         final anim = Tween<double>(
           begin: 0,
@@ -237,8 +249,9 @@ class _LocationListRowState extends State<LocationListRow> {
         final endContentOffset = ValueNotifier(
           Offset(0, (1 - anim.value) * topPadding + 16),
         );
-        hidden.value = true;
-        await Provider.of<AppNotifier>(context, listen: false).push(
+        secondaryAnimation = ModalRoute.of(context).secondaryAnimation
+          ..addListener(listener);
+        Provider.of<AppNotifier>(context, listen: false).push(
           context: context,
           route: ExpandPageRoute(
             builder: (context) {
@@ -260,8 +273,6 @@ class _LocationListRowState extends State<LocationListRow> {
             data: widget.location,
           ),
         );
-        secondaryAnimation = ModalRoute.of(context).secondaryAnimation
-          ..addListener(listener);
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'library.dart';
 
 void main() {
+  //WidgetsFlutterBinding.ensureInitialized().renderView.automaticSystemUiAdjustment = false;
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(HcGardenApp());
 }
@@ -173,40 +174,10 @@ class _MyHomePageState extends State<MyHomePage>
   double topPadding;
   double height;
 
-  // TODO: offline indicator if user opens app when offline, and old contents show instead
-  // Maybe can reduce code duplication
-  /* rootBundle.loadString('assets/data/data.json').then((contents) {
-    List<Flora> floraList = [];
-    List<Fauna> faunaList = [];
-    final parsedJson = jsonDecode(contents);
-    parsedJson['flora&fauna'].forEach((key, value) {
-      if (key.contains('flora')) {
-        floraList.add(Flora.fromJson(key, value));
-      } else if (key.contains('fauna')) {
-        faunaList.add(Fauna.fromJson(key, value));
-      }
-    });
-    floraList.sort((a, b) => a.name.compareTo(b.name));
-    faunaList.sort((a, b) => a.name.compareTo(b.name));
-    Map<Trail, List<TrailLocation>> trails = {};
-    parsedJson['map'].forEach((key, value) {
-      final trail = Trail.fromJson(key, value);
-      trails[trail] = [];
-      value['route'].forEach((key, value) {
-        trails[trail].add(TrailLocation.fromJson(
-          key,
-          value,
-          floraList: floraList,
-          faunaList: faunaList,
-        ));
-      });
-    });
-    Provider.of<AppNotifier>(context, listen: false)
-        .updateBackupLists(floraList, faunaList);
-    Provider.of<AppNotifier>(context, listen: false).trails = trails;
-  }); */
-
   Future<bool> onBack(BuildContext context) async {
+    final scaffoldState = Scaffold.of(context);
+    if (scaffoldState.isEndDrawerOpen || scaffoldState.isDrawerOpen)
+      return true;
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
       context,
@@ -337,7 +308,8 @@ class _MyHomePageState extends State<MyHomePage>
           );
         });
       });
-      Provider.of<MapNotifier>(context, listen: false).defaultMarkers = mapMarkers;
+      Provider.of<MapNotifier>(context, listen: false).defaultMarkers =
+          mapMarkers;
 
       List<HistoricalData> historicalDataList = [];
       parsedJson['historical'].forEach((key, value) {
@@ -405,41 +377,52 @@ class _MyHomePageState extends State<MyHomePage>
         drawer: DebugDrawer(),
         endDrawer: SortingDrawer(),
         body: Builder(builder: (context) {
-          return WillPopScope(
-            onWillPop: () {
-              return onBack(context);
-            },
-            child: CustomAnimatedSwitcher(
-              crossShrink: false,
-              child: height != 0
-                  ? NestedBottomSheet(
-                      initialPosition: height - bottomHeight,
-                      background: Positioned(
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        bottom: bottomBarHeight,
-                        child: ValueListenableBuilder(
-                          valueListenable: _pageIndex,
-                          builder: (context, pageIndex, child) {
-                            return CustomAnimatedSwitcher(
-                              child: pageIndex == 0
-                                  ? HistoryPage()
-                                  : pageIndex == 2 ? AboutPage() : child,
-                            );
-                          },
-                          child: MapWidget(),
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return AnnotatedRegion(
+            value: (isDark
+                    ? ThemeNotifier.darkOverlayStyle
+                    : ThemeNotifier.lightOverlayStyle)
+                .copyWith(
+              statusBarColor:
+                  Theme.of(context).bottomAppBarColor.withOpacity(isDark ? .5 : .8),
+              systemNavigationBarColor: Theme.of(context).bottomAppBarColor,
+            ),
+            child: WillPopScope(
+              onWillPop: () {
+                return onBack(context);
+              },
+              child: CustomAnimatedSwitcher(
+                crossShrink: false,
+                child: height != 0
+                    ? NestedBottomSheet(
+                        initialPosition: height - bottomHeight,
+                        background: Positioned(
+                          left: 0,
+                          top: 0,
+                          right: 0,
+                          bottom: bottomBarHeight,
+                          child: ValueListenableBuilder(
+                            valueListenable: _pageIndex,
+                            builder: (context, pageIndex, child) {
+                              return CustomAnimatedSwitcher(
+                                child: pageIndex == 0
+                                    ? HistoryPage()
+                                    : pageIndex == 2 ? AboutPage() : child,
+                              );
+                            },
+                            child: MapWidget(),
+                          ),
                         ),
-                      ),
-                      body: ExploreBody(
-                        tabController: _tabController,
-                        scrollControllers: _scrollControllers,
-                      ),
-                      footer: BottomSheetFooter(
-                        pageIndex: _pageIndex,
-                      ),
-                    )
-                  : SizedBox.shrink(),
+                        body: ExploreBody(
+                          tabController: _tabController,
+                          scrollControllers: _scrollControllers,
+                        ),
+                        footer: BottomSheetFooter(
+                          pageIndex: _pageIndex,
+                        ),
+                      )
+                    : SizedBox.shrink(),
+              ),
             ),
           );
         }),

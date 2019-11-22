@@ -1,5 +1,19 @@
 import '../library.dart';
 
+// Needed for the selector to correctly compare between 2 different lists of about page data
+class AboutPageDataObject {
+  final List<AboutPageData> value;
+  const AboutPageDataObject(this.value);
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is AboutPageDataObject && listEquals(value, other.value);
+  }
+
+  @override
+  int get hashCode => hashList(value);
+}
+
 class AboutPage extends StatefulWidget {
   const AboutPage({Key key}) : super(key: key);
 
@@ -7,38 +21,89 @@ class AboutPage extends StatefulWidget {
   _AboutPageState createState() => _AboutPageState();
 }
 
-class _AboutPageState extends State<AboutPage> {
+class _AboutPageState extends State<AboutPage>
+    with SingleTickerProviderStateMixin {
+  AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    return Selector<FirebaseData, List<AboutPageData>>(
-      selector: (context, firebaseData) => firebaseData.aboutPageDataList,
-      builder: (context, aboutPageDataList, child) {
-        return CustomScrollView(
-          slivers: <Widget>[
-            SliverAppBar(
-              actions: [const SizedBox.shrink()],
-              automaticallyImplyLeading: false,
-              backgroundColor: Colors.transparent,
-              expandedHeight: 96 + topPadding,
-              flexibleSpace: FlexibleSpaceBar(
-                centerTitle: true,
-                title: Text(
-                  'About',
-                  style: Theme.of(context).textTheme.display2,
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.only(bottom: 16),
-              sliver: SliverToBoxAdapter(
-                child: ExpansionPanelList(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final topExtent = topPadding + 96;
+    final scale = Tween<double>(
+      begin: 1,
+      end: .8,
+    ).animate(_animationController);
+    final opacity = Tween<double>(
+      begin: 2,
+      end: 0,
+    ).animate(_animationController);
+    return AnnotatedRegion(
+      value: (isDark
+              ? ThemeNotifier.darkOverlayStyle
+              : ThemeNotifier.lightOverlayStyle)
+          .copyWith(
+        statusBarColor: Theme.of(context)
+            .scaffoldBackgroundColor
+            .withOpacity(isDark ? .5 : .8),
+        systemNavigationBarColor: Theme.of(context).bottomAppBarColor,
+      ),
+      child: NotificationListener(
+        onNotification: (notification) {
+          if (notification is ScrollUpdateNotification) {
+            if (notification.metrics.pixels < topExtent) {
+              _animationController.value =
+                  notification.metrics.pixels / topExtent;
+            } else if (_animationController.value != 1) {
+              _animationController.value = 1;
+            }
+          }
+          return false;
+        },
+        child: Selector<FirebaseData, AboutPageDataObject>(
+          selector: (context, firebaseData) =>
+              AboutPageDataObject(firebaseData.aboutPageDataList),
+          builder: (context, aboutPageDataObject, child) {
+            return ListView.builder(
+              padding: EdgeInsets.fromLTRB(0, topPadding, 0, 16),
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Padding(
+                    padding: EdgeInsets.fromLTRB(16, 96, 16, 16),
+                    child: ScaleTransition(
+                      scale: scale,
+                      child: FadeTransition(
+                        opacity: opacity,
+                        child: Text(
+                          'About',
+                          style: Theme.of(context).textTheme.display2,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return ExpansionPanelList(
                   expansionCallback: (int index, bool isExpanded) {
                     setState(() {
-                      aboutPageDataList[index].isExpanded = !isExpanded;
+                      aboutPageDataObject.value[index].isExpanded = !isExpanded;
                     });
                   },
-                  children: aboutPageDataList.map((aboutPageData) {
+                  children: aboutPageDataObject.value.map((aboutPageData) {
                     final List<String> bodyStrings =
                         aboutPageData.body.split('\n');
                     return ExpansionPanel(
@@ -102,12 +167,13 @@ class _AboutPageState extends State<AboutPage> {
                       isExpanded: aboutPageData.isExpanded,
                     );
                   }).toList(),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+                );
+              },
+              itemCount: 2,
+            );
+          },
+        ),
+      ),
     );
   }
 }

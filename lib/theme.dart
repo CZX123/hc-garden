@@ -2,6 +2,16 @@ import 'library.dart';
 
 class ThemeNotifier extends ValueNotifier<bool> {
   ThemeNotifier(bool value) : super(value);
+
+  static final lightOverlayStyle = SystemUiOverlayStyle.dark.copyWith(
+    statusBarColor: Colors.white.withOpacity(.5),
+    systemNavigationBarColor: Colors.white,
+  );
+  static final darkOverlayStyle = SystemUiOverlayStyle.light.copyWith(
+    statusBarColor: Colors.grey[850].withOpacity(.5),
+    systemNavigationBarColor: Colors.grey[850],
+  );
+
   @override
   set value(bool newValue) {
     if (super.value != newValue) {
@@ -20,7 +30,7 @@ final ThemeData themeData = ThemeData(
   accentColor: Color(0xFF27B50E),
   accentColorBrightness: Brightness.dark,
   scaffoldBackgroundColor: Colors.grey[100],
-  textTheme: textTheme.merge(lightThemeText),
+  textTheme: lightText,
 );
 
 final ThemeData darkThemeData = ThemeData(
@@ -34,15 +44,18 @@ final ThemeData darkThemeData = ThemeData(
   scaffoldBackgroundColor: Color(0xFF121212),
   canvasColor: Colors.grey[900],
   bottomAppBarColor: Colors.grey[850],
-  textTheme: textTheme.merge(darkThemeText),
   toggleableActiveColor: Colors.lightGreenAccent[400],
+  textTheme: darkText,
 );
+
+final lightText = textTheme.merge(lightThemeText);
+final darkText = textTheme.merge(darkThemeText);
 
 const TextTheme textTheme = TextTheme(
   // History & About headings
   display2: TextStyle(
     height: 1.2,
-    fontSize: 22,
+    fontSize: 32,
     fontWeight: FontWeight.bold,
   ),
   // 'Explore HC Garden' and entity name in details page
@@ -101,7 +114,7 @@ const TextTheme lightThemeText = TextTheme(
 
 const TextTheme darkThemeText = TextTheme(
   display2: TextStyle(
-    color: Color(0xFFF5730F), // Very light green
+    color: Color(0xFFF5730F), // Light reddish-brown
   ),
   display1: TextStyle(
     color: Colors.white,

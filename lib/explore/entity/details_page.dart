@@ -15,6 +15,9 @@ class EntityDetailsPage extends StatefulWidget {
 
 class _EntityDetailsPageState extends State<EntityDetailsPage> {
   bool _init = false;
+
+  /// Whether page should slide up when going to a new route. Only applies when going to image gallery.
+  bool _slideUp = false;
   final _scrollController = ScrollController();
 
   List<Widget> locations(
@@ -84,6 +87,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
     final topPadding = MediaQuery.of(context).padding.top;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     final newImages = widget.entity.images.map(lowerRes).toList();
     final child = SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
@@ -234,21 +238,37 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
         ],
       ),
     );
-    return Material(
-      type: MaterialType.transparency,
-      child: widget.endContentOffset != null
-          ? NotificationListener(
-              onNotification: (notification) {
-                if (notification is ScrollUpdateNotification &&
-                    notification.depth == 0) {
-                  widget.endContentOffset.value -=
-                      Offset(0, notification.scrollDelta);
-                }
-                return false;
-              },
-              child: child,
-            )
-          : child,
+    return ValueListenableBuilder<double>(
+      valueListenable: ModalRoute.of(context).secondaryAnimation,
+      builder: (context, value, child) {
+        // Slides the page up when going to image gallery
+        // As for other routes, it will not do so
+        double y = 0;
+        if (_slideUp || appNotifier.state == 2) {
+          _slideUp = value != 0;
+          y = value * height * -.01;
+        }
+        return Transform.translate(
+          offset: Offset(0, y),
+          child: child,
+        );
+      },
+      child: Material(
+        type: MaterialType.transparency,
+        child: widget.endContentOffset != null
+            ? NotificationListener(
+                onNotification: (notification) {
+                  if (notification is ScrollUpdateNotification &&
+                      notification.depth == 0) {
+                    widget.endContentOffset.value -=
+                        Offset(0, notification.scrollDelta);
+                  }
+                  return false;
+                },
+                child: child,
+              )
+            : child,
+      ),
     );
   }
 }

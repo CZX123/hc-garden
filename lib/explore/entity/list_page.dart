@@ -149,7 +149,9 @@ class _EntityListRowState extends State<EntityListRow> {
   Animation<double> secondaryAnimation;
 
   void listener() {
-    if (secondaryAnimation?.isDismissed ?? false) {
+    if (secondaryAnimation.value > 0) {
+      hidden.value = true;
+    } else if (secondaryAnimation.isDismissed) {
       if (mounted) hidden.value = false;
       secondaryAnimation.removeListener(listener);
     }
@@ -210,11 +212,11 @@ class _EntityListRowState extends State<EntityListRow> {
       ),
     );
     return InkWell(
-      child: ValueListenableBuilder(
-        valueListenable: ModalRoute.of(context).secondaryAnimation,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: hidden,
         builder: (context, value, child) {
           return Visibility(
-            visible: value == 0 || !hidden.value,
+            visible: !value,
             child: child,
           );
         },
@@ -273,8 +275,9 @@ class _EntityListRowState extends State<EntityListRow> {
           begin: entityButtonHeightCollapsed + 24 + topPadding,
           end: bottomHeight - bottomBarHeight + 8,
         ).animate(anim);
-        Provider.of<AppNotifier>(context, listen: false)
-            .push(
+        secondaryAnimation = ModalRoute.of(context).secondaryAnimation
+          ..addListener(listener);
+        Provider.of<AppNotifier>(context, listen: false).push(
           context: context,
           route: ExpandPageRoute(
             builder: (context) => EntityDetailsPage(
@@ -294,12 +297,7 @@ class _EntityListRowState extends State<EntityListRow> {
             name: widget.entity.name,
             data: widget.entity,
           ),
-        )
-            .then((_) {
-          secondaryAnimation = ModalRoute.of(context).secondaryAnimation
-            ..addListener(listener);
-        });
-        hidden.value = true;
+        );
       },
     );
   }

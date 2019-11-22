@@ -20,69 +20,79 @@ class ExploreHeader extends StatelessWidget {
       begin: 0,
       end: 1 / (height - bottomHeight),
     ).animate(bottomSheetNotifier.animation);
-
-    return ValueListenableBuilder(
-      valueListenable: anim,
-      builder: (context, value, child) {
-        Offset offset;
-        if (value > 1) {
-          offset = Offset(0, 0);
-        } else {
-          offset = Offset(
-            0,
-            (value - 1) * totalTranslation,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return AnnotatedRegion(
+      value: (isDark
+              ? ThemeNotifier.darkOverlayStyle
+              : ThemeNotifier.lightOverlayStyle)
+          .copyWith(
+        statusBarColor:
+            Theme.of(context).canvasColor.withOpacity(isDark ? .5 : .8),
+        systemNavigationBarColor: Theme.of(context).bottomAppBarColor,
+      ),
+      child: ValueListenableBuilder(
+        valueListenable: anim,
+        builder: (context, value, child) {
+          Offset offset;
+          if (value > 1) {
+            offset = Offset(0, 0);
+          } else {
+            offset = Offset(
+              0,
+              (value - 1) * totalTranslation,
+            );
+          }
+          return Transform.translate(
+            offset: offset,
+            child: child,
           );
-        }
-        return Transform.translate(
-          offset: offset,
-          child: child,
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(top: 20 + 12.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            AppLogo(
-              opacity: Tween<double>(
-                begin: 16 / 12 - totalTranslation / 12,
-                end: 16 / 12,
-              ).animate(anim),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            FadeTransition(
-              opacity: Tween<double>(
-                begin: (24 + imageHeight) / 12 - totalTranslation / 12,
-                end: (24 + imageHeight) / 12,
-              ).animate(anim),
-              child: Text(
-                'Explore HC Garden',
-                style: Theme.of(context).textTheme.display1.copyWith(
-                      height: headingHeight / 20,
-                    ),
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20 + 12.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              AppLogo(
+                opacity: Tween<double>(
+                  begin: 16 / 12 - totalTranslation / 12,
+                  end: 16 / 12,
+                ).animate(anim),
               ),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            TrailButtonsRow(
-              opacity: Tween<double>(
-                begin: (40 + imageHeight + headingHeight) / 40 -
-                    totalTranslation / 40,
-                end: (40 + imageHeight + headingHeight) / 40,
-              ).animate(anim),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            FloraFaunaTabBar(
-              animateTo: bottomSheetNotifier.animateTo,
-              animation: anim,
-              tabController: tabController,
-            ),
-          ],
+              const SizedBox(
+                height: 8,
+              ),
+              FadeTransition(
+                opacity: Tween<double>(
+                  begin: (24 + imageHeight) / 12 - totalTranslation / 12,
+                  end: (24 + imageHeight) / 12,
+                ).animate(anim),
+                child: Text(
+                  'Explore HC Garden',
+                  style: Theme.of(context).textTheme.display1.copyWith(
+                        height: headingHeight / 20,
+                      ),
+                ),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              TrailButtonsRow(
+                opacity: Tween<double>(
+                  begin: (40 + imageHeight + headingHeight) / 40 -
+                      totalTranslation / 40,
+                  end: (40 + imageHeight + headingHeight) / 40,
+                ).animate(anim),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              FloraFaunaTabBar(
+                animateTo: bottomSheetNotifier.animateTo,
+                animation: anim,
+                tabController: tabController,
+              ),
+            ],
+          ),
         ),
       ),
     );

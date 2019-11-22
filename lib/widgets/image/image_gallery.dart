@@ -18,77 +18,99 @@ class ImageGallery extends StatelessWidget {
   Widget build(BuildContext context) {
     final animation = ModalRoute.of(context).animation;
     final disableScroll = ValueNotifier(false);
-    return FadeTransition(
-      opacity: Tween(
-        begin: 0.0,
-        end: 3.0,
-      ).animate(CurvedAnimation(
-        parent: animation,
-        curve: Curves.fastOutSlowIn,
-      )),
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: Offset(0, .3),
-          end: Offset(0, 0),
+    return ValueListenableBuilder(
+      valueListenable: animation,
+      builder: (context, value, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final statusBarColorTween = ColorTween(
+          begin:
+              Theme.of(context).bottomAppBarColor.withOpacity(isDark ? .5 : .8),
+          end: Colors.black54,
+        );
+        final navBarColorTween = ColorTween(
+          begin: Theme.of(context).bottomAppBarColor,
+          end: Colors.grey[850],
+        );
+        return AnnotatedRegion(
+          value: SystemUiOverlayStyle(
+            statusBarIconBrightness: value > .5 || isDark ? Brightness.light : Brightness.dark,
+            statusBarColor: statusBarColorTween.transform(value),
+            systemNavigationBarIconBrightness: value > .5 || isDark ? Brightness.light : Brightness.dark,
+            systemNavigationBarColor: navBarColorTween.transform(value),
+          ),
+          child: child,
+        );
+      },
+      child: FadeTransition(
+        opacity: Tween(
+          begin: 0.0,
+          end: 3.0,
         ).animate(CurvedAnimation(
           parent: animation,
           curve: Curves.fastOutSlowIn,
         )),
-        child: Material(
-          color: Colors.black,
-          clipBehavior: Clip.hardEdge,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: Offset(0, -.25),
-              end: Offset(0, 0),
-            ).animate(CurvedAnimation(
-              parent: animation,
-              curve: Curves.fastOutSlowIn,
-            )),
-            child: FadeTransition(
-              opacity: Tween(
-                begin: -1.0,
-                end: 2.0,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: Offset(0, .3),
+            end: Offset(0, 0),
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn,
+          )),
+          child: Material(
+            color: Colors.black,
+            clipBehavior: Clip.hardEdge,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: Offset(0, -.25),
+                end: Offset(0, 0),
               ).animate(CurvedAnimation(
                 parent: animation,
                 curve: Curves.fastOutSlowIn,
               )),
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: images.length == 1
-                        ? ZoomableImage(
-                            image: initialImage,
-                          )
-                        : ValueListenableBuilder(
-                            valueListenable: disableScroll,
-                            builder: (context, value, child) {
-                              return PageView(
-                                controller: PageController(
-                                  initialPage: images.indexOf(initialImage),
-                                ),
-                                physics: value
-                                    ? NeverScrollableScrollPhysics()
-                                    : ScrollPhysics(),
-                                children: <Widget>[
-                                  for (var image in images)
-                                    ZoomableImage(
-                                      image: image,
-                                      disableScroll: disableScroll,
-                                    ),
-                                ],
-                              );
-                            },
-                          ),
-                  ),
-                  Theme(
-                    data: darkThemeData,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        boxShadow: kElevationToShadow[8],
-                      ),
-                      child: Builder(
-                        builder: (context) {
+              child: FadeTransition(
+                opacity: Tween(
+                  begin: -1.0,
+                  end: 2.0,
+                ).animate(CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.fastOutSlowIn,
+                )),
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: images.length == 1
+                          ? ZoomableImage(
+                              image: initialImage,
+                            )
+                          : ValueListenableBuilder(
+                              valueListenable: disableScroll,
+                              builder: (context, value, child) {
+                                return PageView(
+                                  controller: PageController(
+                                    initialPage: images.indexOf(initialImage),
+                                  ),
+                                  physics: value
+                                      ? NeverScrollableScrollPhysics()
+                                      : ScrollPhysics(),
+                                  children: <Widget>[
+                                    for (var image in images)
+                                      ZoomableImage(
+                                        image: image,
+                                        disableScroll: disableScroll,
+                                      ),
+                                  ],
+                                );
+                              },
+                            ),
+                    ),
+                    Theme(
+                      data: darkThemeData,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: kElevationToShadow[8],
+                        ),
+                        child: Builder(builder: (context) {
                           return Material(
                             elevation: 0,
                             color: Theme.of(context).bottomAppBarColor,
@@ -104,11 +126,11 @@ class ImageGallery extends StatelessWidget {
                               ),
                             ),
                           );
-                        }
+                        }),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

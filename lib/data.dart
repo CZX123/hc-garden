@@ -13,6 +13,7 @@ class Tuple<A, B> {
       throw RangeError.range(i, 0, 1);
   }
 
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is Tuple<A, B> && item1 == other.item1 && item2 == other.item2;
@@ -58,6 +59,7 @@ abstract class Entity implements DataObject {
           );
         }).toList();
 
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is Entity &&
@@ -95,6 +97,7 @@ class Fauna extends Entity {
             : null,
         super.fromJson(key, parsedJson);
 
+  @override
   bool operator ==(Object other) {
     return super == other &&
         other is Fauna &&
@@ -111,6 +114,7 @@ class Flora extends Entity {
   Flora.fromJson(String key, dynamic parsedJson)
       : super.fromJson(key, parsedJson);
 
+  @override
   bool operator ==(Object other) {
     return super == other && other is Flora;
   }
@@ -132,6 +136,29 @@ class FirebaseData {
     this.historicalDataList,
     this.aboutPageDataList,
   });
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is FirebaseData &&
+            listEquals(floraList, other.floraList) &&
+            listEquals(faunaList, other.faunaList) &&
+            listEquals(historicalDataList, other.historicalDataList) &&
+            listEquals(aboutPageDataList, other.aboutPageDataList) &&
+            trails.length == other.trails.length &&
+            trails.keys.every((trail) {
+              return trails[trail] == other.trails[trail];
+            });
+  }
+
+  @override
+  int get hashCode => hashValues(
+        hashList(floraList),
+        hashList(faunaList),
+        hashList(historicalDataList),
+        hashList(aboutPageDataList),
+        trails,
+      );
 }
 
 class Trail implements DataObject {
@@ -145,11 +172,10 @@ class Trail implements DataObject {
     );
   }
 
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        other is Trail &&
-            id == other.id &&
-            name == other.name;
+        other is Trail && id == other.id && name == other.name;
   }
 
   @override
@@ -200,6 +226,7 @@ class TrailLocation implements DataObject {
     );
   }
 
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is TrailLocation &&
@@ -230,6 +257,7 @@ class EntityPosition {
     this.pulse,
     this.size,
   });
+
   factory EntityPosition.fromJson(
     dynamic parsedJson, {
     @required List<Flora> floraList,
@@ -255,6 +283,20 @@ class EntityPosition {
       size: parsedJson['size'],
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is EntityPosition &&
+            entity == other.entity &&
+            left == other.left &&
+            top == other.top &&
+            pulse == other.pulse &&
+            size == other.size;
+  }
+
+  @override
+  int get hashCode => hashValues(entity, left, top, pulse, size);
 }
 
 class HistoricalData {
@@ -285,6 +327,21 @@ class HistoricalData {
   }
 
   @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is HistoricalData &&
+            id == other.id &&
+            description == other.description &&
+            image == other.image &&
+            name == other.name &&
+            height == other.height &&
+            width == other.width;
+  }
+
+  @override
+  int get hashCode => hashValues(id, description, image, name, height, width);
+
+  @override
   String toString() {
     return 'HistoricalData(id: $id, description: $description, imageURL: $image)';
   }
@@ -307,6 +364,20 @@ class AboutPageData {
       isExpanded: false,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is AboutPageData &&
+            body == other.body &&
+            id == other.id &&
+            quote == other.quote &&
+            title == other.title &&
+            isExpanded == other.isExpanded;
+  }
+
+  @override
+  int get hashCode => hashValues(body, id, quote, title, isExpanded);
 }
 
 String lowerRes(String image) {
