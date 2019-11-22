@@ -8,10 +8,14 @@ import '../../library.dart';
 class ImageGallery extends StatelessWidget {
   final String initialImage;
   final List<String> images;
+
+  /// Only used in going from [HistoryPage]. Makes the change in the android navigation bar colour (from the original bottom app bar colour to dark grey) faster.
+  final bool fasterNavBarColourChange;
   const ImageGallery({
     Key key,
     @required this.initialImage,
     @required this.images,
+    this.fasterNavBarColourChange = false,
   }) : super(key: key);
 
   @override
@@ -25,7 +29,7 @@ class ImageGallery extends StatelessWidget {
         final statusBarColorTween = ColorTween(
           begin:
               Theme.of(context).bottomAppBarColor.withOpacity(isDark ? .5 : .8),
-          end: Colors.black54,
+          end: null,
         );
         final navBarColorTween = ColorTween(
           begin: Theme.of(context).bottomAppBarColor,
@@ -33,10 +37,17 @@ class ImageGallery extends StatelessWidget {
         );
         return AnnotatedRegion(
           value: SystemUiOverlayStyle(
-            statusBarIconBrightness: value > .5 || isDark ? Brightness.light : Brightness.dark,
-            statusBarColor: statusBarColorTween.transform(value),
-            systemNavigationBarIconBrightness: value > .5 || isDark ? Brightness.light : Brightness.dark,
-            systemNavigationBarColor: navBarColorTween.transform(value),
+            statusBarIconBrightness:
+                value > .5 || isDark ? Brightness.light : Brightness.dark,
+            statusBarColor: value == 1
+                ? Colors.black45
+                : statusBarColorTween.transform(min(value * 2, 1)),
+            systemNavigationBarIconBrightness:
+                value > (fasterNavBarColourChange ? 1 / 6 : .5) || isDark
+                    ? Brightness.light
+                    : Brightness.dark,
+            systemNavigationBarColor: navBarColorTween.transform(
+                fasterNavBarColourChange ? min(value * 3, 1) : value),
           ),
           child: child,
         );
@@ -115,7 +126,7 @@ class ImageGallery extends StatelessWidget {
                             elevation: 0,
                             color: Theme.of(context).bottomAppBarColor,
                             child: SizedBox(
-                              height: 48,
+                              height: Sizes.kBottomBarHeight,
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: IconButton(
@@ -157,6 +168,7 @@ class ZoomableImage extends StatefulWidget {
 
 class _ZoomableImageState extends State<ZoomableImage>
     with SingleTickerProviderStateMixin {
+  double _aspectRatio;
   double _viewportHeight;
   double _viewportWidth;
   double _imageHeight;
@@ -288,6 +300,21 @@ class _ZoomableImageState extends State<ZoomableImage>
     return Matrix4(scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, 1, 0, dx, dy, 0, 1);
   }
 
+  void onImageLoad(double ratio) {
+    _aspectRatio = ratio;
+    _viewportHeight = _key.currentContext.size.height;
+    _viewportWidth = _key.currentContext.size.width;
+    final viewportRatio = _viewportWidth / _viewportHeight;
+    if (ratio > viewportRatio) {
+      // Image is wider
+      _imageWidth = _viewportWidth;
+      _imageHeight = _viewportWidth / ratio;
+    } else {
+      _imageHeight = _viewportHeight;
+      _imageWidth = _viewportHeight * ratio;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -295,6 +322,16 @@ class _ZoomableImageState extends State<ZoomableImage>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     )..addListener(animListener);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_aspectRatio != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        onImageLoad(_aspectRatio);
+      });
+    }
   }
 
   @override
@@ -369,19 +406,7 @@ class _ZoomableImageState extends State<ZoomableImage>
               key: _key,
               fit: BoxFit.contain,
               saveInCache: false,
-              onLoad: (ratio) {
-                _viewportHeight = _key.currentContext.size.height;
-                _viewportWidth = _key.currentContext.size.width;
-                final viewportRatio = _viewportWidth / _viewportHeight;
-                if (ratio > viewportRatio) {
-                  // Image is wider
-                  _imageWidth = _viewportWidth;
-                  _imageHeight = _viewportWidth / ratio;
-                } else {
-                  _imageHeight = _viewportHeight;
-                  _imageWidth = _viewportHeight * ratio;
-                }
-              },
+              onLoad: onImageLoad,
             ),
           ),
         ),

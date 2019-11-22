@@ -67,11 +67,15 @@ class EntityListPage extends StatelessWidget {
             selector: (context, searchNotifier) => searchNotifier.searchTerm,
             builder: (context, searchTerm, child) {
               List<Entity> _list = [];
-              updatedEntityList.forEach((entity) {
-                if (_isValid(entity, searchTerm)) {
-                  _list.add(entity);
-                }
-              });
+              if (searchTerm != '*') {
+                updatedEntityList.forEach((entity) {
+                  if (_isValid(entity, searchTerm)) {
+                    _list.add(entity);
+                  }
+                });
+              } else {
+                _list = updatedEntityList;
+              }
               if (isFlora)
                 floraIcons.shuffle();
               else
@@ -104,11 +108,11 @@ class EntityListPage extends StatelessWidget {
                     : ListView.builder(
                         key: ValueKey(
                             searchTerm + updatedEntityList.length.toString()),
-                        padding: const EdgeInsets.fromLTRB(0, 16, 0, 96),
+                        padding: EdgeInsets.fromLTRB(0, 16, 0, searchTerm.isEmpty ? 96 : 64),
                         controller: scrollController,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: _list.length,
-                        itemExtent: searchTerm.isEmpty ? 104 : 88,
+                        itemExtent: searchTerm.isEmpty ? 104 : 84,
                         itemBuilder: (context, index) {
                           return EntityListRow(
                             searchTerm: searchTerm,
@@ -165,7 +169,7 @@ class _EntityListRowState extends State<EntityListRow> {
 
   @override
   Widget build(BuildContext context) {
-    final rowHeight = widget.searchTerm.isEmpty ? 104.0 : 88.0;
+    final rowHeight = widget.searchTerm.isEmpty ? 104.0 : 84.0;
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -202,7 +206,7 @@ class _EntityListRowState extends State<EntityListRow> {
             )
           else
             Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: 2),
               child: Text(
                 widget.entity.sciName,
                 style: Theme.of(context).textTheme.overline,
@@ -267,13 +271,13 @@ class _EntityListRowState extends State<EntityListRow> {
         final sourceRect = Rect.fromLTWH(0, 69, width, rowHeight);
         final anim = Tween<double>(
           begin: 0,
-          end: 1 / (height - bottomHeight),
+          end: 1 / (height - Sizes.kBottomHeight),
         ).animate(
           Provider.of<BottomSheetNotifier>(context, listen: false).animation,
         );
         final topSpace = Tween(
-          begin: entityButtonHeightCollapsed + 24 + topPadding,
-          end: bottomHeight - bottomBarHeight + 8,
+          begin: Sizes.hEntityButtonHeightCollapsed + 24 + topPadding,
+          end: Sizes.kBottomHeight - Sizes.hBottomBarHeight + 8,
         ).animate(anim);
         secondaryAnimation = ModalRoute.of(context).secondaryAnimation
           ..addListener(listener);

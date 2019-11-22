@@ -16,7 +16,7 @@ class BottomSheetFooter extends StatelessWidget {
     );
     final anim = Tween<double>(
       begin: 0,
-      end: 1 / (height - bottomHeight),
+      end: 1 / (height - Sizes.kBottomHeight),
     ).animate(bottomSheetNotifier.animation);
     return Stack(
       children: <Widget>[
@@ -30,16 +30,17 @@ class BottomSheetFooter extends StatelessWidget {
               left: 0,
               right: 0,
               bottom: 0,
+              height: Sizes.hBottomBarHeight,
               child: ValueListenableBuilder(
                 valueListenable: anim,
                 builder: (context, value, child) {
                   Offset offset;
                   if (state != 0) {
-                    offset = Offset(0, bottomBarHeight * 2);
+                    offset = Offset(0, Sizes.hBottomBarHeight * 2);
                   } else if (value > 1) {
                     offset = Offset(0, 0);
                   } else {
-                    offset = Offset(0, bottomBarHeight * 2 * (1 - value));
+                    offset = Offset(0, Sizes.hBottomBarHeight * 2 * (1 - value));
                   }
                   return Transform.translate(
                     offset: offset,
@@ -58,7 +59,7 @@ class BottomSheetFooter extends StatelessWidget {
                 duration: const Duration(milliseconds: 300),
                 transform: Matrix4.translationValues(
                   0,
-                  value ? bottomBarHeight * 2 : 0,
+                  value ? Sizes.hBottomBarHeight * 2 : 0,
                   0,
                 ),
                 child: child,
@@ -79,12 +80,12 @@ class BottomSheetFooter extends StatelessWidget {
                       if (index == 1) {
                         bottomSheetNotifier
                           ..draggingDisabled = false
-                          ..animateTo(height - bottomHeight);
+                          ..animateTo(height - Sizes.kBottomHeight);
                       } else {
                         bottomSheetNotifier
                           ..draggingDisabled = true
                           ..animateTo(
-                            height - bottomBarHeight,
+                            height - Sizes.hBottomBarHeight,
                             const Duration(milliseconds: 240),
                           );
                       }
@@ -159,7 +160,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
               context,
               listen: false,
             ).animation.value >
-            (height - bottomHeight) / 2;
+            (height - Sizes.kBottomHeight) / 2;
         _animationController.animateTo(
           0.5,
           duration: Duration(milliseconds: 250),
@@ -171,7 +172,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
               context,
               listen: false,
             ).animation.value >
-            (height - bottomHeight) / 2;
+            (height - Sizes.kBottomHeight) / 2;
         _animationController.animateTo(
           0,
           duration: Duration(milliseconds: 350),
@@ -248,14 +249,14 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
     final rectTween = MaterialRectArcTween(
-      begin: Rect.fromLTWH(0, 28, _width, 48),
+      begin: Rect.fromLTWH(0, 28, _width, Sizes.kBottomBarHeight),
       end: Rect.fromCircle(
         center: Offset(_width / 2, 28),
         radius: 28,
       ),
     );
     return SizedBox(
-      height: 76,
+      height: Sizes.kBottomBarHeight + 28,
       child: Selector<AppNotifier, bool>(
         selector: (context, appNotifier) => appNotifier.routes.isNotEmpty,
         builder: (context, appear, child) {
@@ -266,10 +267,10 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
               double y = 0;
               if (!appear && _state == 0) {
                 if (value >= .5) {
-                  y = 76;
+                  y = Sizes.kBottomBarHeight + 28;
                 } else {
                   d = Duration.zero;
-                  y = value * 152;
+                  y = value * (Sizes.kBottomBarHeight + 28) * 2;
                 }
               }
               return AnimatedContainer(
@@ -292,6 +293,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
               builder: (context, value, child) {
                 return AnimatedTheme(
                   data: value ? darkThemeData : themeData,
+                  duration: const Duration(milliseconds: 340),
                   child: child,
                 );
               },
@@ -328,7 +330,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
                     child: Material(
                       type: MaterialType.transparency,
                       child: SizedBox(
-                        height: 48,
+                        height: Sizes.kBottomBarHeight,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
@@ -377,7 +379,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
               left: 0,
               right: 0,
               height: 1,
-              bottom: 47,
+              bottom: Sizes.kBottomBarHeight - 1,
               child: Selector<AppNotifier, bool>(
                 selector: (context, appNotifier) => appNotifier.state != 2,
                 builder: (context, value, child) {
@@ -580,7 +582,7 @@ class _SearchBarState extends State<SearchBar> {
           Positioned(
             left: 0,
             bottom: 0,
-            height: 48,
+            height: Sizes.kBottomBarHeight,
             width: 48,
             child: Tooltip(
               message: 'Back',
@@ -599,7 +601,7 @@ class _SearchBarState extends State<SearchBar> {
             left: 96,
             right: 96,
             bottom: 0,
-            height: 48,
+            height: Sizes.kBottomBarHeight,
             child: TextField(
               focusNode: focusNode,
               controller: controller,
@@ -621,7 +623,7 @@ class _SearchBarState extends State<SearchBar> {
           Positioned(
             right: 0,
             bottom: 0,
-            height: 48,
+            height: Sizes.kBottomBarHeight,
             width: 48,
             child: Tooltip(
               message: 'Clear',

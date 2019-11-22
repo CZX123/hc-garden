@@ -129,8 +129,13 @@ class _HistoryPageState extends State<HistoryPage>
                                   child: Material(
                                     type: MaterialType.transparency,
                                     child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
+                                      onTap: () async {
+                                        SystemChrome.setPreferredOrientations([
+                                          DeviceOrientation.portraitUp,
+                                          DeviceOrientation.landscapeLeft,
+                                          DeviceOrientation.landscapeRight,
+                                        ]);
+                                        await Navigator.push(
                                           context,
                                           PageRouteBuilder(
                                             opaque: false,
@@ -141,12 +146,16 @@ class _HistoryPageState extends State<HistoryPage>
                                                   return image.isNotEmpty;
                                                 }).toList(),
                                                 initialImage: newImages[i],
+                                                fasterNavBarColourChange: true,
                                               );
                                             },
                                             transitionDuration: const Duration(
                                                 milliseconds: 340),
                                           ),
                                         );
+                                        SystemChrome.setPreferredOrientations([
+                                          DeviceOrientation.portraitUp,
+                                        ]);
                                       },
                                     ),
                                   ),

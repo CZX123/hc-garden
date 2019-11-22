@@ -1,23 +1,5 @@
 import '../library.dart';
 
-const spacing = 4 * 8 + 16 + 12 + 8 + 4.0;
-const imageHeight = 28.0;
-const headingHeight = 28.0;
-const trailButtonHeight = 80.0;
-const entityButtonHeight = 108.0;
-const entityButtonHeightCollapsed = 64.0;
-const bottomBarHeight = 62.0;
-const bottomHeight = spacing +
-    headingHeight +
-    imageHeight +
-    trailButtonHeight +
-    entityButtonHeight +
-    bottomBarHeight;
-const offsetTranslation = bottomHeight -
-    16 -
-    entityButtonHeight -
-    bottomBarHeight; // without topPadding
-
 class ExploreBody extends StatefulWidget {
   final TabController tabController;
   final List<ScrollController> scrollControllers;
@@ -61,7 +43,7 @@ class _ExploreBodyState extends State<ExploreBody> {
     final height = MediaQuery.of(context).size.height;
     final anim = Tween<double>(
       begin: 0,
-      end: 1 / (height - bottomHeight),
+      end: 1 / (height - Sizes.kBottomHeight),
     ).animate(bottomSheetNotifier.animation);
 
     final initialRoute = CrossFadePageRoute<void>(
@@ -95,7 +77,7 @@ class _ExploreBodyState extends State<ExploreBody> {
           child: BottomSheetHandle(
             opacity: Tween<double>(
               begin: 0,
-              end: (height - bottomHeight) / topPadding,
+              end: (height - Sizes.kBottomHeight) / topPadding,
             ).animate(anim),
           ),
         ),
@@ -120,11 +102,11 @@ class ExplorePage extends StatelessWidget {
       listen: false,
     );
     final topPadding = MediaQuery.of(context).padding.top;
-    final totalTranslation = offsetTranslation - topPadding;
+    final totalTranslation = Sizes.hOffsetTranslation - topPadding;
     final height = MediaQuery.of(context).size.height;
     final anim = Tween<double>(
       begin: 0,
-      end: 1 / (height - bottomHeight),
+      end: 1 / (height - Sizes.kBottomHeight),
     ).animate(bottomSheetNotifier.animation);
     return Material(
       color: Theme.of(context).canvasColor,
@@ -142,9 +124,9 @@ class ExplorePage extends StatelessWidget {
                 if (value > 1)
                   offset = Offset(
                     0,
-                    bottomHeight -
-                        bottomBarHeight -
-                        entityButtonHeightCollapsed -
+                    Sizes.kBottomHeight -
+                        Sizes.hBottomBarHeight -
+                        Sizes.hEntityButtonHeightCollapsed -
                         16 -
                         topPadding,
                   );
@@ -152,9 +134,9 @@ class ExplorePage extends StatelessWidget {
                   offset = Offset(
                     0,
                     value *
-                        (bottomHeight -
-                            bottomBarHeight -
-                            entityButtonHeightCollapsed -
+                        (Sizes.kBottomHeight -
+                            Sizes.hBottomBarHeight -
+                            Sizes.hEntityButtonHeightCollapsed -
                             16 -
                             topPadding),
                   );

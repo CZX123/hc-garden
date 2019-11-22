@@ -30,6 +30,7 @@ final ThemeData themeData = ThemeData(
   accentColor: Color(0xFF27B50E),
   accentColorBrightness: Brightness.dark,
   scaffoldBackgroundColor: Colors.grey[100],
+  textSelectionHandleColor: Colors.white,
   textTheme: lightText,
 );
 
@@ -45,6 +46,8 @@ final ThemeData darkThemeData = ThemeData(
   canvasColor: Colors.grey[900],
   bottomAppBarColor: Colors.grey[850],
   toggleableActiveColor: Colors.lightGreenAccent[400],
+  // indicatorColor: Colors.lightGreenAccent[400],
+  textSelectionHandleColor: Colors.lightGreenAccent[400],
   textTheme: darkText,
 );
 
@@ -95,7 +98,7 @@ const TextTheme textTheme = TextTheme(
   overline: TextStyle(
     fontSize: 15.5,
     fontStyle: FontStyle.italic,
-    height: 1.5,
+    height: 1.3,
     letterSpacing: 0.05,
   ),
 );

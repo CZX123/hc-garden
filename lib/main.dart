@@ -163,6 +163,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
+  bool _init = false;
   final _location = Location();
   final _pageIndex = ValueNotifier(1);
   TabController _tabController;
@@ -191,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage>
         appNotifier.pop(context);
         bottomSheetNotifier
           ..activeScrollController = _scrollControllers[_tabController.index]
-          ..animateTo(height - bottomHeight);
+          ..animateTo(height - Sizes.kBottomHeight);
         return false;
       }
       // If something wrong happens, navigator somehow still can be popped
@@ -204,15 +205,15 @@ class _MyHomePageState extends State<MyHomePage>
           ..isSearching = false
           ..searchTerm = '';
         return false;
-      } else if (animation.value < height - bottomHeight) {
-        bottomSheetNotifier.animateTo(height - bottomHeight);
+      } else if (animation.value < height - Sizes.kBottomHeight) {
+        bottomSheetNotifier.animateTo(height - Sizes.kBottomHeight);
         return false;
       }
       if (_pageIndex.value != 1) {
         _pageIndex.value = 1;
         bottomSheetNotifier
           ..draggingDisabled = false
-          ..animateTo(height - bottomHeight);
+          ..animateTo(height - Sizes.kBottomHeight);
         return false;
       }
       return true;
@@ -221,8 +222,8 @@ class _MyHomePageState extends State<MyHomePage>
       if (appNotifier.routes.isEmpty) {
         bottomSheetNotifier.activeScrollController =
             _scrollControllers[_tabController.index];
-        if (state == 1 && animation.value > height - bottomHeight) {
-          bottomSheetNotifier.animateTo(height - bottomHeight);
+        if (state == 1 && animation.value > height - Sizes.kBottomHeight) {
+          bottomSheetNotifier.animateTo(height - Sizes.kBottomHeight);
         }
         if (searchNotifier.searchTerm.isNotEmpty)
           searchNotifier.isSearching = true;
@@ -342,15 +343,17 @@ class _MyHomePageState extends State<MyHomePage>
     topPadding = MediaQuery.of(context).padding.top;
     height = MediaQuery.of(context).size.height;
     if (height == 0) return;
-    if (Provider.of<AppNotifier>(context, listen: false).state == 0)
+    if (!_init) {
       Provider.of<BottomSheetNotifier>(context, listen: false)
         ..snappingPositions.value = [
           0,
-          height - bottomHeight,
-          height - bottomBarHeight,
+          height - Sizes.kBottomHeight,
+          height - Sizes.hBottomBarHeight,
         ]
-        ..endCorrection = topPadding - offsetTranslation
+        ..endCorrection = topPadding - Sizes.hOffsetTranslation
         ..activeScrollController ??= _scrollControllers[_tabController.index];
+      _init = true;
+    }
   }
 
   @override
@@ -383,8 +386,9 @@ class _MyHomePageState extends State<MyHomePage>
                     ? ThemeNotifier.darkOverlayStyle
                     : ThemeNotifier.lightOverlayStyle)
                 .copyWith(
-              statusBarColor:
-                  Theme.of(context).bottomAppBarColor.withOpacity(isDark ? .5 : .8),
+              statusBarColor: Theme.of(context)
+                  .bottomAppBarColor
+                  .withOpacity(isDark ? .5 : .8),
               systemNavigationBarColor: Theme.of(context).bottomAppBarColor,
             ),
             child: WillPopScope(
@@ -395,12 +399,12 @@ class _MyHomePageState extends State<MyHomePage>
                 crossShrink: false,
                 child: height != 0
                     ? NestedBottomSheet(
-                        initialPosition: height - bottomHeight,
+                        initialPosition: height - Sizes.kBottomHeight,
                         background: Positioned(
                           left: 0,
                           top: 0,
                           right: 0,
-                          bottom: bottomBarHeight,
+                          bottom: Sizes.hBottomBarHeight,
                           child: ValueListenableBuilder(
                             valueListenable: _pageIndex,
                             builder: (context, pageIndex, child) {

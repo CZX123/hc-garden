@@ -52,7 +52,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
           Provider.of<BottomSheetNotifier>(
             context,
             listen: false,
-          ).animateTo(height - 48 - 96);
+          ).animateTo(height - Sizes.kCollapsedHeight);
           Provider.of<MapNotifier>(
             context,
             listen: false,
@@ -102,8 +102,8 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
             ).animation,
             builder: (context, value, child) {
               double h = 0;
-              if (value < height - 378) {
-                h = (1 - value / (height - 378)) * topPadding;
+              if (value < height - Sizes.kBottomHeight) {
+                h = (1 - value / (height - Sizes.kBottomHeight)) * topPadding;
                 if (value > 1)
                   widget.endContentOffset?.value = Offset(0, h + 16);
               }
@@ -112,8 +112,9 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
               );
             },
           ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(14, 16, 14, 16),
+          Container(
+            height: Sizes.kInfoRowHeight,
+            padding: EdgeInsets.fromLTRB(14, 0, 14, 0),
             child: Row(
               children: <Widget>[
                 ClipRRect(
@@ -131,7 +132,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                 ),
                 Expanded(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
@@ -148,6 +149,9 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
+                      const SizedBox(
+                        height: 2,
+                      ),
                     ],
                   ),
                 ),
@@ -155,7 +159,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
             ),
           ),
           Container(
-            height: 218,
+            height: Sizes.kImageHeight,
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
               scrollDirection: Axis.horizontal,
@@ -168,8 +172,10 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                         children: <Widget>[
                           CustomImage(
                             image,
-                            height: 218,
-                            width: newImages.length == 1 ? width - 32 : 324,
+                            height: Sizes.kImageHeight,
+                            width: newImages.length == 1
+                                ? width - 32
+                                : Sizes.kImageHeight / 2 * 3,
                             fit: BoxFit.cover,
                             placeholderColor: Theme.of(context).dividerColor,
                             saveInCache: false,

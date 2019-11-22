@@ -22,6 +22,7 @@ export 'main.dart';
 export 'bottom_navigation.dart';
 export 'data.dart';
 export 'debug.dart';
+export 'sizes.dart';
 export 'theme.dart';
 export 'about/about.dart';
 export 'explore/explore.dart';

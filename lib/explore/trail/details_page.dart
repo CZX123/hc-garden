@@ -56,7 +56,7 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 48),
+      padding: const EdgeInsets.only(bottom: Sizes.kBottomBarHeight),
       child: Material(
         color: Theme.of(context).bottomAppBarColor,
         child: CustomScrollView(
@@ -71,8 +71,8 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
                 ).animation,
                 builder: (context, value, child) {
                   double h = 0;
-                  if (value < height - bottomHeight) {
-                    h = (1 - value / (height - bottomHeight)) * topPadding;
+                  if (value < height - Sizes.kBottomHeight) {
+                    h = (1 - value / (height - Sizes.kBottomHeight)) * topPadding;
                   }
                   return Padding(
                     padding: EdgeInsets.only(top: h + 32),
@@ -237,7 +237,7 @@ class _LocationListRowState extends State<LocationListRow> {
         final sourceRect = Rect.fromLTWH(0, 69, width, 84);
         final anim = Tween<double>(
           begin: 0,
-          end: 1 / (height - bottomHeight),
+          end: 1 / (height - Sizes.kBottomHeight),
         ).animate(
           Provider.of<BottomSheetNotifier>(context, listen: false).animation,
         );

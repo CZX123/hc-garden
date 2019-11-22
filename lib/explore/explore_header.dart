@@ -1,5 +1,6 @@
 import '../library.dart';
 
+// TODO: Cater to smaller screens by removing/shifting some elements of the ExploreHeader, like the app logo
 class ExploreHeader extends StatelessWidget {
   final TabController tabController;
   const ExploreHeader({
@@ -15,10 +16,10 @@ class ExploreHeader extends StatelessWidget {
     );
     final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
-    final totalTranslation = offsetTranslation - topPadding;
+    final totalTranslation = Sizes.hOffsetTranslation - topPadding;
     final anim = Tween<double>(
       begin: 0,
-      end: 1 / (height - bottomHeight),
+      end: 1 / (height - Sizes.kBottomHeight),
     ).animate(bottomSheetNotifier.animation);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnnotatedRegion(
@@ -63,13 +64,13 @@ class ExploreHeader extends StatelessWidget {
               ),
               FadeTransition(
                 opacity: Tween<double>(
-                  begin: (24 + imageHeight) / 12 - totalTranslation / 12,
-                  end: (24 + imageHeight) / 12,
+                  begin: (24 + Sizes.hLogoHeight) / 12 - totalTranslation / 12,
+                  end: (24 + Sizes.hLogoHeight) / 12,
                 ).animate(anim),
                 child: Text(
                   'Explore HC Garden',
                   style: Theme.of(context).textTheme.display1.copyWith(
-                        height: headingHeight / 20,
+                        height: Sizes.hHeadingHeight / 20,
                       ),
                 ),
               ),
@@ -78,9 +79,9 @@ class ExploreHeader extends StatelessWidget {
               ),
               TrailButtonsRow(
                 opacity: Tween<double>(
-                  begin: (40 + imageHeight + headingHeight) / 40 -
+                  begin: (40 + Sizes.hLogoHeight + Sizes.hHeadingHeight) / 40 -
                       totalTranslation / 40,
-                  end: (40 + imageHeight + headingHeight) / 40,
+                  end: (40 + Sizes.hLogoHeight + Sizes.hHeadingHeight) / 40,
                 ).animate(anim),
               ),
               const SizedBox(
@@ -112,7 +113,7 @@ class AppLogo extends StatelessWidget {
         children: <Widget>[
           Image.asset(
             'assets/images/hci.png',
-            height: imageHeight,
+            height: Sizes.hLogoHeight,
           ),
           const SizedBox(
             width: 12,
@@ -148,7 +149,7 @@ class AppLogo extends StatelessWidget {
             scale: 1.1,
             child: Image.asset(
               'assets/images/app_logo/default.png',
-              height: imageHeight,
+              height: Sizes.hLogoHeight,
             ),
           ),
         ],
@@ -268,7 +269,7 @@ class TrailButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Container(
-                height: trailButtonHeight,
+                height: Sizes.hTrailButtonHeight,
                 alignment: Alignment.center,
                 child: Text(
                   trailName.toUpperCase(),
@@ -337,11 +338,11 @@ class FloraFaunaTabBar extends StatelessWidget {
                             valueListenable: animation,
                             builder: (context, value, child) {
                               double y = 0;
-                              double cardHeight = entityButtonHeight;
+                              double cardHeight = Sizes.hEntityButtonHeight;
                               if (value < 1) {
-                                cardHeight = entityButtonHeightCollapsed +
-                                    (entityButtonHeight -
-                                            entityButtonHeightCollapsed) *
+                                cardHeight = Sizes.hEntityButtonHeightCollapsed +
+                                    (Sizes.hEntityButtonHeight -
+                                            Sizes.hEntityButtonHeightCollapsed) *
                                         value;
                                 y = (value - 1) * 3;
                               }
@@ -364,7 +365,7 @@ class FloraFaunaTabBar extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            if (animation.value < height - bottomHeight) {
+                            if (animation.value < height - Sizes.kBottomHeight) {
                               tabController.animateTo(i);
                             } else {
                               tabController.animateTo(

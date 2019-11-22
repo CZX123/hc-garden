@@ -55,8 +55,8 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
             valueListenable: animation,
             builder: (context, value, child) {
               double h = 0;
-              if (value < height - 378) {
-                h = (1 - value / (height - 378)) * topPadding;
+              if (value < height - Sizes.kBottomHeight) {
+                h = (1 - value / (height - Sizes.kBottomHeight)) * topPadding;
                 if (value > 1)
                   widget.endContentOffset?.value = Offset(0, h + 16);
               }
@@ -66,7 +66,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
             },
           ),
           Container(
-            height: 96,
+            height: Sizes.kInfoRowHeight,
             child: Row(
               children: <Widget>[
                 const SizedBox(
@@ -132,9 +132,9 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                   minHeight: max(
                     height -
                         value -
-                        48 -
-                        96 -
-                        (1 - value / (height - 378)) * topPadding,
+                        Sizes.kBottomBarHeight -
+                        Sizes.kInfoRowHeight -
+                        (1 - value / (height - Sizes.kBottomHeight)) * topPadding,
                     0,
                   ),
                 ),
@@ -186,7 +186,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
             ),
           ),
           const SizedBox(
-            height: 48,
+            height: Sizes.kBottomBarHeight,
           ),
         ],
       ),

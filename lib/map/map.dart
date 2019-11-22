@@ -211,7 +211,7 @@ class MapNotifier extends ChangeNotifier {
     final metresPerPixel =
         156543.03392 * cos(center.latitude * pi / 180) / pow(2, zoom);
     // height of bottom sheet in metres, based on the map
-    final height = (bottomHeight - bottomBarHeight) / 2 * metresPerPixel;
+    final height = (Sizes.kBottomHeight - Sizes.hBottomBarHeight) / 2 * metresPerPixel;
     final angle = height / circumference * 360;
     return angle;
   }

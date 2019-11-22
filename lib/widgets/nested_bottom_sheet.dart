@@ -76,7 +76,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   bool _isLandscape = false;
 
   void animateTo(double end, [Duration duration]) {
-    if (end == _animationController.value) return;
+    if (end == _animationController?.value ?? end) return;
     assert(
       _sortedPositions.contains(end),
       'Value to animate to should be one of the snapping positions',
@@ -179,7 +179,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       if (_animationController.value < _sortedPositions[1]) {
         final range = _sortedPositions[1] - _sortedPositions.first;
         _animationController.value +=
-            (_bottomSheetNotifier.endCorrection / range + 1) *
+            (range / (range - _bottomSheetNotifier.endCorrection)) *
                 details.primaryDelta;
       } else {
         if (_animationController.value < _sortedPositions.last ||
@@ -256,17 +256,16 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _bottomSheetNotifier = Provider.of<BottomSheetNotifier>(context, listen: false);
     if (MediaQuery.of(context).orientation == Orientation.landscape) {
       _isLandscape = true;
-      animateTo(0);
+      if (!_bottomSheetNotifier.draggingDisabled) animateTo(0);
     } else {
       _isLandscape = false;
     }
     if (!_init) {
       final height = MediaQuery.of(context).size.height;
       if (height == 0) return;
-      _bottomSheetNotifier =
-          Provider.of<BottomSheetNotifier>(context, listen: false);
       _sortedPositions = _bottomSheetNotifier.snappingPositions.value;
       _sortedPositions.sort();
       final _initialPosition = widget.initialPosition ?? _sortedPositions.first;

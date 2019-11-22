@@ -432,7 +432,7 @@ class AppNotifier extends ChangeNotifier {
         routeInfo: routes.last,
       );
     }
-    print('After pop: $routes');
+    // print('After pop: $routes');
     navigatorKey.currentState.pop();
   }
 
@@ -449,7 +449,7 @@ class AppNotifier extends ChangeNotifier {
     if (routes.last.data == data) {
       routes.last.scrollController = scrollController;
       bottomSheetNotifier.activeScrollController = scrollController;
-      print('Updated scroll controller for ${routes.last.name}');
+      // print('Updated scroll controller for ${routes.last.name}');
     } else {
       throw 'Last route data is not equivalent!';
     }
@@ -468,7 +468,7 @@ class AppNotifier extends ChangeNotifier {
       routeInfo: routeInfo,
       disableDragging: disableDragging,
     );
-    print('After push: $routes');
+    // print('After push: $routes');
     return navigatorKey.currentState.push(route);
   }
 
@@ -484,6 +484,11 @@ class AppNotifier extends ChangeNotifier {
     );
     if (disableDragging) {
       _state = 2;
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
       notifyListeners();
       bottomSheetNotifier
         ..draggingDisabled = true
@@ -502,20 +507,25 @@ class AppNotifier extends ChangeNotifier {
       _state = 0;
       bottomSheetNotifier.snappingPositions.value = [
         0,
-        height - bottomHeight,
-        isHome ? height - bottomBarHeight : height - 48 - 76,
+        height - Sizes.kBottomHeight,
+        isHome
+            ? height - Sizes.hBottomBarHeight
+            : height - Sizes.tCollapsedHeight,
       ];
       if (isHome) {
         mapNotifier.animateBackToCenter(adjusted: true);
       } else {
-        final adjusted = bottomSheetNotifier.animation.value < height - 48 - 96;
+        final adjusted = bottomSheetNotifier.animation.value <
+            height - Sizes.kCollapsedHeight;
         mapNotifier.animateToTrail(
           locations: Provider.of<FirebaseData>(context, listen: false)
               .trails[routeInfo.data],
           adjusted: adjusted,
           mapSize: Size(
             width,
-            adjusted ? height - bottomHeight : height - 62,
+            adjusted
+                ? height - Sizes.kBottomHeight
+                : height - Sizes.hBottomBarHeight,
           ),
         );
       }
@@ -523,10 +533,11 @@ class AppNotifier extends ChangeNotifier {
       _state = 1;
       bottomSheetNotifier.snappingPositions.value = [
         0,
-        height - 48 - 96 - 218 - 16,
-        height - 48 - 96,
+        height - Sizes.kBottomHeight,
+        height - Sizes.kCollapsedHeight,
       ];
-      final adjusted = bottomSheetNotifier.animation.value < height - 48 - 96;
+      final adjusted =
+          bottomSheetNotifier.animation.value < height - Sizes.kCollapsedHeight;
       if (routeInfo.data is Entity) {
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
         Provider.of<SearchNotifier>(context, listen: false).isSearching = false;
@@ -536,7 +547,9 @@ class AppNotifier extends ChangeNotifier {
           adjusted: adjusted,
           mapSize: Size(
             width,
-            adjusted ? height - bottomHeight : height - 62,
+            adjusted
+                ? height - Sizes.kBottomHeight
+                : height - Sizes.hBottomBarHeight,
           ),
         );
       } else {
@@ -555,7 +568,7 @@ class AppNotifier extends ChangeNotifier {
     notifyListeners();
     bottomSheetNotifier
       ..draggingDisabled = false
-      ..endCorrection = isHome ? topPadding - offsetTranslation : topPadding
+      ..endCorrection = isHome ? topPadding - Sizes.hOffsetTranslation : topPadding
       ..activeScrollController = routeInfo?.scrollController;
   }
 }
