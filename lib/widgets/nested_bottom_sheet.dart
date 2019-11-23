@@ -210,25 +210,11 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       _animationController.animateWith(simulation);
     } else if (!_scrolling) {
       double end;
-      // if (velocity.abs() < 3200) {
       if (velocity < 0) {
         end = closestValue(_sortedPositions, start, strictlySmaller: true);
       } else {
         end = closestValue(_sortedPositions, start, strictlyBigger: true);
       }
-      // } else {
-      //   Simulation scrollSimulation;
-      //   if (_isIOS) {
-      //     scrollSimulation = FrictionSimulation(0.135, start, velocity * 0.91);
-      //   } else {
-      //     scrollSimulation = ClampingScrollSimulation(
-      //       position: _animationController.value,
-      //       velocity: velocity,
-      //     );
-      //   }
-      //   final finalX = scrollSimulation.x(double.infinity);
-      //   end = closestValue(_sortedPositions, finalX);
-      // }
       final simulation = ScrollSpringSimulation(
         spring,
         start,

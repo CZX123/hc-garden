@@ -498,8 +498,14 @@ class AppNotifier extends ChangeNotifier {
         );
       return;
     }
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    if (MediaQuery.of(context).orientation == Orientation.landscape) {
+      // Swap height and width
+      final temp = height;
+      height = width;
+      width = temp;
+    }
     final topPadding = MediaQuery.of(context).padding.top;
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
     if (isHome || routeInfo.data is Trail) {
@@ -568,7 +574,8 @@ class AppNotifier extends ChangeNotifier {
     notifyListeners();
     bottomSheetNotifier
       ..draggingDisabled = false
-      ..endCorrection = isHome ? topPadding - Sizes.hOffsetTranslation : topPadding
+      ..endCorrection =
+          isHome ? topPadding - Sizes.hOffsetTranslation : topPadding
       ..activeScrollController = routeInfo?.scrollController;
   }
 }

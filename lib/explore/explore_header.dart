@@ -189,11 +189,12 @@ class TrailButtonsRow extends StatelessWidget {
                   final trail = firebaseData.trails.keys.firstWhere((trail) {
                     return trail.name.contains(_trails[i].substring(0, 5));
                   });
-                  final trailLocations = firebaseData.trails[trail];
                   Provider.of<AppNotifier>(context).push(
                     context: context,
                     route: CrossFadePageRoute(
                       builder: (context) {
+                        final firebaseData = Provider.of<FirebaseData>(context);
+                        final trailLocations = firebaseData.trails[trail];
                         return TrailDetailsPage(
                           trail: trail,
                           trailLocations: trailLocations,
@@ -340,9 +341,11 @@ class FloraFaunaTabBar extends StatelessWidget {
                               double y = 0;
                               double cardHeight = Sizes.hEntityButtonHeight;
                               if (value < 1) {
-                                cardHeight = Sizes.hEntityButtonHeightCollapsed +
+                                cardHeight = Sizes
+                                        .hEntityButtonHeightCollapsed +
                                     (Sizes.hEntityButtonHeight -
-                                            Sizes.hEntityButtonHeightCollapsed) *
+                                            Sizes
+                                                .hEntityButtonHeightCollapsed) *
                                         value;
                                 y = (value - 1) * 3;
                               }
@@ -365,7 +368,8 @@ class FloraFaunaTabBar extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            if (animation.value < height - Sizes.kBottomHeight) {
+                            if (animation.value <
+                                height - Sizes.kBottomHeight) {
                               tabController.animateTo(i);
                             } else {
                               tabController.animateTo(

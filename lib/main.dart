@@ -13,8 +13,9 @@ class HcGardenApp extends StatefulWidget {
 
 class _HcGardenAppState extends State<HcGardenApp> {
   final _location = Location();
-  final _themeNotifier = ThemeNotifier(false);
+  final _themeNotifier = ThemeNotifier(null);
   final _mapNotifier = MapNotifier();
+  bool _firstTime = false;
 
   void checkPermission() async {
     var granted = await _location.hasPermission();
@@ -39,39 +40,24 @@ class _HcGardenAppState extends State<HcGardenApp> {
   @override
   void initState() {
     super.initState();
-    SharedPreferences.getInstance().then((prefs) {
-      _themeNotifier.value = prefs.getBool('isDark') ?? false;
-      _mapNotifier.mapType = CustomMapType.values[prefs.getInt('mapType') ?? 0];
-    });
-    BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(),
-      'assets/images/google_maps/yellow_marker.png',
-    ).then((descriptor) {
-      _mapNotifier.darkThemeMarkerIcons.insert(0, descriptor);
-    });
-    BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(),
-      'assets/images/google_maps/pink_marker.png',
-    ).then((descriptor) {
-      _mapNotifier.darkThemeMarkerIcons.insert(
-        _mapNotifier.darkThemeMarkerIcons.isEmpty ? 0 : 1,
-        descriptor,
-      );
-    });
-    BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(),
-      'assets/images/google_maps/blue_marker.png',
-    ).then((descriptor) {
-      _mapNotifier.darkThemeMarkerIcons.insert(
-        min(2, _mapNotifier.darkThemeMarkerIcons.length),
-        descriptor,
-      );
-    });
-    BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(),
-      'assets/images/google_maps/green_marker.png',
-    ).then((descriptor) {
-      _mapNotifier.darkThemeMarkerIcons.add(descriptor);
+    SharedPreferences.getInstance()
+      ..then((prefs) {
+        final isDark = prefs.getBool('isDark');
+        _firstTime = isDark == null;
+        _themeNotifier.value = isDark ?? false;
+        _mapNotifier.mapType =
+            CustomMapType.values[prefs.getInt('mapType') ?? 0];
+      });
+    final markerColors = ['yellow', 'pink', 'blue', 'green'];
+    Future.wait<BitmapDescriptor>(
+      markerColors.map((color) {
+        return BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(),
+          'assets/images/google_maps/${color}_marker.png',
+        );
+      }),
+    ).then((bitmapList) {
+      _mapNotifier.darkThemeMarkerIcons = bitmapList;
     });
   }
 
@@ -117,6 +103,8 @@ class _HcGardenAppState extends State<HcGardenApp> {
       ],
       child: Consumer<ThemeNotifier>(
         builder: (context, themeNotifier, child) {
+          if (themeNotifier.value == null) return const SizedBox.shrink();
+          // TODO: Onboarding: Make use of the _firstTime variable to show different screens
           return Consumer<DebugNotifier>(
             builder: (context, debugInfo, child) {
               return MaterialApp(

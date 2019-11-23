@@ -42,7 +42,7 @@ final ThemeData darkThemeData = ThemeData(
   accentColor: Colors.lightGreenAccent[400],
   accentColorBrightness: Brightness.dark,
   cardColor: Colors.grey[900],
-  scaffoldBackgroundColor: Color(0xFF121212),
+  scaffoldBackgroundColor: Color(0xFF050505),
   canvasColor: Colors.grey[900],
   bottomAppBarColor: Colors.grey[850],
   toggleableActiveColor: Colors.lightGreenAccent[400],

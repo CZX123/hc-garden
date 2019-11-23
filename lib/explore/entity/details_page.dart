@@ -199,7 +199,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                                         );
                                       },
                                       transitionDuration:
-                                          const Duration(milliseconds: 340),
+                                          const Duration(milliseconds: 300),
                                     ),
                                     routeInfo: RouteInfo(name: 'Gallery'),
                                     disableDragging: true,

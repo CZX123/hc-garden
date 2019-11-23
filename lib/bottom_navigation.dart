@@ -40,7 +40,8 @@ class BottomSheetFooter extends StatelessWidget {
                   } else if (value > 1) {
                     offset = Offset(0, 0);
                   } else {
-                    offset = Offset(0, Sizes.hBottomBarHeight * 2 * (1 - value));
+                    offset =
+                        Offset(0, Sizes.hBottomBarHeight * 2 * (1 - value));
                   }
                   return Transform.translate(
                     offset: offset,
@@ -134,11 +135,11 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
   int _state = 0;
   SearchNotifier _searchNotifier;
   bool _isSearching = false;
+  bool _themeIsChanging = true;
   AnimationController _animationController;
   AnimationController _fabPressController;
 
   void stateListener() {
-    if (_appNotifier.state == 2) return;
     if (_appNotifier.state == 1) {
       _animationController.animateTo(
         1,
@@ -179,6 +180,8 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
           curve: hidden ? Interval(.5, 1) : Curves.fastOutSlowIn,
         );
       }
+    } else {
+      _themeIsChanging = false;
     }
     _state = _appNotifier.state;
   }
@@ -221,6 +224,7 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _themeIsChanging = true;
     if (!init) {
       _appNotifier = Provider.of<AppNotifier>(
         context,
@@ -293,7 +297,9 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
               builder: (context, value, child) {
                 return AnimatedTheme(
                   data: value ? darkThemeData : themeData,
-                  duration: const Duration(milliseconds: 340),
+                  duration: _themeIsChanging
+                      ? kThemeAnimationDuration
+                      : const Duration(milliseconds: 300),
                   child: child,
                 );
               },

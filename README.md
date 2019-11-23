@@ -35,6 +35,10 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 #### About Screen
 - Update to whatever new design suggested
 
+#### Breadcrumb Navigation
+- Breadcrumbs in the bottom app bar when going to different pages, to indicate navigation history, and also easily go back home
+- Rough plan: Use AnimatedList to animate new active breadcrumb into view, Integrate AnimatedListState methods into AppNotifier push and pop methods, Use TextPainter to calculate padding needed to centralise active breadcrumb.
+
 ### Low Priority
 
 #### Search

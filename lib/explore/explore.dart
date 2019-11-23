@@ -14,24 +14,19 @@ class ExploreBody extends StatefulWidget {
 }
 
 class _ExploreBodyState extends State<ExploreBody> {
-  HeroController _heroController;
-  List<NavigatorObserver> _navigatorObservers = [];
+  // HeroController _heroController;
+  // List<NavigatorObserver> _navigatorObservers = [];
 
-  RectTween _createRectTween(Rect begin, Rect end) {
-    return MaterialRectArcTween(begin: begin, end: end);
-  }
+  // RectTween _createRectTween(Rect begin, Rect end) {
+  //   return MaterialRectArcTween(begin: begin, end: end);
+  // }
 
-  @override
-  void initState() {
-    super.initState();
-    _heroController = HeroController(createRectTween: _createRectTween);
-    _navigatorObservers.add(_heroController);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   //_heroController = HeroController(createRectTween: _createRectTween);
+  //   //_navigatorObservers.add(_heroController);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +54,11 @@ class _ExploreBodyState extends State<ExploreBody> {
         Navigator(
           key: Provider.of<AppNotifier>(context, listen: false).navigatorKey,
           onGenerateRoute: (settings) {
-            if (settings.name == Navigator.defaultRouteName)
+            if (settings.isInitialRoute)
               return initialRoute;
             return null;
           },
-          observers: _navigatorObservers,
+          //observers: _navigatorObservers,
         ),
         Selector<AppNotifier, bool>(
           selector: (context, appNotifier) => appNotifier.state == 0,

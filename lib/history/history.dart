@@ -150,7 +150,7 @@ class _HistoryPageState extends State<HistoryPage>
                                               );
                                             },
                                             transitionDuration: const Duration(
-                                                milliseconds: 340),
+                                                milliseconds: 300),
                                           ),
                                         );
                                         SystemChrome.setPreferredOrientations([

@@ -144,7 +144,6 @@ Marker generateMarker({
   TrailLocation location,
 }) {
   final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
-  final hues = MapNotifier.hues;
   return Marker(
     onTap: mapNotifier.stopAnimating,
     markerId: MarkerId('${trail.id} ${location.id}'),
@@ -186,7 +185,7 @@ Marker generateMarker({
     ),
     icon: mapNotifier.mapType == CustomMapType.dark
         ? mapNotifier.darkThemeMarkerIcons[trail.id - 1]
-        : BitmapDescriptor.defaultMarkerWithHue(hues[trail.id - 1]),
+        : mapNotifier.lightThemeMarkerIcons[trail.id - 1],
   );
 }
 
@@ -201,8 +200,25 @@ class MapNotifier extends ChangeNotifier {
   bool permissionEnabled;
   bool gpsOn;
   GoogleMapController mapController;
-  static const hues = [38.0, 340.0, 199.0];
-  List<BitmapDescriptor> darkThemeMarkerIcons = [];
+  final lightThemeMarkerIcons = [
+    BitmapDescriptor.defaultMarkerWithHue(38),
+    BitmapDescriptor.defaultMarkerWithHue(340),
+    BitmapDescriptor.defaultMarkerWithHue(199),
+    BitmapDescriptor.defaultMarkerWithHue(90),
+  ];
+  List<BitmapDescriptor> _darkThemeMarkerIcons;
+  List<BitmapDescriptor> get darkThemeMarkerIcons {
+    if (_darkThemeMarkerIcons == null) {
+      // If something goes wrong, return the light theme icons instead so no fatal errors occur
+      return lightThemeMarkerIcons;
+    }
+    return _darkThemeMarkerIcons;
+  }
+
+  set darkThemeMarkerIcons(List<BitmapDescriptor> darkThemeMarkerIcons) {
+    _darkThemeMarkerIcons = darkThemeMarkerIcons;
+  }
+
   CameraPosition cameraPosition;
 
   /// Translation needed to move the map up if bottom sheet is half expanded. (+ve values)
@@ -211,7 +227,8 @@ class MapNotifier extends ChangeNotifier {
     final metresPerPixel =
         156543.03392 * cos(center.latitude * pi / 180) / pow(2, zoom);
     // height of bottom sheet in metres, based on the map
-    final height = (Sizes.kBottomHeight - Sizes.hBottomBarHeight) / 2 * metresPerPixel;
+    final height =
+        (Sizes.kBottomHeight - Sizes.hBottomBarHeight) / 2 * metresPerPixel;
     final angle = height / circumference * 360;
     return angle;
   }
@@ -243,18 +260,16 @@ class MapNotifier extends ChangeNotifier {
         if (_mapType == CustomMapType.dark) {
           for (var id in defaultMarkers?.keys ?? []) {
             defaultMarkers[id] = defaultMarkers[id].copyWith(
-              iconParam: BitmapDescriptor.defaultMarkerWithHue(
-                hues[int.parse(id.value.split(' ').first) - 1],
-              ),
+              iconParam: lightThemeMarkerIcons[
+                  int.parse(id.value.split(' ').first) - 1],
             );
           }
           for (var id in markers?.keys ?? []) {
             markers[id] = markers[id].copyWith(
-              iconParam: BitmapDescriptor.defaultMarkerWithHue(
-                greenMarkers.contains(id)
-                    ? 90
-                    : hues[int.parse(id.value.split(' ').first) - 1],
-              ),
+              iconParam: greenMarkers.contains(id)
+                  ? lightThemeMarkerIcons.last
+                  : lightThemeMarkerIcons[
+                      int.parse(id.value.split(' ').first) - 1],
             );
           }
         }
@@ -274,7 +289,7 @@ class MapNotifier extends ChangeNotifier {
   Map<MarkerId, Marker> get defaultMarkers => _defaultMarkers;
   set defaultMarkers(Map<MarkerId, Marker> defaultMarkers) {
     _defaultMarkers = defaultMarkers;
-    if (_markers == null) {
+    if (_markers == null || isDefaultMarkers) {
       markers = _defaultMarkers;
       isDefaultMarkers = true;
     }
@@ -298,7 +313,7 @@ class MapNotifier extends ChangeNotifier {
     markers[markerId] = markers[markerId].copyWith(
       iconParam: mapType == CustomMapType.dark
           ? darkThemeMarkerIcons.last
-          : BitmapDescriptor.defaultMarkerWithHue(90),
+          : lightThemeMarkerIcons.last,
     );
   }
 
@@ -306,6 +321,7 @@ class MapNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Animate to a specific point
   void _animateToPoint(LatLng point, double zoom, [bool adjusted = false]) {
     mapController.animateCamera(CameraUpdate.newLatLngZoom(
       adjusted
@@ -318,6 +334,7 @@ class MapNotifier extends ChangeNotifier {
     ));
   }
 
+  /// Get the correct zoom level of the map from the bounds, and mapSize in pts
   double _getZoomFromBounds(LatLngBounds bounds, Size mapSize) {
     final centerLat =
         (bounds.northeast.latitude + bounds.southwest.latitude) / 2;
@@ -332,6 +349,7 @@ class MapNotifier extends ChangeNotifier {
     return zoom;
   }
 
+  /// Animate to the bounds of a list of points
   void _animateToPoints(
     List<LatLng> points, [
     bool adjusted = false,

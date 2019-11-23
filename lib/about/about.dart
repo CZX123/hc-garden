@@ -97,76 +97,89 @@ class _AboutPageState extends State<AboutPage>
                     ),
                   );
                 }
-                return ExpansionPanelList(
-                  expansionCallback: (int index, bool isExpanded) {
-                    setState(() {
-                      aboutPageDataObject.value[index].isExpanded = !isExpanded;
-                    });
-                  },
-                  children: aboutPageDataObject.value.map((aboutPageData) {
-                    final List<String> bodyStrings =
-                        aboutPageData.body.split('\n');
-                    return ExpansionPanel(
-                      canTapOnHeader: true,
-                      headerBuilder: (BuildContext context, bool isExpanded) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8, left: 24),
-                          child: Text(
-                            aboutPageData.title,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
+                return AnnotatedRegion(
+                  value: (isDark
+                          ? ThemeNotifier.darkOverlayStyle
+                          : ThemeNotifier.lightOverlayStyle)
+                      .copyWith(
+                    statusBarColor: Theme.of(context)
+                        .canvasColor
+                        .withOpacity(isDark ? .5 : .8),
+                    systemNavigationBarColor:
+                        Theme.of(context).bottomAppBarColor,
+                  ),
+                  child: ExpansionPanelList(
+                    expansionCallback: (int index, bool isExpanded) {
+                      setState(() {
+                        aboutPageDataObject.value[index].isExpanded =
+                            !isExpanded;
+                      });
+                    },
+                    children: aboutPageDataObject.value.map((aboutPageData) {
+                      final List<String> bodyStrings =
+                          aboutPageData.body.split('\n');
+                      return ExpansionPanel(
+                        canTapOnHeader: true,
+                        headerBuilder: (BuildContext context, bool isExpanded) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8, left: 24),
+                            child: Text(
+                              aboutPageData.title,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      body: Padding(
-                          padding: const EdgeInsets.only(bottom: 28),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(24, 0, 24, 8),
-                                child: Text(
-                                  aboutPageData.quote,
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    color: Colors.grey,
-                                    fontStyle: FontStyle.italic,
+                          );
+                        },
+                        body: Padding(
+                            padding: const EdgeInsets.only(bottom: 28),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                                  child: Text(
+                                    aboutPageData.quote,
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: Colors.grey,
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                                child: Column(
-                                  children: <Widget>[
-                                    for (var bodyString in bodyStrings)
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 10,
-                                        ),
-                                        child: Text(
-                                          bodyString,
-                                          style: TextStyle(
-                                            fontSize: 15,
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                                  child: Column(
+                                    children: <Widget>[
+                                      for (var bodyString in bodyStrings)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 10,
                                           ),
-                                          textAlign: aboutPageData.title ==
-                                                  'References'
-                                              ? TextAlign.left
-                                              : TextAlign.justify,
+                                          child: Text(
+                                            bodyString,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                            ),
+                                            textAlign: aboutPageData.title ==
+                                                    'References'
+                                                ? TextAlign.left
+                                                : TextAlign.justify,
+                                          ),
                                         ),
-                                      ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          )),
-                      isExpanded: aboutPageData.isExpanded,
-                    );
-                  }).toList(),
+                              ],
+                            )),
+                        isExpanded: aboutPageData.isExpanded,
+                      );
+                    }).toList(),
+                  ),
                 );
               },
               itemCount: 2,
