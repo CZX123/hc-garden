@@ -88,6 +88,9 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final bottomSheetNotifier =
+        Provider.of<BottomSheetNotifier>(context, listen: false);
+    final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
     final newImages = widget.entity.images.map(lowerRes).toList();
     final child = SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
@@ -96,14 +99,11 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           ValueListenableBuilder(
-            valueListenable: Provider.of<BottomSheetNotifier>(
-              context,
-              listen: false,
-            ).animation,
+            valueListenable: bottomSheetNotifier.animation,
             builder: (context, value, child) {
               double h = 0;
-              if (value < height - Sizes.kBottomHeight) {
-                h = (1 - value / (height - Sizes.kBottomHeight)) * topPadding;
+              if (value < paddingBreakpoint) {
+                h = (1 - value / paddingBreakpoint) * topPadding;
                 if (value > 1)
                   widget.endContentOffset?.value = Offset(0, h + 16);
               }

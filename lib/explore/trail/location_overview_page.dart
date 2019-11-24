@@ -44,19 +44,19 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    final animation =
-        Provider.of<BottomSheetNotifier>(context, listen: false).animation;
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(context, listen: false);
+    final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
     final child = SingleChildScrollView(
       controller: _scrollController,
       physics: NeverScrollableScrollPhysics(),
       child: Column(
         children: <Widget>[
           ValueListenableBuilder<double>(
-            valueListenable: animation,
+            valueListenable: bottomSheetNotifier.animation,
             builder: (context, value, child) {
               double h = 0;
-              if (value < height - Sizes.kBottomHeight) {
-                h = (1 - value / (height - Sizes.kBottomHeight)) * topPadding;
+              if (value < paddingBreakpoint) {
+                h = (1 - value / paddingBreakpoint) * topPadding;
                 if (value > 1)
                   widget.endContentOffset?.value = Offset(0, h + 16);
               }
@@ -124,7 +124,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
             ),
           ),
           ValueListenableBuilder<double>(
-            valueListenable: animation,
+            valueListenable: bottomSheetNotifier.animation,
             builder: (context, value, child) {
               return Container(
                 alignment: Alignment.center,

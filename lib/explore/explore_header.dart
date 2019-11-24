@@ -8,18 +8,21 @@ class ExploreHeader extends StatelessWidget {
     @required this.tabController,
   }) : super(key: key);
 
+  double _getPaddingBreakPoint(BottomSheetNotifier bottomSheetNotifier) {
+    return bottomSheetNotifier.snappingPositions.value[1];
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
       context,
       listen: false,
     );
-    final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
     final totalTranslation = Sizes.hOffsetTranslation - topPadding;
     final anim = Tween<double>(
       begin: 0,
-      end: 1 / (height - Sizes.kBottomHeight),
+      end: 1 / _getPaddingBreakPoint(bottomSheetNotifier),
     ).animate(bottomSheetNotifier.animation);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnnotatedRegion(

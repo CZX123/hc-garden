@@ -7,16 +7,19 @@ class BottomSheetFooter extends StatelessWidget {
     @required this.pageIndex,
   }) : super(key: key);
 
+  double _getPaddingBreakPoint(BottomSheetNotifier bottomSheetNotifier) {
+    return bottomSheetNotifier.snappingPositions.value[1];
+  }
+
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
     final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
       context,
       listen: false,
     );
     final anim = Tween<double>(
       begin: 0,
-      end: 1 / (height - Sizes.kBottomHeight),
+      end: 1 / _getPaddingBreakPoint(bottomSheetNotifier),
     ).animate(bottomSheetNotifier.animation);
     return Stack(
       children: <Widget>[
@@ -31,7 +34,7 @@ class BottomSheetFooter extends StatelessWidget {
               right: 0,
               bottom: 0,
               height: Sizes.hBottomBarHeight,
-              child: ValueListenableBuilder(
+              child: ValueListenableBuilder<double>(
                 valueListenable: anim,
                 builder: (context, value, child) {
                   Offset offset;
@@ -40,8 +43,12 @@ class BottomSheetFooter extends StatelessWidget {
                   } else if (value > 1) {
                     offset = Offset(0, 0);
                   } else {
-                    offset =
-                        Offset(0, Sizes.hBottomBarHeight * 2 * (1 - value));
+                    offset = Offset(
+                        0,
+                        Sizes.hBottomBarHeight *
+                            2 *
+                            (1 - value));
+                  //print('$value, $paddingBreakpoint, $offset');
                   }
                   return Transform.translate(
                     offset: offset,
@@ -81,14 +88,14 @@ class BottomSheetFooter extends StatelessWidget {
                       if (index == 1) {
                         bottomSheetNotifier
                           ..draggingDisabled = false
-                          ..animateTo(height - Sizes.kBottomHeight);
+                          ..animateTo(bottomSheetNotifier.snappingPositions.value[1]);
                       } else {
                         bottomSheetNotifier
-                          ..draggingDisabled = true
                           ..animateTo(
-                            height - Sizes.hBottomBarHeight,
+                            bottomSheetNotifier.snappingPositions.value.last,
                             const Duration(milliseconds: 240),
-                          );
+                          )
+                          ..draggingDisabled = true;
                       }
                       pageIndex.value = index;
                     },
@@ -363,12 +370,17 @@ class _AnimatedNotchedAppBarState extends State<AnimatedNotchedAppBar>
                                   );
                                 },
                                 child: Tooltip(
-                                  message: 'Sort',
+                                  message: 'Filter',
                                   preferBelow: false,
                                   child: IconButton(
-                                    icon: const Icon(Icons.sort),
-                                    onPressed:
-                                        Scaffold.of(context).openEndDrawer,
+                                    icon: const Icon(Icons.filter_list),
+                                    onPressed: () {
+                                      if (Provider.of<AppNotifier>(context,
+                                              listen: false)
+                                          .routes
+                                          .isEmpty)
+                                        Scaffold.of(context).openEndDrawer();
+                                    },
                                   ),
                                 ),
                               ),

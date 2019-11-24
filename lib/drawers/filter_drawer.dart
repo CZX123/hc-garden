@@ -1,7 +1,7 @@
 import '../library.dart';
 
-class SortingDrawer extends StatelessWidget {
-  const SortingDrawer({Key key}) : super(key: key);
+class FilterDrawer extends StatelessWidget {
+  const FilterDrawer({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class SortingDrawer extends StatelessWidget {
                   return firebaseData.trails.keys.toList();
                 },
                 builder: (context, allTrails, child) {
-                  return Selector<SortNotifier, List<Trail>>(
+                  return Selector<FilterNotifier, List<Trail>>(
                     selector: (context, sortNotifier) {
                       return sortNotifier.selectedTrails;
                     },
@@ -33,7 +33,7 @@ class SortingDrawer extends StatelessWidget {
                           return const SizedBox.shrink();
                         else {
                           selectedTrails = List.from(allTrails);
-                          Provider.of<SortNotifier>(context, listen: false)
+                          Provider.of<FilterNotifier>(context, listen: false)
                               .updateSelectedTrailsDiscreetly(selectedTrails);
                         }
                       }
@@ -107,7 +107,7 @@ class SortingDrawer extends StatelessWidget {
                                   checkColor: Theme.of(context).canvasColor,
                                   onChanged: (value) {
                                     final sortNotifier =
-                                        Provider.of<SortNotifier>(
+                                        Provider.of<FilterNotifier>(
                                       context,
                                       listen: false,
                                     );
@@ -136,7 +136,7 @@ class SortingDrawer extends StatelessWidget {
   }
 }
 
-class SortNotifier extends ChangeNotifier {
+class FilterNotifier extends ChangeNotifier {
   List<Trail> _selectedTrails;
   List<Trail> get selectedTrails => _selectedTrails;
   set selectedTrails(List<Trail> selectedTrails) {

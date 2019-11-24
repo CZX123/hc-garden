@@ -422,12 +422,12 @@ class AppNotifier extends ChangeNotifier {
   void pop(BuildContext context) {
     routes.removeLast();
     if (routes.isEmpty) {
-      _changeState(
+      changeState(
         context: context,
         isHome: true,
       );
     } else {
-      _changeState(
+      changeState(
         context: context,
         routeInfo: routes.last,
       );
@@ -463,7 +463,7 @@ class AppNotifier extends ChangeNotifier {
     bool disableDragging = false,
   }) async {
     routes.add(routeInfo);
-    _changeState(
+    changeState(
       context: context,
       routeInfo: routeInfo,
       disableDragging: disableDragging,
@@ -472,24 +472,25 @@ class AppNotifier extends ChangeNotifier {
     return navigatorKey.currentState.push(route);
   }
 
-  void _changeState({
+  void changeState({
     @required BuildContext context,
     RouteInfo routeInfo,
     bool isHome = false,
     bool disableDragging = false,
+    bool notify = true,
   }) {
     final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
       context,
       listen: false,
     );
-    if (disableDragging) {
+    if (disableDragging && !isHome) {
       _state = 2;
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
-      notifyListeners();
+      if (notify) notifyListeners();
       bottomSheetNotifier
         ..draggingDisabled = true
         ..animateTo(
@@ -500,12 +501,7 @@ class AppNotifier extends ChangeNotifier {
     }
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    if (MediaQuery.of(context).orientation == Orientation.landscape) {
-      // Swap height and width
-      final temp = height;
-      height = width;
-      width = temp;
-    }
+    final heightTooSmall = height - Sizes.kBottomHeight < 100;
     final topPadding = MediaQuery.of(context).padding.top;
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
     if (isHome || routeInfo.data is Trail) {
@@ -513,7 +509,10 @@ class AppNotifier extends ChangeNotifier {
       _state = 0;
       bottomSheetNotifier.snappingPositions.value = [
         0,
-        height - Sizes.kBottomHeight,
+        if (!heightTooSmall)
+          height - Sizes.kBottomHeight
+        else if (isHome)
+          height - Sizes.kBottomHeight + Sizes.hEntityButtonHeight + 8,
         isHome
             ? height - Sizes.hBottomBarHeight
             : height - Sizes.tCollapsedHeight,
@@ -522,7 +521,8 @@ class AppNotifier extends ChangeNotifier {
         mapNotifier.animateBackToCenter(adjusted: true);
       } else {
         final adjusted = bottomSheetNotifier.animation.value <
-            height - Sizes.kCollapsedHeight;
+                height - Sizes.kCollapsedHeight &&
+            !heightTooSmall;
         mapNotifier.animateToTrail(
           locations: Provider.of<FirebaseData>(context, listen: false)
               .trails[routeInfo.data],
@@ -539,11 +539,12 @@ class AppNotifier extends ChangeNotifier {
       _state = 1;
       bottomSheetNotifier.snappingPositions.value = [
         0,
-        height - Sizes.kBottomHeight,
+        if (!heightTooSmall) height - Sizes.kBottomHeight,
         height - Sizes.kCollapsedHeight,
       ];
-      final adjusted =
-          bottomSheetNotifier.animation.value < height - Sizes.kCollapsedHeight;
+      final adjusted = bottomSheetNotifier.animation.value <
+              height - Sizes.kCollapsedHeight &&
+          !heightTooSmall;
       if (routeInfo.data is Entity) {
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
         Provider.of<SearchNotifier>(context, listen: false).isSearching = false;
@@ -571,9 +572,9 @@ class AppNotifier extends ChangeNotifier {
         ]);
       }
     }
-    notifyListeners();
+    if (notify) notifyListeners();
     bottomSheetNotifier
-      ..draggingDisabled = false
+      ..draggingDisabled = disableDragging
       ..endCorrection =
           isHome ? topPadding - Sizes.hOffsetTranslation : topPadding
       ..activeScrollController = routeInfo?.scrollController;

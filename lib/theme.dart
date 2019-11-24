@@ -3,12 +3,16 @@ import 'library.dart';
 class ThemeNotifier extends ValueNotifier<bool> {
   ThemeNotifier(bool value) : super(value);
 
-  static final lightOverlayStyle = SystemUiOverlayStyle.dark.copyWith(
+  static final lightOverlayStyle = SystemUiOverlayStyle(
+    statusBarIconBrightness: Brightness.dark,
     statusBarColor: Colors.white.withOpacity(.5),
+    systemNavigationBarIconBrightness: Brightness.dark,
     systemNavigationBarColor: Colors.white,
   );
-  static final darkOverlayStyle = SystemUiOverlayStyle.light.copyWith(
+  static final darkOverlayStyle = SystemUiOverlayStyle(
+    statusBarIconBrightness: Brightness.light,
     statusBarColor: Colors.grey[850].withOpacity(.5),
+    systemNavigationBarIconBrightness: Brightness.light,
     systemNavigationBarColor: Colors.grey[850],
   );
 

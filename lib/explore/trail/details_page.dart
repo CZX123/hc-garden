@@ -54,7 +54,8 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final height = MediaQuery.of(context).size.height;
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(context, listen: false);
+    final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
     return Padding(
       padding: const EdgeInsets.only(bottom: Sizes.kBottomBarHeight),
       child: Material(
@@ -65,14 +66,11 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
           slivers: <Widget>[
             SliverToBoxAdapter(
               child: ValueListenableBuilder(
-                valueListenable: Provider.of<BottomSheetNotifier>(
-                  context,
-                  listen: false,
-                ).animation,
+                valueListenable: bottomSheetNotifier.animation,
                 builder: (context, value, child) {
                   double h = 0;
-                  if (value < height - Sizes.kBottomHeight) {
-                    h = (1 - value / (height - Sizes.kBottomHeight)) * topPadding;
+                  if (value < paddingBreakpoint) {
+                    h = (1 - value / paddingBreakpoint) * topPadding;
                   }
                   return Padding(
                     padding: EdgeInsets.only(top: h + 32),

@@ -73,7 +73,6 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   Drag _scrollDrag;
   ScrollHoldController _scrollHold;
   bool _scrolling;
-  bool _isLandscape = false;
 
   void animateTo(double end, [Duration duration]) {
     if (end == _animationController?.value ?? end) return;
@@ -155,11 +154,10 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
   void dragUpdate(DragUpdateDetails details) {
     final controller = _bottomSheetNotifier.activeScrollController;
     // Scrolling the inner scroll view
-    if (_isLandscape ||
-        controller != null &&
-            controller.hasClients &&
-            _animationController.value == _sortedPositions.first &&
-            (details.primaryDelta < 0 || controller.offset > 0)) {
+    if (controller != null &&
+        controller.hasClients &&
+        _animationController.value == _sortedPositions.first &&
+        (details.primaryDelta < 0 || controller.offset > 0)) {
       if (_scrollDrag == null) {
         _scrollDrag = controller.position.drag(
           DragStartDetails(
@@ -233,21 +231,29 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     final newSortedPositions = _bottomSheetNotifier.snappingPositions.value;
     newSortedPositions.sort();
     if (listEquals(_sortedPositions, newSortedPositions)) return;
-    _sortedPositions = newSortedPositions;
-    if (!_sortedPositions.contains(_animationController.value)) {
-      animateTo(closestValue(_sortedPositions, _animationController.value));
+    if (!newSortedPositions.contains(_animationController.value)) {
+      if (_animationController.value == _sortedPositions.last) {
+        _sortedPositions = newSortedPositions;
+        _animationController.value = _sortedPositions.last;
+      } else {
+        _sortedPositions = newSortedPositions;
+        animateTo(closestValue(_sortedPositions, _animationController.value));
+      }
+    } else {
+      _sortedPositions = newSortedPositions;
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _bottomSheetNotifier = Provider.of<BottomSheetNotifier>(context, listen: false);
-    if (MediaQuery.of(context).orientation == Orientation.landscape) {
-      _isLandscape = true;
-      if (!_bottomSheetNotifier.draggingDisabled) animateTo(0);
-    } else {
-      _isLandscape = false;
+    _bottomSheetNotifier =
+        Provider.of<BottomSheetNotifier>(context, listen: false);
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    if (MediaQuery.of(context).orientation == Orientation.landscape &&
+        appNotifier.routes.isNotEmpty &&
+        appNotifier.routes.last.data is TrailLocationOverviewPage) {
+      animateTo(0);
     }
     if (!_init) {
       final height = MediaQuery.of(context).size.height;

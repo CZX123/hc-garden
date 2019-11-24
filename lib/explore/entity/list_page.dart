@@ -39,7 +39,7 @@ class EntityListPage extends StatelessWidget {
         }
         return false;
       },
-      child: Selector<SortNotifier, List<Trail>>(
+      child: Selector<FilterNotifier, List<Trail>>(
         selector: (context, sortNotifier) {
           return sortNotifier.selectedTrails;
         },
@@ -50,7 +50,7 @@ class EntityListPage extends StatelessWidget {
                     ?.trails
                     ?.keys);
             if (selectedTrails == null) return const SizedBox.shrink();
-            Provider.of<SortNotifier>(context, listen: false)
+            Provider.of<FilterNotifier>(context, listen: false)
                 .updateSelectedTrailsDiscreetly(selectedTrails);
           }
           List<Entity> updatedEntityList = entityList;
@@ -108,7 +108,7 @@ class EntityListPage extends StatelessWidget {
                     : ListView.builder(
                         key: ValueKey(
                             searchTerm + updatedEntityList.length.toString()),
-                        padding: EdgeInsets.fromLTRB(0, 16, 0, searchTerm.isEmpty ? 96 : 64),
+                        padding: EdgeInsets.fromLTRB(0, 16, 0, searchTerm.isEmpty ? 80 : 64),
                         controller: scrollController,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: _list.length,

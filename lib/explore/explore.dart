@@ -28,6 +28,10 @@ class _ExploreBodyState extends State<ExploreBody> {
   //   //_navigatorObservers.add(_heroController);
   // }
 
+  double _getPaddingBreakPoint(BottomSheetNotifier bottomSheetNotifier) {
+    return bottomSheetNotifier.snappingPositions.value[1];
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
@@ -35,10 +39,9 @@ class _ExploreBodyState extends State<ExploreBody> {
       listen: false,
     );
     final topPadding = MediaQuery.of(context).padding.top;
-    final height = MediaQuery.of(context).size.height;
     final anim = Tween<double>(
       begin: 0,
-      end: 1 / (height - Sizes.kBottomHeight),
+      end: 1 / _getPaddingBreakPoint(bottomSheetNotifier),
     ).animate(bottomSheetNotifier.animation);
 
     final initialRoute = CrossFadePageRoute<void>(
@@ -72,7 +75,7 @@ class _ExploreBodyState extends State<ExploreBody> {
           child: BottomSheetHandle(
             opacity: Tween<double>(
               begin: 0,
-              end: (height - Sizes.kBottomHeight) / topPadding,
+              end: _getPaddingBreakPoint(bottomSheetNotifier) / topPadding,
             ).animate(anim),
           ),
         ),
@@ -90,6 +93,10 @@ class ExplorePage extends StatelessWidget {
     @required this.scrollControllers,
   }) : super(key: key);
 
+  double _getPaddingBreakPoint(BottomSheetNotifier bottomSheetNotifier) {
+    return bottomSheetNotifier.snappingPositions.value[1];
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
@@ -101,7 +108,7 @@ class ExplorePage extends StatelessWidget {
     final height = MediaQuery.of(context).size.height;
     final anim = Tween<double>(
       begin: 0,
-      end: 1 / (height - Sizes.kBottomHeight),
+      end: 1 / _getPaddingBreakPoint(bottomSheetNotifier),
     ).animate(bottomSheetNotifier.animation);
     return Material(
       color: Theme.of(context).canvasColor,
