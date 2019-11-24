@@ -221,14 +221,14 @@ class MapNotifier extends ChangeNotifier {
 
   CameraPosition cameraPosition;
 
+  double bottomSheetHeight = Sizes.kBottomHeight - Sizes.hBottomBarHeight;
   /// Translation needed to move the map up if bottom sheet is half expanded. (+ve values)
   double _getAdjustAmount(double zoom) {
     const circumference = 2 * pi * 6378137;
     final metresPerPixel =
         156543.03392 * cos(center.latitude * pi / 180) / pow(2, zoom);
     // height of bottom sheet in metres, based on the map
-    final height =
-        (Sizes.kBottomHeight - Sizes.hBottomBarHeight) / 2 * metresPerPixel;
+    final height = bottomSheetHeight / 2 * metresPerPixel;
     final angle = height / circumference * 360;
     return angle;
   }
@@ -302,6 +302,10 @@ class MapNotifier extends ChangeNotifier {
   set markers(Map<MarkerId, Marker> markers) {
     _markers = markers;
     notifyListeners();
+  }
+  void setMarkers(Map<MarkerId, Marker> markers, {bool notify = true}) {
+    _markers = markers;
+    if (notify) notifyListeners();
   }
 
   void _replaceWithGreenMarker(

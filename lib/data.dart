@@ -507,6 +507,12 @@ class AppNotifier extends ChangeNotifier {
     if (isHome || routeInfo.data is Trail) {
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
       _state = 0;
+      mapNotifier.bottomSheetHeight = heightTooSmall
+          ? Sizes.kBottomHeight -
+              Sizes.hEntityButtonHeight -
+              Sizes.hBottomBarHeight -
+              8
+          : Sizes.kBottomHeight - Sizes.hBottomBarHeight;
       bottomSheetNotifier.snappingPositions.value = [
         0,
         if (!heightTooSmall)
@@ -518,7 +524,7 @@ class AppNotifier extends ChangeNotifier {
             : height - Sizes.tCollapsedHeight,
       ];
       if (isHome) {
-        mapNotifier.animateBackToCenter(adjusted: true);
+        if (!disableDragging) mapNotifier.animateBackToCenter(adjusted: true);
       } else {
         final adjusted = bottomSheetNotifier.animation.value <
                 height - Sizes.kCollapsedHeight &&
@@ -576,7 +582,9 @@ class AppNotifier extends ChangeNotifier {
     bottomSheetNotifier
       ..draggingDisabled = disableDragging
       ..endCorrection =
-          isHome ? topPadding - Sizes.hOffsetTranslation : topPadding
-      ..activeScrollController = routeInfo?.scrollController;
+          isHome ? topPadding - Sizes.hOffsetTranslation : topPadding;
+    if (!isHome) {
+      bottomSheetNotifier.activeScrollController = routeInfo?.scrollController;
+    }
   }
 }

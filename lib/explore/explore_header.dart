@@ -8,22 +8,16 @@ class ExploreHeader extends StatelessWidget {
     @required this.tabController,
   }) : super(key: key);
 
-  double _getPaddingBreakPoint(BottomSheetNotifier bottomSheetNotifier) {
-    return bottomSheetNotifier.snappingPositions.value[1];
-  }
-
   @override
   Widget build(BuildContext context) {
     final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
       context,
       listen: false,
     );
+    final animation = bottomSheetNotifier.animation;
+    final animTween = bottomSheetNotifier.animTween;
     final topPadding = MediaQuery.of(context).padding.top;
     final totalTranslation = Sizes.hOffsetTranslation - topPadding;
-    final anim = Tween<double>(
-      begin: 0,
-      end: 1 / _getPaddingBreakPoint(bottomSheetNotifier),
-    ).animate(bottomSheetNotifier.animation);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnnotatedRegion(
       value: (isDark
@@ -35,7 +29,7 @@ class ExploreHeader extends StatelessWidget {
         systemNavigationBarColor: Theme.of(context).bottomAppBarColor,
       ),
       child: ValueListenableBuilder(
-        valueListenable: anim,
+        valueListenable: animTween.animate(animation),
         builder: (context, value, child) {
           Offset offset;
           if (value > 1) {
@@ -60,16 +54,17 @@ class ExploreHeader extends StatelessWidget {
                 opacity: Tween<double>(
                   begin: 16 / 12 - totalTranslation / 12,
                   end: 16 / 12,
-                ).animate(anim),
+                ).animate(animTween.animate(animation)),
               ),
               const SizedBox(
                 height: 8,
               ),
               FadeTransition(
                 opacity: Tween<double>(
-                  begin: (24 + Sizes.hLogoHeight) / 12 - totalTranslation / 12,
+                  begin:
+                      (24 + Sizes.hLogoHeight) / 12 - totalTranslation / 12,
                   end: (24 + Sizes.hLogoHeight) / 12,
-                ).animate(anim),
+                ).animate(animTween.animate(animation)),
                 child: Text(
                   'Explore HC Garden',
                   style: Theme.of(context).textTheme.display1.copyWith(
@@ -82,17 +77,18 @@ class ExploreHeader extends StatelessWidget {
               ),
               TrailButtonsRow(
                 opacity: Tween<double>(
-                  begin: (40 + Sizes.hLogoHeight + Sizes.hHeadingHeight) / 40 -
-                      totalTranslation / 40,
+                  begin:
+                      (40 + Sizes.hLogoHeight + Sizes.hHeadingHeight) / 40 -
+                          totalTranslation / 40,
                   end: (40 + Sizes.hLogoHeight + Sizes.hHeadingHeight) / 40,
-                ).animate(anim),
+                ).animate(animTween.animate(animation)),
               ),
               const SizedBox(
                 height: 8,
               ),
               FloraFaunaTabBar(
                 animateTo: bottomSheetNotifier.animateTo,
-                animation: anim,
+                animation: animTween.animate(animation),
                 tabController: tabController,
               ),
             ],

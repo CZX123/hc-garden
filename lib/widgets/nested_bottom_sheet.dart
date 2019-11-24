@@ -234,7 +234,16 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     if (!newSortedPositions.contains(_animationController.value)) {
       if (_animationController.value == _sortedPositions.last) {
         _sortedPositions = newSortedPositions;
-        _animationController.value = _sortedPositions.last;
+        if (_bottomSheetNotifier.draggingDisabled) {
+          _animationController.value = _sortedPositions.last;
+        } else {
+          animateTo(_sortedPositions.last);
+        }
+      } else if (_sortedPositions.length == 3 &&
+          newSortedPositions.length == 3 &&
+          _animationController.value == _sortedPositions[1]) {
+        _sortedPositions = newSortedPositions;
+        animateTo(_sortedPositions[1]);
       } else {
         _sortedPositions = newSortedPositions;
         animateTo(closestValue(_sortedPositions, _animationController.value));
@@ -242,6 +251,9 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
     } else {
       _sortedPositions = newSortedPositions;
     }
+    // Assume begin is always 0
+    _bottomSheetNotifier.animTween
+      ..end = 1 / _sortedPositions[1];
   }
 
   @override
@@ -273,6 +285,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       );
       _bottomSheetNotifier
         ..animation = _animationController.view
+        ..animTween.end = 1 / _sortedPositions[1]
         ..animateTo = animateTo;
       _bottomSheetNotifier.snappingPositions.addListener(listener);
       _init = true;
@@ -393,9 +406,16 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
 }
 
 class BottomSheetNotifier extends ChangeNotifier {
-  Animation<double> animation; //  Animation for bottom sheet
+  /// Default bottom sheet animation. Has values ranging from 0 to window Height
+  Animation<double> animation;
+
+  /// Tween that goes from 0 to 1, from the bottom sheet's 0 to 2nd snapping position.
+  final animTween = Tween<double>(
+    // Assume begin is always 0
+    begin: 0,
+  );
   void Function(double, [Duration])
-      animateTo; // AnimateTo function for bottom sheet
+      animateTo; // animateTo function for bottom sheet
   ScrollController activeScrollController;
   ValueNotifier<bool> isScrolledNotifier = ValueNotifier(false);
   ValueNotifier<List<double>> snappingPositions = ValueNotifier(null);

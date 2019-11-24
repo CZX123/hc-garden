@@ -88,19 +88,29 @@ class CrossFadeTransition extends StatelessWidget {
       end: 1.0,
     ).animate(animation);
 
-    return ScaleTransition(
-      scale: scaleIn,
-      child: FadeTransition(
-        opacity: opacityIn,
-        child: fadeOut
-            ? FadeTransition(
-                opacity: Tween(
-                  begin: 1.0,
-                  end: -1.0,
-                ).animate(secondaryAnimation),
-                child: child,
-              )
-            : child,
+    return ValueListenableBuilder(
+      valueListenable: secondaryAnimation,
+      builder: (context, value, child) {
+        return Visibility(
+          visible: value < 1,
+          maintainState: true,
+          child: child,
+        );
+      },
+      child: ScaleTransition(
+        scale: scaleIn,
+        child: FadeTransition(
+          opacity: opacityIn,
+          child: fadeOut
+              ? FadeTransition(
+                  opacity: Tween(
+                    begin: 1.0,
+                    end: -1.0,
+                  ).animate(secondaryAnimation),
+                  child: child,
+                )
+              : child,
+        ),
       ),
     );
   }

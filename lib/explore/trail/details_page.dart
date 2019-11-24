@@ -19,7 +19,7 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
   final _scrollController = ScrollController();
 
   void stateListener() {
-    if (_appNotifier.state == 0 && _appNotifier.routes.isNotEmpty) {
+    if (context != null && _appNotifier.state == 0 && _appNotifier.routes.isNotEmpty) {
       final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
         context,
         listen: false,

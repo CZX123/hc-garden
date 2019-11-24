@@ -187,88 +187,99 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
           curve: const Interval(0, .4, curve: Curves.ease),
         );
 
-        return Stack(
-          children: <Widget>[
-            PositionedTransition(
-              rect: itemPosition,
-              child: Stack(
-                children: <Widget>[
-                  FadeTransition(
-                    opacity: fadeMaterial,
-                    child: Material(
-                      color: Theme.of(context).bottomAppBarColor,
-                      child: SizedBox(
-                        width: width,
-                        height: height,
-                      ),
-                    ),
-                  ),
-                  AnimatedBuilder(
-                    animation: contentOffset,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: contentOffset.value,
-                        child: child,
-                      );
-                    },
-                    child: FadeTransition(
-                      opacity: fadeContent,
-                      child: FadeTransition(
-                        opacity: Tween(
-                          begin: 1.0,
-                          end: -1.0,
-                        ).animate(secondaryAnimation),
-                        child: Container(
+        return ValueListenableBuilder(
+          valueListenable: secondaryAnimation,
+          builder: (context, value, child) {
+            return Visibility(
+              visible: value < 1,
+              maintainState: true,
+              child: child,
+            );
+          },
+          child: Stack(
+            children: <Widget>[
+              PositionedTransition(
+                rect: itemPosition,
+                child: Stack(
+                  children: <Widget>[
+                    FadeTransition(
+                      opacity: fadeMaterial,
+                      child: Material(
+                        color: Theme.of(context).bottomAppBarColor,
+                        child: SizedBox(
+                          width: width,
                           height: height,
-                          child: widget.child,
                         ),
                       ),
                     ),
-                  ),
-                  if (widget.oldChild != null)
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      right: 0,
-                      child: IgnorePointer(
-                        child: AnimatedBuilder(
-                          animation: oldChildOffset,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: oldChildOffset.value,
-                              child: child,
-                            );
-                          },
-                          child: FadeTransition(
-                            opacity: fadeOldContent,
-                            child: widget.oldChild,
+                    AnimatedBuilder(
+                      animation: contentOffset,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: contentOffset.value,
+                          child: child,
+                        );
+                      },
+                      child: FadeTransition(
+                        opacity: fadeContent,
+                        child: FadeTransition(
+                          opacity: Tween(
+                            begin: 1.0,
+                            end: -1.0,
+                          ).animate(secondaryAnimation),
+                          child: Container(
+                            height: height,
+                            child: widget.child,
                           ),
                         ),
                       ),
                     ),
-                  if (widget.persistentOldChild != null)
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      right: 0,
-                      child: IgnorePointer(
-                        child: AnimatedBuilder(
-                          animation: animation,
-                          builder: (context, child) {
-                            if (animation.value == 1) return SizedBox.shrink();
-                            return Transform.translate(
-                              offset: oldChildOffset.value,
-                              child: child,
-                            );
-                          },
-                          child: widget.persistentOldChild,
+                    if (widget.oldChild != null)
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        child: IgnorePointer(
+                          child: AnimatedBuilder(
+                            animation: oldChildOffset,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: oldChildOffset.value,
+                                child: child,
+                              );
+                            },
+                            child: FadeTransition(
+                              opacity: fadeOldContent,
+                              child: widget.oldChild,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                    if (widget.persistentOldChild != null)
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        child: IgnorePointer(
+                          child: AnimatedBuilder(
+                            animation: animation,
+                            builder: (context, child) {
+                              if (animation.value == 1)
+                                return SizedBox.shrink();
+                              return Transform.translate(
+                                offset: oldChildOffset.value,
+                                child: child,
+                              );
+                            },
+                            child: widget.persistentOldChild,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );

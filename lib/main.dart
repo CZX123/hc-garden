@@ -1,7 +1,6 @@
 import 'library.dart';
 
 void main() {
-  //WidgetsFlutterBinding.ensureInitialized().renderView.automaticSystemUiAdjustment = false;
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(HcGardenApp());
 }
@@ -100,37 +99,37 @@ class _HcGardenAppState extends State<HcGardenApp> {
           builder: (context) => FilterNotifier(),
         ),
       ],
-      child: FirebaseDataWidget(
-        child: Consumer<ThemeNotifier>(
-          builder: (context, themeNotifier, child) {
-            if (themeNotifier.value == null) return const SizedBox.shrink();
-            // TODO: Onboarding: Make use of the _firstTime variable to show different screens
-            return Consumer<DebugNotifier>(
-              builder: (context, debugInfo, child) {
-                return MaterialApp(
-                  title: 'HC Garden',
-                  theme: (themeNotifier.value ? darkThemeData : themeData)
-                      .copyWith(
-                    platform: debugInfo.isIOS
-                        ? TargetPlatform.iOS
-                        : TargetPlatform.android,
-                  ),
-                  onGenerateRoute: (settings) {
-                    if (settings.isInitialRoute) {
-                      return PageRouteBuilder(
-                        pageBuilder: (context, _, __) {
-                          return const MyHomePage(title: 'HC Garden');
-                        },
-                      );
-                    }
-                    return null;
-                  },
-                  showPerformanceOverlay: debugInfo.showPerformanceOverlay,
-                );
-              },
-            );
-          },
-        ),
+      child: Consumer<ThemeNotifier>(
+        builder: (context, themeNotifier, child) {
+          if (themeNotifier.value == null) return const SizedBox.shrink();
+          // TODO: Onboarding: Make use of the _firstTime variable to show different screens
+          return Consumer<DebugNotifier>(
+            builder: (context, debugInfo, child) {
+              return MaterialApp(
+                title: 'HC Garden',
+                theme:
+                    (themeNotifier.value ? darkThemeData : themeData).copyWith(
+                  platform: debugInfo.isIOS
+                      ? TargetPlatform.iOS
+                      : TargetPlatform.android,
+                ),
+                onGenerateRoute: (settings) {
+                  if (settings.isInitialRoute) {
+                    return PageRouteBuilder(
+                      pageBuilder: (context, _, __) {
+                        return const FirebaseDataWidget(
+                          child: const MyHomePage(),
+                        );
+                      },
+                    );
+                  }
+                  return null;
+                },
+                showPerformanceOverlay: debugInfo.showPerformanceOverlay,
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -237,8 +236,7 @@ class _FirebaseDataWidgetState extends State<FirebaseDataWidget> {
 }
 
 class MyHomePage extends StatefulWidget {
-  final String title;
-  const MyHomePage({Key key, this.title}) : super(key: key);
+  const MyHomePage({Key key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -385,9 +383,7 @@ class _MyHomePageState extends State<MyHomePage>
       builder: (context, routesIsEmpty, child) {
         return Scaffold(
           drawer: SettingsDrawer(),
-          endDrawer: FilterDrawer(),
-          drawerEdgeDragWidth:
-              routesIsEmpty ? 20 : 0, // Disable drawer dragging
+          endDrawer: routesIsEmpty ? FilterDrawer() : null,
           body: child,
         );
       },

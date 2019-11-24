@@ -7,24 +7,18 @@ class BottomSheetFooter extends StatelessWidget {
     @required this.pageIndex,
   }) : super(key: key);
 
-  double _getPaddingBreakPoint(BottomSheetNotifier bottomSheetNotifier) {
-    return bottomSheetNotifier.snappingPositions.value[1];
-  }
-
   @override
   Widget build(BuildContext context) {
     final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
       context,
       listen: false,
     );
-    final anim = Tween<double>(
-      begin: 0,
-      end: 1 / _getPaddingBreakPoint(bottomSheetNotifier),
-    ).animate(bottomSheetNotifier.animation);
+    final animation = bottomSheetNotifier.animation;
+    final animTween = bottomSheetNotifier.animTween;
     return Stack(
       children: <Widget>[
         // Notched Bottom App Bar for Entity List Page
-        AnimatedNotchedAppBar(bottomSheetAnimation: anim),
+        AnimatedNotchedAppBar(bottomSheetAnimation: animTween.animate(animation)),
         // 3 Button Bottom Navigation
         Selector<AppNotifier, int>(
           selector: (context, appNotifier) => appNotifier.state,
@@ -35,7 +29,7 @@ class BottomSheetFooter extends StatelessWidget {
               bottom: 0,
               height: Sizes.hBottomBarHeight,
               child: ValueListenableBuilder<double>(
-                valueListenable: anim,
+                valueListenable: animTween.animate(animation),
                 builder: (context, value, child) {
                   Offset offset;
                   if (state != 0) {
@@ -48,7 +42,6 @@ class BottomSheetFooter extends StatelessWidget {
                         Sizes.hBottomBarHeight *
                             2 *
                             (1 - value));
-                  //print('$value, $paddingBreakpoint, $offset');
                   }
                   return Transform.translate(
                     offset: offset,
