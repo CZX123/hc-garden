@@ -1,5 +1,17 @@
 import 'library.dart';
 
+String lowerRes(String image) {
+  if (image.isEmpty) return '';
+  var split = image.split('.');
+  final end = '.' + split.removeLast();
+  return split.join('.') + 'h' + end;
+}
+
+bool mapEquals<A, B>(Map<A, B> a, Map<A, B> b) {
+  return a?.length == b?.length &&
+      (a?.keys?.every((key) => a[key] == b[key]) ?? true);
+}
+
 class Tuple<A, B> {
   final A item1;
   final B item2;
@@ -145,10 +157,7 @@ class FirebaseData {
             listEquals(faunaList, other.faunaList) &&
             listEquals(historicalDataList, other.historicalDataList) &&
             listEquals(aboutPageDataList, other.aboutPageDataList) &&
-            trails.length == other.trails.length &&
-            trails.keys.every((trail) {
-              return trails[trail] == other.trails[trail];
-            });
+            mapEquals(trails, other.trails);
   }
 
   @override
@@ -380,23 +389,28 @@ class AboutPageData {
   int get hashCode => hashValues(body, id, quote, title, isExpanded);
 }
 
-String lowerRes(String image) {
-  if (image.isEmpty) return '';
-  var split = image.split('.');
-  final end = '.' + split.removeLast();
-  return split.join('.') + 'h' + end;
-}
-
 /// Information needed for the new screen to be displayed within the bottom sheet. Contains the name of  the route, the [DataObject] it contains, and the active scroll controller for the bottom sheet.
-class RouteInfo {
-  final String name; // To be displayed on the bottom app bar
-  final DataObject data; // Entity, Trail or TrailLocation
+class RouteInfo<T> {
+  /// Name of route, to be displayed on bottom nav bar
+  final String name;
+
+  /// The [Route] to be pushed to the custom [Navigator] within the bottom sheet
+  final Route<T> route;
+
+  /// An [Entity], [Trail] or [TrailLocation]
+  final DataObject data;
+
+  /// The [ScrollController] within the new route. Usually updated after the route is pushed, and on first creation of the new screen, using the [AppNotifier.updateScrollController] function.
   ScrollController scrollController;
+
   RouteInfo({
     @required this.name,
+    @required this.route,
     this.data,
     this.scrollController,
-  });
+  })  : assert(name != null),
+        assert(route != null);
+
   @override
   String toString() {
     return name;
@@ -433,16 +447,21 @@ class AppNotifier extends ChangeNotifier {
       );
     }
     // print('After pop: $routes');
-    navigatorKey.currentState.pop();
+    // Ensure that routes and navigator stack remains in sync even if there is an error, by resetting when going back to home
+    if (routes.isEmpty) {
+      navigatorKey.currentState.popUntil((route) => route.isFirst);
+    } else {
+      navigatorKey.currentState.pop();
+    }
   }
 
   /// Update active scroll controller after new route is pushed onto the bottom sheet.
   ///
   /// The 'data' argument is still needed for checking if the last [RouteInfo] is still equivalent.
   void updateScrollController({
-    BuildContext context,
-    DataObject data,
-    ScrollController scrollController,
+    @required BuildContext context,
+    @required DataObject data,
+    @required ScrollController scrollController,
   }) {
     final bottomSheetNotifier =
         Provider.of<BottomSheetNotifier>(context, listen: false);
@@ -458,7 +477,6 @@ class AppNotifier extends ChangeNotifier {
   /// Displays a new screen within the bottom sheet
   Future<T> push<T>({
     @required BuildContext context,
-    @required Route<T> route,
     @required RouteInfo routeInfo,
     bool disableDragging = false,
   }) async {
@@ -469,7 +487,7 @@ class AppNotifier extends ChangeNotifier {
       disableDragging: disableDragging,
     );
     // print('After push: $routes');
-    return navigatorKey.currentState.push(route);
+    return navigatorKey.currentState.push(routeInfo.route);
   }
 
   void changeState({

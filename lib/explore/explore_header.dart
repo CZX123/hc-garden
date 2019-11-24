@@ -61,8 +61,7 @@ class ExploreHeader extends StatelessWidget {
               ),
               FadeTransition(
                 opacity: Tween<double>(
-                  begin:
-                      (24 + Sizes.hLogoHeight) / 12 - totalTranslation / 12,
+                  begin: (24 + Sizes.hLogoHeight) / 12 - totalTranslation / 12,
                   end: (24 + Sizes.hLogoHeight) / 12,
                 ).animate(animTween.animate(animation)),
                 child: Text(
@@ -77,9 +76,8 @@ class ExploreHeader extends StatelessWidget {
               ),
               TrailButtonsRow(
                 opacity: Tween<double>(
-                  begin:
-                      (40 + Sizes.hLogoHeight + Sizes.hHeadingHeight) / 40 -
-                          totalTranslation / 40,
+                  begin: (40 + Sizes.hLogoHeight + Sizes.hHeadingHeight) / 40 -
+                      totalTranslation / 40,
                   end: (40 + Sizes.hLogoHeight + Sizes.hHeadingHeight) / 40,
                 ).animate(animTween.animate(animation)),
               ),
@@ -190,19 +188,20 @@ class TrailButtonsRow extends StatelessWidget {
                   });
                   Provider.of<AppNotifier>(context).push(
                     context: context,
-                    route: CrossFadePageRoute(
-                      builder: (context) {
-                        final firebaseData = Provider.of<FirebaseData>(context);
-                        final trailLocations = firebaseData.trails[trail];
-                        return TrailDetailsPage(
-                          trail: trail,
-                          trailLocations: trailLocations,
-                        );
-                      },
-                    ),
                     routeInfo: RouteInfo(
                       name: trail.name,
                       data: trail,
+                      route: CrossFadePageRoute(
+                        builder: (context) {
+                          final firebaseData =
+                              Provider.of<FirebaseData>(context);
+                          final trailLocations = firebaseData.trails[trail];
+                          return TrailDetailsPage(
+                            trail: trail,
+                            trailLocations: trailLocations,
+                          );
+                        },
+                      ),
                     ),
                   );
                 },

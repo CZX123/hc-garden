@@ -108,7 +108,8 @@ class EntityListPage extends StatelessWidget {
                     : ListView.builder(
                         key: ValueKey(
                             searchTerm + updatedEntityList.length.toString()),
-                        padding: EdgeInsets.fromLTRB(0, 16, 0, searchTerm.isEmpty ? 80 : 64),
+                        padding: EdgeInsets.fromLTRB(
+                            0, 16, 0, searchTerm.isEmpty ? 80 : 64),
                         controller: scrollController,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: _list.length,
@@ -283,23 +284,23 @@ class _EntityListRowState extends State<EntityListRow> {
           ..addListener(listener);
         Provider.of<AppNotifier>(context, listen: false).push(
           context: context,
-          route: ExpandPageRoute(
-            builder: (context) => EntityDetailsPage(
-              endContentOffset: endContentOffset,
-              entity: widget.entity,
-            ),
-            sourceRect: sourceRect,
-            oldChild: oldChild,
-            startContentOffset: startContentOffset,
-            endContentOffset: endContentOffset,
-            persistentOldChild: persistentOldChild,
-            rowOffset: rowHeight * widget.index,
-            oldScrollController: widget.scrollController,
-            topSpace: topSpace,
-          ),
           routeInfo: RouteInfo(
             name: widget.entity.name,
             data: widget.entity,
+            route: ExpandPageRoute(
+              builder: (context) => EntityDetailsPage(
+                endContentOffset: endContentOffset,
+                entity: widget.entity,
+              ),
+              sourceRect: sourceRect,
+              oldChild: oldChild,
+              startContentOffset: startContentOffset,
+              endContentOffset: endContentOffset,
+              persistentOldChild: persistentOldChild,
+              rowOffset: rowHeight * widget.index,
+              oldScrollController: widget.scrollController,
+              topSpace: topSpace,
+            ),
           ),
         );
       },

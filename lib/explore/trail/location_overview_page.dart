@@ -44,7 +44,8 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(context, listen: false);
+    final bottomSheetNotifier =
+        Provider.of<BottomSheetNotifier>(context, listen: false);
     final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
     final child = SingleChildScrollView(
       controller: _scrollController,
@@ -134,7 +135,8 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                         value -
                         Sizes.kBottomBarHeight -
                         Sizes.kInfoRowHeight -
-                        (1 - value / (height - Sizes.kBottomHeight)) * topPadding,
+                        (1 - value / (height - Sizes.kBottomHeight)) *
+                            topPadding,
                     0,
                   ),
                 ),
@@ -166,17 +168,17 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                       onTap: () {
                         Provider.of<AppNotifier>(context, listen: false).push(
                           context: context,
-                          route: CrossFadePageRoute(
-                            builder: (context) => Material(
-                              color: Theme.of(context).bottomAppBarColor,
-                              child: EntityDetailsPage(
-                                entity: entityPosition.entity,
-                              ),
-                            ),
-                          ),
                           routeInfo: RouteInfo(
                             name: entityPosition.entity.name,
                             data: entityPosition.entity,
+                            route: CrossFadePageRoute(
+                              builder: (context) => Material(
+                                color: Theme.of(context).bottomAppBarColor,
+                                child: EntityDetailsPage(
+                                  entity: entityPosition.entity,
+                                ),
+                              ),
+                            ),
                           ),
                         );
                       },

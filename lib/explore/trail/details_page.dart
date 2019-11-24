@@ -19,7 +19,9 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
   final _scrollController = ScrollController();
 
   void stateListener() {
-    if (context != null && _appNotifier.state == 0 && _appNotifier.routes.isNotEmpty) {
+    if (context != null &&
+        _appNotifier.state == 0 &&
+        _appNotifier.routes.isNotEmpty) {
       final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
         context,
         listen: false,
@@ -34,7 +36,8 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _appNotifier = Provider.of<AppNotifier>(context, listen: false)..addListener(stateListener);
+    _appNotifier = Provider.of<AppNotifier>(context, listen: false)
+      ..addListener(stateListener);
     if (!_init) {
       _appNotifier.updateScrollController(
         context: context,
@@ -54,7 +57,8 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(context, listen: false);
+    final bottomSheetNotifier =
+        Provider.of<BottomSheetNotifier>(context, listen: false);
     final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
     return Padding(
       padding: const EdgeInsets.only(bottom: Sizes.kBottomBarHeight),
@@ -251,24 +255,24 @@ class _LocationListRowState extends State<LocationListRow> {
           ..addListener(listener);
         Provider.of<AppNotifier>(context, listen: false).push(
           context: context,
-          route: ExpandPageRoute(
-            builder: (context) {
-              return TrailLocationOverviewPage(
-                trailLocation: widget.location,
-                endContentOffset: endContentOffset,
-              );
-            },
-            sourceRect: sourceRect,
-            startContentOffset: startContentOffset,
-            endContentOffset: endContentOffset,
-            rowOffset: 84.0 * widget.index,
-            oldScrollController: widget.scrollController,
-            topSpace: topSpace,
-            persistentOldChild: child,
-          ),
           routeInfo: RouteInfo(
             name: widget.location.name,
             data: widget.location,
+            route: ExpandPageRoute(
+              builder: (context) {
+                return TrailLocationOverviewPage(
+                  trailLocation: widget.location,
+                  endContentOffset: endContentOffset,
+                );
+              },
+              sourceRect: sourceRect,
+              startContentOffset: startContentOffset,
+              endContentOffset: endContentOffset,
+              rowOffset: 84.0 * widget.index,
+              oldScrollController: widget.scrollController,
+              topSpace: topSpace,
+              persistentOldChild: child,
+            ),
           ),
         );
       },

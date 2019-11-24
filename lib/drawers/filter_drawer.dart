@@ -8,96 +8,62 @@ class FilterDrawer extends StatelessWidget {
     final height = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
     return Drawer(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              height: topPadding,
+      child: Scrollbar(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(0, topPadding + 16, 0, 16),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: height - topPadding - 32,
             ),
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: height - topPadding,
-              ),
-              child: Selector<FirebaseData, List<Trail>>(
-                selector: (context, firebaseData) {
-                  return firebaseData.trails.keys.toList();
-                },
-                builder: (context, allTrails, child) {
-                  return Selector<FilterNotifier, List<Trail>>(
-                    selector: (context, sortNotifier) {
-                      return sortNotifier.selectedTrails;
-                    },
-                    builder: (context, selectedTrails, child) {
-                      if (selectedTrails == null) {
-                        if (allTrails == null)
-                          return const SizedBox.shrink();
-                        else {
-                          selectedTrails = List.from(allTrails);
-                          Provider.of<FilterNotifier>(context, listen: false)
-                              .updateSelectedTrailsDiscreetly(selectedTrails);
-                        }
-                      }
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Selector<MapNotifier, CustomMapType>(
-                            selector: (context, m) => m.mapType,
-                            builder: (context, mapType, child) {
-
-                              void onChanged(CustomMapType newType) {
-                                Provider.of<MapNotifier>(context, listen: false)
-                                    .mapType = newType;
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox.shrink(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Text(
+                    'Filter',
+                    style: Theme.of(context).textTheme.display2,
+                  ),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                      child: Text(
+                        'Trails',
+                        style: Theme.of(context).textTheme.subtitle,
+                      ),
+                    ),
+                    Selector<FirebaseData, List<Trail>>(
+                      selector: (context, firebaseData) {
+                        return firebaseData.trails.keys.toList();
+                      },
+                      builder: (context, allTrails, child) {
+                        return Selector<FilterNotifier, List<Trail>>(
+                          selector: (context, sortNotifier) {
+                            return sortNotifier.selectedTrails;
+                          },
+                          builder: (context, selectedTrails, child) {
+                            if (selectedTrails == null) {
+                              if (allTrails == null)
+                                return const SizedBox.shrink();
+                              else {
+                                selectedTrails = List.from(allTrails);
+                                Provider.of<FilterNotifier>(context,
+                                        listen: false)
+                                    .updateSelectedTrailsDiscreetly(
+                                        selectedTrails);
                               }
-
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  ListTile(
-                                    title: Text(
-                                      'Map Type',
-                                      style:
-                                          Theme.of(context).textTheme.subtitle,
-                                    ),
-                                  ),
-                                  RadioListTile<CustomMapType>(
-                                    controlAffinity:
-                                        ListTileControlAffinity.trailing,
-                                    groupValue: mapType,
-                                    value: CustomMapType.normal,
-                                    title: const Text('Normal'),
-                                    onChanged: onChanged,
-                                  ),
-                                  RadioListTile<CustomMapType>(
-                                    controlAffinity:
-                                        ListTileControlAffinity.trailing,
-                                    groupValue: mapType,
-                                    value: CustomMapType.dark,
-                                    title: const Text('Dark'),
-                                    onChanged: onChanged,
-                                  ),
-                                  RadioListTile<CustomMapType>(
-                                    controlAffinity:
-                                        ListTileControlAffinity.trailing,
-                                    groupValue: mapType,
-                                    value: CustomMapType.satellite,
-                                    title: const Text('Satellite'),
-                                    onChanged: onChanged,
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              ListTile(
-                                title: Text(
-                                  'Filter',
-                                  style: Theme.of(context).textTheme.subtitle,
-                                ),
-                              ),
-                              for (var trail in allTrails)
-                                CheckboxListTile(
+                            }
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: allTrails.map((trail) {
+                                return CheckboxListTile(
+                                  dense: true,
                                   controlAffinity:
                                       ListTileControlAffinity.trailing,
                                   value: selectedTrails.contains(trail),
@@ -107,10 +73,8 @@ class FilterDrawer extends StatelessWidget {
                                   checkColor: Theme.of(context).canvasColor,
                                   onChanged: (value) {
                                     final sortNotifier =
-                                        Provider.of<FilterNotifier>(
-                                      context,
-                                      listen: false,
-                                    );
+                                        Provider.of<FilterNotifier>(context,
+                                            listen: false);
                                     List<Trail> newTrails =
                                         List.from(sortNotifier.selectedTrails);
                                     newTrails.remove(trail);
@@ -119,17 +83,42 @@ class FilterDrawer extends StatelessWidget {
                                     }
                                     sortNotifier.selectedTrails = newTrails;
                                   },
-                                ),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
+                                );
+                              }).toList(),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                      child: Text(
+                        'Sort',
+                        style: Theme.of(context).textTheme.subtitle,
+                      ),
+                    ),
+                    RadioListTile<bool>(
+                      dense: true,
+                      controlAffinity: ListTileControlAffinity.trailing,
+                      groupValue: true,
+                      value: true,
+                      title: const Text('Alphabetical'),
+                      onChanged: (_) {},
+                    ),
+                    RadioListTile<bool>(
+                      dense: true,
+                      controlAffinity: ListTileControlAffinity.trailing,
+                      groupValue: true,
+                      value: false,
+                      title: const Text('Distance'),
+                      subtitle: const Text('Coming Soon'),
+                    ),
+                  ],
+                ),
+                const SizedBox.shrink(),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

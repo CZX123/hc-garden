@@ -190,18 +190,20 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                                     listen: false,
                                   ).push(
                                     context: context,
-                                    route: PageRouteBuilder(
-                                      opaque: false,
-                                      pageBuilder: (context, _, __) {
-                                        return ImageGallery(
-                                          images: newImages,
-                                          initialImage: image,
-                                        );
-                                      },
-                                      transitionDuration:
-                                          const Duration(milliseconds: 300),
+                                    routeInfo: RouteInfo(
+                                      name: 'Gallery',
+                                      route: PageRouteBuilder(
+                                        opaque: false,
+                                        pageBuilder: (context, _, __) {
+                                          return ImageGallery(
+                                            images: newImages,
+                                            initialImage: image,
+                                          );
+                                        },
+                                        transitionDuration:
+                                            const Duration(milliseconds: 300),
+                                      ),
                                     ),
-                                    routeInfo: RouteInfo(name: 'Gallery'),
                                     disableDragging: true,
                                   );
                                 },

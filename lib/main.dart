@@ -12,6 +12,7 @@ class HcGardenApp extends StatefulWidget {
 
 class _HcGardenAppState extends State<HcGardenApp> {
   final _location = Location();
+  final _filterNotifier = FilterNotifier();
   final _themeNotifier = ThemeNotifier(null);
   final _mapNotifier = MapNotifier();
   bool _firstTime = false;
@@ -95,8 +96,8 @@ class _HcGardenAppState extends State<HcGardenApp> {
         ChangeNotifierProvider(
           builder: (context) => SearchNotifier(),
         ),
-        ChangeNotifierProvider(
-          builder: (context) => FilterNotifier(),
+        ChangeNotifierProvider.value(
+          value: _filterNotifier,
         ),
       ],
       child: Consumer<ThemeNotifier>(

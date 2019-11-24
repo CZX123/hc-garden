@@ -165,19 +165,19 @@ Marker generateMarker({
         } else {
           appNotifier.push(
             context: context,
-            route: CrossFadePageRoute(
-              builder: (context) {
-                return Material(
-                  color: Theme.of(context).bottomAppBarColor,
-                  child: TrailLocationOverviewPage(
-                    trailLocation: location,
-                  ),
-                );
-              },
-            ),
             routeInfo: RouteInfo(
               name: location.name,
               data: location,
+              route: CrossFadePageRoute(
+                builder: (context) {
+                  return Material(
+                    color: Theme.of(context).bottomAppBarColor,
+                    child: TrailLocationOverviewPage(
+                      trailLocation: location,
+                    ),
+                  );
+                },
+              ),
             ),
           );
         }
@@ -222,6 +222,7 @@ class MapNotifier extends ChangeNotifier {
   CameraPosition cameraPosition;
 
   double bottomSheetHeight = Sizes.kBottomHeight - Sizes.hBottomBarHeight;
+
   /// Translation needed to move the map up if bottom sheet is half expanded. (+ve values)
   double _getAdjustAmount(double zoom) {
     const circumference = 2 * pi * 6378137;
@@ -300,9 +301,11 @@ class MapNotifier extends ChangeNotifier {
 
   /// This will also call [notifyListeners]
   set markers(Map<MarkerId, Marker> markers) {
+    if (mapEquals(_markers, markers)) return;
     _markers = markers;
     notifyListeners();
   }
+
   void setMarkers(Map<MarkerId, Marker> markers, {bool notify = true}) {
     _markers = markers;
     if (notify) notifyListeners();

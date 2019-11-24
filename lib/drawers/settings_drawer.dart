@@ -31,6 +31,14 @@ class SettingsDrawer extends StatefulWidget {
 }
 
 class _SettingsDrawerState extends State<SettingsDrawer> {
+  bool _showDebug = false;
+
+  void _toggleDebugOptions() {
+    setState(() {
+      _showDebug = !_showDebug;
+    });
+  }
+
   void _changeMapType(CustomMapType newType) {
     Provider.of<MapNotifier>(context, listen: false).mapType = newType;
   }
@@ -40,27 +48,29 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     return Drawer(
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Consumer<DebugNotifier>(
-          builder: (context, debugInfo, child) {
-            return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(0, topPadding + 16, 0, 16),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: height - topPadding - 32,
+      child: Scrollbar(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(0, topPadding + 16, 0, 16),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: height - topPadding - 32,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox.shrink(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Text(
+                    'Preferences',
+                    style: Theme.of(context).textTheme.display2,
+                  ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        'Preferences',
-                        style: Theme.of(context).textTheme.display2,
-                      ),
-                    ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                       child: Text(
@@ -79,6 +89,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                             value: themeNotifier.value,
                             onChanged: (value) => themeNotifier.value = value,
                           ),
+                          onLongPress: _toggleDebugOptions,
                           onTap: () =>
                               themeNotifier.value = !themeNotifier.value,
                         );
@@ -125,39 +136,57 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                         );
                       },
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                      child: Text(
-                        'Debug',
-                        style: Theme.of(context).textTheme.subtitle,
+                    if (_showDebug)
+                      Consumer<DebugNotifier>(
+                        builder: (context, debugInfo, child) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                                child: Text(
+                                  'Debug',
+                                  style: Theme.of(context).textTheme.subtitle,
+                                ),
+                              ),
+                              CheckboxListTile(
+                                dense: true,
+                                title: const Text('Show Performance Overlay'),
+                                value: debugInfo.showPerformanceOverlay,
+                                onChanged: (_) =>
+                                    debugInfo.togglePerformanceOverlay(),
+                              ),
+                              StatefulBuilder(
+                                builder: (context, setState) {
+                                  return CheckboxListTile(
+                                    dense: true,
+                                    title: const Text('Slow Animations'),
+                                    value: timeDilation != 1.0,
+                                    onChanged: (_) {
+                                      debugInfo.toggleSlowAnimations();
+                                      setState(() {});
+                                    },
+                                  );
+                                },
+                              ),
+                              CheckboxListTile(
+                                dense: true,
+                                title: const Text('Toggle iOS'),
+                                value: debugInfo.isIOS,
+                                onChanged: (_) => debugInfo.toggleIOS(),
+                              ),
+                            ],
+                          );
+                        },
                       ),
-                    ),
-                    CheckboxListTile(
-                      dense: true,
-                      title: const Text('Show Performance Overlay'),
-                      value: debugInfo.showPerformanceOverlay,
-                      onChanged: (_) => debugInfo.togglePerformanceOverlay(),
-                    ),
-                    CheckboxListTile(
-                      dense: true,
-                      title: const Text('Slow Animations'),
-                      value: timeDilation != 1.0,
-                      onChanged: (_) {
-                        debugInfo.toggleSlowAnimations();
-                        setState(() {});
-                      },
-                    ),
-                    CheckboxListTile(
-                      dense: true,
-                      title: const Text('Toggle iOS'),
-                      value: debugInfo.isIOS,
-                      onChanged: (_) => debugInfo.toggleIOS(),
-                    ),
                   ],
                 ),
-              ),
-            );
-          },
+                const SizedBox.shrink(),
+              ],
+            ),
+          ),
         ),
       ),
     );
