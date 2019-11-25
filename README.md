@@ -7,12 +7,13 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 ### High Priority
 
 #### Trail Location Overview Page
-- Better animated circles (TS)
+- ~~Better animated circles (TS)~~ ✔️
+- Fauna circles: Display image within circle as well (TS)
 
 #### Firebase Data (TS)
 - Filter out invalid data from Firebase (e.g. MISSING INFO)
 - Ensure app is resilient even if there is invalid data and no red screen of death within the app
-- Sort the data for trails better
+- ~~Sort the data for trails better~~ ✔️
 
 #### Map Markers
 - ~~Green markers depending on which page the user is on to show the current location(s)~~ ✔️
