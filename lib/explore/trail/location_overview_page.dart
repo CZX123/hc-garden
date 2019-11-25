@@ -164,26 +164,60 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                             (entityPosition.size / sizeScaling) * width / 2,
                     width: (entityPosition.size / sizeScaling) * width,
                     height: (entityPosition.size / sizeScaling) * width,
-                    child: AnimatedPulseCircle(
-                      height: (entityPosition.size / sizeScaling) * width,
-                      onTap: () {
-                        Provider.of<AppNotifier>(context, listen: false).push(
-                          context: context,
-                          routeInfo: RouteInfo(
-                            name: entityPosition.entity.name,
-                            data: entityPosition.entity,
-                            route: CrossFadePageRoute(
-                              builder: (context) => Material(
-                                color: Theme.of(context).bottomAppBarColor,
-                                child: EntityDetailsPage(
-                                  entity: entityPosition.entity,
-                                ),
+                    child: entityPosition.entity is Fauna
+                        ? GestureDetector(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: Colors.green, width: 1.5),
+                              ),
+                              child: CustomImage(
+                                entityPosition.entity.smallImage,
+                                fit: BoxFit.cover,
                               ),
                             ),
+                            onTap: () {
+                              Provider.of<AppNotifier>(context, listen: false)
+                                  .push(
+                                context: context,
+                                routeInfo: RouteInfo(
+                                  name: entityPosition.entity.name,
+                                  data: entityPosition.entity,
+                                  route: CrossFadePageRoute(
+                                    builder: (context) => Material(
+                                      color:
+                                          Theme.of(context).bottomAppBarColor,
+                                      child: EntityDetailsPage(
+                                        entity: entityPosition.entity,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : AnimatedPulseCircle(
+                            height: (entityPosition.size / sizeScaling) * width,
+                            onTap: () {
+                              Provider.of<AppNotifier>(context, listen: false)
+                                  .push(
+                                context: context,
+                                routeInfo: RouteInfo(
+                                  name: entityPosition.entity.name,
+                                  data: entityPosition.entity,
+                                  route: CrossFadePageRoute(
+                                    builder: (context) => Material(
+                                      color:
+                                          Theme.of(context).bottomAppBarColor,
+                                      child: EntityDetailsPage(
+                                        entity: entityPosition.entity,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
                   ),
               ],
             ),
