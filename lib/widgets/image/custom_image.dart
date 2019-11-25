@@ -1,70 +1,151 @@
+import 'dart:ui' as ui show Codec;
 import '../../library.dart';
 
-final HttpClient _httpClient = HttpClient();
+/// This is a mixture of [FileImage] and [NetworkImage].
+/// It will download the image from the url once, save it locally in the file system,
+/// and then use it from there in the future.
+///
+/// In more detail:
+///
+/// Given a file and url of an image, it first tries to read it from the local file.
+/// It decodes the given [File] object as an image, associating it with the given scale.
+///
+/// However, if the image doesn't yet exist as a local file, it fetches the given URL
+/// from the network, associating it with the given scale, and then saves it to the local file.
+/// The image will be cached regardless of cache headers from the server.
+///
+/// Notes:
+///
+/// - If the provided url is null or empty, [NetworkToFileImage] will default
+/// to [FileImage]. It will read the image from the local file, and won't try to
+/// download it from the network.
+///
+/// - If the provided file is null, [NetworkToFileImage] will default
+/// to [NetworkImage]. It will download the image from the network, and won't
+/// save it locally.
+///
+/// - If you make debug=true it will print to the console whether the image was
+/// read from the file or fetched from the network.
+class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
+  const NetworkToFileImage({
+    @required this.file,
+    @required this.url,
+    this.scale = 1.0,
+    this.headers,
+    this.debug = false,
+  })  : assert(file != null || url != null),
+        assert(scale != null);
 
-void saveImageInCache(BuildContext context, String url, Uint8List bytes) {
-  var imageMap = Provider.of<Map<String, Uint8List>>(context, listen: false);
-  var size = 0;
-  imageMap.forEach((key, value) {
-    size += value.lengthInBytes;
-  });
-  while (size > 10000000) {
-    size -= imageMap.values.toList()[0].lengthInBytes;
-    imageMap.remove(imageMap.keys.toList()[0]);
+  final File file;
+  final String url;
+  final double scale;
+  final Map<String, String> headers;
+  final bool debug;
+
+  @override
+  Future<NetworkToFileImage> obtainKey(ImageConfiguration configuration) {
+    return SynchronousFuture<NetworkToFileImage>(this);
   }
-  imageMap.addAll({url: bytes});
-}
 
-Future<Uint8List> fetchImage({
-  @required BuildContext context,
-  @required String url,
-  bool saveInCache = true,
-  bool retry = false,
-}) async {
-  final String filePath = url.replaceAll('/', '-');
-  final Directory dir = Provider.of<Directory>(context, listen: false);
-  final File file = File('${dir.path}/$filePath');
-  if (file.existsSync()) {
-    final bytes = file.readAsBytesSync();
-    if (saveInCache) saveImageInCache(context, url, bytes);
-    _fetchImageFromNetwork(context, url, file, saveInCache, false);
+  @override
+  ImageStreamCompleter load(NetworkToFileImage key) {
+    return MultiFrameImageStreamCompleter(
+        codec: _loadAsync(key),
+        scale: key.scale,
+        informationCollector: () sync* {
+          yield ErrorDescription('Image provider: $this');
+          yield ErrorDescription('File: ${file?.path}');
+          yield ErrorDescription('Url: $url');
+        });
+  }
+
+  Future<ui.Codec> _loadAsync(NetworkToFileImage key) async {
+    assert(key == this);
+    // ---
+
+    Uint8List bytes;
+
+    // // Runs both futures in parallel, and which ever one completes faster provides the bytes.
+    // bytes = await Future.any<Uint8List>([
+    //   // Reads from the local file.
+    //   if (file != null && _ifFileExistsLocally()) _readFromTheLocalFile(),
+    //   // Reads from the network and saves it to the local file.
+    //   if (url != null && url.isNotEmpty) _downloadFromTheNetworkAndSaveToTheLocalFile(),
+    // ]);
+
+    // Reads from the local file.
+    if (file != null && _ifFileExistsLocally()) {
+      bytes = await _readFromTheLocalFile();
+    }
+
+    // Reads from the network and saves it to the local file.
+    else if (url != null && url.isNotEmpty) {
+      bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile();
+    }
+
+    // ---
+
+    // Empty file.
+    if ((bytes != null) && (bytes.lengthInBytes == 0)) bytes = null;
+
+    return await PaintingBinding.instance.instantiateImageCodec(bytes);
+  }
+
+  bool _ifFileExistsLocally() => file.existsSync();
+
+  Future<Uint8List> _readFromTheLocalFile() async {
+    if (debug) print("Reading image file: ${file?.path}");
+    return await file.readAsBytes();
+  }
+
+  static final HttpClient _httpClient = HttpClient();
+
+  Future<Uint8List> _downloadFromTheNetworkAndSaveToTheLocalFile() async {
+    assert(url != null && url.isNotEmpty);
+    if (debug) print("Fetching image from: $url");
+    // ---
+
+    final Uri resolved = Uri.base.resolve(url);
+    final HttpClientRequest request = await _httpClient.getUrl(resolved);
+    headers?.forEach((String name, String value) {
+      request.headers.add(name, value);
+    });
+    final HttpClientResponse response = await request.close();
+    if (response.statusCode != HttpStatus.ok)
+      throw Exception('HTTP request failed, '
+          'statusCode: ${response?.statusCode}, $resolved');
+
+    final Uint8List bytes = await consolidateHttpClientResponseBytes(response);
+    if (bytes.lengthInBytes == 0) {
+      throw Exception('NetworkImage is an empty file: $resolved');
+    }
+
+    if (file != null) saveImageToTheLocalFile(bytes);
+
     return bytes;
   }
-  return _fetchImageFromNetwork(context, url, file, saveInCache, retry);
-}
 
-Future<Uint8List> _fetchImageFromNetwork(
-  BuildContext context,
-  String url,
-  File file,
-  bool saveInCache,
-  bool retry,
-) async {
-  while (true) {
-    try {
-      final Uri resolved = Uri.base.resolve(url);
-      final HttpClientRequest request = await _httpClient.getUrl(resolved);
-      final HttpClientResponse response = await request.close();
-      if (response.statusCode != HttpStatus.ok) {
-        throw Exception(
-          'HTTP request failed, statusCode: ${response?.statusCode}, $resolved',
-        );
-      }
-      final Uint8List bytes =
-          await consolidateHttpClientResponseBytes(response);
-      if (bytes.lengthInBytes == 0) {
-        throw Exception('NetworkImage is an empty file: $resolved');
-      }
-      if (saveInCache) saveImageInCache(context, url, bytes);
-      file.writeAsBytes(bytes);
-      return bytes;
-    } catch (e) {
-      if (retry) await Future.delayed(const Duration(seconds: 2));
-    }
+  void saveImageToTheLocalFile(Uint8List bytes) async {
+    if (debug) print("Saving image to file: ${file?.path}");
+    file.writeAsBytes(bytes, flush: true);
   }
+
+  @override
+  bool operator ==(dynamic other) {
+    if (other.runtimeType != runtimeType) return false;
+    final NetworkToFileImage typedOther = other;
+    return url == typedOther.url &&
+        file?.path == typedOther.file?.path &&
+        scale == typedOther.scale;
+  }
+
+  @override
+  int get hashCode => hashValues(url, file?.path, scale);
+
+  @override
+  String toString() => '$runtimeType("${file?.path}", "$url", scale: $scale)';
 }
 
-// Custom FirebaseImage widget that can be reused for all images in the app
 class CustomImage extends StatefulWidget {
   final String url;
   final Uint8List fallbackMemoryImage;
@@ -74,9 +155,8 @@ class CustomImage extends StatefulWidget {
   final double width;
   final double height;
   final Duration fadeInDuration;
-  final bool keepAlive;
   final bool saveInCache;
-  final void Function(double) onLoad;
+  final void Function(double aspectRatio) onLoad;
   CustomImage(
     this.url, {
     Key key,
@@ -86,199 +166,92 @@ class CustomImage extends StatefulWidget {
     this.fit: BoxFit.cover,
     this.width,
     this.height,
-    this.fadeInDuration: const Duration(milliseconds: 400),
-    this.keepAlive: false,
-    this.saveInCache: true,
+    this.fadeInDuration: const Duration(milliseconds: 200),
+    this.saveInCache,
     this.onLoad,
   }) : super(key: key);
 
+  @override
   _CustomImageState createState() => _CustomImageState();
 }
 
-class _CustomImageState extends State<CustomImage>
-    with AutomaticKeepAliveClientMixin {
-  static final HttpClient _httpClient = HttpClient();
-  MemoryImage _imageProvider;
-  bool networkError = false;
-  bool didUpdate = false;
-  bool fadeIn = false;
-  //int rebuildCount= 0;
+class _CustomImageState extends State<CustomImage> {
+  bool _init = false;
+  ImageProvider _imageProvider;
+  String _dirPath;
+  bool _isFadingIn;
 
-  void fetchImageFromStorage(Map<String, Uint8List> imageMap) async {
-    final String filePath = widget.url.replaceAll('/', '-');
-    final Directory dir = await getApplicationDocumentsDirectory();
-    final File file = File('${dir.path}/$filePath');
-    if (file.existsSync()) {
-      Uint8List bytes = file.readAsBytesSync();
-      if (mounted && (_imageProvider == null || networkError)) {
-        setState(() {
-          networkError = false;
-          fadeIn = false;
-          _imageProvider = MemoryImage(bytes);
-        });
-        onLoadCallback();
-      }
-      if (widget.saveInCache) {
-        var size = 0;
-        imageMap.forEach((key, value) {
-          size += value.length;
-        });
-        while (size > 10000000) {
-          size -= imageMap.values.toList()[0].length;
-          imageMap.remove(imageMap.keys.toList()[0]);
-        }
-        imageMap.addAll({widget.url: bytes});
-      }
-    }
-  }
-
-  void fetchImageFromNetwork(Map<String, Uint8List> imageMap) async {
-    try {
-      final Uri resolved = Uri.base.resolve(widget.url);
-      final HttpClientRequest request = await _httpClient.getUrl(resolved);
-      final HttpClientResponse response = await request.close();
-      if (response.statusCode != HttpStatus.ok) {
-        throw Exception('HTTP request failed, '
-            'statusCode: ${response?.statusCode}, $resolved');
-      }
-      final Uint8List bytes =
-          await consolidateHttpClientResponseBytes(response);
-      if (bytes.lengthInBytes == 0) {
-        throw Exception('NetworkImage is an empty file: $resolved');
-      }
-      if (mounted && _imageProvider == null) {
-        setState(() {
-          fadeIn = true;
-          _imageProvider = MemoryImage(bytes);
-        });
-        onLoadCallback();
-      }
-      if (widget.saveInCache) {
-        var size = 0;
-        imageMap.forEach((key, value) {
-          size += value.lengthInBytes;
-        });
-        while (size > 10000000) {
-          size -= imageMap.values.toList()[0].lengthInBytes;
-          imageMap.remove(imageMap.keys.toList()[0]);
-        }
-        imageMap.addAll({widget.url: bytes});
-      }
-      final Directory dir = await getApplicationDocumentsDirectory();
-      final String filePath = widget.url.replaceAll('/', '-');
-      final File file = File('${dir.path}/$filePath');
-      file.writeAsBytes(bytes);
-    } catch (e) {
-      if (mounted && _imageProvider == null) {
-        setState(() {
-          fadeIn = true;
-          networkError = true;
-          _imageProvider =
-              MemoryImage(widget.fallbackMemoryImage ?? kTransparentImage);
-        });
-        onLoadCallback();
-      }
-    }
+  void _resolveImage([Duration _]) {
+    _imageProvider.resolve(ImageConfiguration()).addListener(
+      ImageStreamListener((image, synchronousCall) {
+        if (mounted) widget.onLoad(image.image.width / image.image.height);
+      }),
+    );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Map<String, Uint8List> imageMap =
-        Provider.of<Map<String, Uint8List>>(context);
-    if (widget.url == null) {
-      _imageProvider =
-          MemoryImage(widget.fallbackMemoryImage ?? kTransparentImage);
-      onLoadCallback();
-    } else if (imageMap.containsKey(widget.url)) {
-      // If the provider already has the image associated with
-      _imageProvider = MemoryImage(imageMap[widget.url]);
-      onLoadCallback();
-    } else {
-      // These 2 functions below runs in parallel
-      fetchImageFromStorage(imageMap);
-      fetchImageFromNetwork(imageMap);
-    }
-  }
-
-  void onLoadCallback() {
-    if (widget.onLoad != null) {
-      decodeImageFromList(_imageProvider.bytes).then((image) {
-        if (mounted) {
-          widget.onLoad(image.width / image.height);
-        }
-      });
+    if (!_init) {
+      _dirPath = Provider.of<Directory>(context)?.path;
+      if (_dirPath == null) return;
+      final filePath = widget.url.split('/').last;
+      final file = File('$_dirPath/$filePath');
+      _isFadingIn =
+          (widget?.fadeInDuration ?? Duration.zero) != Duration.zero &&
+              !file.existsSync();
+      _imageProvider = NetworkToFileImage(
+        file: file,
+        url: widget.url,
+      );
+      if (widget.onLoad != null)
+        WidgetsBinding.instance.addPostFrameCallback(_resolveImage);
+      _init = true;
     }
   }
 
   @override
-  void didUpdateWidget(oldWidget) {
+  void didUpdateWidget(CustomImage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.url != widget.url) {
-      _imageProvider = null;
-      if (widget.url == null) {
-        _imageProvider =
-            MemoryImage(widget.fallbackMemoryImage ?? kTransparentImage);
-        onLoadCallback();
-      } else {
-        didUpdate = true;
-      }
+      final filePath = widget.url.split('/').last;
+      final file = File('$_dirPath/$filePath');
+      _isFadingIn =
+          (widget?.fadeInDuration ?? Duration.zero) != Duration.zero &&
+              !file.existsSync();
+      _imageProvider = NetworkToFileImage(
+        file: file,
+        url: widget.url,
+      );
+      if (widget.onLoad != null)
+        WidgetsBinding.instance.addPostFrameCallback(_resolveImage);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (didUpdate) {
-      Map<String, Uint8List> imageMap =
-          Provider.of<Map<String, Uint8List>>(context);
-      if (imageMap.containsKey(widget.url)) {
-        _imageProvider = MemoryImage(imageMap[widget.url]);
-        onLoadCallback();
-      } else {
-        fetchImageFromStorage(imageMap);
-        fetchImageFromNetwork(imageMap);
-      }
-      didUpdate = false;
-    }
-    super.build(context);
-    //rebuildCount += 1;
-    //print('Rebuilt: ${widget.url} $rebuildCount times');
-    return _imageProvider == null
-        ? Container(
-            width: widget.width ?? widget.height,
-            height: widget.height ?? widget.width,
-            decoration: BoxDecoration(
-              color: widget.placeholderColor,
-            ),
-          )
-        : DecoratedBox(
-            decoration: BoxDecoration(
-              color: widget.placeholderColor,
-            ),
-            child: Image(
-              gaplessPlayback: true,
-              image: _imageProvider,
-              width: widget.width,
-              height: widget.height,
-              fit: widget.fit,
-              frameBuilder: (context, child, frames, wasSynchronouslyLoaded) {
-                if (fadeIn &&
-                    !wasSynchronouslyLoaded &&
-                    widget.fadeInDuration != null &&
-                    widget.fadeInDuration != Duration.zero) {
-                  return AnimatedOpacity(
-                    opacity: frames == null ? 0 : 1,
-                    child: child,
-                    duration: widget.fadeInDuration,
-                    curve: Curves.easeIn,
-                  );
-                }
-                return child;
-              },
-            ),
-          );
+    return Container(
+      color: widget.placeholderColor,
+      width: widget.width,
+      height: widget.height,
+      child: _dirPath == null
+          ? null
+          : _isFadingIn
+              ? FadeInImage(
+                  fadeInDuration: widget.fadeInDuration,
+                  placeholder: MemoryImage(kTransparentImage),
+                  image: _imageProvider,
+                  width: widget.width,
+                  height: widget.height,
+                  fit: widget.fit,
+                )
+              : Image(
+                  gaplessPlayback: true,
+                  image: _imageProvider,
+                  width: widget.width,
+                  height: widget.height,
+                  fit: widget.fit,
+                ),
+    );
   }
-
-  @override
-  bool get wantKeepAlive => widget.keepAlive;
 }

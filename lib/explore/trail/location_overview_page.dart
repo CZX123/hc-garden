@@ -225,6 +225,7 @@ class AnimatedPulseCircle extends StatefulWidget {
 
 class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
     with SingleTickerProviderStateMixin {
+  final _isPressed = ValueNotifier(false);
   Animation<double> scale;
   Animation<Color> color;
   AnimationController controller;
@@ -259,7 +260,7 @@ class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
     final curve = CurveTween(curve: Curves.fastOutSlowIn);
     return GestureDetector(
       child: Material(
-        type: MaterialType.transparency,
+        color: Colors.transparent,
         child: Transform.scale(
           scale: .75,
           child: Stack(
@@ -275,7 +276,7 @@ class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
                         border: Border.all(
                           color: color.value,
                           width: height *
-                              0.4 *
+                              .4 *
                               curve.transform(value) /
                               scale.value,
                         ),
@@ -286,19 +287,34 @@ class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
                 ),
               ),
               Positioned.fill(
-                child: Material(
-                  elevation: 4,
-                  type: MaterialType.circle,
-                  color: Colors.white70,
-                  clipBehavior: Clip.antiAlias,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _isPressed,
+                  builder: (context, value, _) {
+                    return AnimatedContainer(
+                      duration: Duration(milliseconds: value ? 100 : 300),
+                      decoration: BoxDecoration(
+                        color: value ? Colors.white38 : Colors.white70,
+                        shape: BoxShape.circle,
+                        boxShadow: kElevationToShadow[4],
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
           ),
         ),
       ),
-      onTapDown: (_) {},
+      onTapDown: (_) {
+        _isPressed.value = true;
+      },
+      onTapUp: (_) {
+        _isPressed.value = false;
+      },
       onTap: widget.onTap,
+      onTapCancel: () {
+        _isPressed.value = false;
+      },
     );
   }
 }
