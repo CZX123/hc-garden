@@ -191,6 +191,7 @@ class _FirebaseDataWidgetState extends State<FirebaseDataWidget> {
             location: location,
           );
         });
+        trails[trail].sort((a, b) => a.name.compareTo(b.name));
       });
       Provider.of<MapNotifier>(context, listen: false).defaultMarkers =
           mapMarkers;

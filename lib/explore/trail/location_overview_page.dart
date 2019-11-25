@@ -165,6 +165,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                     width: (entityPosition.size / sizeScaling) * width,
                     height: (entityPosition.size / sizeScaling) * width,
                     child: AnimatedPulseCircle(
+                      height: (entityPosition.size / sizeScaling) * width,
                       onTap: () {
                         Provider.of<AppNotifier>(context, listen: false).push(
                           context: context,
@@ -213,8 +214,10 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
 }
 
 class AnimatedPulseCircle extends StatefulWidget {
+  final double height;
   final VoidCallback onTap;
-  AnimatedPulseCircle({Key key, @required this.onTap}) : super(key: key);
+  AnimatedPulseCircle({Key key, @required this.onTap, this.height})
+      : super(key: key);
 
   @override
   _AnimatedPulseCircleState createState() => _AnimatedPulseCircleState();
@@ -222,54 +225,80 @@ class AnimatedPulseCircle extends StatefulWidget {
 
 class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
     with SingleTickerProviderStateMixin {
-  Animation<double> animation;
+  Animation<double> scale;
+  Animation<Color> color;
   AnimationController controller;
-
-  void listener(AnimationStatus status) {
-    if (status == AnimationStatus.completed)
-      controller.reverse();
-    else if (status == AnimationStatus.dismissed) controller.forward();
-  }
 
   @override
   void initState() {
     super.initState();
     controller = AnimationController(
-        duration: const Duration(milliseconds: 700), vsync: this)
-      ..addStatusListener(listener);
-    animation = Tween<double>(begin: 0.85, end: 1).animate(CurvedAnimation(
+        duration: const Duration(milliseconds: 2000), vsync: this);
+    scale = Tween<double>(begin: 1, end: 1.8).animate(CurvedAnimation(
       parent: controller,
-      curve: Curves.easeInOutQuad,
+      curve: Curves.fastOutSlowIn,
     ));
-    controller.forward();
+    color = ColorTween(
+      begin: Colors.white54,
+      end: null,
+    ).animate(CurvedAnimation(
+      parent: controller,
+      curve: Curves.fastOutSlowIn,
+    ));
+    controller.repeat();
   }
 
   @override
   void dispose() {
-    // @TS, remember to dispose!
-    controller
-      ..removeStatusListener(listener)
-      ..dispose();
+    controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: animation,
+    final curve = CurveTween(curve: Curves.fastOutSlowIn);
+    return GestureDetector(
       child: Material(
-        color: Colors.black.withOpacity(.2),
-        shape: CircleBorder(
-          side: BorderSide(
-            color: Colors.lightGreenAccent,
-            width: 2.0,
+        type: MaterialType.transparency,
+        child: Transform.scale(
+          scale: .75,
+          child: Stack(
+            children: <Widget>[
+              ScaleTransition(
+                scale: scale,
+                child: ValueListenableBuilder<double>(
+                  valueListenable: controller,
+                  builder: (context, value, child) {
+                    double height = widget.height;
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: color.value,
+                          width: height *
+                              0.4 *
+                              curve.transform(value) /
+                              scale.value,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Positioned.fill(
+                child: Material(
+                  elevation: 4,
+                  type: MaterialType.circle,
+                  color: Colors.white70,
+                  clipBehavior: Clip.antiAlias,
+                ),
+              ),
+            ],
           ),
         ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: widget.onTap,
-        ),
       ),
+      onTapDown: (_) {},
+      onTap: widget.onTap,
     );
   }
 }
