@@ -155,6 +155,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                                 dense: true,
                                 title: const Text('Show Performance Overlay'),
                                 value: debugInfo.showPerformanceOverlay,
+                                checkColor: Theme.of(context).canvasColor,
                                 onChanged: (_) =>
                                     debugInfo.togglePerformanceOverlay(),
                               ),
@@ -164,6 +165,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                                     dense: true,
                                     title: const Text('Slow Animations'),
                                     value: timeDilation != 1.0,
+                                    checkColor: Theme.of(context).canvasColor,
                                     onChanged: (_) {
                                       debugInfo.toggleSlowAnimations();
                                       setState(() {});
@@ -175,6 +177,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                                 dense: true,
                                 title: const Text('Toggle iOS'),
                                 value: debugInfo.isIOS,
+                                checkColor: Theme.of(context).canvasColor,
                                 onChanged: (_) => debugInfo.toggleIOS(),
                               ),
                             ],
