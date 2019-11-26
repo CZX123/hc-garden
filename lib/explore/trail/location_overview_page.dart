@@ -185,6 +185,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                     child: entityPosition.entity is Fauna
                         ? FaunaCircle(
                             fauna: entityPosition.entity,
+                            height: (entityPosition.size / sizeScaling) * width,
                             onTap: () => _onTap(entityPosition.entity),
                           )
                         : AnimatedPulseCircle(
@@ -222,10 +223,12 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
 
 class FaunaCircle extends StatelessWidget {
   final Fauna fauna;
+  final double height;
   final VoidCallback onTap;
   const FaunaCircle({
     Key key,
     @required this.fauna,
+    @required this.height,
     @required this.onTap,
   }) : super(key: key);
 
@@ -235,7 +238,7 @@ class FaunaCircle extends StatelessWidget {
       shape: CircleBorder(
         side: BorderSide(
           color: Colors.white,
-          width: 2,
+          width: height*0.03,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -245,6 +248,8 @@ class FaunaCircle extends StatelessWidget {
           CustomImage(
             fauna.smallImage,
             fit: BoxFit.cover,
+            height: height,
+            width: height,
           ),
           Positioned.fill(
             child: Material(
