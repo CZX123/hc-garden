@@ -330,7 +330,7 @@ class MapNotifier extends ChangeNotifier {
 
   /// Animate to a specific point
   void _animateToPoint(LatLng point, double zoom, [bool adjusted = false]) {
-    mapController.animateCamera(CameraUpdate.newLatLngZoom(
+    mapController?.animateCamera(CameraUpdate.newLatLngZoom(
       adjusted
           ? LatLng(
               point.latitude - _getAdjustAmount(zoom),
@@ -468,6 +468,6 @@ class MapNotifier extends ChangeNotifier {
 
   /// Stop any map movement. This is used when markers are tapped to prevent map from moving to the marker.
   void stopAnimating() {
-    mapController.moveCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    mapController?.moveCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 }

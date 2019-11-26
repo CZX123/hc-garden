@@ -20,6 +20,24 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   double aspectRatio;
   static const double sizeScaling = 500;
 
+  void _onTap(Entity entity) {
+    Provider.of<AppNotifier>(context, listen: false).push(
+      context: context,
+      routeInfo: RouteInfo(
+        name: entity.name,
+        data: entity,
+        route: CrossFadePageRoute(
+          builder: (context) => Material(
+            color: Theme.of(context).bottomAppBarColor,
+            child: EntityDetailsPage(
+              entity: entity,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -165,58 +183,13 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                     width: (entityPosition.size / sizeScaling) * width,
                     height: (entityPosition.size / sizeScaling) * width,
                     child: entityPosition.entity is Fauna
-                        ? GestureDetector(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: Colors.green, width: 1.5),
-                              ),
-                              child: CustomImage(
-                                entityPosition.entity.smallImage,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            onTap: () {
-                              Provider.of<AppNotifier>(context, listen: false)
-                                  .push(
-                                context: context,
-                                routeInfo: RouteInfo(
-                                  name: entityPosition.entity.name,
-                                  data: entityPosition.entity,
-                                  route: CrossFadePageRoute(
-                                    builder: (context) => Material(
-                                      color:
-                                          Theme.of(context).bottomAppBarColor,
-                                      child: EntityDetailsPage(
-                                        entity: entityPosition.entity,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
+                        ? FaunaCircle(
+                            fauna: entityPosition.entity,
+                            onTap: () => _onTap(entityPosition.entity),
                           )
                         : AnimatedPulseCircle(
                             height: (entityPosition.size / sizeScaling) * width,
-                            onTap: () {
-                              Provider.of<AppNotifier>(context, listen: false)
-                                  .push(
-                                context: context,
-                                routeInfo: RouteInfo(
-                                  name: entityPosition.entity.name,
-                                  data: entityPosition.entity,
-                                  route: CrossFadePageRoute(
-                                    builder: (context) => Material(
-                                      color:
-                                          Theme.of(context).bottomAppBarColor,
-                                      child: EntityDetailsPage(
-                                        entity: entityPosition.entity,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
+                            onTap: () => _onTap(entityPosition.entity),
                           ),
                   ),
               ],
@@ -247,11 +220,54 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   }
 }
 
+class FaunaCircle extends StatelessWidget {
+  final Fauna fauna;
+  final VoidCallback onTap;
+  const FaunaCircle({
+    Key key,
+    @required this.fauna,
+    @required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      shape: CircleBorder(
+        side: BorderSide(
+          color: Colors.white,
+          width: 2,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      elevation: 4,
+      child: Stack(
+        children: <Widget>[
+          CustomImage(
+            fauna.smallImage,
+            fit: BoxFit.cover,
+          ),
+          Positioned.fill(
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                onTap: onTap,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class AnimatedPulseCircle extends StatefulWidget {
   final double height;
   final VoidCallback onTap;
-  AnimatedPulseCircle({Key key, @required this.onTap, this.height})
-      : super(key: key);
+  AnimatedPulseCircle({
+    Key key,
+    @required this.onTap,
+    @required this.height,
+  }) : super(key: key);
 
   @override
   _AnimatedPulseCircleState createState() => _AnimatedPulseCircleState();

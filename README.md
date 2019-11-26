@@ -6,9 +6,12 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 ### High Priority
 
+#### All Pages
+- Tapping on the info row should also expand the bottom sheet fully
+
 #### Trail Location Overview Page
 - ~~Better animated circles (TS)~~ ✔️
-- Fauna circles: Display image within circle as well (TS)
+- ~~Fauna circles: Display image within circle as well (TS)~~ ✔️
 
 #### Firebase Data (TS)
 - Filter out invalid data from Firebase (e.g. MISSING INFO)
