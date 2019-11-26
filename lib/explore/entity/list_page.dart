@@ -154,11 +154,11 @@ class _EntityListRowState extends State<EntityListRow> {
   Animation<double> secondaryAnimation;
 
   void listener() {
-    if (secondaryAnimation.value > 0) {
-      hidden.value = true;
-    } else if (secondaryAnimation.isDismissed) {
+    if (secondaryAnimation.isDismissed) {
       if (mounted) hidden.value = false;
       secondaryAnimation.removeListener(listener);
+    } else {
+      hidden.value = true;
     }
   }
 
@@ -192,29 +192,28 @@ class _EntityListRowState extends State<EntityListRow> {
           Text(
             widget.entity.name,
             style: Theme.of(context).textTheme.subhead.copyWith(
-                  fontSize: widget.searchTerm.isEmpty ? 16 : 17,
-                ),
-          ),
-          if (widget.searchTerm.isEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(
-                widget.entity.description,
-                style: Theme.of(context).textTheme.caption,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 3,
-              ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Text(
-                widget.entity.sciName,
-                style: Theme.of(context).textTheme.overline,
-              ),
+              fontSize: 16,
             ),
+          ),
+          Text(
+            widget.entity.description,
+            style: Theme.of(context).textTheme.caption,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 3,
+          ),
+          const SizedBox(
+            height: 4,
+          ),
         ],
       ),
+    );
+    final infoRow = InfoRow(
+      height: 84,
+      image: widget.entity.smallImage,
+      title: widget.entity.name,
+      subtitle: widget.entity.sciName,
+      italicised: true,
+      tapToAnimate: false,
     );
     return InkWell(
       child: ValueListenableBuilder<bool>(
@@ -225,18 +224,20 @@ class _EntityListRowState extends State<EntityListRow> {
             child: child,
           );
         },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-          child: Row(
-            children: <Widget>[
-              thumbnail,
-              const SizedBox(
-                width: 16,
-              ),
-              rightColumn,
-            ],
-          ),
-        ),
+        child: widget.searchTerm.isEmpty
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Row(
+                  children: <Widget>[
+                    thumbnail,
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    rightColumn,
+                  ],
+                ),
+              )
+            : infoRow,
       ),
       onTap: () async {
         final searchNotifier =
@@ -245,27 +246,28 @@ class _EntityListRowState extends State<EntityListRow> {
           searchNotifier.keyboardAppear = false;
           await Future.delayed(const Duration(milliseconds: 100));
         }
-        final oldChild = Container(
-          height: rowHeight,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Row(
-            children: <Widget>[
-              const SizedBox(
-                width: 80,
-              ),
-              rightColumn,
-            ],
-          ),
-        );
-        final persistentOldChild = Container(
-          height: rowHeight,
-          padding: const EdgeInsets.only(left: 14),
-          child: Row(
-            children: <Widget>[
-              thumbnail,
-            ],
-          ),
-        );
+        final oldChild = widget.searchTerm.isEmpty
+            ? Container(
+                height: rowHeight,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Row(
+                  children: <Widget>[
+                    const SizedBox(
+                      width: 80,
+                    ),
+                    rightColumn,
+                  ],
+                ),
+              )
+            : null;
+        final persistentOldChild = widget.searchTerm.isEmpty
+            ? Container(
+                height: rowHeight,
+                padding: const EdgeInsets.only(left: 14),
+                alignment: Alignment.centerLeft,
+                child: thumbnail,
+              )
+            : infoRow;
         final startContentOffset =
             ValueNotifier(Offset(0, (rowHeight - 64) / 2));
         final endContentOffset = ValueNotifier(Offset(0, topPadding + 16));
@@ -291,6 +293,7 @@ class _EntityListRowState extends State<EntityListRow> {
               builder: (context) => EntityDetailsPage(
                 endContentOffset: endContentOffset,
                 entity: widget.entity,
+                hideInfoRowOnExpand: widget.searchTerm.isNotEmpty,
               ),
               sourceRect: sourceRect,
               oldChild: oldChild,

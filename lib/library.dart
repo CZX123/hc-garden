@@ -35,6 +35,7 @@ export 'explore/trail/location_overview_page.dart';
 export 'history/history.dart';
 export 'map/map.dart';
 export 'map/map_data.dart';
+export 'widgets/general_widgets.dart';
 export 'widgets/nested_bottom_sheet.dart';
 export 'widgets/animation/cross_fade_page_route.dart';
 export 'widgets/animation/expand_page_route.dart';

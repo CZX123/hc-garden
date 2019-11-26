@@ -49,7 +49,7 @@ class Sizes {
   static const kBottomBarHeight = 48.0;
 
   /// Height of trail name in [TrailDetailsPage]. 't' stands for Trail.
-  static const tHeadingHeight = 76.0;
+  static const tHeadingHeight = 72.0;
 
   /// Height of fully collapsed bottom sheet in [TrailDetailsPage]. 't' stands for Trail.
   static const tCollapsedHeight = kBottomBarHeight + tHeadingHeight;

@@ -36,6 +36,8 @@ final ThemeData themeData = ThemeData(
   scaffoldBackgroundColor: Colors.grey[100],
   textSelectionHandleColor: Colors.white,
   textTheme: lightText,
+  // highlightColor: Color(0xFF27B50E).withOpacity(.12),
+  // splashColor: Color(0xFF27B50E).withOpacity(.12),
 );
 
 final ThemeData darkThemeData = ThemeData(
@@ -79,30 +81,30 @@ const TextTheme textTheme = TextTheme(
     height: 1.5,
     fontWeight: FontWeight.bold,
   ),
-  // Used for each entity's name in entity list page
+  // Used for each entity's name in entity list page and trail's name in trail details page, as well as info row titles
   subhead: TextStyle(
-    fontSize: 16,
+    fontSize: 17,
   ),
   // Used for each entity's description in entity list page
   caption: TextStyle(
     height: 1.5,
   ),
   subtitle: TextStyle(
-    fontSize: 14.2,
+    fontSize: 14.5,
     fontWeight: FontWeight.bold,
   ),
   // Main paragraph text
   body1: TextStyle(
-    fontSize: 14.2,
+    fontSize: 14,
   ),
   body2: TextStyle(
-    fontSize: 14.2,
+    fontSize: 14,
   ),
   // For latin names
   overline: TextStyle(
-    fontSize: 15.5,
+    fontSize: 14,
     fontStyle: FontStyle.italic,
-    height: 1.3,
+    height: 1.5,
     letterSpacing: 0.05,
   ),
 );

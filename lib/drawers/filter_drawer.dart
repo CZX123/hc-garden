@@ -32,7 +32,7 @@ class FilterDrawer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                      padding: const EdgeInsets.fromLTRB(16, 28, 16, 12),
                       child: Text(
                         'Trails',
                         style: Theme.of(context).textTheme.subtitle,
@@ -69,6 +69,7 @@ class FilterDrawer extends StatelessWidget {
                                   value: selectedTrails.contains(trail),
                                   title: Text(
                                     trail.name.split('(').first.trimRight(),
+                                    style: Theme.of(context).textTheme.body1,
                                   ),
                                   checkColor: Theme.of(context).canvasColor,
                                   onChanged: (value) {
@@ -91,7 +92,7 @@ class FilterDrawer extends StatelessWidget {
                       },
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                      padding: const EdgeInsets.fromLTRB(16, 28, 16, 12),
                       child: Text(
                         'Sort',
                         style: Theme.of(context).textTheme.subtitle,
@@ -102,7 +103,10 @@ class FilterDrawer extends StatelessWidget {
                       controlAffinity: ListTileControlAffinity.trailing,
                       groupValue: true,
                       value: true,
-                      title: const Text('Alphabetical'),
+                      title: Text(
+                        'Alphabetical',
+                        style: Theme.of(context).textTheme.body1,
+                      ),
                       onChanged: (_) {},
                     ),
                     RadioListTile<bool>(
@@ -110,7 +114,12 @@ class FilterDrawer extends StatelessWidget {
                       controlAffinity: ListTileControlAffinity.trailing,
                       groupValue: true,
                       value: false,
-                      title: const Text('Distance'),
+                      title: Text(
+                        'Distance',
+                        style: Theme.of(context).textTheme.body1.copyWith(
+                          color: Theme.of(context).disabledColor,
+                        ),
+                      ),
                       subtitle: const Text('Coming Soon'),
                     ),
                   ],

@@ -77,20 +77,36 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
                     h = (1 - value / paddingBreakpoint) * topPadding;
                   }
                   return Padding(
-                    padding: EdgeInsets.only(top: h + 32),
+                    padding: EdgeInsets.only(top: h),
                     child: child,
                   );
                 },
-                child: Text(
-                  widget.trail.name,
-                  style: Theme.of(context).textTheme.display1,
-                  textAlign: TextAlign.center,
+                child: InkWell(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 32, 0, 16),
+                    child: Text(
+                      widget.trail.name,
+                      style: Theme.of(context).textTheme.display1,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  onTap: () {
+                    if (bottomSheetNotifier.animation.value < 8) {
+                      bottomSheetNotifier.animateTo(
+                        bottomSheetNotifier.snappingPositions.value.last,
+                      );
+                    } else {
+                      bottomSheetNotifier.animateTo(
+                        bottomSheetNotifier.snappingPositions.value.first,
+                      );
+                    }
+                  },
                 ),
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 16,
+              padding: const EdgeInsets.only(
+                bottom: 16,
               ),
               sliver: SliverFixedExtentList(
                 delegate: SliverChildBuilderDelegate(
@@ -133,11 +149,11 @@ class _LocationListRowState extends State<LocationListRow> {
   Animation<double> secondaryAnimation;
 
   void listener() {
-    if (secondaryAnimation.value > 0) {
-      hidden.value = true;
-    } else if (secondaryAnimation.isDismissed) {
+    if (secondaryAnimation.isDismissed) {
       if (mounted) hidden.value = false;
       secondaryAnimation.removeListener(listener);
+    } else {
+      hidden.value = true;
     }
   }
 
@@ -160,69 +176,12 @@ class _LocationListRowState extends State<LocationListRow> {
               }))
         .map((position) => position.entity.name)
         .toList();
-    final child = Container(
+    final child = InfoRow(
       height: 84,
-      child: Row(
-        children: <Widget>[
-          const SizedBox(
-            width: 14,
-          ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(32),
-            child: CustomImage(
-              widget.location.smallImage,
-              height: 64,
-              width: 64,
-              placeholderColor: Theme.of(context).dividerColor,
-              fadeInDuration: const Duration(milliseconds: 300),
-            ),
-          ),
-          const SizedBox(
-            width: 16,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  widget.location.name,
-                  style: Theme.of(context).textTheme.subhead,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Stack(
-                    children: <Widget>[
-                      // 2 text required, one to ack as the background for the other text, so they will not flicker when going to new screen
-                      Text(
-                        names.join(', '),
-                        style: Theme.of(context).textTheme.caption.copyWith(
-                              fontSize: 13.5,
-                              color: Theme.of(context).bottomAppBarColor,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      Text(
-                        names.join(', '),
-                        style: Theme.of(context).textTheme.caption.copyWith(
-                              fontSize: 13.5,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-          const SizedBox(
-            width: 14,
-          ),
-        ],
-      ),
+      image: widget.location.smallImage,
+      title: widget.location.name,
+      subtitle: names.join(', '),
+      tapToAnimate: false,
     );
     return InkWell(
       child: ValueListenableBuilder<bool>(
@@ -263,6 +222,7 @@ class _LocationListRowState extends State<LocationListRow> {
                 return TrailLocationOverviewPage(
                   trailLocation: widget.location,
                   endContentOffset: endContentOffset,
+                  hideInfoRowOnExpand: true,
                 );
               },
               sourceRect: sourceRect,

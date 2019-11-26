@@ -3,10 +3,12 @@ import '../../library.dart';
 class EntityDetailsPage extends StatefulWidget {
   final ValueNotifier<Offset> endContentOffset;
   final Entity entity;
+  final bool hideInfoRowOnExpand;
   const EntityDetailsPage({
     Key key,
     this.endContentOffset,
     @required this.entity,
+    this.hideInfoRowOnExpand = false,
   }) : super(key: key);
 
   @override
@@ -19,6 +21,16 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
   /// Whether page should slide up when going to a new route. Only applies when going to image gallery.
   bool _slideUp = false;
   final _scrollController = ScrollController();
+  final hidden = ValueNotifier(false);
+  Animation<double> animation;
+
+  void listener() {
+    if (animation.value < 1) {
+      hidden.value = true;
+    } else if (animation.isCompleted) {
+      hidden.value = false;
+    }
+  }
 
   List<Widget> locations(
     BuildContext context,
@@ -36,12 +48,11 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
         return loc.id == locationId;
       });
       children.add(ListTile(
+        dense: true,
         leading: Icon(Icons.location_on),
         title: Text(
           '${location.name}',
-          style: Theme.of(context).textTheme.body1.copyWith(
-                height: 1.3,
-              ),
+          style: Theme.of(context).textTheme.body1,
         ),
         onTap: () {
           _scrollController.animateTo(
@@ -72,12 +83,17 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
         data: widget.entity,
         scrollController: _scrollController,
       );
+      if (widget.hideInfoRowOnExpand ?? false) {
+        animation = ModalRoute.of(context).animation..addListener(listener);
+        hidden.value = true;
+      }
       _init = true;
     }
   }
 
   @override
   void dispose() {
+    animation?.removeListener(listener);
     _scrollController.dispose();
     super.dispose();
   }
@@ -112,50 +128,22 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
               );
             },
           ),
-          Container(
-            height: Sizes.kInfoRowHeight,
-            padding: EdgeInsets.fromLTRB(14, 0, 14, 0),
-            child: Row(
-              children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(32),
-                  child: CustomImage(
-                    widget.entity.smallImage,
-                    height: 64,
-                    width: 64,
-                    placeholderColor: Theme.of(context).dividerColor,
-                    fadeInDuration: null,
-                  ),
-                ),
-                const SizedBox(
-                  width: 16,
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        widget.entity.name,
-                        style: Theme.of(context).textTheme.subhead.copyWith(
-                              fontSize: 18,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      Text(
-                        widget.entity.sciName,
-                        style: Theme.of(context).textTheme.overline,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      const SizedBox(
-                        height: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+          ValueListenableBuilder<bool>(
+            valueListenable: hidden,
+            builder: (context, value, child) {
+              return Visibility(
+                visible: !value,
+                maintainState: true,
+                maintainAnimation: true,
+                maintainSize: true,
+                child: child,
+              );
+            },
+            child: InfoRow(
+              image: widget.entity.smallImage,
+              title: widget.entity.name,
+              subtitle: widget.entity.sciName,
+              italicised: true,
             ),
           ),
           Container(

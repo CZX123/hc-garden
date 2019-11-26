@@ -7,7 +7,7 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 ### High Priority
 
 #### All Pages
-- Tapping on the info row should also expand the bottom sheet fully
+- ~~Tapping on the info row should also expand the bottom sheet fully~~ ✔️
 
 #### Trail Location Overview Page
 - ~~Better animated circles (TS)~~ ✔️

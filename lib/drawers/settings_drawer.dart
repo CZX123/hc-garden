@@ -72,7 +72,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                      padding: const EdgeInsets.fromLTRB(16, 28, 16, 12),
                       child: Text(
                         'App Theme',
                         style: Theme.of(context).textTheme.subtitle,
@@ -84,7 +84,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                           dense: true,
                           contentPadding:
                               const EdgeInsets.fromLTRB(16, 0, 8, 0),
-                          title: const Text('Dark Mode'),
+                          title: Text(
+                            'Dark Mode',
+                            style: Theme.of(context).textTheme.body1,
+                          ),
                           trailing: Switch(
                             value: themeNotifier.value,
                             onChanged: (value) => themeNotifier.value = value,
@@ -96,7 +99,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                       },
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                      padding: const EdgeInsets.fromLTRB(16, 28, 16, 12),
                       child: Text(
                         'Map Type',
                         style: Theme.of(context).textTheme.subtitle,
@@ -113,7 +116,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                               controlAffinity: ListTileControlAffinity.trailing,
                               groupValue: mapType,
                               value: CustomMapType.normal,
-                              title: const Text('Normal'),
+                              title: Text(
+                                'Normal',
+                                style: Theme.of(context).textTheme.body1,
+                              ),
                               onChanged: _changeMapType,
                             ),
                             RadioListTile<CustomMapType>(
@@ -121,7 +127,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                               controlAffinity: ListTileControlAffinity.trailing,
                               groupValue: mapType,
                               value: CustomMapType.dark,
-                              title: const Text('Dark'),
+                              title: Text(
+                                'Dark',
+                                style: Theme.of(context).textTheme.body1,
+                              ),
                               onChanged: _changeMapType,
                             ),
                             RadioListTile<CustomMapType>(
@@ -129,7 +138,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                               controlAffinity: ListTileControlAffinity.trailing,
                               groupValue: mapType,
                               value: CustomMapType.satellite,
-                              title: const Text('Satellite'),
+                              title: Text(
+                                'Satellite',
+                                style: Theme.of(context).textTheme.body1,
+                              ),
                               onChanged: _changeMapType,
                             ),
                           ],
@@ -145,7 +157,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                             children: <Widget>[
                               Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                                    const EdgeInsets.fromLTRB(16, 28, 16, 12),
                                 child: Text(
                                   'Debug',
                                   style: Theme.of(context).textTheme.subtitle,
@@ -153,7 +165,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                               ),
                               CheckboxListTile(
                                 dense: true,
-                                title: const Text('Show Performance Overlay'),
+                                title: Text(
+                                  'Show Performance Overlay',
+                                  style: Theme.of(context).textTheme.body1,
+                                ),
                                 value: debugInfo.showPerformanceOverlay,
                                 checkColor: Theme.of(context).canvasColor,
                                 onChanged: (_) =>
@@ -163,7 +178,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                                 builder: (context, setState) {
                                   return CheckboxListTile(
                                     dense: true,
-                                    title: const Text('Slow Animations'),
+                                    title: Text(
+                                      'Slow Animations',
+                                      style: Theme.of(context).textTheme.body1,
+                                    ),
                                     value: timeDilation != 1.0,
                                     checkColor: Theme.of(context).canvasColor,
                                     onChanged: (_) {
@@ -175,7 +193,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                               ),
                               CheckboxListTile(
                                 dense: true,
-                                title: const Text('Toggle iOS'),
+                                title: Text(
+                                  'Toggle iOS',
+                                  style: Theme.of(context).textTheme.body1,
+                                ),
                                 value: debugInfo.isIOS,
                                 checkColor: Theme.of(context).canvasColor,
                                 onChanged: (_) => debugInfo.toggleIOS(),

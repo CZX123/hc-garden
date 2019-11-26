@@ -145,7 +145,38 @@ Marker generateMarker({
 }) {
   final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
   return Marker(
-    onTap: mapNotifier.stopAnimating,
+    onTap: () {
+      final appNotifier = Provider.of<AppNotifier>(
+        context,
+        listen: false,
+      );
+      if (appNotifier.routes.isNotEmpty &&
+          appNotifier.routes.last.data is TrailLocation &&
+          appNotifier.routes.last.data == location) {
+        Provider.of<BottomSheetNotifier>(
+          context,
+          listen: false,
+        ).animateTo(0);
+      } else {
+        appNotifier.push(
+          context: context,
+          routeInfo: RouteInfo(
+            name: location.name,
+            data: location,
+            route: CrossFadePageRoute(
+              builder: (context) {
+                return Material(
+                  color: Theme.of(context).bottomAppBarColor,
+                  child: TrailLocationOverviewPage(
+                    trailLocation: location,
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      }
+    },
     markerId: MarkerId('${trail.id} ${location.id}'),
     position: location.coordinates,
     infoWindow: InfoWindow(

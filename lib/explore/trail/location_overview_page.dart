@@ -3,10 +3,12 @@ import '../../library.dart';
 class TrailLocationOverviewPage extends StatefulWidget {
   final TrailLocation trailLocation;
   final ValueNotifier<Offset> endContentOffset;
+  final bool hideInfoRowOnExpand;
   const TrailLocationOverviewPage({
     Key key,
     @required this.trailLocation,
     this.endContentOffset,
+    this.hideInfoRowOnExpand = false,
   }) : super(key: key);
 
   @override
@@ -19,6 +21,16 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   final _scrollController = ScrollController();
   double aspectRatio;
   static const double sizeScaling = 500;
+  final hidden = ValueNotifier(false);
+  Animation<double> animation;
+
+  void listener() {
+    if (animation.value < 1) {
+      hidden.value = true;
+    } else if (animation.isCompleted) {
+      hidden.value = false;
+    }
+  }
 
   void _onTap(Entity entity) {
     Provider.of<AppNotifier>(context, listen: false).push(
@@ -47,12 +59,17 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
         data: widget.trailLocation,
         scrollController: _scrollController,
       );
+      if (widget.hideInfoRowOnExpand ?? false) {
+        animation = ModalRoute.of(context).animation..addListener(listener);
+        hidden.value = true;
+      }
       _init = true;
     }
   }
 
   @override
   void dispose() {
+    animation?.removeListener(listener);
     _scrollController.dispose();
     super.dispose();
   }
@@ -84,62 +101,29 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
               );
             },
           ),
-          Container(
-            height: Sizes.kInfoRowHeight,
-            child: Row(
-              children: <Widget>[
-                const SizedBox(
-                  width: 14,
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(32),
-                  child: CustomImage(
-                    widget.trailLocation.smallImage,
-                    height: 64,
-                    width: 64,
-                    placeholderColor: Theme.of(context).dividerColor,
-                    fadeInDuration: const Duration(milliseconds: 300),
-                  ),
-                ),
-                const SizedBox(
-                  width: 16,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        widget.trailLocation.name,
-                        style: Theme.of(context).textTheme.subhead,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          (widget.trailLocation.entityPositions
-                                  .where((position) => position.entity != null)
-                                  .toList()
-                                    ..sort((a, b) {
-                                      return a.left.compareTo(b.left);
-                                    }))
-                              .map((position) => position.entity.name)
-                              .toList()
-                              .join(', '),
-                          style: Theme.of(context).textTheme.caption.copyWith(
-                                fontSize: 13.5,
-                              ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  width: 14,
-                ),
-              ],
+          ValueListenableBuilder<bool>(
+            valueListenable: hidden,
+            builder: (context, value, child) {
+              return Visibility(
+                visible: !value,
+                maintainState: true,
+                maintainAnimation: true,
+                maintainSize: true,
+                child: child,
+              );
+            },
+            child: InfoRow(
+              image: widget.trailLocation.smallImage,
+              title: widget.trailLocation.name,
+              subtitle: (widget.trailLocation.entityPositions
+                      .where((position) => position.entity != null)
+                      .toList()
+                        ..sort((a, b) {
+                          return a.left.compareTo(b.left);
+                        }))
+                  .map((position) => position.entity.name)
+                  .toList()
+                  .join(', '),
             ),
           ),
           ValueListenableBuilder<double>(
@@ -220,7 +204,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   }
 }
 
-class FaunaCircle extends StatelessWidget {
+class FaunaCircle extends StatefulWidget {
   final Fauna fauna;
   final VoidCallback onTap;
   const FaunaCircle({
@@ -230,32 +214,58 @@ class FaunaCircle extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _FaunaCircleState createState() => _FaunaCircleState();
+}
+
+class _FaunaCircleState extends State<FaunaCircle> {
+  final _isPressed = ValueNotifier(false);
+
+  @override
+  void dispose() {
+    _isPressed.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Material(
-      shape: CircleBorder(
-        side: BorderSide(
-          color: Colors.white,
-          width: 2,
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      elevation: 4,
-      child: Stack(
-        children: <Widget>[
-          CustomImage(
-            fauna.smallImage,
-            fit: BoxFit.cover,
-          ),
-          Positioned.fill(
-            child: Material(
-              type: MaterialType.transparency,
-              child: InkWell(
-                onTap: onTap,
+    return GestureDetector(
+      child: Material(
+        color: Colors.transparent,
+        child: ValueListenableBuilder<bool>(
+          valueListenable: _isPressed,
+          builder: (context, value, child) {
+            return AnimatedOpacity(
+              opacity: value ? .5 : 1,
+              duration: Duration(milliseconds: value ? 100 : 300),
+              child: child,
+            );
+          },
+          child: Material(
+            shape: CircleBorder(
+              side: BorderSide(
+                color: Colors.white,
+                width: 2,
               ),
             ),
+            clipBehavior: Clip.antiAlias,
+            elevation: 4,
+            child: CustomImage(
+              widget.fauna.smallImage,
+              fit: BoxFit.cover,
+            ),
           ),
-        ],
+        ),
       ),
+      onTapDown: (_) {
+        _isPressed.value = true;
+      },
+      onTapUp: (_) {
+        _isPressed.value = false;
+      },
+      onTap: widget.onTap,
+      onTapCancel: () {
+        _isPressed.value = false;
+      },
     );
   }
 }
