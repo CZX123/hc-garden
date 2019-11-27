@@ -86,3 +86,92 @@ class InfoRow extends StatelessWidget {
     );
   }
 }
+
+// This is just for a much smoother gradient
+class GradientWidget extends StatelessWidget {
+  final Color color;
+  final double size;
+  final Alignment begin;
+  final Alignment end;
+  const GradientWidget({
+    Key key,
+    @required this.color,
+    this.size = 32,
+    this.begin = Alignment.topCenter,
+    this.end = Alignment.bottomCenter,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        height: begin == Alignment.centerLeft || begin == Alignment.centerRight
+            ? null
+            : size,
+        width: begin == Alignment.centerLeft || begin == Alignment.centerRight
+            ? size
+            : null,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: begin,
+            end: end,
+            colors: [
+              color.withOpacity(1),
+              color.withOpacity(.738),
+              color.withOpacity(.541),
+              color.withOpacity(.382),
+              color.withOpacity(.278),
+              color.withOpacity(.194),
+              color.withOpacity(.126),
+              color.withOpacity(.075),
+              color.withOpacity(.042),
+              color.withOpacity(.021),
+              color.withOpacity(.008),
+              color.withOpacity(.002),
+              color.withOpacity(0),
+            ],
+            stops: [
+              0,
+              .19,
+              .34,
+              .45,
+              .565,
+              .65,
+              .73,
+              .802,
+              .861,
+              .91,
+              .952,
+              .982,
+              1,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A widget that has a height of the [MediaQuery]'s bottom padding
+class BottomPadding extends StatelessWidget {
+  const BottomPadding({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).padding.bottom,
+    );
+  }
+}
+
+/// A widget that has a height of the [MediaQuery]'s bottom view inset
+class BottomInset extends StatelessWidget {
+  const BottomInset({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).viewInsets.bottom,
+    );
+  }
+}

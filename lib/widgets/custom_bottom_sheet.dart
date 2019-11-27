@@ -35,7 +35,7 @@ final SpringDescription spring = SpringDescription.withDampingRatio(
   ratio: 1.1,
 );
 
-class NestedBottomSheet extends StatefulWidget {
+class CustomBottomSheet extends StatefulWidget {
   final ShapeBorder shape;
   final Color color;
   final double initialPosition;
@@ -44,7 +44,7 @@ class NestedBottomSheet extends StatefulWidget {
   final Widget footer;
   final Widget background;
 
-  const NestedBottomSheet({
+  const CustomBottomSheet({
     Key key,
     this.shape = const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -60,10 +60,10 @@ class NestedBottomSheet extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _NestedBottomSheetState createState() => _NestedBottomSheetState();
+  _CustomBottomSheetState createState() => _CustomBottomSheetState();
 }
 
-class _NestedBottomSheetState extends State<NestedBottomSheet>
+class _CustomBottomSheetState extends State<CustomBottomSheet>
     with SingleTickerProviderStateMixin {
   bool _init = false;
   BottomSheetNotifier _bottomSheetNotifier;

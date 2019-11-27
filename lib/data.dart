@@ -420,8 +420,11 @@ class RouteInfo<T> {
 /// The main notifier in charge of app state, and pushing and popping routes within the bottom sheet
 class AppNotifier extends ChangeNotifier {
   // Both routes and navigator stack are kept in sync with each other
-  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  final navigatorKey = GlobalKey<NavigatorState>();
   List<RouteInfo> routes = [];
+  final animatedListKey = GlobalKey<AnimatedListState>();
+  final animatedListScrollController = ScrollController();
+  bool justPopped = false;
 
   int _state = 0;
 
@@ -432,9 +435,39 @@ class AppNotifier extends ChangeNotifier {
   /// 2: [ImageGallery]
   int get state => _state;
 
+  void popUntil(BuildContext context, int index) {
+    if (index == null) return;
+    if (index < 0) {
+      while (routes.isNotEmpty) pop(context);
+    } else {
+      if (animatedListScrollController.hasClients &&
+          animatedListScrollController.offset != 0) {
+        animatedListScrollController.animateTo(
+          0,
+          duration: BreadcrumbNavigation.duration,
+          curve: Interval(.2, 1, curve: Curves.fastOutSlowIn),
+        );
+      }
+      while (routes.length > index + 1) pop(context);
+    }
+  }
+
   /// Pop the current screen in the bottom sheet
   void pop(BuildContext context) {
-    routes.removeLast();
+    if (routes.length == 0) return;
+    final last = routes.removeLast();
+    animatedListKey?.currentState?.removeItem(
+      0,
+      (context, animation) {
+        return BreadcrumbNavigation.removeItemBuilder(
+          context,
+          animation,
+          last.name,
+        );
+      },
+      duration: BreadcrumbNavigation.duration,
+    );
+    justPopped = true;
     if (routes.isEmpty) {
       changeState(
         context: context,
@@ -481,6 +514,19 @@ class AppNotifier extends ChangeNotifier {
     bool disableDragging = false,
   }) async {
     routes.add(routeInfo);
+    animatedListKey?.currentState?.insertItem(
+      0,
+      duration: BreadcrumbNavigation.duration,
+    );
+    if (animatedListScrollController.hasClients &&
+        animatedListScrollController.offset != 0) {
+      animatedListScrollController.animateTo(
+        0,
+        duration: BreadcrumbNavigation.duration,
+        curve: Interval(0, .8, curve: Curves.fastOutSlowIn),
+      );
+    }
+    justPopped = false;
     changeState(
       context: context,
       routeInfo: routeInfo,
@@ -604,5 +650,11 @@ class AppNotifier extends ChangeNotifier {
     if (!isHome) {
       bottomSheetNotifier.activeScrollController = routeInfo?.scrollController;
     }
+  }
+
+  @override
+  void dispose() {
+    animatedListScrollController.dispose();
+    super.dispose();
   }
 }

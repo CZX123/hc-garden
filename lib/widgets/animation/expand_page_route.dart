@@ -132,12 +132,12 @@ class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
           begin: RelativeRect.fromLTRB(
             widget.sourceRect.left,
             widget.rowOffset -
-                widget.oldScrollController.offset +
+                (widget.oldScrollController?.offset ?? height) +
                 widget.topSpace.value,
             width - widget.sourceRect.right,
             height -
                 (widget.rowOffset -
-                    widget.oldScrollController.offset +
+                    (widget.oldScrollController?.offset ?? height) +
                     widget.topSpace.value) -
                 widget.sourceRect.height,
           ),

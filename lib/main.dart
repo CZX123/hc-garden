@@ -408,7 +408,7 @@ class _MyHomePageState extends State<MyHomePage>
             child: CustomAnimatedSwitcher(
               crossShrink: false,
               child: height != 0
-                  ? NestedBottomSheet(
+                  ? CustomBottomSheet(
                       initialPosition: height -
                           (heightTooSmall
                               ? Sizes.kBottomHeight -

@@ -189,7 +189,7 @@ class TrailButtonsRow extends StatelessWidget {
                   Provider.of<AppNotifier>(context).push(
                     context: context,
                     routeInfo: RouteInfo(
-                      name: trail.name,
+                      name: trail.name.split('(').first.trimRight(),
                       data: trail,
                       route: CrossFadePageRoute(
                         builder: (context) {
