@@ -285,9 +285,10 @@ class _MyHomePageState extends State<MyHomePage>
         return false;
       }
       final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
-      if (searchNotifier.isSearching) {
+      if (FocusScope.of(context).focusedChild == searchNotifier.focusNode ||
+          searchNotifier.searchTerm.isNotEmpty) {
         searchNotifier
-          ..isSearching = false
+          ..unfocus()
           ..searchTerm = '';
         return false;
       } else if (animation.value < paddingBreakpoint) {
@@ -311,8 +312,6 @@ class _MyHomePageState extends State<MyHomePage>
         if (state == 1 && animation.value > paddingBreakpoint) {
           bottomSheetNotifier.animateTo(paddingBreakpoint);
         }
-        if (searchNotifier.searchTerm.isNotEmpty)
-          searchNotifier.isSearching = true;
       }
       return false;
     }
@@ -384,6 +383,7 @@ class _MyHomePageState extends State<MyHomePage>
       selector: (context, appNotifier) => appNotifier.routes.isEmpty,
       builder: (context, routesIsEmpty, child) {
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           drawer: SettingsDrawer(),
           endDrawer: routesIsEmpty ? FilterDrawer() : null,
           body: child,

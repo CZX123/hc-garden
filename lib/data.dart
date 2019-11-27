@@ -571,7 +571,7 @@ class AppNotifier extends ChangeNotifier {
           !heightTooSmall;
       if (routeInfo.data is Entity) {
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-        Provider.of<SearchNotifier>(context, listen: false).isSearching = false;
+        Provider.of<SearchNotifier>(context, listen: false).unfocus();
         mapNotifier.animateToEntity(
           entity: routeInfo.data,
           trails: Provider.of<FirebaseData>(context, listen: false).trails,

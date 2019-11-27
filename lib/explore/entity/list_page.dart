@@ -31,103 +31,94 @@ class EntityListPage extends StatelessWidget {
     ];
     if (entityList.length == 0) return SizedBox.shrink();
     final isFlora = entityList[0] is Flora;
-    return NotificationListener(
-      onNotification: (notification) {
-        if (notification is ScrollUpdateNotification &&
-            notification.depth == 0) {
-          Provider.of<SearchNotifier>(context).keyboardAppear = false;
-        }
-        return false;
+    return Selector<FilterNotifier, List<Trail>>(
+      selector: (context, sortNotifier) {
+        return sortNotifier.selectedTrails;
       },
-      child: Selector<FilterNotifier, List<Trail>>(
-        selector: (context, sortNotifier) {
-          return sortNotifier.selectedTrails;
-        },
-        builder: (context, selectedTrails, child) {
-          if (selectedTrails == null) {
-            selectedTrails = List.from(
-                Provider.of<FirebaseData>(context, listen: false)
-                    ?.trails
-                    ?.keys);
-            if (selectedTrails == null) return const SizedBox.shrink();
-            Provider.of<FilterNotifier>(context, listen: false)
-                .updateSelectedTrailsDiscreetly(selectedTrails);
-          }
-          List<Entity> updatedEntityList = entityList;
-          if (selectedTrails.length != 3) {
-            updatedEntityList = entityList.where((entity) {
-              return !entity.locations.every((location) {
-                return selectedTrails.every((trail) {
-                  return trail.id != location[0];
-                });
+      builder: (context, selectedTrails, child) {
+        if (selectedTrails == null) {
+          selectedTrails = List.from(
+              Provider.of<FirebaseData>(context, listen: false)
+                  ?.trails
+                  ?.keys);
+          if (selectedTrails == null) return const SizedBox.shrink();
+          Provider.of<FilterNotifier>(context, listen: false)
+              .updateSelectedTrailsDiscreetly(selectedTrails);
+        }
+        List<Entity> updatedEntityList = entityList;
+        if (selectedTrails.length != 3) {
+          updatedEntityList = entityList.where((entity) {
+            return !entity.locations.every((location) {
+              return selectedTrails.every((trail) {
+                return trail.id != location[0];
               });
-            }).toList();
-          }
-          return Selector<SearchNotifier, String>(
-            selector: (context, searchNotifier) => searchNotifier.searchTerm,
-            builder: (context, searchTerm, child) {
-              List<Entity> _list = [];
-              if (searchTerm != '*') {
-                updatedEntityList.forEach((entity) {
-                  if (_isValid(entity, searchTerm)) {
-                    _list.add(entity);
-                  }
-                });
-              } else {
-                _list = updatedEntityList;
-              }
-              if (isFlora)
-                floraIcons.shuffle();
-              else
-                faunaIcons.shuffle();
-              return CustomAnimatedSwitcher(
-                child: _list.length == 0
-                    ? Padding(
-                        key: ValueKey(searchTerm + '!'),
-                        padding: const EdgeInsets.fromLTRB(0, 16, 0, 64),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(
-                              isFlora ? floraIcons[0] : faunaIcons[0],
-                              size: 64,
+            });
+          }).toList();
+        }
+        return Selector<SearchNotifier, String>(
+          selector: (context, searchNotifier) => searchNotifier.searchTerm,
+          builder: (context, searchTerm, child) {
+            List<Entity> _list = [];
+            if (searchTerm != '*') {
+              updatedEntityList.forEach((entity) {
+                if (_isValid(entity, searchTerm)) {
+                  _list.add(entity);
+                }
+              });
+            } else {
+              _list = updatedEntityList;
+            }
+            if (isFlora)
+              floraIcons.shuffle();
+            else
+              faunaIcons.shuffle();
+            return CustomAnimatedSwitcher(
+              child: _list.length == 0
+                  ? Padding(
+                      key: ValueKey(searchTerm + '!'),
+                      padding: const EdgeInsets.fromLTRB(0, 16, 0, 64),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            isFlora ? floraIcons[0] : faunaIcons[0],
+                            size: 64,
+                            color: Theme.of(context).disabledColor,
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            'No matching ${isFlora ? 'flora' : 'fauna'}',
+                            style: TextStyle(
                               color: Theme.of(context).disabledColor,
                             ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Text(
-                              'No matching ${isFlora ? 'flora' : 'fauna'}',
-                              style: TextStyle(
-                                color: Theme.of(context).disabledColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ListView.builder(
-                        key: ValueKey(
-                            searchTerm + updatedEntityList.length.toString()),
-                        padding: EdgeInsets.fromLTRB(
-                            0, 16, 0, searchTerm.isEmpty ? 80 : 64),
-                        controller: scrollController,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: _list.length,
-                        itemExtent: searchTerm.isEmpty ? 104 : 84,
-                        itemBuilder: (context, index) {
-                          return EntityListRow(
-                            searchTerm: searchTerm,
-                            entity: _list[index],
-                            index: index,
-                            scrollController: scrollController,
-                          );
-                        },
+                          ),
+                        ],
                       ),
-              );
-            },
-          );
-        },
-      ),
+                    )
+                  : ListView.builder(
+                      key: ValueKey(
+                          searchTerm + updatedEntityList.length.toString()),
+                      padding: EdgeInsets.fromLTRB(
+                          0, 16, 0, searchTerm.isEmpty ? 80 : 64),
+                      controller: scrollController,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _list.length,
+                      itemExtent: searchTerm.isEmpty ? 104 : 84,
+                      itemBuilder: (context, index) {
+                        return EntityListRow(
+                          searchTerm: searchTerm,
+                          entity: _list[index],
+                          index: index,
+                          scrollController: scrollController,
+                        );
+                      },
+                    ),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -239,13 +230,13 @@ class _EntityListRowState extends State<EntityListRow> {
               )
             : infoRow,
       ),
-      onTap: () async {
-        final searchNotifier =
-            Provider.of<SearchNotifier>(context, listen: false);
-        if (searchNotifier.keyboardAppear) {
-          searchNotifier.keyboardAppear = false;
-          await Future.delayed(const Duration(milliseconds: 100));
-        }
+      onTap: () {
+        // final searchNotifier =
+        //     Provider.of<SearchNotifier>(context, listen: false);
+        // if (searchNotifier.keyboardAppear) {
+        //   searchNotifier.keyboardAppear = false;
+        //   await Future.delayed(const Duration(milliseconds: 100));
+        // }
         final oldChild = widget.searchTerm.isEmpty
             ? Container(
                 height: rowHeight,

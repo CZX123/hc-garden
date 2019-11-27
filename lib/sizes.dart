@@ -28,7 +28,7 @@ class Sizes {
   /// Collapsed height of the flora & fauna buttons when bottom sheet is fully expanded
   static const hEntityButtonHeightCollapsed = 64.0;
 
-  /// Height of the [BottomAppBar] covering the bottom sheet
+  /// Height of the [BottomNavigationBar] covering the bottom sheet
   static const hBottomBarHeight = 62.0;
 
   /// Height of the bottom sheet in the semi-collapsed state. Also the sum of all the individual heights in [ExploreHeader].
@@ -46,7 +46,7 @@ class Sizes {
       hBottomBarHeight; // without topPadding
 
   /// Height of the bottom bar of the bottom sheet in all the other screens: [TrailDetailsPage], [EntityDetailsPage], [TrailLocationOverviewPage] and [ImageGallery], all excluding the home page.
-  static const kBottomBarHeight = 48.0;
+  static const kBottomBarHeight = 52.0;
 
   /// Height of trail name in [TrailDetailsPage]. 't' stands for Trail.
   static const tHeadingHeight = 72.0;

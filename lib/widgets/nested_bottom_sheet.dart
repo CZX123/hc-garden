@@ -140,6 +140,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
 
   // User has just started to drag
   void dragStart(DragStartDetails details) {
+    Provider.of<SearchNotifier>(context, listen: false).unfocus();
     final controller = _bottomSheetNotifier.activeScrollController;
     // Check if the [SingleChildScrollView] is scrollable in the first place
     if (controller != null &&
@@ -252,8 +253,7 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
       _sortedPositions = newSortedPositions;
     }
     // Assume begin is always 0
-    _bottomSheetNotifier.animTween
-      ..end = 1 / _sortedPositions[1];
+    _bottomSheetNotifier.animTween..end = 1 / _sortedPositions[1];
   }
 
   @override
@@ -332,60 +332,65 @@ class _NestedBottomSheetState extends State<NestedBottomSheet>
           },
           child: Stack(
             children: <Widget>[
-              SlideTransition(
-                position: position,
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: kElevationToShadow[6],
-                  ),
-                  child: AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (context, child) {
-                      final shape = ShapeBorderTween(
-                        begin: RoundedRectangleBorder(),
-                        end: widget.shape.scale(1 / _sortedPositions[1]),
-                      ).animate(_animationController);
-                      return PhysicalShape(
-                        color: widget.color ?? Theme.of(context).canvasColor,
-                        clipper: ShapeBorderClipper(
-                          shape:
-                              _animationController.value < _sortedPositions[1]
-                                  ? shape.value
-                                  : widget.shape,
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: child,
-                      );
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        NotificationListener(
-                          onNotification: (notification) {
-                            if (notification is ScrollUpdateNotification &&
-                                notification.depth == 1) {
-                              if (notification.metrics.pixels <= 5 &&
-                                  _bottomSheetNotifier
-                                          .isScrolledNotifier.value ==
-                                      true) {
-                                _bottomSheetNotifier.isScrolledNotifier.value =
-                                    false;
-                              } else if (notification.metrics.pixels > 5 &&
-                                  _bottomSheetNotifier
-                                          .isScrolledNotifier.value ==
-                                      false)
-                                _bottomSheetNotifier.isScrolledNotifier.value =
-                                    true;
-                            }
-                            return null;
-                          },
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            height: height,
-                            child: widget.body,
+              GestureDetector(
+                onTapDown: (_) {
+                  Provider.of<SearchNotifier>(context, listen: false).unfocus();
+                },
+                child: SlideTransition(
+                  position: position,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: kElevationToShadow[6],
+                    ),
+                    child: AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        final shape = ShapeBorderTween(
+                          begin: RoundedRectangleBorder(),
+                          end: widget.shape.scale(1 / _sortedPositions[1]),
+                        ).animate(_animationController);
+                        return PhysicalShape(
+                          color: widget.color ?? Theme.of(context).canvasColor,
+                          clipper: ShapeBorderClipper(
+                            shape:
+                                _animationController.value < _sortedPositions[1]
+                                    ? shape.value
+                                    : widget.shape,
                           ),
-                        ),
-                        if (widget.header != null) widget.header,
-                      ],
+                          clipBehavior: Clip.antiAlias,
+                          child: child,
+                        );
+                      },
+                      child: Stack(
+                        children: <Widget>[
+                          NotificationListener(
+                            onNotification: (notification) {
+                              if (notification is ScrollUpdateNotification &&
+                                  notification.depth == 1) {
+                                if (notification.metrics.pixels <= 5 &&
+                                    _bottomSheetNotifier
+                                            .isScrolledNotifier.value ==
+                                        true) {
+                                  _bottomSheetNotifier
+                                      .isScrolledNotifier.value = false;
+                                } else if (notification.metrics.pixels > 5 &&
+                                    _bottomSheetNotifier
+                                            .isScrolledNotifier.value ==
+                                        false)
+                                  _bottomSheetNotifier
+                                      .isScrolledNotifier.value = true;
+                              }
+                              return null;
+                            },
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              height: height,
+                              child: widget.body,
+                            ),
+                          ),
+                          if (widget.header != null) widget.header,
+                        ],
+                      ),
                     ),
                   ),
                 ),
