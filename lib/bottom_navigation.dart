@@ -306,7 +306,8 @@ class _CustomBottomAppBarState extends State<CustomBottomAppBar>
                         height: 1,
                         child: IgnorePointer(
                           child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
+                            duration: Duration(milliseconds: value ? 400 : 200),
+                            curve: value ? Interval(.5, 1) : Curves.linear,
                             decoration: BoxDecoration(
                               color:
                                   value ? null : Theme.of(context).dividerColor,
@@ -342,7 +343,8 @@ class _CustomBottomAppBarState extends State<CustomBottomAppBar>
                         ignoringSemantics: !value,
                         child: AnimatedOpacity(
                           opacity: value ? 1 : 0,
-                          duration: const Duration(milliseconds: 300),
+                          duration: Duration(milliseconds: value ? 400 : 200),
+                          curve: value ? Interval(.5, 1) : Curves.linear,
                           child: child,
                         ),
                       );
@@ -364,8 +366,8 @@ class _CustomBottomAppBarState extends State<CustomBottomAppBar>
               ),
               Positioned(
                 top: 6,
-                left: 48,
-                right: 48,
+                left: 64,
+                right: 64,
                 bottom: 6,
                 child: ValueListenableBuilder<bool>(
                   valueListenable: _isHome,
@@ -375,7 +377,8 @@ class _CustomBottomAppBarState extends State<CustomBottomAppBar>
                       ignoringSemantics: !value,
                       child: AnimatedOpacity(
                         opacity: value ? 1 : 0,
-                        duration: const Duration(milliseconds: 300),
+                        duration: Duration(milliseconds: value ? 400 : 200),
+                        curve: value ? Interval(.5, 1) : Curves.linear,
                         child: child,
                       ),
                     );
@@ -448,69 +451,67 @@ class _SearchBarState extends State<SearchBar> {
           : themeData.copyWith(
               dividerColor: Colors.grey[100],
             ),
-      child: Builder(
-        builder: (context) {
-          return Material(
-            type: MaterialType.transparency,
-            borderRadius: BorderRadius.circular(Sizes.kBottomBarHeight / 2 - 6),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              children: <Widget>[
-                TextField(
-                  focusNode: _focusNode,
-                  controller: _controller,
-                  style: Theme.of(context).textTheme.body1,
-                  cursorColor: Theme.of(context).accentColor,
-                  decoration: InputDecoration(
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 46,
-                      vertical: 8,
-                    ),
-                    fillColor: Theme.of(context).dividerColor,
-                    border: InputBorder.none,
-                    hintStyle: Theme.of(context).textTheme.body1.copyWith(
-                          color: Theme.of(context).disabledColor,
-                        ),
-                    hintText: 'Search',
+      child: Builder(builder: (context) {
+        return Material(
+          type: MaterialType.transparency,
+          borderRadius: BorderRadius.circular(Sizes.kBottomBarHeight / 2 - 6),
+          clipBehavior: Clip.antiAlias,
+          color: Theme.of(context).dividerColor,
+          child: Stack(
+            children: <Widget>[
+              TextField(
+                focusNode: _focusNode,
+                controller: _controller,
+                style: Theme.of(context).textTheme.body1,
+                cursorColor: Theme.of(context).accentColor,
+                decoration: InputDecoration(
+                  filled: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 8,
                   ),
+                  border: InputBorder.none,
+                  hintStyle: Theme.of(context).textTheme.body1.copyWith(
+                        color: Theme.of(context).disabledColor,
+                      ),
+                  hintText: 'Search',
                 ),
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  width: Sizes.kBottomBarHeight - 12,
-                  child: ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: _controller,
-                    builder: (context, value, child) {
-                      return IgnorePointer(
-                        ignoring: value.text.isEmpty,
-                        child: Material(
-                          type: MaterialType.transparency,
-                          shape: CircleBorder(),
-                          clipBehavior: Clip.antiAlias,
-                          child: Tooltip(
-                            message: 'Clear',
-                            preferBelow: false,
-                            child: IconButton(
-                              icon: const Icon(Icons.clear),
-                              iconSize: 20,
-                              color: Theme.of(context).disabledColor,
-                              disabledColor: Colors.transparent,
-                              onPressed:
-                                  value.text.isEmpty ? null : _controller.clear,
-                            ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: Sizes.kBottomBarHeight - 12,
+                child: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _controller,
+                  builder: (context, value, child) {
+                    return IgnorePointer(
+                      ignoring: value.text.isEmpty,
+                      child: Material(
+                        type: MaterialType.transparency,
+                        shape: CircleBorder(),
+                        clipBehavior: Clip.antiAlias,
+                        child: Tooltip(
+                          message: 'Clear',
+                          preferBelow: false,
+                          child: IconButton(
+                            icon: const Icon(Icons.clear),
+                            iconSize: 20,
+                            color: Theme.of(context).disabledColor,
+                            disabledColor: Colors.transparent,
+                            onPressed:
+                                value.text.isEmpty ? null : _controller.clear,
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
-              ],
-            ),
-          );
-        }
-      ),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }
