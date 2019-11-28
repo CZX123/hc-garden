@@ -92,6 +92,7 @@ class _BreadcrumbNavigationState extends State<BreadcrumbNavigation> {
                     Breadcrumb(
                       title: appNotifier.routes[i].name,
                       index: i,
+                      active: i == appNotifier.routes.length - 1,
                     ),
                   SizedBox(
                     width: _getEndPadding(appNotifier.routes),
@@ -126,11 +127,13 @@ class Breadcrumb extends StatelessWidget {
   final String title;
   final int index;
   final bool hasChevron;
+  final bool active;
   const Breadcrumb({
     Key key,
     @required this.title,
     @required this.index,
     this.hasChevron = true,
+    this.active = false,
   }) : super(key: key);
 
   @override
@@ -160,7 +163,11 @@ class Breadcrumb extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Text(
                   _title,
-                  style: Theme.of(context).textTheme.subtitle,
+                  style: Theme.of(context).textTheme.subtitle.copyWith(
+                        color: active
+                            ? Theme.of(context).colorScheme.onSurface
+                            : Theme.of(context).hintColor,
+                      ),
                 ),
               ),
               onTap: () {

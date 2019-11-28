@@ -383,8 +383,7 @@ class _ZoomableImageState extends State<ZoomableImage>
                           borderRadius: BorderRadius.circular(6),
                           color: Colors.black45,
                         ),
-                        margin: EdgeInsets.only(
-                            bottom: 16 + MediaQuery.of(context).padding.bottom),
+                        margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.symmetric(
                           vertical: 8,
                         ),
