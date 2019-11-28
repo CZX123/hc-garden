@@ -77,6 +77,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final bottomSheetNotifier =
@@ -136,6 +137,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
                     height -
                         value -
                         Sizes.kBottomBarHeight -
+                        bottomPadding -
                         Sizes.kInfoRowHeight -
                         (1 - value / (height - Sizes.kBottomHeight)) *
                             topPadding,
@@ -180,8 +182,8 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
               ],
             ),
           ),
-          const SizedBox(
-            height: Sizes.kBottomBarHeight,
+          SizedBox(
+            height: Sizes.kBottomBarHeight + bottomPadding,
           ),
         ],
       ),

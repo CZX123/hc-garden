@@ -58,10 +58,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    _offset = Tween<Offset>(
-      begin: Offset.zero,
-      end: Offset(0, Sizes.hBottomBarHeight * 2),
-    ).animate(_animationController);
   }
 
   @override
@@ -75,6 +71,11 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
             ..animation.addListener(animListener);
       _init = true;
     }
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    _offset = Tween<Offset>(
+      begin: Offset.zero,
+      end: Offset(0, (Sizes.hBottomBarHeight + bottomPadding) * 2),
+    ).animate(_animationController);
   }
 
   @override
@@ -87,11 +88,12 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Positioned(
       left: 0,
       right: 0,
       bottom: 0,
-      height: Sizes.hBottomBarHeight,
+      height: Sizes.hBottomBarHeight + bottomPadding,
       child: ValueListenableBuilder<Offset>(
         valueListenable: _offset,
         builder: (context, value, child) {

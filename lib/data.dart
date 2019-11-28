@@ -567,6 +567,7 @@ class AppNotifier extends ChangeNotifier {
     double width = MediaQuery.of(context).size.width;
     final heightTooSmall = height - Sizes.kBottomHeight < 100;
     final topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
     if (isHome || routeInfo.data is Trail) {
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -580,9 +581,9 @@ class AppNotifier extends ChangeNotifier {
       bottomSheetNotifier.snappingPositions.value = [
         0,
         if (!heightTooSmall)
-          height - Sizes.kBottomHeight
+          height - Sizes.kBottomHeight - bottomPadding
         else if (isHome)
-          height - Sizes.kBottomHeight + Sizes.hEntityButtonHeight + 8,
+          height - Sizes.kBottomHeight + Sizes.hEntityButtonHeight + 8 - bottomPadding,
         isHome
             ? height - Sizes.hBottomBarHeight
             : height - Sizes.tCollapsedHeight,
@@ -609,7 +610,7 @@ class AppNotifier extends ChangeNotifier {
       _state = 1;
       bottomSheetNotifier.snappingPositions.value = [
         0,
-        if (!heightTooSmall) height - Sizes.kBottomHeight,
+        if (!heightTooSmall) height - Sizes.kBottomHeight - bottomPadding,
         height - Sizes.kCollapsedHeight,
       ];
       final adjusted = bottomSheetNotifier.animation.value <

@@ -11,6 +11,7 @@ class HcGardenApp extends StatefulWidget {
 }
 
 class _HcGardenAppState extends State<HcGardenApp> {
+  Stream<FirebaseData> _stream;
   final _location = Location();
   final _filterNotifier = FilterNotifier();
   final _themeNotifier = ThemeNotifier(null);
@@ -58,98 +59,6 @@ class _HcGardenAppState extends State<HcGardenApp> {
     ).then((bitmapList) {
       _mapNotifier.darkThemeMarkerIcons = bitmapList;
     });
-  }
-
-  @override
-  void dispose() {
-    _themeNotifier.dispose();
-    _mapNotifier.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        // Custom cache for all images in the app
-        Provider<Map<String, Uint8List>>.value(
-          value: {},
-        ),
-        FutureProvider.value(
-          value: getApplicationDocumentsDirectory(),
-        ),
-        ChangeNotifierProvider.value(
-          value: _themeNotifier,
-        ),
-        ChangeNotifierProvider.value(
-          value: _mapNotifier,
-        ),
-        ChangeNotifierProvider(
-          builder: (context) => DebugNotifier(),
-        ),
-        ChangeNotifierProvider(
-          builder: (context) => AppNotifier(),
-        ),
-        ChangeNotifierProvider(
-          builder: (context) => BottomSheetNotifier(),
-        ),
-        ChangeNotifierProvider(
-          builder: (context) => SearchNotifier(),
-        ),
-        ChangeNotifierProvider.value(
-          value: _filterNotifier,
-        ),
-      ],
-      child: Consumer<ThemeNotifier>(
-        builder: (context, themeNotifier, child) {
-          if (themeNotifier.value == null) return const SizedBox.shrink();
-          // TODO: Onboarding: Make use of the _firstTime variable to show different screens
-          return Consumer<DebugNotifier>(
-            builder: (context, debugInfo, child) {
-              return MaterialApp(
-                title: 'HC Garden',
-                theme:
-                    (themeNotifier.value ? darkThemeData : themeData).copyWith(
-                  platform: debugInfo.isIOS
-                      ? TargetPlatform.iOS
-                      : TargetPlatform.android,
-                ),
-                onGenerateRoute: (settings) {
-                  if (settings.isInitialRoute) {
-                    return PageRouteBuilder(
-                      pageBuilder: (context, _, __) {
-                        return const FirebaseDataWidget(
-                          child: const MyHomePage(),
-                        );
-                      },
-                    );
-                  }
-                  return null;
-                },
-                showPerformanceOverlay: debugInfo.showPerformanceOverlay,
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class FirebaseDataWidget extends StatefulWidget {
-  final Widget child;
-  const FirebaseDataWidget({Key key, @required this.child}) : super(key: key);
-
-  @override
-  _FirebaseDataWidgetState createState() => _FirebaseDataWidgetState();
-}
-
-class _FirebaseDataWidgetState extends State<FirebaseDataWidget> {
-  Stream<FirebaseData> _stream;
-
-  @override
-  void initState() {
-    super.initState();
     _stream = FirebaseDatabase.instance.reference().onValue.map((event) {
       if (event.snapshot.value == null) {
         throw Exception('Value is empty!');
@@ -169,8 +78,6 @@ class _FirebaseDataWidgetState extends State<FirebaseDataWidget> {
       floraList.sort((a, b) => a.name.compareTo(b.name));
       faunaList.sort((a, b) => a.name.compareTo(b.name));
 
-      Map<MarkerId, Marker> mapMarkers = {};
-
       // Add trails and locations
       Map<Trail, List<TrailLocation>> trails = {};
       parsedJson['map'].forEach((key, value) {
@@ -185,16 +92,9 @@ class _FirebaseDataWidgetState extends State<FirebaseDataWidget> {
             faunaList: faunaList,
           );
           trails[trail].add(location);
-          mapMarkers[MarkerId('${trail.id} ${location.id}')] = generateMarker(
-            context: context,
-            trail: trail,
-            location: location,
-          );
         });
         trails[trail].sort((a, b) => a.name.compareTo(b.name));
       });
-      Provider.of<MapNotifier>(context, listen: false).defaultMarkers =
-          mapMarkers;
 
       List<HistoricalData> historicalDataList = [];
       parsedJson['historical'].forEach((key, value) {
@@ -222,19 +122,157 @@ class _FirebaseDataWidgetState extends State<FirebaseDataWidget> {
   }
 
   @override
+  void dispose() {
+    _themeNotifier.dispose();
+    _mapNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return StreamProvider.value(
-      initialData: FirebaseData(
-        floraList: [],
-        faunaList: [],
-        trails: {},
-        historicalDataList: [],
-        aboutPageDataList: [],
+    return MultiProvider(
+      providers: [
+        // Save the directory path into a provider, so later references does not require to wait for a Future
+        FutureProvider.value(
+          value: getApplicationDocumentsDirectory(),
+        ),
+        // ThemeNotifier
+        ChangeNotifierProvider.value(
+          value: _themeNotifier,
+        ),
+        // MapNotifier
+        ChangeNotifierProvider.value(
+          value: _mapNotifier,
+        ),
+        // To be removed
+        ChangeNotifierProvider(
+          builder: (context) => DebugNotifier(),
+        ),
+        // Main AppNotifier in changed of main app flow
+        ChangeNotifierProvider(
+          builder: (context) => AppNotifier(),
+        ),
+        // Contains bottom sheet animations, ability to change active scroll controller
+        ChangeNotifierProvider(
+          builder: (context) => BottomSheetNotifier(),
+        ),
+        // Simple ChangeNotifier for searching flora and fauna
+        ChangeNotifierProvider(
+          builder: (context) => SearchNotifier(),
+        ),
+        // Simple ChangeNotifier for filtering flora and fauna
+        ChangeNotifierProvider.value(
+          value: _filterNotifier,
+        ),
+        // Provider for all data from Firebase
+        StreamProvider.value(
+          initialData: FirebaseData(
+            floraList: [],
+            faunaList: [],
+            trails: {},
+            historicalDataList: [],
+            aboutPageDataList: [],
+          ),
+          value: _stream,
+        ),
+      ],
+      child: Consumer<ThemeNotifier>(
+        builder: (context, themeNotifier, child) {
+          if (themeNotifier.value == null) return const SizedBox.shrink();
+          // TODO: Onboarding: Make use of the _firstTime variable to show different screens
+          return Consumer<DebugNotifier>(
+            builder: (context, debugInfo, child) {
+              return MaterialApp(
+                title: 'HC Garden',
+                theme:
+                    (themeNotifier.value ? darkThemeData : themeData).copyWith(
+                  platform: debugInfo.isIOS
+                      ? TargetPlatform.iOS
+                      : TargetPlatform.android,
+                ),
+                onGenerateRoute: (settings) {
+                  if (settings.isInitialRoute) {
+                    return PageRouteBuilder(
+                      pageBuilder: (context, _, __) {
+                        return MarkerDataWidget(
+                          firebaseDataStream: _stream,
+                          child: const MyHomePage(),
+                        );
+                      },
+                    );
+                  }
+                  return null;
+                },
+                showPerformanceOverlay: debugInfo.showPerformanceOverlay,
+              );
+            },
+          );
+        },
       ),
-      value: _stream,
-      child: widget.child,
     );
   }
+}
+
+/// Updates default markers of [MapNotifier] by listening to the firebase data stream
+class MarkerDataWidget extends StatefulWidget {
+  final Stream<FirebaseData> firebaseDataStream;
+  final Widget child;
+  const MarkerDataWidget({
+    Key key,
+    @required this.firebaseDataStream,
+    @required this.child,
+  }) : super(key: key);
+
+  @override
+  _MarkerDataWidgetState createState() => _MarkerDataWidgetState();
+}
+
+class _MarkerDataWidgetState extends State<MarkerDataWidget> {
+  bool _init = false;
+  StreamSubscription<FirebaseData> _streamSubscription;
+
+  void onData(FirebaseData data, {bool notify = true}) {
+    print('update');
+    Map<MarkerId, Marker> mapMarkers = {};
+    data.trails.forEach((trail, locations) {
+      for (var location in locations) {
+        mapMarkers[MarkerId('${trail.id} ${location.id}')] = generateMarker(
+          context: context,
+          trail: trail,
+          location: location,
+        );
+      }
+    });
+    if (data.trails.isNotEmpty)
+      Provider.of<MapNotifier>(context, listen: false).setDefaultMarkers(
+        mapMarkers,
+        notify: notify,
+      );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_init) {
+      _streamSubscription = widget.firebaseDataStream.listen(onData);
+      onData(Provider.of<FirebaseData>(context, listen: false), notify: false);
+      _init = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 class MyHomePage extends StatefulWidget {
@@ -336,6 +374,7 @@ class _MyHomePageState extends State<MyHomePage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     height = MediaQuery.of(context).size.height;
     final heightTooSmall = height - Sizes.kBottomHeight < 100;
     if (height == 0) return;
@@ -344,9 +383,13 @@ class _MyHomePageState extends State<MyHomePage>
         ..snappingPositions.value = [
           0,
           if (heightTooSmall)
-            height - Sizes.kBottomHeight + Sizes.hEntityButtonHeight + 8
+            height -
+                Sizes.kBottomHeight +
+                Sizes.hEntityButtonHeight +
+                8 -
+                bottomPadding
           else
-            height - Sizes.kBottomHeight,
+            height - Sizes.kBottomHeight - bottomPadding,
           height - Sizes.hBottomBarHeight,
         ]
         ..endCorrection = topPadding - Sizes.hOffsetTranslation

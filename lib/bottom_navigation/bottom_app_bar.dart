@@ -53,10 +53,6 @@ class _CustomBottomAppBarState extends State<CustomBottomAppBar>
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    _offset = Tween<Offset>(
-      begin: Offset(0, Sizes.kBottomBarHeight * 2),
-      end: Offset.zero,
-    ).animate(_animationController);
   }
 
   @override
@@ -70,6 +66,11 @@ class _CustomBottomAppBarState extends State<CustomBottomAppBar>
             ..animation.addListener(animListener);
       _init = true;
     }
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    _offset = Tween<Offset>(
+      begin: Offset(0, (Sizes.kBottomBarHeight + bottomPadding) * 2),
+      end: Offset.zero,
+    ).animate(_animationController);
   }
 
   @override
@@ -83,11 +84,12 @@ class _CustomBottomAppBarState extends State<CustomBottomAppBar>
   @override
   Widget build(BuildContext context) {
     _themeIsChanging = true;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Positioned(
       left: 0,
       right: 0,
       bottom: 0,
-      height: Sizes.kBottomBarHeight,
+      height: Sizes.kBottomBarHeight + bottomPadding,
       child: ValueListenableBuilder<Offset>(
         valueListenable: _offset,
         builder: (context, value, child) {
@@ -145,61 +147,19 @@ class _CustomBottomAppBarState extends State<CustomBottomAppBar>
               }),
             );
           },
-          child: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              Positioned(
-                top: 6,
-                left: 64,
-                right: 64,
-                bottom: 6,
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: _isHome,
-                  builder: (context, value, child) {
-                    return IgnorePointer(
-                      ignoring: !value,
-                      ignoringSemantics: !value,
-                      child: AnimatedOpacity(
-                        opacity: value ? 1 : 0,
-                        duration: Duration(milliseconds: value ? 400 : 200),
-                        curve: value ? Interval(.5, 1) : Curves.linear,
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: SearchBar(),
-                ),
-              ),
-              Positioned.fill(
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: _isHome,
-                  builder: (context, value, child) {
-                    return IgnorePointer(
-                      ignoring: value,
-                      ignoringSemantics: value,
-                      child: AnimatedOpacity(
-                        opacity: value ? 0 : 1,
-                        duration: Duration(milliseconds: value ? 200 : 400),
-                        curve: value ? Curves.linear : Interval(.5, 1),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: BreadcrumbNavigation(),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Tooltip(
-                    message: 'Back',
-                    preferBelow: false,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.maybePop(context),
-                    ),
-                  ),
-                  ValueListenableBuilder<bool>(
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: bottomPadding,
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                Positioned(
+                  top: 6,
+                  left: 64,
+                  right: 64,
+                  bottom: 6,
+                  child: ValueListenableBuilder<bool>(
                     valueListenable: _isHome,
                     builder: (context, value, child) {
                       return IgnorePointer(
@@ -213,22 +173,69 @@ class _CustomBottomAppBarState extends State<CustomBottomAppBar>
                         ),
                       );
                     },
-                    child: Tooltip(
-                      message: 'Filter',
+                    child: SearchBar(),
+                  ),
+                ),
+                Positioned.fill(
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: _isHome,
+                    builder: (context, value, child) {
+                      return IgnorePointer(
+                        ignoring: value,
+                        ignoringSemantics: value,
+                        child: AnimatedOpacity(
+                          opacity: value ? 0 : 1,
+                          duration: Duration(milliseconds: value ? 200 : 400),
+                          curve: value ? Curves.linear : Interval(.5, 1),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: BreadcrumbNavigation(),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Tooltip(
+                      message: 'Back',
                       preferBelow: false,
                       child: IconButton(
-                        icon: const Icon(Icons.filter_list),
-                        onPressed: () {
-                          if (_isHome.value) {
-                            Scaffold.of(context).openEndDrawer();
-                          }
-                        },
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.maybePop(context),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    ValueListenableBuilder<bool>(
+                      valueListenable: _isHome,
+                      builder: (context, value, child) {
+                        return IgnorePointer(
+                          ignoring: !value,
+                          ignoringSemantics: !value,
+                          child: AnimatedOpacity(
+                            opacity: value ? 1 : 0,
+                            duration: Duration(milliseconds: value ? 400 : 200),
+                            curve: value ? Interval(.5, 1) : Curves.linear,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: Tooltip(
+                        message: 'Filter',
+                        preferBelow: false,
+                        child: IconButton(
+                          icon: const Icon(Icons.filter_list),
+                          onPressed: () {
+                            if (_isHome.value) {
+                              Scaffold.of(context).openEndDrawer();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

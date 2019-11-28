@@ -319,10 +319,14 @@ class MapNotifier extends ChangeNotifier {
 
   Map<MarkerId, Marker> _defaultMarkers;
   Map<MarkerId, Marker> get defaultMarkers => _defaultMarkers;
-  set defaultMarkers(Map<MarkerId, Marker> defaultMarkers) {
+  void setDefaultMarkers(
+    Map<MarkerId, Marker> defaultMarkers, {
+    bool notify = true,
+  }) {
     _defaultMarkers = defaultMarkers;
     if (_markers == null || isDefaultMarkers) {
-      markers = _defaultMarkers;
+      _markers = _defaultMarkers;
+      if (notify) notifyListeners();
       isDefaultMarkers = true;
     }
   }
@@ -335,11 +339,6 @@ class MapNotifier extends ChangeNotifier {
     if (mapEquals(_markers, markers)) return;
     _markers = markers;
     notifyListeners();
-  }
-
-  void setMarkers(Map<MarkerId, Marker> markers, {bool notify = true}) {
-    _markers = markers;
-    if (notify) notifyListeners();
   }
 
   void _replaceWithGreenMarker(

@@ -229,8 +229,9 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
             },
           ),
           const SizedBox(
-            height: 64,
+            height: Sizes.kBottomBarHeight + 8,
           ),
+          const BottomPadding(),
         ],
       ),
     );

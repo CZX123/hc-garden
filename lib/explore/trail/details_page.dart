@@ -61,7 +61,9 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
         Provider.of<BottomSheetNotifier>(context, listen: false);
     final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
     return Padding(
-      padding: const EdgeInsets.only(bottom: Sizes.kBottomBarHeight),
+      padding: EdgeInsets.only(
+        bottom: Sizes.kBottomBarHeight + MediaQuery.of(context).padding.bottom,
+      ),
       child: Material(
         color: Theme.of(context).bottomAppBarColor,
         child: CustomScrollView(
@@ -106,7 +108,7 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
             ),
             SliverPadding(
               padding: const EdgeInsets.only(
-                bottom: 16,
+                bottom: 8,
               ),
               sliver: SliverFixedExtentList(
                 delegate: SliverChildBuilderDelegate(

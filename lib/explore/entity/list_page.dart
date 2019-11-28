@@ -20,6 +20,7 @@ class EntityListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     final floraIcons = [
       Icons.nature_people,
       Icons.filter_vintage,
@@ -38,9 +39,7 @@ class EntityListPage extends StatelessWidget {
       builder: (context, selectedTrails, child) {
         if (selectedTrails == null) {
           selectedTrails = List.from(
-              Provider.of<FirebaseData>(context, listen: false)
-                  ?.trails
-                  ?.keys);
+              Provider.of<FirebaseData>(context, listen: false)?.trails?.keys);
           if (selectedTrails == null) return const SizedBox.shrink();
           Provider.of<FilterNotifier>(context, listen: false)
               .updateSelectedTrailsDiscreetly(selectedTrails);
@@ -76,7 +75,8 @@ class EntityListPage extends StatelessWidget {
               child: _list.length == 0
                   ? Padding(
                       key: ValueKey(searchTerm + '!'),
-                      padding: const EdgeInsets.fromLTRB(0, 16, 0, 64),
+                      padding: EdgeInsets.fromLTRB(
+                          0, 16, 0, bottomPadding + Sizes.kBottomBarHeight + 8),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
@@ -101,7 +101,7 @@ class EntityListPage extends StatelessWidget {
                       key: ValueKey(
                           searchTerm + updatedEntityList.length.toString()),
                       padding: EdgeInsets.fromLTRB(
-                          0, 16, 0, searchTerm.isEmpty ? 80 : 64),
+                          0, 16, 0, bottomPadding + Sizes.kBottomBarHeight + 8),
                       controller: scrollController,
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: _list.length,
@@ -183,8 +183,8 @@ class _EntityListRowState extends State<EntityListRow> {
           Text(
             widget.entity.name,
             style: Theme.of(context).textTheme.subhead.copyWith(
-              fontSize: 16,
-            ),
+                  fontSize: 16,
+                ),
           ),
           Text(
             widget.entity.description,
