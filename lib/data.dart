@@ -555,8 +555,8 @@ class AppNotifier extends ChangeNotifier {
               8 -
               bottomPadding,
         isHome
-            ? height - Sizes.hBottomBarHeight
-            : height - Sizes.tCollapsedHeight,
+            ? height - Sizes.hBottomBarHeight - bottomPadding
+            : height - Sizes.tCollapsedHeight - bottomPadding,
       ];
       if (isHome) {
         if (!disableDragging) mapNotifier.animateBackToCenter(adjusted: true);
@@ -581,7 +581,7 @@ class AppNotifier extends ChangeNotifier {
       bottomSheetNotifier.snappingPositions.value = [
         0,
         if (!heightTooSmall) height - Sizes.kBottomHeight - bottomPadding,
-        height - Sizes.kCollapsedHeight,
+        height - Sizes.kCollapsedHeight - bottomPadding,
       ];
       final adjusted = bottomSheetNotifier.animation.value <
               height - Sizes.kCollapsedHeight &&

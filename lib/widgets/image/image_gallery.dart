@@ -126,7 +126,8 @@ class ImageGallery extends StatelessWidget {
                             elevation: 0,
                             color: Theme.of(context).bottomAppBarColor,
                             child: SizedBox(
-                              height: Sizes.kBottomBarHeight,
+                              height: Sizes.kBottomBarHeight +
+                                  MediaQuery.of(context).padding.bottom,
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: IconButton(
@@ -382,7 +383,8 @@ class _ZoomableImageState extends State<ZoomableImage>
                           borderRadius: BorderRadius.circular(6),
                           color: Colors.black45,
                         ),
-                        margin: const EdgeInsets.only(bottom: 16),
+                        margin: EdgeInsets.only(
+                            bottom: 16 + MediaQuery.of(context).padding.bottom),
                         padding: const EdgeInsets.symmetric(
                           vertical: 8,
                         ),

@@ -382,7 +382,7 @@ class _MyHomePageState extends State<MyHomePage>
                 bottomPadding
           else
             height - Sizes.kBottomHeight - bottomPadding,
-          height - Sizes.hBottomBarHeight,
+          height - Sizes.hBottomBarHeight - bottomPadding,
         ]
         ..endCorrection = topPadding - Sizes.hOffsetTranslation
         ..activeScrollController ??=

@@ -161,7 +161,9 @@ class _EntityListRowState extends State<EntityListRow> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(context, listen: false);
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final bottomSheetNotifier =
+        Provider.of<BottomSheetNotifier>(context, listen: false);
     final rowHeight = widget.searchTerm.isEmpty ? 104.0 : 84.0;
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
@@ -293,7 +295,10 @@ class _EntityListRowState extends State<EntityListRow> {
               rowOffset: rowHeight * widget.index,
               oldScrollController: widget.scrollController,
               topSpace: topSpace,
-              disappear: () => bottomSheetNotifier.animation.value > 8,
+              disappear: () {
+                return appNotifier.routes.isEmpty &&
+                    bottomSheetNotifier.animation.value > 8;
+              },
             ),
           ),
         );

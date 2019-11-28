@@ -312,14 +312,14 @@ class _SearchBarState extends State<SearchBar> {
                 focusNode: _focusNode,
                 controller: _controller,
                 style: Theme.of(context).textTheme.body1.copyWith(
-                  height: 1.6,
+                  height: 1.55,
                 ),
                 textAlignVertical: TextAlignVertical.center,
                 cursorColor: Theme.of(context).accentColor,
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 30,
-                    vertical: (Sizes.kBottomBarHeight - 14 * 1.6 - 12) / 2,
+                    vertical: (Sizes.kBottomBarHeight - 14 * 1.55 - 12) / 2,
                   ),
                   border: InputBorder.none,
                   hintStyle: Theme.of(context).textTheme.body1.copyWith(
