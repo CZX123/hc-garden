@@ -267,6 +267,9 @@ class TrailButton extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 6,
+              ),
               child: Container(
                 height: Sizes.hTrailButtonHeight,
                 alignment: Alignment.center,
