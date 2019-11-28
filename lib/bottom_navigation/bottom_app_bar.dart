@@ -302,22 +302,24 @@ class _SearchBarState extends State<SearchBar> {
             ),
       child: Builder(builder: (context) {
         return Material(
-          type: MaterialType.transparency,
           borderRadius: BorderRadius.circular(Sizes.kBottomBarHeight / 2 - 6),
           clipBehavior: Clip.antiAlias,
           color: Theme.of(context).dividerColor,
           child: Stack(
+            fit: StackFit.passthrough,
             children: <Widget>[
               TextField(
                 focusNode: _focusNode,
                 controller: _controller,
-                style: Theme.of(context).textTheme.body1,
+                style: Theme.of(context).textTheme.body1.copyWith(
+                  height: 1.6,
+                ),
+                textAlignVertical: TextAlignVertical.center,
                 cursorColor: Theme.of(context).accentColor,
                 decoration: InputDecoration(
-                  filled: true,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 30,
-                    vertical: (Sizes.kBottomBarHeight - 36) / 2,
+                    vertical: (Sizes.kBottomBarHeight - 14 * 1.6 - 12) / 2,
                   ),
                   border: InputBorder.none,
                   hintStyle: Theme.of(context).textTheme.body1.copyWith(

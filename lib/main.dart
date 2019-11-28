@@ -343,8 +343,13 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void tabListener() {
-    Provider.of<AppNotifier>(context, listen: false).tabIndex =
-        _tabController.index;
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    appNotifier.tabIndex = _tabController.index;
+    Provider.of<BottomSheetNotifier>(
+      context,
+      listen: false,
+    ).activeScrollController =
+        appNotifier.homeScrollControllers[_tabController.index];
   }
 
   @override
@@ -446,7 +451,8 @@ class _MyHomePageState extends State<MyHomePage>
                               ? Sizes.kBottomHeight -
                                   Sizes.hEntityButtonHeight -
                                   8
-                              : Sizes.kBottomHeight) - bottomPadding,
+                              : Sizes.kBottomHeight) -
+                          bottomPadding,
                       background: Positioned(
                         left: 0,
                         top: 0,
