@@ -424,9 +424,6 @@ class AppNotifier extends ChangeNotifier {
   // Both routes and navigator stack are kept in sync with each other
   final navigatorKey = GlobalKey<NavigatorState>();
   List<RouteInfo> routes = [];
-  final animatedListKey = GlobalKey<AnimatedListState>();
-  final animatedListScrollController = ScrollController();
-  bool justPopped = false;
 
   int _state = 0;
 
@@ -442,14 +439,6 @@ class AppNotifier extends ChangeNotifier {
     if (index < 0) {
       while (routes.isNotEmpty) pop(context);
     } else {
-      if (animatedListScrollController.hasClients &&
-          animatedListScrollController.offset != 0) {
-        animatedListScrollController.animateTo(
-          0,
-          duration: BreadcrumbNavigation.duration,
-          curve: Interval(.2, 1, curve: Curves.fastOutSlowIn),
-        );
-      }
       while (routes.length > index + 1) pop(context);
     }
   }
@@ -457,19 +446,7 @@ class AppNotifier extends ChangeNotifier {
   /// Pop the current screen in the bottom sheet
   void pop(BuildContext context) {
     if (routes.length == 0) return;
-    final last = routes.removeLast();
-    animatedListKey?.currentState?.removeItem(
-      0,
-      (context, animation) {
-        return BreadcrumbNavigation.removeItemBuilder(
-          context,
-          animation,
-          last.name,
-        );
-      },
-      duration: BreadcrumbNavigation.duration,
-    );
-    justPopped = true;
+    routes.removeLast();
     if (routes.isEmpty) {
       changeState(
         context: context,
@@ -516,19 +493,6 @@ class AppNotifier extends ChangeNotifier {
     bool disableDragging = false,
   }) async {
     routes.add(routeInfo);
-    animatedListKey?.currentState?.insertItem(
-      0,
-      duration: BreadcrumbNavigation.duration,
-    );
-    if (animatedListScrollController.hasClients &&
-        animatedListScrollController.offset != 0) {
-      animatedListScrollController.animateTo(
-        0,
-        duration: BreadcrumbNavigation.duration,
-        curve: Interval(0, .8, curve: Curves.fastOutSlowIn),
-      );
-    }
-    justPopped = false;
     changeState(
       context: context,
       routeInfo: routeInfo,
@@ -662,7 +626,6 @@ class AppNotifier extends ChangeNotifier {
   @override
   void dispose() {
     for (var controller in homeScrollControllers) controller.dispose();
-    animatedListScrollController.dispose();
     super.dispose();
   }
 }

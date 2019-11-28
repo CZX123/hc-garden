@@ -163,15 +163,3 @@ class BottomPadding extends StatelessWidget {
     );
   }
 }
-
-/// A widget that has a height of the [MediaQuery]'s bottom view inset
-class BottomInset extends StatelessWidget {
-  const BottomInset({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).viewInsets.bottom,
-    );
-  }
-}

@@ -2,37 +2,13 @@ import '../library.dart';
 
 class BreadcrumbNavigation extends StatefulWidget {
   const BreadcrumbNavigation({Key key}) : super(key: key);
-  static const duration = Duration(milliseconds: 340);
-  static Widget removeItemBuilder(
-    BuildContext context,
-    Animation<double> animation,
-    String name,
-  ) {
-    return SizeTransition(
-      axis: Axis.horizontal,
-      sizeFactor: CurvedAnimation(
-        curve: Interval(0, .8, curve: Curves.fastOutSlowIn),
-        parent: animation,
-      ),
-      child: FadeTransition(
-        opacity: CurvedAnimation(
-          curve: Interval(.7, 1),
-          parent: animation,
-        ),
-        child: Breadcrumb(
-          title: name,
-          index: null,
-        ),
-      ),
-    );
-  }
 
   @override
   _BreadcrumbNavigationState createState() => _BreadcrumbNavigationState();
 }
 
 class _BreadcrumbNavigationState extends State<BreadcrumbNavigation> {
-  /// [Duration] of breadcrumb addition and removal animation
+  int _previousRoutesLength;
   double _width;
   double _startPadding;
 
@@ -51,7 +27,7 @@ class _BreadcrumbNavigationState extends State<BreadcrumbNavigation> {
 
   double _getEndPadding(List<RouteInfo> routes) {
     if (routes.isEmpty) return _startPadding;
-    return (_width - _getWidth(routes.last.name) - 128) / 2;
+    return (_width - _getWidth(routes.last.name) - 120) / 2;
   }
 
   @override
@@ -59,97 +35,88 @@ class _BreadcrumbNavigationState extends State<BreadcrumbNavigation> {
     super.didChangeDependencies();
     final width = MediaQuery.of(context).size.width;
     if (_width != width) {
+      final appNotifier = Provider.of<AppNotifier>(context);
+      _previousRoutesLength = appNotifier.routes.length;
       _width = width;
-      _startPadding = (_width - _getWidth('Home') - 128) / 2;
+      _startPadding = (_width - _getWidth('Home') - 120) / 2;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final appNotifier = Provider.of<AppNotifier>(context);
+    bool pushed = appNotifier.routes.length > _previousRoutesLength;
+    _previousRoutesLength = appNotifier.routes.length;
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 64,
+        horizontal: 60,
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          SingleChildScrollView(
-            reverse: true,
-            scrollDirection: Axis.horizontal,
-            controller: appNotifier.animatedListScrollController,
-            child: Row(
-              children: <Widget>[
-                SizedBox(
-                  width: _startPadding,
-                ),
-                AnimatedList(
-                  key: appNotifier.animatedListKey,
-                  initialItemCount: appNotifier.routes.length + 1,
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  reverse: true,
-                  itemBuilder: (context, index, animation) {
-                    if (index == appNotifier.routes.length) {
-                      return Breadcrumb(
-                        title: 'Home',
-                        index: -1,
-                        hasChevron: false,
-                      );
-                    }
-                    return SizeTransition(
-                      axis: Axis.horizontal,
-                      sizeFactor: CurvedAnimation(
-                        curve: Interval(0, .8, curve: Curves.fastOutSlowIn),
-                        parent: animation,
-                      ),
-                      child: FadeTransition(
-                        opacity: CurvedAnimation(
-                          curve: Interval(.7, 1),
-                          parent: animation,
-                        ),
-                        child: Breadcrumb(
-                          title: appNotifier
-                              .routes[appNotifier.routes.length - index - 1]
-                              .name,
-                          index: appNotifier.routes.length - index - 1,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                Consumer<AppNotifier>(
-                  builder: (context, appNotifier, child) {
-                    return AnimatedContainer(
-                      duration: BreadcrumbNavigation.duration,
-                      curve: appNotifier.justPopped
-                          ? Interval(.2, 1, curve: Curves.fastOutSlowIn)
-                          : Interval(0, .8, curve: Curves.fastOutSlowIn),
-                      width: _getEndPadding(appNotifier.routes),
-                    );
-                  },
-                ),
-              ],
+      child: CustomAnimatedSwitcher(
+        duration: const Duration(milliseconds: 400),
+        switchInCurve: Interval(.2, 1, curve: Curves.ease),
+        switchOutCurve: Interval(.7, 1, curve: Curves.ease),
+        transitionBuilder: (child, animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: Offset(pushed ? .1 : -.1, 0),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.fastLinearToSlowEaseIn,
+                reverseCurve: Threshold(0),
+              )),
+              child: child,
             ),
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GradientWidget(
-              color: Theme.of(context).bottomAppBarColor,
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+          );
+        },
+        child: Stack(
+          key: ValueKey(appNotifier.routes.join()),
+          fit: StackFit.expand,
+          children: <Widget>[
+            SingleChildScrollView(
+              reverse: true,
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: <Widget>[
+                  SizedBox(
+                    width: _startPadding,
+                  ),
+                  Breadcrumb(
+                    title: 'Home',
+                    index: -1,
+                    hasChevron: false,
+                  ),
+                  for (int i = 0; i < appNotifier.routes.length; i++)
+                    Breadcrumb(
+                      title: appNotifier.routes[i].name,
+                      index: i,
+                    ),
+                  SizedBox(
+                    width: _getEndPadding(appNotifier.routes),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: GradientWidget(
-              color: Theme.of(context).bottomAppBarColor,
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
+            Align(
+              alignment: Alignment.centerLeft,
+              child: GradientWidget(
+                color: Theme.of(context).bottomAppBarColor,
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
             ),
-          ),
-        ],
+            Align(
+              alignment: Alignment.centerRight,
+              child: GradientWidget(
+                color: Theme.of(context).bottomAppBarColor,
+                begin: Alignment.centerRight,
+                end: Alignment.centerLeft,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -191,12 +158,20 @@ class Breadcrumb extends StatelessWidget {
             child: InkWell(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child:
-                    Text(_title, style: Theme.of(context).textTheme.subtitle),
+                child: Text(
+                  _title,
+                  style: Theme.of(context).textTheme.subtitle,
+                ),
               ),
               onTap: () {
                 Provider.of<AppNotifier>(context, listen: false)
                     .popUntil(context, index);
+                if (index < 0) {
+                  final bottomSheetNotifier =
+                      Provider.of<BottomSheetNotifier>(context, listen: false);
+                  bottomSheetNotifier.animateTo(
+                      bottomSheetNotifier.snappingPositions.value[1]);
+                }
               },
             ),
           ),

@@ -111,7 +111,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final mapNotifier = Provider.of<MapNotifier>(context);
     return CustomAnimatedSwitcher(
-      crossShrink: false,
+      fadeIn: true,
       child: mapNotifier.markers?.isEmpty ?? true
           ? DecoratedBox(
               decoration: BoxDecoration(

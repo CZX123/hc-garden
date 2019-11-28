@@ -167,6 +167,7 @@ class _LocationListRowState extends State<LocationListRow> {
 
   @override
   Widget build(BuildContext context) {
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -214,7 +215,7 @@ class _LocationListRowState extends State<LocationListRow> {
         );
         secondaryAnimation = ModalRoute.of(context).secondaryAnimation
           ..addListener(listener);
-        Provider.of<AppNotifier>(context, listen: false).push(
+        appNotifier.push(
           context: context,
           routeInfo: RouteInfo(
             name: widget.location.name,
@@ -234,6 +235,7 @@ class _LocationListRowState extends State<LocationListRow> {
               oldScrollController: widget.scrollController,
               topSpace: topSpace,
               persistentOldChild: child,
+              disappear: () => appNotifier.routes.isEmpty,
             ),
           ),
         );

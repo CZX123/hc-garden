@@ -12,6 +12,9 @@ class ExpandPageRoute<T> extends PageRoute<T> {
   final ValueListenable<double> topSpace;
   final bool isOpaque;
 
+  /// Fade out all the contents during the animation if this function returns true. Used to make the back animation better if user skips from [TrailLocationOverviewPage] directly to the home page, skipping past the [TrailDetailsPage]
+  final bool Function() disappear;
+
   ExpandPageRoute({
     @required this.builder,
     @required this.sourceRect,
@@ -24,6 +27,7 @@ class ExpandPageRoute<T> extends PageRoute<T> {
     @required this.oldScrollController,
     @required this.topSpace,
     this.isOpaque = false,
+    this.disappear,
     RouteSettings settings,
   })  : assert(builder != null),
         assert(transitionDuration != null),
@@ -70,6 +74,7 @@ class ExpandPageRoute<T> extends PageRoute<T> {
       rowOffset: rowOffset,
       oldScrollController: oldScrollController,
       topSpace: topSpace,
+      disappear: disappear,
     );
   }
 
@@ -92,6 +97,7 @@ class ExpandItemPageTransition extends StatefulWidget {
     this.rowOffset,
     this.oldScrollController,
     this.topSpace,
+    this.disappear,
   }) : super(key: key);
 
   final ValueNotifier<Offset> startContentOffset;
@@ -107,181 +113,189 @@ class ExpandItemPageTransition extends StatefulWidget {
   final ScrollController oldScrollController;
   final ValueListenable<double> topSpace;
 
+  /// Fade out all the contents during the animation if this function returns true. Used to make the back animation better if user skips from [TrailLocationOverviewPage] directly to the home page, skipping past the [TrailDetailsPage], or if user goes back to home from [EntityDetailsPage], but the bottom sheet is collapsed
+  final bool Function() disappear;
+
   @override
   _ExpandItemPageTransitionState createState() =>
       _ExpandItemPageTransitionState();
 }
 
 class _ExpandItemPageTransitionState extends State<ExpandItemPageTransition> {
+  double scrollOffset;
   @override
   Widget build(BuildContext context) {
     final animation = widget.animation;
     final secondaryAnimation = widget.secondaryAnimation;
+    if (widget.oldScrollController.hasClients) {
+      scrollOffset = widget.oldScrollController.offset;
+    }
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final height = constraints.biggest.height;
-        final width = constraints.biggest.width;
+    return AnimatedOpacity(
+      opacity: widget.disappear == null ? 1 : widget.disappear() ? 0 : 1,
+      duration: const Duration(milliseconds: 200),
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final height = constraints.biggest.height;
+          final width = constraints.biggest.width;
 
-        final positionAnimation = CurvedAnimation(
-          parent: animation,
-          curve: Curves.fastOutSlowIn,
-        );
-
-        final itemPosition = RelativeRectTween(
-          begin: RelativeRect.fromLTRB(
-            widget.sourceRect.left,
-            widget.rowOffset -
-                (widget.oldScrollController?.offset ?? height) +
-                widget.topSpace.value,
-            width - widget.sourceRect.right,
-            height -
-                (widget.rowOffset -
-                    (widget.oldScrollController?.offset ?? height) +
-                    widget.topSpace.value) -
-                widget.sourceRect.height,
-          ),
-          end: RelativeRect.fill,
-        ).animate(positionAnimation);
-
-        final fadeOldContent = Tween(
-          begin: 1.0,
-          end: 0.0,
-        ).animate(
-          CurvedAnimation(
+          final positionAnimation = CurvedAnimation(
             parent: animation,
-            curve: const Interval(0, .3, curve: Curves.ease),
-          ),
-        );
+            curve: Curves.fastOutSlowIn,
+          );
 
-        final contentOffset = Tween<Offset>(
-          begin:
-              widget.startContentOffset.value - widget.endContentOffset.value,
-          end: Offset.zero,
-        ).animate(positionAnimation);
+          final itemPosition = RelativeRectTween(
+            begin: RelativeRect.fromLTRB(
+              widget.sourceRect.left,
+              widget.rowOffset - scrollOffset + widget.topSpace.value,
+              width - widget.sourceRect.right,
+              height -
+                  (widget.rowOffset - scrollOffset + widget.topSpace.value) -
+                  widget.sourceRect.height,
+            ),
+            end: RelativeRect.fill,
+          ).animate(positionAnimation);
 
-        // final contentPosition = RelativeRectTween(
-        //   begin: RelativeRect.fromLTRB(
-        //     widget.startContentOffset.value.dx -
-        //         widget.endContentOffset.value.dx,
-        //     widget.startContentOffset.value.dy -
-        //         widget.endContentOffset.value.dy,
-        //     RelativeRect.fill.right,
-        //     RelativeRect.fill.bottom,
-        //   ),
-        //   end: RelativeRect.fill,
-        // ).animate(positionAnimation);
+          final fadeOldContent = Tween(
+            begin: 1.0,
+            end: 0.0,
+          ).animate(
+            CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0, .3, curve: Curves.ease),
+            ),
+          );
 
-        final oldChildOffset = Tween<Offset>(
-          begin: Offset.zero,
-          end: widget.endContentOffset.value - widget.startContentOffset.value,
-        ).animate(positionAnimation);
+          final contentOffset = Tween<Offset>(
+            begin:
+                widget.startContentOffset.value - widget.endContentOffset.value,
+            end: Offset.zero,
+          ).animate(positionAnimation);
 
-        final fadeContent = CurvedAnimation(
-          parent: animation,
-          curve: const Interval(.1, .8, curve: Curves.ease),
-        );
+          // final contentPosition = RelativeRectTween(
+          //   begin: RelativeRect.fromLTRB(
+          //     widget.startContentOffset.value.dx -
+          //         widget.endContentOffset.value.dx,
+          //     widget.startContentOffset.value.dy -
+          //         widget.endContentOffset.value.dy,
+          //     RelativeRect.fill.right,
+          //     RelativeRect.fill.bottom,
+          //   ),
+          //   end: RelativeRect.fill,
+          // ).animate(positionAnimation);
 
-        final fadeMaterial = CurvedAnimation(
-          parent: animation,
-          curve: const Interval(0, .4, curve: Curves.ease),
-        );
+          final oldChildOffset = Tween<Offset>(
+            begin: Offset.zero,
+            end:
+                widget.endContentOffset.value - widget.startContentOffset.value,
+          ).animate(positionAnimation);
 
-        return ValueListenableBuilder(
-          valueListenable: secondaryAnimation,
-          builder: (context, value, child) {
-            return Visibility(
-              visible: value < 1,
-              maintainState: true,
-              child: child,
-            );
-          },
-          child: Stack(
-            children: <Widget>[
-              PositionedTransition(
-                rect: itemPosition,
-                child: Stack(
-                  children: <Widget>[
-                    FadeTransition(
-                      opacity: fadeMaterial,
-                      child: Material(
-                        color: Theme.of(context).bottomAppBarColor,
-                        child: SizedBox(
-                          width: width,
-                          height: height,
-                        ),
-                      ),
-                    ),
-                    AnimatedBuilder(
-                      animation: contentOffset,
-                      builder: (context, child) {
-                        return Transform.translate(
-                          offset: contentOffset.value,
-                          child: child,
-                        );
-                      },
-                      child: FadeTransition(
-                        opacity: fadeContent,
-                        child: FadeTransition(
-                          opacity: Tween(
-                            begin: 1.0,
-                            end: -1.0,
-                          ).animate(secondaryAnimation),
-                          child: Container(
+          final fadeContent = CurvedAnimation(
+            parent: animation,
+            curve: const Interval(.1, .8, curve: Curves.ease),
+          );
+
+          final fadeMaterial = CurvedAnimation(
+            parent: animation,
+            curve: const Interval(0, .4, curve: Curves.ease),
+          );
+
+          return ValueListenableBuilder(
+            valueListenable: secondaryAnimation,
+            builder: (context, value, child) {
+              return Visibility(
+                visible: value < 1,
+                maintainState: true,
+                child: child,
+              );
+            },
+            child: Stack(
+              children: <Widget>[
+                PositionedTransition(
+                  rect: itemPosition,
+                  child: Stack(
+                    children: <Widget>[
+                      FadeTransition(
+                        opacity: fadeMaterial,
+                        child: Material(
+                          color: Theme.of(context).bottomAppBarColor,
+                          child: SizedBox(
+                            width: width,
                             height: height,
-                            child: widget.child,
                           ),
                         ),
                       ),
-                    ),
-                    if (widget.oldChild != null)
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        child: IgnorePointer(
-                          child: AnimatedBuilder(
-                            animation: oldChildOffset,
-                            builder: (context, child) {
-                              return Transform.translate(
-                                offset: oldChildOffset.value,
-                                child: child,
-                              );
-                            },
-                            child: FadeTransition(
-                              opacity: fadeOldContent,
-                              child: widget.oldChild,
+                      AnimatedBuilder(
+                        animation: contentOffset,
+                        builder: (context, child) {
+                          return Transform.translate(
+                            offset: contentOffset.value,
+                            child: child,
+                          );
+                        },
+                        child: FadeTransition(
+                          opacity: fadeContent,
+                          child: FadeTransition(
+                            opacity: Tween(
+                              begin: 1.0,
+                              end: -1.0,
+                            ).animate(secondaryAnimation),
+                            child: Container(
+                              height: height,
+                              child: widget.child,
                             ),
                           ),
                         ),
                       ),
-                    if (widget.persistentOldChild != null)
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        child: IgnorePointer(
-                          child: AnimatedBuilder(
-                            animation: animation,
-                            builder: (context, child) {
-                              if (animation.value == 1)
-                                return SizedBox.shrink();
-                              return Transform.translate(
-                                offset: oldChildOffset.value,
-                                child: child,
-                              );
-                            },
-                            child: widget.persistentOldChild,
+                      if (widget.oldChild != null)
+                        Positioned(
+                          left: 0,
+                          top: 0,
+                          right: 0,
+                          child: IgnorePointer(
+                            child: AnimatedBuilder(
+                              animation: oldChildOffset,
+                              builder: (context, child) {
+                                return Transform.translate(
+                                  offset: oldChildOffset.value,
+                                  child: child,
+                                );
+                              },
+                              child: FadeTransition(
+                                opacity: fadeOldContent,
+                                child: widget.oldChild,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                      if (widget.persistentOldChild != null)
+                        Positioned(
+                          left: 0,
+                          top: 0,
+                          right: 0,
+                          child: IgnorePointer(
+                            child: AnimatedBuilder(
+                              animation: animation,
+                              builder: (context, child) {
+                                if (animation.value == 1)
+                                  return SizedBox.shrink();
+                                return Transform.translate(
+                                  offset: oldChildOffset.value,
+                                  child: child,
+                                );
+                              },
+                              child: widget.persistentOldChild,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

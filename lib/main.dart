@@ -438,7 +438,7 @@ class _MyHomePageState extends State<MyHomePage>
               return onBack(context);
             },
             child: CustomAnimatedSwitcher(
-              crossShrink: false,
+              fadeIn: true,
               child: height != 0
                   ? CustomBottomSheet(
                       initialPosition: height -

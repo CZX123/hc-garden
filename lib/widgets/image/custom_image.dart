@@ -131,7 +131,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
     final NetworkToFileImage typedOther = other;
     return url == typedOther.url &&

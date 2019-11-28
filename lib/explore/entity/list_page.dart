@@ -161,6 +161,7 @@ class _EntityListRowState extends State<EntityListRow> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(context, listen: false);
     final rowHeight = widget.searchTerm.isEmpty ? 104.0 : 84.0;
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
@@ -266,9 +267,7 @@ class _EntityListRowState extends State<EntityListRow> {
         final anim = Tween<double>(
           begin: 0,
           end: 1 / (height - Sizes.kBottomHeight),
-        ).animate(
-          Provider.of<BottomSheetNotifier>(context, listen: false).animation,
-        );
+        ).animate(bottomSheetNotifier.animation);
         final topSpace = Tween(
           begin: Sizes.hEntityButtonHeightCollapsed + 24 + topPadding,
           end: Sizes.kBottomHeight - Sizes.hBottomBarHeight + 8,
@@ -294,6 +293,7 @@ class _EntityListRowState extends State<EntityListRow> {
               rowOffset: rowHeight * widget.index,
               oldScrollController: widget.scrollController,
               topSpace: topSpace,
+              disappear: () => bottomSheetNotifier.animation.value > 8,
             ),
           ),
         );

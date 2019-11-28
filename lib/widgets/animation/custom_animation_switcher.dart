@@ -2,13 +2,21 @@ import 'package:flutter/material.dart';
 
 class CustomAnimatedSwitcher extends StatelessWidget {
   final Widget child;
+  final Widget Function(Widget, Animation<double>) transitionBuilder;
   final bool crossShrink;
+  final bool fadeIn;
   final Duration duration;
+  final Curve switchInCurve;
+  final Curve switchOutCurve;
   const CustomAnimatedSwitcher({
     Key key,
     @required this.child,
+    this.transitionBuilder,
     this.crossShrink = true,
+    this.fadeIn = false,
     this.duration = const Duration(milliseconds: 300),
+    this.switchInCurve,
+    this.switchOutCurve,
   }) : super(key: key);
 
   static Widget layoutBuilder(
@@ -24,7 +32,7 @@ class CustomAnimatedSwitcher extends StatelessWidget {
     );
   }
 
-  Widget transitionBuilder(Widget child, Animation<double> animation) {
+  Widget defaultTransitionBuilder(Widget child, Animation<double> animation) {
     final element = FadeTransition(
       opacity: animation,
       child: child,
@@ -34,7 +42,7 @@ class CustomAnimatedSwitcher extends StatelessWidget {
         scale: Tween<double>(begin: .97, end: 1).animate(CurvedAnimation(
           parent: animation,
           curve: Curves.linear,
-          reverseCurve: Interval(0, .001),
+          reverseCurve: Threshold(0),
         )),
         child: element,
       );
@@ -45,11 +53,12 @@ class CustomAnimatedSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
-      transitionBuilder: transitionBuilder,
+      transitionBuilder: transitionBuilder ?? defaultTransitionBuilder,
       layoutBuilder: layoutBuilder,
-      switchInCurve: Interval(crossShrink ? .5 : .1, 1, curve: Curves.ease),
-      switchOutCurve:
-          Interval(crossShrink ? .5 : .1, 1, curve: Curves.decelerate),
+      switchInCurve:
+          switchInCurve ?? Interval(fadeIn ? .1 : .5, 1, curve: Curves.ease),
+      switchOutCurve: switchOutCurve ??
+          Interval(fadeIn ? .1 : .5, 1, curve: Curves.decelerate),
       duration: duration,
       child: child,
     );
