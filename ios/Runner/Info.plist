@@ -42,9 +42,9 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Location.</string>
+	<string>Location is need for the map and navigation.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Location.</string>
+	<string>Location is need for the map and navigation.</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>
