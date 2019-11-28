@@ -37,6 +37,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
     Map<Trail, List<TrailLocation>> trails,
   ) {
     final height = MediaQuery.of(context).size.height;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     List<Widget> children = [];
     for (var loc in widget.entity.locations) {
       final int trailId = loc[0];
@@ -63,7 +64,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
           Provider.of<BottomSheetNotifier>(
             context,
             listen: false,
-          ).animateTo(height - Sizes.kCollapsedHeight);
+          ).animateTo(height - Sizes.kCollapsedHeight - bottomPadding);
           Provider.of<MapNotifier>(
             context,
             listen: false,
