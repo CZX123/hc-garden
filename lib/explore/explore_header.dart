@@ -235,7 +235,7 @@ class TrailButton extends StatelessWidget {
           builder: (context, themeNotifier, child) {
             final textStyle = TextStyle(
               fontFamily: 'Manrope',
-              fontSize: 13,
+              fontSize: 12.5,
               height: 1.5,
               fontWeight: FontWeight.bold,
             );

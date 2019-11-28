@@ -6,6 +6,9 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 ### High Priority
 
+#### iOS
+- Account for bottom padding ⌛
+
 #### All Pages
 - ~~Tapping on the info row should also expand the bottom sheet fully~~ ✔️
 

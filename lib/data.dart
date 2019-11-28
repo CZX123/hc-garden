@@ -419,6 +419,8 @@ class RouteInfo<T> {
 
 /// The main notifier in charge of app state, and pushing and popping routes within the bottom sheet
 class AppNotifier extends ChangeNotifier {
+  int tabIndex = 0;
+  final homeScrollControllers = [ScrollController(), ScrollController()];
   // Both routes and navigator stack are kept in sync with each other
   final navigatorKey = GlobalKey<NavigatorState>();
   List<RouteInfo> routes = [];
@@ -583,7 +585,11 @@ class AppNotifier extends ChangeNotifier {
         if (!heightTooSmall)
           height - Sizes.kBottomHeight - bottomPadding
         else if (isHome)
-          height - Sizes.kBottomHeight + Sizes.hEntityButtonHeight + 8 - bottomPadding,
+          height -
+              Sizes.kBottomHeight +
+              Sizes.hEntityButtonHeight +
+              8 -
+              bottomPadding,
         isHome
             ? height - Sizes.hBottomBarHeight
             : height - Sizes.tCollapsedHeight,
@@ -647,14 +653,15 @@ class AppNotifier extends ChangeNotifier {
     bottomSheetNotifier
       ..draggingDisabled = disableDragging
       ..endCorrection =
-          isHome ? topPadding - Sizes.hOffsetTranslation : topPadding;
-    if (!isHome) {
-      bottomSheetNotifier.activeScrollController = routeInfo?.scrollController;
-    }
+          isHome ? topPadding - Sizes.hOffsetTranslation : topPadding
+      ..activeScrollController = isHome
+          ? homeScrollControllers[tabIndex]
+          : routeInfo?.scrollController;
   }
 
   @override
   void dispose() {
+    for (var controller in homeScrollControllers) controller.dispose();
     animatedListScrollController.dispose();
     super.dispose();
   }

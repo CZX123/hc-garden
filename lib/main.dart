@@ -232,7 +232,6 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
   StreamSubscription<FirebaseData> _streamSubscription;
 
   void onData(FirebaseData data, {bool notify = true}) {
-    print('update');
     Map<MarkerId, Marker> mapMarkers = {};
     data.trails.forEach((trail, locations) {
       for (var location in locations) {
@@ -243,16 +242,12 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
         );
       }
     });
-    if (data.trails.isNotEmpty)
+    if (data.trails.isNotEmpty) {
       Provider.of<MapNotifier>(context, listen: false).setDefaultMarkers(
         mapMarkers,
         notify: notify,
       );
-  }
-
-  @override
-  void initState() {
-    super.initState();
+    }
   }
 
   @override
@@ -288,10 +283,6 @@ class _MyHomePageState extends State<MyHomePage>
   final _location = Location();
   final _pageIndex = ValueNotifier(1);
   TabController _tabController;
-  final _scrollControllers = [
-    ScrollController(),
-    ScrollController(),
-  ];
   double topPadding;
   double height;
 
@@ -312,9 +303,7 @@ class _MyHomePageState extends State<MyHomePage>
         appNotifier.pop(context);
         final paddingBreakpoint =
             bottomSheetNotifier.snappingPositions.value[1];
-        bottomSheetNotifier
-          ..activeScrollController = _scrollControllers[_tabController.index]
-          ..animateTo(paddingBreakpoint);
+        bottomSheetNotifier.animateTo(paddingBreakpoint);
         return false;
       }
       // If something wrong happens, navigator somehow still can be popped
@@ -345,8 +334,6 @@ class _MyHomePageState extends State<MyHomePage>
       appNotifier.pop(context);
       final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
       if (appNotifier.routes.isEmpty) {
-        bottomSheetNotifier.activeScrollController =
-            _scrollControllers[_tabController.index];
         if (state == 1 && animation.value > paddingBreakpoint) {
           bottomSheetNotifier.animateTo(paddingBreakpoint);
         }
@@ -356,9 +343,8 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void tabListener() {
-    if (Provider.of<AppNotifier>(context, listen: false).state == 0)
-      Provider.of<BottomSheetNotifier>(context, listen: false)
-          .activeScrollController = _scrollControllers[_tabController.index];
+    Provider.of<AppNotifier>(context, listen: false).tabIndex =
+        _tabController.index;
   }
 
   @override
@@ -374,10 +360,11 @@ class _MyHomePageState extends State<MyHomePage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     topPadding = MediaQuery.of(context).padding.top;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
     height = MediaQuery.of(context).size.height;
-    final heightTooSmall = height - Sizes.kBottomHeight < 100;
     if (height == 0) return;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final heightTooSmall = height - Sizes.kBottomHeight < 100;
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     if (!_init) {
       Provider.of<BottomSheetNotifier>(context, listen: false)
         ..snappingPositions.value = [
@@ -393,10 +380,10 @@ class _MyHomePageState extends State<MyHomePage>
           height - Sizes.hBottomBarHeight,
         ]
         ..endCorrection = topPadding - Sizes.hOffsetTranslation
-        ..activeScrollController ??= _scrollControllers[_tabController.index];
+        ..activeScrollController ??=
+            appNotifier.homeScrollControllers[_tabController.index];
       _init = true;
     } else {
-      final appNotifier = Provider.of<AppNotifier>(context, listen: false);
       final isHome = appNotifier.routes.isEmpty;
       appNotifier.changeState(
         context: context,
@@ -422,6 +409,8 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     final heightTooSmall = height - Sizes.kBottomHeight < 100;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     return Selector<AppNotifier, bool>(
       selector: (context, appNotifier) => appNotifier.routes.isEmpty,
       builder: (context, routesIsEmpty, child) {
@@ -462,7 +451,7 @@ class _MyHomePageState extends State<MyHomePage>
                         left: 0,
                         top: 0,
                         right: 0,
-                        bottom: Sizes.hBottomBarHeight,
+                        bottom: Sizes.hBottomBarHeight + bottomPadding,
                         child: ValueListenableBuilder(
                           valueListenable: _pageIndex,
                           builder: (context, pageIndex, child) {
@@ -477,7 +466,7 @@ class _MyHomePageState extends State<MyHomePage>
                       ),
                       body: ExploreBody(
                         tabController: _tabController,
-                        scrollControllers: _scrollControllers,
+                        scrollControllers: appNotifier.homeScrollControllers,
                       ),
                       footer: BottomSheetFooter(
                         pageIndex: _pageIndex,
