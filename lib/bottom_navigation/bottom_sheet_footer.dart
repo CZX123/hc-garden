@@ -14,7 +14,8 @@ class BottomSheetFooter extends StatelessWidget {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       height: max(Sizes.hBottomBarHeight, Sizes.kBottomBarHeight) +
-          MediaQuery.of(context).viewInsets.bottom,
+          MediaQuery.of(context).viewInsets.bottom +
+          MediaQuery.of(context).padding.bottom,
       child: Stack(
         children: <Widget>[
           CustomBottomAppBar(),
