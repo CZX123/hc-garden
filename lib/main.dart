@@ -446,7 +446,7 @@ class _MyHomePageState extends State<MyHomePage>
                               ? Sizes.kBottomHeight -
                                   Sizes.hEntityButtonHeight -
                                   8
-                              : Sizes.kBottomHeight),
+                              : Sizes.kBottomHeight) - bottomPadding,
                       background: Positioned(
                         left: 0,
                         top: 0,
