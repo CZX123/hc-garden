@@ -72,7 +72,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
   AnimationController _animationController;
   Drag _scrollDrag;
   ScrollHoldController _scrollHold;
-  bool _scrolling;
+  bool _scrolling = false;
 
   void animateTo(double end, [Duration duration]) {
     if (end == _animationController?.value ?? end) return;

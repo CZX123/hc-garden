@@ -1,7 +1,10 @@
 import 'library.dart';
 
 void main() {
+  // Restrict to only portrait orientation
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // Offline access with just one line
+  FirebaseDatabase.instance.setPersistenceEnabled(true);
   runApp(HcGardenApp());
 }
 
@@ -11,13 +14,17 @@ class HcGardenApp extends StatefulWidget {
 }
 
 class _HcGardenAppState extends State<HcGardenApp> {
+  /// Stream of data from Firebase Realtime Database
   Stream<FirebaseData> _stream;
+
+  /// An instance of [Location]
   final _location = Location();
   final _filterNotifier = FilterNotifier();
   final _themeNotifier = ThemeNotifier(null);
   final _mapNotifier = MapNotifier();
   bool _firstTime = false;
 
+  /// Check if location permission is on
   void checkPermission() async {
     var granted = await _location.hasPermission();
     if (!granted) {
@@ -29,6 +36,7 @@ class _HcGardenAppState extends State<HcGardenApp> {
     }
   }
 
+  /// Check if GPS itself is turned on
   void checkGPS() async {
     var isOn = await _location.serviceEnabled();
     if (!isOn) {
@@ -42,6 +50,7 @@ class _HcGardenAppState extends State<HcGardenApp> {
   void initState() {
     super.initState();
     checkPermission();
+    // Get value
     SharedPreferences.getInstance().then((prefs) {
       final isDark = prefs.getBool('isDark');
       _firstTime = isDark == null;
@@ -96,12 +105,14 @@ class _HcGardenAppState extends State<HcGardenApp> {
         trails[trail].sort((a, b) => a.name.compareTo(b.name));
       });
 
+      // Add historical data
       List<HistoricalData> historicalDataList = [];
       parsedJson['historical'].forEach((key, value) {
         historicalDataList.add(HistoricalData.fromJson(key, value));
       });
       historicalDataList.sort((a, b) => a.id.compareTo(b.id));
 
+      // Add AboutPage data
       List<AboutPageData> aboutPageDataList = [];
       parsedJson['about'].forEach((key, value) {
         aboutPageDataList.add(AboutPageData.fromJson(key, value));
@@ -123,6 +134,7 @@ class _HcGardenAppState extends State<HcGardenApp> {
 
   @override
   void dispose() {
+    _filterNotifier.dispose();
     _themeNotifier.dispose();
     _mapNotifier.dispose();
     super.dispose();
@@ -224,8 +236,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
+  // 'init' stand for initialised. Commonly used in didChangeDependencies to fetch values from Providers only for one time.
   bool _init = false;
-  final _location = Location();
   final _pageIndex = ValueNotifier(1);
   TabController _tabController;
   double topPadding;

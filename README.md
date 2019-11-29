@@ -59,7 +59,7 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 - Improved dark theme
 
 #### Offline Mode
-- Users can still use the app offline
+- ~~Users can still use the app offline~~ ✔️
 
 #### Image Zooming
 - Make use of upcoming pan and zoom widget (https://github.com/flutter/flutter/issues/12878)
