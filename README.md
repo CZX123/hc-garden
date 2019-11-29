@@ -6,8 +6,11 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 
 ### High Priority
 
+#### Map
+- Highlight buildings on map, correct colour selection (high school/college) (Galen)
+
 #### iOS
-- Account for bottom padding ⌛
+- ~~Account for bottom padding~~ ✔️
 
 #### All Pages
 - ~~Tapping on the info row should also expand the bottom sheet fully~~ ✔️
@@ -41,7 +44,7 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 ### Medium Priority
 
 #### History Screen
-- Update to new design as suggested by Dr Chia
+- Update to new design
 
 #### About Screen
 - Update to whatever new design suggested
@@ -53,7 +56,6 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 - Search should perhaps highlight the searchTerm within the name for clarity
 
 #### Map
-- Highlight buildings on map, correct colour selection (high school/college) (Galen)
 - Improved dark theme
 
 #### Offline Mode
@@ -68,16 +70,16 @@ The user interface for HC Garden, with the bottom sheet, flora & fauna pages, an
 ## Bugs
 
 ### High Priority
-- Map bottom padding sometimes does not update when collapsing the bottom sheet
+- ~~Map bottom padding sometimes does not update when collapsing the bottom sheet~~ ✔️
 
 ### Medium Priority
-- Images in EntityListPage sometimes flicker when opening entity's DetailsPage
+- ~~Images in EntityListPage sometimes flicker when opening entity's DetailsPage~~ ✔️
 
 ## Future Improvements
 
 ### Possible
 - ~~Images should not use a new cache, but somehow utilise ImageCache instead. Make use of ImageProvider to place images directly in ImageCache.~~ ✔️
-- ExpandPageRouteTransition can be simplified greatly, and also figure out how to properly use Heroes to animate the Entity thumbnail to the DetailsPage. (Update: finally found out why heroes do not work: https://github.com/flutter/flutter/issues/25261, heroes now work!)
+- ExpandPageRouteTransition can be simplified greatly, and also figure out how to properly use Heroes to animate the Entity thumbnail to the DetailsPage. (Update: Custom Navigator also requires custom HeroController: https://github.com/flutter/flutter/issues/25261)
 
 ### Possible but very hard
 - Tablet support

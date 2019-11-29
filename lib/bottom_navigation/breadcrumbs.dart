@@ -12,10 +12,12 @@ class _BreadcrumbNavigationState extends State<BreadcrumbNavigation> {
   double _width;
   double _startPadding;
 
-  double _getWidth(String text) {
+  double _getWidth(String text, [bool bold = true]) {
     if (text.length > 24) text = text.substring(0, 24) + '…';
     final TextSpan span = TextSpan(
-      style: Theme.of(context).textTheme.subtitle,
+      style: Theme.of(context).textTheme.subtitle.copyWith(
+            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+          ),
       text: text,
     );
     final TextPainter painter = TextPainter(
@@ -38,7 +40,7 @@ class _BreadcrumbNavigationState extends State<BreadcrumbNavigation> {
       final appNotifier = Provider.of<AppNotifier>(context);
       _previousRoutesLength = appNotifier.routes.length;
       _width = width;
-      _startPadding = (_width - _getWidth('Home') - 120) / 2;
+      _startPadding = (_width - _getWidth('Home', false) - 120) / 2;
     }
   }
 
@@ -52,21 +54,37 @@ class _BreadcrumbNavigationState extends State<BreadcrumbNavigation> {
         horizontal: 60,
       ),
       child: CustomAnimatedSwitcher(
-        duration: const Duration(milliseconds: 400),
-        switchInCurve: Interval(.2, 1, curve: Curves.ease),
-        switchOutCurve: Interval(.7, 1, curve: Curves.ease),
+        switchInCurve: Curves.linear,
+        switchOutCurve: Curves.linear,
         transitionBuilder: (child, animation) {
+          final offsetCurveAnimation = CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn,
+            reverseCurve: Curves.fastOutSlowIn.flipped,
+          );
           return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset(pushed ? .1 : -.1, 0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: animation,
-                curve: Curves.fastLinearToSlowEaseIn,
-                reverseCurve: Threshold(0),
-              )),
+            opacity: CurvedAnimation(
+              parent: animation,
+              curve: Interval(.3, 1),
+              reverseCurve: Interval(.65, 1),
+            ),
+            child: AnimatedBuilder(
+              animation: animation,
+              builder: (context, child) {
+                final offsetTween = Tween<Offset>(
+                  begin: Offset(
+                    pushed ^ (animation.status == AnimationStatus.reverse)
+                        ? 16
+                        : -16,
+                    0,
+                  ),
+                  end: Offset.zero,
+                );
+                return Transform.translate(
+                  offset: offsetTween.evaluate(offsetCurveAnimation),
+                  child: child,
+                );
+              },
               child: child,
             ),
           );
@@ -164,9 +182,13 @@ class Breadcrumb extends StatelessWidget {
                 child: Text(
                   _title,
                   style: Theme.of(context).textTheme.subtitle.copyWith(
-                        color: active
-                            ? Theme.of(context).colorScheme.onSurface
-                            : Theme.of(context).hintColor,
+                        fontWeight:
+                            active ? FontWeight.bold : FontWeight.normal,
+                        color: Theme.of(context)
+                            .textTheme
+                            .subtitle
+                            .color
+                            .withOpacity(active ? 1 : .7),
                       ),
                 ),
               ),

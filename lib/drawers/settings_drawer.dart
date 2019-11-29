@@ -56,9 +56,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
               minHeight: height - topPadding - 32,
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                const SizedBox.shrink(),
                 const SizedBox.shrink(),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -208,6 +209,16 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                   ],
                 ),
                 const SizedBox.shrink(),
+                IconButton(
+                  icon: const Icon(Icons.help),
+                  color: Theme.of(context).hintColor,
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(context, OnboardingPageRoute(
+                      builder: (context) => OnboardingPage(),
+                    ));
+                  },
+                ),
               ],
             ),
           ),

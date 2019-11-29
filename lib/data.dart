@@ -571,8 +571,8 @@ class AppNotifier extends ChangeNotifier {
           mapSize: Size(
             width,
             adjusted
-                ? height - Sizes.kBottomHeight
-                : height - Sizes.hBottomBarHeight,
+                ? height - Sizes.kBottomHeight - bottomPadding
+                : height - Sizes.hBottomBarHeight - bottomPadding,
           ),
         );
       }
@@ -596,8 +596,8 @@ class AppNotifier extends ChangeNotifier {
           mapSize: Size(
             width,
             adjusted
-                ? height - Sizes.kBottomHeight
-                : height - Sizes.hBottomBarHeight,
+                ? height - Sizes.kBottomHeight - bottomPadding
+                : height - Sizes.hBottomBarHeight - bottomPadding,
           ),
         );
       } else {

@@ -146,6 +146,7 @@ class _HistoryPageState extends State<HistoryPage>
                                                   return image.isNotEmpty;
                                                 }).toList(),
                                                 initialImage: newImages[i],
+                                                title: 'Historical Photos',
                                                 fasterNavBarColourChange: true,
                                               );
                                             },

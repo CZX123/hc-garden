@@ -8,6 +8,7 @@ import '../../library.dart';
 class ImageGallery extends StatelessWidget {
   final String initialImage;
   final List<String> images;
+  final String title;
 
   /// Only used in going from [HistoryPage]. Makes the change in the android navigation bar colour (from the original bottom app bar colour to dark grey) faster.
   final bool fasterNavBarColourChange;
@@ -15,6 +16,7 @@ class ImageGallery extends StatelessWidget {
     Key key,
     @required this.initialImage,
     @required this.images,
+    this.title = 'Gallery',
     this.fasterNavBarColourChange = false,
   }) : super(key: key);
 
@@ -125,16 +127,29 @@ class ImageGallery extends StatelessWidget {
                           return Material(
                             elevation: 0,
                             color: Theme.of(context).bottomAppBarColor,
-                            child: SizedBox(
+                            child: Container(
                               height: Sizes.kBottomBarHeight +
                                   MediaQuery.of(context).padding.bottom,
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: IconButton(
-                                  icon: const Icon(Icons.arrow_back),
-                                  onPressed: () => Navigator.maybePop(context),
-                                  tooltip: 'Back',
-                                ),
+                              padding: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).padding.bottom,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_back),
+                                    onPressed: () =>
+                                        Navigator.maybePop(context),
+                                    tooltip: 'Back',
+                                  ),
+                                  Text(
+                                    title,
+                                    style: Theme.of(context).textTheme.subtitle,
+                                  ),
+                                  const SizedBox(
+                                    width: 48,
+                                  ),
+                                ],
                               ),
                             ),
                           );

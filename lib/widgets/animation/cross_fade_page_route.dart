@@ -2,34 +2,34 @@ import '../../library.dart';
 
 class CrossFadePageRoute<T> extends PageRoute<T> {
   final WidgetBuilder builder;
-  final Color scrimColor;
-  final String scrimLabel;
   final bool fadeOut;
-  final bool isOpaque;
+  final bool _opaque;
   @override
   final Duration transitionDuration;
 
   CrossFadePageRoute({
     @required this.builder,
     this.transitionDuration = const Duration(milliseconds: 300),
-    this.scrimColor,
-    this.scrimLabel,
     this.fadeOut = true,
-    this.isOpaque = false,
+    bool opaque = false,
     RouteSettings settings,
   })  : assert(builder != null),
         assert(fadeOut != null),
         assert(transitionDuration != null),
+        _opaque = opaque,
         super(settings: settings);
 
   @override
-  bool get opaque => isOpaque;
+  bool get opaque => _opaque;
 
   @override
-  Color get barrierColor => scrimColor;
+  Color get barrierColor => null;
 
   @override
-  String get barrierLabel => scrimLabel;
+  String get barrierLabel => null;
+
+  @override
+  bool get maintainState => true;
 
   @override
   Widget buildPage(
@@ -54,9 +54,6 @@ class CrossFadePageRoute<T> extends PageRoute<T> {
       child: child,
     );
   }
-
-  @override
-  bool get maintainState => true;
 }
 
 class CrossFadeTransition extends StatelessWidget {

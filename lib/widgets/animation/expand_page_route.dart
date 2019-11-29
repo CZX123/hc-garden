@@ -10,7 +10,7 @@ class ExpandPageRoute<T> extends PageRoute<T> {
   final double rowOffset;
   final ScrollController oldScrollController;
   final ValueListenable<double> topSpace;
-  final bool isOpaque;
+  final bool _opaque;
 
   /// Fade out all the contents during the animation if this function returns true. Used to make the back animation better if user skips from [TrailLocationOverviewPage] directly to the home page, skipping past the [TrailDetailsPage]
   final bool Function() disappear;
@@ -26,24 +26,28 @@ class ExpandPageRoute<T> extends PageRoute<T> {
     @required this.rowOffset,
     @required this.oldScrollController,
     @required this.topSpace,
-    this.isOpaque = false,
+    bool opaque = false,
     this.disappear,
     RouteSettings settings,
   })  : assert(builder != null),
         assert(transitionDuration != null),
+        _opaque = opaque,
         super(settings: settings);
 
   @override
   final Duration transitionDuration;
 
   @override
-  bool get opaque => isOpaque;
+  bool get opaque => _opaque;
 
   @override
   Color get barrierColor => null;
 
   @override
   String get barrierLabel => null;
+
+  @override
+  bool get maintainState => true;
 
   @override
   Widget buildPage(
@@ -77,9 +81,6 @@ class ExpandPageRoute<T> extends PageRoute<T> {
       disappear: disappear,
     );
   }
-
-  @override
-  bool get maintainState => true;
 }
 
 class ExpandItemPageTransition extends StatefulWidget {

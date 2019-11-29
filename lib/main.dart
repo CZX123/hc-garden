@@ -179,7 +179,6 @@ class _HcGardenAppState extends State<HcGardenApp> {
       child: Consumer<ThemeNotifier>(
         builder: (context, themeNotifier, child) {
           if (themeNotifier.value == null) return const SizedBox.shrink();
-          // TODO: Onboarding: Make use of the _firstTime variable to show different screens
           return Consumer<DebugNotifier>(
             builder: (context, debugInfo, child) {
               return MaterialApp(
@@ -196,7 +195,9 @@ class _HcGardenAppState extends State<HcGardenApp> {
                       pageBuilder: (context, _, __) {
                         return MarkerDataWidget(
                           firebaseDataStream: _stream,
-                          child: const MyHomePage(),
+                          child: MyHomePage(
+                            firstTime: _firstTime,
+                          ),
                         );
                       },
                     );
@@ -213,65 +214,9 @@ class _HcGardenAppState extends State<HcGardenApp> {
   }
 }
 
-/// Updates default markers of [MapNotifier] by listening to the firebase data stream
-class MarkerDataWidget extends StatefulWidget {
-  final Stream<FirebaseData> firebaseDataStream;
-  final Widget child;
-  const MarkerDataWidget({
-    Key key,
-    @required this.firebaseDataStream,
-    @required this.child,
-  }) : super(key: key);
-
-  @override
-  _MarkerDataWidgetState createState() => _MarkerDataWidgetState();
-}
-
-class _MarkerDataWidgetState extends State<MarkerDataWidget> {
-  bool _init = false;
-  StreamSubscription<FirebaseData> _streamSubscription;
-
-  void onData(FirebaseData data, {bool notify = true}) {
-    Map<MarkerId, Marker> mapMarkers = {};
-    data.trails.forEach((trail, locations) {
-      for (var location in locations) {
-        mapMarkers[MarkerId('${trail.id} ${location.id}')] = generateMarker(
-          context: context,
-          trail: trail,
-          location: location,
-        );
-      }
-    });
-    if (data.trails.isNotEmpty) {
-      Provider.of<MapNotifier>(context, listen: false).setDefaultMarkers(
-        mapMarkers,
-        notify: notify,
-      );
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_init) {
-      _streamSubscription = widget.firebaseDataStream.listen(onData);
-      onData(Provider.of<FirebaseData>(context, listen: false), notify: false);
-      _init = true;
-    }
-  }
-
-  @override
-  void dispose() {
-    _streamSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
-}
-
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key}) : super(key: key);
+  final bool firstTime;
+  const MyHomePage({Key key, this.firstTime = false}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -371,6 +316,13 @@ class _MyHomePageState extends State<MyHomePage>
     final heightTooSmall = height - Sizes.kBottomHeight < 100;
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     if (!_init) {
+      if (widget.firstTime) {
+        Future.delayed(const Duration(seconds: 1), () {
+          Navigator.of(context).push(OnboardingPageRoute(
+            builder: (context) => const OnboardingPage(),
+          ));
+        });
+      }
       Provider.of<BottomSheetNotifier>(context, listen: false)
         ..snappingPositions.value = [
           0,
