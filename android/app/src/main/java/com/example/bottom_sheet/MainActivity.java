@@ -1,4 +1,4 @@
-package com.example.bottom_sheet;
+package com.hci.hcgarden;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
