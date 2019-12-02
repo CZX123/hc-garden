@@ -61,17 +61,8 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
 
   Future<ui.Codec> _loadAsync(NetworkToFileImage key) async {
     assert(key == this);
-    // ---
 
     Uint8List bytes;
-
-    // // Runs both futures in parallel, and which ever one completes faster provides the bytes.
-    // bytes = await Future.any<Uint8List>([
-    //   // Reads from the local file.
-    //   if (file != null && _ifFileExistsLocally()) _readFromTheLocalFile(),
-    //   // Reads from the network and saves it to the local file.
-    //   if (url != null && url.isNotEmpty) _downloadFromTheNetworkAndSaveToTheLocalFile(),
-    // ]);
 
     // Reads from the local file.
     if (file != null && _ifFileExistsLocally()) {
@@ -82,8 +73,6 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
     else if (url != null && url.isNotEmpty) {
       bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile();
     }
-
-    // ---
 
     // Empty file.
     if ((bytes != null) && (bytes.lengthInBytes == 0)) bytes = null;
@@ -103,7 +92,6 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   Future<Uint8List> _downloadFromTheNetworkAndSaveToTheLocalFile() async {
     assert(url != null && url.isNotEmpty);
     if (debug) print("Fetching image from: $url");
-    // ---
 
     final Uri resolved = Uri.base.resolve(url);
     final HttpClientRequest request = await _httpClient.getUrl(resolved);

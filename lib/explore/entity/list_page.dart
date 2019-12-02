@@ -234,12 +234,6 @@ class _EntityListRowState extends State<EntityListRow> {
             : infoRow,
       ),
       onTap: () {
-        // final searchNotifier =
-        //     Provider.of<SearchNotifier>(context, listen: false);
-        // if (searchNotifier.keyboardAppear) {
-        //   searchNotifier.keyboardAppear = false;
-        //   await Future.delayed(const Duration(milliseconds: 100));
-        // }
         final oldChild = widget.searchTerm.isEmpty
             ? Container(
                 height: rowHeight,

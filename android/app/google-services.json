@@ -30,6 +30,49 @@
             {
               "client_id": "590763635317-ml8n1lr08kpot52v229f4ekqj4ohcfi4.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "590763635317-s4dbvuhvkse146p0ttvirs3uv6ioutor.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hci.hcgarden"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590763635317:android:f45340524d315681077e3c",
+        "android_client_info": {
+          "package_name": "com.hci.hcgarden"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "590763635317-ml8n1lr08kpot52v229f4ekqj4ohcfi4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvlJ0q8i9KLeeMcGIdhiEUSf50yOlgzN8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "590763635317-ml8n1lr08kpot52v229f4ekqj4ohcfi4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "590763635317-s4dbvuhvkse146p0ttvirs3uv6ioutor.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hci.hcgarden"
+              }
             }
           ]
         }
