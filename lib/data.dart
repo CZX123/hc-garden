@@ -7,11 +7,6 @@ String lowerRes(String image) {
   return split.join('.') + 'h' + end;
 }
 
-bool mapEquals<A, B>(Map<A, B> a, Map<A, B> b) {
-  return a?.length == b?.length &&
-      (a?.keys?.every((key) => a[key] == b[key]) ?? true);
-}
-
 class Tuple<A, B> {
   final A item1;
   final B item2;

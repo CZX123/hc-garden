@@ -121,6 +121,7 @@ class FilterDrawer extends StatelessWidget {
                         ),
                       ),
                       subtitle: const Text('Coming Soon'),
+                      onChanged: null,
                     ),
                   ],
                 ),

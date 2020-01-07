@@ -48,7 +48,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   }
 
   @override
-  ImageStreamCompleter load(NetworkToFileImage key) {
+  ImageStreamCompleter load(NetworkToFileImage key, DecoderCallback _) {
     return MultiFrameImageStreamCompleter(
         codec: _loadAsync(key),
         scale: key.scale,
