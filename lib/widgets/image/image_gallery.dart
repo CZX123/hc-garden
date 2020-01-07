@@ -421,7 +421,6 @@ class _ZoomableImageState extends State<ZoomableImage>
               widget.image,
               key: _key,
               fit: BoxFit.contain,
-              saveInCache: false,
               onLoad: onImageLoad,
             ),
           ),

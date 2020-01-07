@@ -138,24 +138,20 @@ class CustomImage extends StatefulWidget {
   final String url;
   final Uint8List fallbackMemoryImage;
   final Color placeholderColor;
-  final Duration timeout;
   final BoxFit fit;
   final double width;
   final double height;
   final Duration fadeInDuration;
-  final bool saveInCache;
   final void Function(double aspectRatio) onLoad;
   CustomImage(
     this.url, {
     Key key,
     this.fallbackMemoryImage,
     this.placeholderColor,
-    this.timeout: const Duration(seconds: 10),
     this.fit: BoxFit.cover,
     this.width,
     this.height,
     this.fadeInDuration: const Duration(milliseconds: 200),
-    this.saveInCache,
     this.onLoad,
   }) : super(key: key);
 
@@ -211,8 +207,9 @@ class _CustomImageState extends State<CustomImage> {
         file: file,
         url: widget.url,
       );
-      if (widget.onLoad != null)
+      if (widget.onLoad != null) {
         WidgetsBinding.instance.addPostFrameCallback(_resolveImage);
+      }
     }
   }
 

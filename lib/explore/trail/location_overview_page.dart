@@ -20,6 +20,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   bool _init = false;
   final _scrollController = ScrollController();
   double aspectRatio;
+  final _aspectRatio = ValueNotifier<double>(null);
   static const double sizeScaling = 500;
   final hidden = ValueNotifier(false);
   Animation<double> animation;
@@ -70,6 +71,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   @override
   void dispose() {
     animation?.removeListener(listener);
+    _aspectRatio.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -80,113 +82,148 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     final bottomSheetNotifier =
         Provider.of<BottomSheetNotifier>(context, listen: false);
     final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
-    final child = SingleChildScrollView(
-      controller: _scrollController,
-      physics: NeverScrollableScrollPhysics(),
-      child: Column(
-        children: <Widget>[
-          ValueListenableBuilder<double>(
-            valueListenable: bottomSheetNotifier.animation,
-            builder: (context, value, child) {
-              double h = 0;
-              if (value < paddingBreakpoint) {
-                h = (1 - value / paddingBreakpoint) * topPadding;
-                if (value > 1)
-                  widget.endContentOffset?.value = Offset(0, h + 16);
-              }
-              return SizedBox(
-                height: h,
-              );
-            },
-          ),
-          ValueListenableBuilder<bool>(
-            valueListenable: hidden,
-            builder: (context, value, child) {
-              return Visibility(
-                visible: !value,
-                maintainState: true,
-                maintainAnimation: true,
-                maintainSize: true,
-                child: child,
-              );
-            },
-            child: InfoRow(
-              image: widget.trailLocation.smallImage,
-              title: widget.trailLocation.name,
-              subtitle: (widget.trailLocation.entityPositions
-                      .where((position) => position.entity != null)
+    final maxImageHeight = height - Sizes.kBottomBarHeight - bottomPadding;
+    final child = Stack(
+      children: [
+        SingleChildScrollView(
+          controller: _scrollController,
+          physics: NeverScrollableScrollPhysics(),
+          child: Column(
+            children: <Widget>[
+              ValueListenableBuilder<double>(
+                valueListenable: bottomSheetNotifier.animation,
+                builder: (context, value, child) {
+                  double h = 0;
+                  if (value < paddingBreakpoint) {
+                    h = (1 - value / paddingBreakpoint) * topPadding;
+                    if (value > 1)
+                      widget.endContentOffset?.value = Offset(0, h + 16);
+                  }
+                  return SizedBox(
+                    height: h,
+                  );
+                },
+              ),
+              ValueListenableBuilder<bool>(
+                valueListenable: hidden,
+                builder: (context, value, child) {
+                  return Visibility(
+                    visible: !value,
+                    maintainState: true,
+                    maintainAnimation: true,
+                    maintainSize: true,
+                    child: child,
+                  );
+                },
+                child: InfoRow(
+                  image: widget.trailLocation.smallImage,
+                  title: widget.trailLocation.name,
+                  subtitle: (widget.trailLocation.entityPositions
+                          .where((position) => position.entity != null)
+                          .toList()
+                            ..sort((a, b) {
+                              return a.left.compareTo(b.left);
+                            }))
+                      .map((position) => position.entity.name)
                       .toList()
-                        ..sort((a, b) {
-                          return a.left.compareTo(b.left);
-                        }))
-                  .map((position) => position.entity.name)
-                  .toList()
-                  .join(', '),
-            ),
-          ),
-          ValueListenableBuilder<double>(
-            valueListenable: bottomSheetNotifier.animation,
-            builder: (context, value, child) {
-              return Container(
-                alignment: Alignment.center,
-                constraints: BoxConstraints(
-                  minHeight: max(
-                    height -
-                        value -
-                        Sizes.kBottomBarHeight -
-                        bottomPadding -
-                        Sizes.kInfoRowHeight -
-                        (1 - value / (height - Sizes.kBottomHeight)) *
-                            topPadding,
-                    0,
-                  ),
+                      .join(', '),
                 ),
-                child: child,
-              );
-            },
-            child: Stack(
-              children: <Widget>[
-                CustomImage(
-                  lowerRes(widget.trailLocation.image),
-                  fit: BoxFit.fitWidth,
-                  onLoad: (double aspectRatio) {
-                    setState(() {
-                      this.aspectRatio = aspectRatio;
-                    });
-                  },
-                ),
-                for (var entityPosition in widget.trailLocation.entityPositions)
-                  new Positioned(
-                    left: entityPosition.left * width -
-                        (entityPosition.size / sizeScaling) * width / 2,
-                    top: aspectRatio == null
-                        ? height
-                        : entityPosition.top * (width / aspectRatio) -
+              ),
+              ValueListenableBuilder<double>(
+                valueListenable: bottomSheetNotifier.animation,
+                builder: (context, value, child) {
+                  return Container(
+                    alignment: Alignment.center,
+                    constraints: BoxConstraints(
+                      minHeight: isLandscape &&
+                              maxImageHeight < width / aspectRatio
+                          ? maxImageHeight
+                          : max(
+                              height -
+                                  value -
+                                  Sizes.kBottomBarHeight -
+                                  bottomPadding -
+                                  Sizes.kInfoRowHeight -
+                                  (1 - value / paddingBreakpoint) * topPadding,
+                              0,
+                            ),
+                    ),
+                    child: child,
+                  );
+                },
+                child: Stack(
+                  children: <Widget>[
+                    CustomImage(
+                      lowerRes(widget.trailLocation.image),
+                      fit: BoxFit.contain,
+                      onLoad: (double aspectRatio) {
+                        _aspectRatio.value = aspectRatio;
+                        setState(() {
+                          this.aspectRatio = aspectRatio;
+                        });
+                      },
+                    ),
+                    for (var entityPosition
+                        in widget.trailLocation.entityPositions)
+                      new Positioned(
+                        left: entityPosition.left * width -
                             (entityPosition.size / sizeScaling) * width / 2,
-                    width: (entityPosition.size / sizeScaling) * width,
-                    height: (entityPosition.size / sizeScaling) * width,
-                    child: entityPosition.entity is Fauna
-                        ? FaunaCircle(
-                            fauna: entityPosition.entity,
-                            height: (entityPosition.size / sizeScaling) * width,
-                            onTap: () => _onTap(entityPosition.entity),
-                          )
-                        : AnimatedPulseCircle(
-                            height: (entityPosition.size / sizeScaling) * width,
-                            onTap: () => _onTap(entityPosition.entity),
-                          ),
-                  ),
-              ],
-            ),
+                        top: aspectRatio == null
+                            ? height
+                            : entityPosition.top * (width / aspectRatio) -
+                                (entityPosition.size / sizeScaling) * width / 2,
+                        width: (entityPosition.size / sizeScaling) * width,
+                        height: (entityPosition.size / sizeScaling) * width,
+                        child: entityPosition.entity is Fauna
+                            ? FaunaCircle(
+                                fauna: entityPosition.entity,
+                                height:
+                                    (entityPosition.size / sizeScaling) * width,
+                                onTap: () => _onTap(entityPosition.entity),
+                              )
+                            : AnimatedPulseCircle(
+                                height:
+                                    (entityPosition.size / sizeScaling) * width,
+                                onTap: () => _onTap(entityPosition.entity),
+                              ),
+                      ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: Sizes.kBottomBarHeight + bottomPadding,
+              ),
+            ],
           ),
-          SizedBox(
-            height: Sizes.kBottomBarHeight + bottomPadding,
-          ),
-        ],
-      ),
+        ),
+        // ValueListenableBuilder<double>(
+        //   valueListenable: bottomSheetNotifier.animation,
+        //   builder: (context, value, child) {
+        //     return Positioned(
+        //       right: 16,
+        //       bottom: Sizes.kBottomBarHeight + bottomPadding + 16 + value,
+        //       height: 48,
+        //       width: 48,
+        //       child: child,
+        //     );
+        //   },
+        //   child: Material(
+        //     type: MaterialType.circle,
+        //     color: Colors.black45,
+        //     clipBehavior: Clip.antiAlias,
+        //     child: IconButton(
+        //       icon: Icon(Icons.zoom_in),
+        //       color: Colors.white,
+        //       onPressed: () {},
+        //     ),
+        //   ),
+        // ),
+      ],
     );
     return Material(
       type: MaterialType.transparency,
@@ -383,3 +420,4 @@ class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
     );
   }
 }
+

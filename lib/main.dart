@@ -49,14 +49,18 @@ class _HcGardenAppState extends State<HcGardenApp> {
   @override
   void initState() {
     super.initState();
+
     checkPermission();
-    // Get value
+
+    // Get values
     SharedPreferences.getInstance().then((prefs) {
       final isDark = prefs.getBool('isDark');
       _firstTime = isDark == null;
       _themeNotifier.value = isDark ?? false;
       _mapNotifier.mapType = CustomMapType.values[prefs.getInt('mapType') ?? 0];
     });
+
+    // Load and convert all markers to bitmap descriptors
     final markerColors = ['yellow', 'pink', 'blue', 'green'];
     Future.wait<BitmapDescriptor>(
       markerColors.map((color) {
@@ -68,6 +72,8 @@ class _HcGardenAppState extends State<HcGardenApp> {
     ).then((bitmapList) {
       _mapNotifier.darkThemeMarkerIcons = bitmapList;
     });
+
+    // Handle firebase data
     _stream = FirebaseDatabase.instance.reference().onValue.map((event) {
       if (event.snapshot.value == null) {
         throw Exception('Value is empty!');

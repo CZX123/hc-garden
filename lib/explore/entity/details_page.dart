@@ -167,7 +167,6 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
                                 : Sizes.kImageHeight / 2 * 3,
                             fit: BoxFit.cover,
                             placeholderColor: Theme.of(context).dividerColor,
-                            saveInCache: false,
                           ),
                           Positioned.fill(
                             child: Material(
