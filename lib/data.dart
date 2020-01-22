@@ -54,17 +54,30 @@ abstract class Entity implements DataObject {
         sciName = parsedJson['sciName'],
         description = parsedJson['description'],
         smallImage = parsedJson['smallImage'],
-        images = List<String>.from(parsedJson['imageRef']),
-        locations =
-            List.from(parsedJson['locations'].split(',')).where((value) {
-          return value != null && value.isNotEmpty;
-        }).map((value) {
-          final split = value.split('/');
-          return Tuple(
-            int.tryParse(split.first.split('-').last),
-            int.tryParse(split.last.split('-').last),
-          );
-        }).toList();
+        images = (parsedJson['imageRef'] == null)
+            ? null
+            : List<String>.from(parsedJson['imageRef']),
+        locations = (parsedJson['locations'] == null)
+            ? null
+            : List.from(parsedJson['locations'].split(',')).where((value) {
+                return value != null && value.isNotEmpty;
+              }).map((value) {
+                final split = value.split('/');
+                return Tuple(
+                  int.tryParse(split.first.split('-').last),
+                  int.tryParse(split.last.split('-').last),
+                );
+              }).toList();
+
+  bool get isValid {
+    return id != null &&
+        name != null &&
+        sciName != null &&
+        description != null &&
+        smallImage != null &&
+        images != null &&
+        locations != null;
+  }
 
   @override
   bool operator ==(Object other) {
@@ -103,6 +116,11 @@ class Fauna extends Entity {
             ? LatLng(parsedJson['latitude'], parsedJson['longitude'])
             : null,
         super.fromJson(key, parsedJson);
+
+  @override
+  bool get isValid {
+    return super.isValid && area != null && coordinates != null;
+  }
 
   @override
   bool operator ==(Object other) {
@@ -176,6 +194,10 @@ class Trail implements DataObject {
     );
   }
 
+  bool get isValid {
+    return id != null && name != null;
+  }
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -220,14 +242,28 @@ class TrailLocation implements DataObject {
       coordinates: parsedJson.containsKey('latitude')
           ? LatLng(parsedJson['latitude'], parsedJson['longitude'])
           : null,
-      entityPositions: List.from(parsedJson['points']).map((point) {
-        return EntityPosition.fromJson(
-          point,
-          floraList: floraList,
-          faunaList: faunaList,
-        );
-      }).toList(),
+      entityPositions: parsedJson.containsKey('points')
+          ? List.from(parsedJson['points']).map((point) {
+              final entityPosition = EntityPosition.fromJson(
+                point, 
+                floraList: floraList,
+                faunaList: faunaList,
+              );
+              if(entityPosition.isValid) return entityPosition;
+              else return null;
+            }).toList().where((position) => position!=null)
+          : null,
     );
+  }
+
+  bool get isValid {
+    return id != null &&
+        trail != null &&
+        name != null &&
+        image != null &&
+        smallImage != null &&
+        coordinates != null &&
+        entityPositions != null;
   }
 
   @override
@@ -252,13 +288,11 @@ class EntityPosition {
   final Entity entity;
   final double left;
   final double top;
-  final num pulse;
   final num size;
   const EntityPosition({
     this.entity,
     this.left,
     this.top,
-    this.pulse,
     this.size,
   });
 
@@ -283,9 +317,15 @@ class EntityPosition {
       entity: entity,
       left: parsedJson['left'],
       top: parsedJson['top'],
-      pulse: parsedJson['pulse'],
       size: parsedJson['size'],
     );
+  }
+
+  bool get isValid{
+    return entity != null &&
+            left != null &&
+            top != null &&
+            size != null;
   }
 
   @override
@@ -295,12 +335,11 @@ class EntityPosition {
             entity == other.entity &&
             left == other.left &&
             top == other.top &&
-            pulse == other.pulse &&
             size == other.size;
   }
 
   @override
-  int get hashCode => hashValues(entity, left, top, pulse, size);
+  int get hashCode => hashValues(entity, left, top, size);
 }
 
 class HistoricalData {
@@ -328,6 +367,15 @@ class HistoricalData {
       height: parsedJson['height'],
       width: parsedJson['width'],
     );
+  }
+
+  bool get isValid {
+    return id != null &&
+        description != null &&
+        image != null &&
+        name != null &&
+        height != null &&
+        width != null;
   }
 
   @override
@@ -367,6 +415,10 @@ class AboutPageData {
       title: parsedJson['title'],
       isExpanded: false,
     );
+  }
+
+  bool get isValid {
+    return body != null && id != null && title != null;
   }
 
   @override

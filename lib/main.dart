@@ -85,9 +85,11 @@ class _HcGardenAppState extends State<HcGardenApp> {
       List<Fauna> faunaList = [];
       parsedJson['flora&fauna'].forEach((key, value) {
         if (key.contains('flora')) {
-          floraList.add(Flora.fromJson(key, value));
+          final flora = Flora.fromJson(key, value);
+          if (flora.isValid) floraList.add(flora);
         } else {
-          faunaList.add(Fauna.fromJson(key, value));
+          final fauna = Fauna.fromJson(key, value);
+          if (fauna.isValid) faunaList.add(fauna);
         }
       });
       floraList.sort((a, b) => a.name.compareTo(b.name));
@@ -97,31 +99,35 @@ class _HcGardenAppState extends State<HcGardenApp> {
       Map<Trail, List<TrailLocation>> trails = {};
       parsedJson['map'].forEach((key, value) {
         final trail = Trail.fromJson(key, value);
-        trails[trail] = [];
-        value['route'].forEach((key, value) {
-          final location = TrailLocation.fromJson(
-            key,
-            value,
-            trail: trail,
-            floraList: floraList,
-            faunaList: faunaList,
-          );
-          trails[trail].add(location);
-        });
-        trails[trail].sort((a, b) => a.name.compareTo(b.name));
+        if (trail.isValid) {
+          trails[trail] = [];
+          value['route'].forEach((key, value) {
+            final location = TrailLocation.fromJson(
+              key,
+              value,
+              trail: trail,
+              floraList: floraList,
+              faunaList: faunaList,
+            );
+            if(location.isValid) trails[trail].add(location);
+          });
+          trails[trail].sort((a, b) => a.name.compareTo(b.name));
+        }
       });
 
       // Add historical data
       List<HistoricalData> historicalDataList = [];
       parsedJson['historical'].forEach((key, value) {
-        historicalDataList.add(HistoricalData.fromJson(key, value));
+        final historicalData = HistoricalData.fromJson(key, value);
+        if(historicalData.isValid) historicalDataList.add(historicalData);
       });
       historicalDataList.sort((a, b) => a.id.compareTo(b.id));
 
       // Add AboutPage data
       List<AboutPageData> aboutPageDataList = [];
       parsedJson['about'].forEach((key, value) {
-        aboutPageDataList.add(AboutPageData.fromJson(key, value));
+        final aboutPageData = AboutPageData.fromJson(key, value);
+        if(aboutPageData.isValid) aboutPageDataList.add(aboutPageData);
       });
       aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
 

@@ -141,14 +141,16 @@ class _AboutPageState extends State<AboutPage>
                                 Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(24, 0, 24, 8),
-                                  child: Text(
-                                    aboutPageData.quote,
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      color: Colors.grey,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
+                                  child: (aboutPageData.quote != null)
+                                      ? Text(
+                                          aboutPageData.quote,
+                                          style: TextStyle(
+                                            fontSize: 16.0,
+                                            color: Colors.grey,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        )
+                                      : null,
                                 ),
                                 Padding(
                                   padding:
