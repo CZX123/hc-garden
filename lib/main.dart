@@ -127,7 +127,6 @@ class _HcGardenAppState extends State<HcGardenApp> {
 
       // TODO: handle cases of invalid data
       // i.e. filter those whose data fields are null out
-
       return FirebaseData(
         floraList: floraList,
         faunaList: faunaList,
@@ -164,19 +163,19 @@ class _HcGardenAppState extends State<HcGardenApp> {
         ),
         // To be removed
         ChangeNotifierProvider(
-          builder: (context) => DebugNotifier(),
+          create: (context) => DebugNotifier(),
         ),
         // Main AppNotifier in changed of main app flow
         ChangeNotifierProvider(
-          builder: (context) => AppNotifier(),
+          create: (context) => AppNotifier(),
         ),
         // Contains bottom sheet animations, ability to change active scroll controller
         ChangeNotifierProvider(
-          builder: (context) => BottomSheetNotifier(),
+          create: (context) => BottomSheetNotifier(),
         ),
         // Simple ChangeNotifier for searching flora and fauna
         ChangeNotifierProvider(
-          builder: (context) => SearchNotifier(),
+          create: (context) => SearchNotifier(),
         ),
         // Simple ChangeNotifier for filtering flora and fauna
         ChangeNotifierProvider.value(
