@@ -190,7 +190,7 @@ class Trail implements DataObject {
   factory Trail.fromJson(String key, dynamic parsedJson) {
     return Trail(
       id: int.tryParse(key.split('-').last),
-      name: parsedJson['name'],
+      name: parsedJson is Map ? parsedJson['name'] : null,
     );
   }
 
@@ -249,9 +249,9 @@ class TrailLocation implements DataObject {
                 floraList: floraList,
                 faunaList: faunaList,
               );
-              if(entityPosition.isValid) return entityPosition;
+              if (entityPosition.isValid) return entityPosition;
               else return null;
-            }).toList().where((position) => position!=null)
+            }).where((position) => position != null).toList()
           : null,
     );
   }

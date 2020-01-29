@@ -1,19 +1,5 @@
 import '../library.dart';
 
-// Needed for the selector to correctly compare between 2 different lists of historical data
-class HistoricalDataObject {
-  final List<HistoricalData> value;
-  const HistoricalDataObject(this.value);
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is HistoricalDataObject && listEquals(value, other.value);
-  }
-
-  @override
-  int get hashCode => hashList(value);
-}
-
 class HistoryPage extends StatefulWidget {
   const HistoryPage({Key key}) : super(key: key);
   @override
@@ -82,11 +68,11 @@ class _HistoryPageState extends State<HistoryPage>
                 }
                 return false;
               },
-              child: Selector<FirebaseData, HistoricalDataObject>(
+              child: Selector<FirebaseData, List<HistoricalData>>(
                 selector: (context, firebaseData) =>
-                    HistoricalDataObject(firebaseData.historicalDataList),
-                builder: (context, historicalDataObject, child) {
-                  final newImages = historicalDataObject.value.map((h) {
+                    firebaseData.historicalDataList,
+                builder: (context, historicalData, child) {
+                  final newImages = historicalData.map((h) {
                     return lowerRes(h.image);
                   }).toList();
                   return ListView.builder(
@@ -110,65 +96,72 @@ class _HistoryPageState extends State<HistoryPage>
                       }
                       final i = index - 1;
                       final height = width *
-                          historicalDataObject.value[i].height /
-                          historicalDataObject.value[i].width;
+                          historicalData[i].height /
+                          historicalData[i].width;
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           if (newImages[i].isNotEmpty)
                             Stack(
                               children: <Widget>[
-                                CustomImage(
-                                  newImages[i],
-                                  height: height,
-                                  width: width,
-                                  placeholderColor:
-                                      Theme.of(context).dividerColor,
-                                ),
-                                Positioned.fill(
-                                  child: Material(
-                                    type: MaterialType.transparency,
-                                    child: InkWell(
-                                      onTap: () async {
-                                        SystemChrome.setPreferredOrientations([
-                                          DeviceOrientation.portraitUp,
-                                          DeviceOrientation.landscapeLeft,
-                                          DeviceOrientation.landscapeRight,
-                                        ]);
-                                        await Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            opaque: false,
-                                            pageBuilder: (context, _, __) {
-                                              return ImageGallery(
-                                                images:
-                                                    newImages.where((image) {
-                                                  return image.isNotEmpty;
-                                                }).toList(),
-                                                initialImage: newImages[i],
-                                                title: 'Historical Photos',
-                                                fasterNavBarColourChange: true,
-                                              );
-                                            },
-                                            transitionDuration: const Duration(
-                                                milliseconds: 300),
-                                          ),
-                                        );
-                                        SystemChrome.setPreferredOrientations([
-                                          DeviceOrientation.portraitUp,
-                                        ]);
-                                      },
-                                    ),
+                                BeforeAfter(
+                                  imageHeight: height,
+                                  imageWidth: width,
+                                  beforeImage: CustomImage(
+                                    newImages[i],
+                                    placeholderColor:
+                                        Theme.of(context).dividerColor,
+                                  ),
+                                  afterImage: CustomImage(
+                                    newImages[i],
+                                    placeholderColor:
+                                        Theme.of(context).dividerColor,
                                   ),
                                 ),
+                                // Positioned.fill(
+                                //   child: Material(
+                                //     type: MaterialType.transparency,
+                                //     child: InkWell(
+                                //       onTap: () async {
+                                //         SystemChrome.setPreferredOrientations([
+                                //           DeviceOrientation.portraitUp,
+                                //           DeviceOrientation.landscapeLeft,
+                                //           DeviceOrientation.landscapeRight,
+                                //         ]);
+                                //         await Navigator.push(
+                                //           context,
+                                //           PageRouteBuilder(
+                                //             opaque: false,
+                                //             pageBuilder: (context, _, __) {
+                                //               return ImageGallery(
+                                //                 images:
+                                //                     newImages.where((image) {
+                                //                   return image.isNotEmpty;
+                                //                 }).toList(),
+                                //                 initialImage: newImages[i],
+                                //                 title: 'Historical Photos',
+                                //                 fasterNavBarColourChange: true,
+                                //               );
+                                //             },
+                                //             transitionDuration: const Duration(
+                                //                 milliseconds: 300),
+                                //           ),
+                                //         );
+                                //         SystemChrome.setPreferredOrientations([
+                                //           DeviceOrientation.portraitUp,
+                                //         ]);
+                                //       },
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
-                          if (historicalDataObject.value[i].description != '')
+                          if (historicalData[i].description != '')
                             Padding(
                               padding:
                                   const EdgeInsets.fromLTRB(16, 16, 16, 24),
                               child: Text(
-                                historicalDataObject.value[i].description,
+                                historicalData[i].description,
                                 style: TextStyle(
                                   fontSize: 15,
                                 ),
@@ -178,7 +171,7 @@ class _HistoryPageState extends State<HistoryPage>
                         ],
                       );
                     },
-                    itemCount: historicalDataObject.value.length + 1,
+                    itemCount: historicalData.length + 1,
                   );
                 },
               ),

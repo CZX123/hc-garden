@@ -46,6 +46,7 @@ export 'widgets/general_widgets.dart';
 export 'widgets/animation/cross_fade_page_route.dart';
 export 'widgets/animation/expand_page_route.dart';
 export 'widgets/animation/custom_animation_switcher.dart';
+export 'widgets/image/before_after.dart';
 export 'widgets/image/custom_image.dart';
 export 'widgets/image/image_gallery.dart';
 export 'widgets/image/transparent_image.dart';

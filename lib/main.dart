@@ -1,6 +1,7 @@
 import 'library.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   // Restrict to only portrait orientation
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // Offline access with just one line
@@ -80,7 +81,7 @@ class _HcGardenAppState extends State<HcGardenApp> {
       }
 
       // Add list of entities
-      final parsedJson = Map<String, dynamic>.from(event.snapshot.value);
+      final Map parsedJson = event.snapshot.value;
       List<Flora> floraList = [];
       List<Fauna> faunaList = [];
       parsedJson['flora&fauna'].forEach((key, value) {
@@ -99,7 +100,9 @@ class _HcGardenAppState extends State<HcGardenApp> {
       Map<Trail, List<TrailLocation>> trails = {};
       parsedJson['map'].forEach((key, value) {
         final trail = Trail.fromJson(key, value);
+        print('$key, ${trail.isValid}');
         if (trail.isValid) {
+          print(trail.name);
           trails[trail] = [];
           value['route'].forEach((key, value) {
             final location = TrailLocation.fromJson(
@@ -109,7 +112,7 @@ class _HcGardenAppState extends State<HcGardenApp> {
               floraList: floraList,
               faunaList: faunaList,
             );
-            if(location.isValid) trails[trail].add(location);
+            if (location.isValid) trails[trail].add(location);
           });
           trails[trail].sort((a, b) => a.name.compareTo(b.name));
         }
