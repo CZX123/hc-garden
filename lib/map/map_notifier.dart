@@ -232,7 +232,7 @@ class MapNotifier extends ChangeNotifier {
   /// Moves the map to the bounding box of all locations of the entity
   void animateToEntity({
     @required Entity entity,
-    @required Map<Trail, List<TrailLocation>> trails,
+    @required Map<Trail, Map<int, TrailLocation>> trails,
     @required Size mapSize,
     bool adjusted = false,
   }) {
@@ -246,9 +246,7 @@ class MapNotifier extends ChangeNotifier {
       final trail = trails.keys.firstWhere((trail) {
         return trail.id == trailId;
       });
-      final location = trails[trail].firstWhere((loc) {
-        return loc.id == locationId;
-      });
+      final location = trails[trail][locationId];
       return location.coordinates;
     }).toList();
     markers = newMarkers;

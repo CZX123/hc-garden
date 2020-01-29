@@ -34,7 +34,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
 
   List<Widget> locations(
     BuildContext context,
-    Map<Trail, List<TrailLocation>> trails,
+    Map<Trail, Map<int, TrailLocation>> trails,
   ) {
     final height = MediaQuery.of(context).size.height;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
@@ -45,9 +45,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
       final trail = trails.keys.firstWhere((trail) {
         return trail.id == trailId;
       });
-      final location = trails[trail].firstWhere((loc) {
-        return loc.id == locationId;
-      });
+      final location = trails[trail][locationId];
       children.add(ListTile(
         dense: true,
         leading: Icon(Icons.location_on),
@@ -219,7 +217,7 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
           const SizedBox(
             height: 8,
           ),
-          Selector<FirebaseData, Map<Trail, List<TrailLocation>>>(
+          Selector<FirebaseData, Map<Trail, Map<int, TrailLocation>>>(
             selector: (context, firebaseData) => firebaseData.trails,
             builder: (context, trails, child) {
               return Column(

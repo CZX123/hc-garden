@@ -217,13 +217,13 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
   void onData(FirebaseData data, {bool notify = true}) {
     Map<MarkerId, Marker> mapMarkers = {};
     data.trails.forEach((trail, locations) {
-      for (var location in locations) {
-        mapMarkers[MarkerId('${trail.id} ${location.id}')] = _generateMarker(
+      locations.forEach((key, value) {
+        mapMarkers[MarkerId('${trail.id} $key')] = _generateMarker(
           context: context,
           trail: trail,
-          location: location,
+          location: value,
         );
-      }
+      });
     });
     if (data.trails.isNotEmpty) {
       Provider.of<MapNotifier>(context, listen: false).setDefaultMarkers(

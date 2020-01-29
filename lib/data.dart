@@ -149,14 +149,14 @@ class Flora extends Entity {
 }
 
 class FirebaseData {
-  final List<Flora> floraList;
-  final List<Fauna> faunaList;
-  final Map<Trail, List<TrailLocation>> trails;
+  final Map<int, Flora> floraMap;
+  final Map<int, Fauna> faunaMap;
+  final Map<Trail, Map<int, TrailLocation>> trails;
   final List<HistoricalData> historicalDataList;
   final List<AboutPageData> aboutPageDataList;
   const FirebaseData({
-    this.floraList,
-    this.faunaList,
+    this.floraMap,
+    this.faunaMap,
     this.trails,
     this.historicalDataList,
     this.aboutPageDataList,
@@ -166,8 +166,8 @@ class FirebaseData {
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is FirebaseData &&
-            listEquals(floraList, other.floraList) &&
-            listEquals(faunaList, other.faunaList) &&
+            mapEquals(floraMap, other.floraMap) &&
+            mapEquals(faunaMap, other.faunaMap) &&
             listEquals(historicalDataList, other.historicalDataList) &&
             listEquals(aboutPageDataList, other.aboutPageDataList) &&
             mapEquals(trails, other.trails);
@@ -175,8 +175,8 @@ class FirebaseData {
 
   @override
   int get hashCode => hashValues(
-        hashList(floraList),
-        hashList(faunaList),
+        floraMap,
+        faunaMap,
         hashList(historicalDataList),
         hashList(aboutPageDataList),
         trails,
@@ -230,8 +230,8 @@ class TrailLocation implements DataObject {
     String key,
     dynamic parsedJson, {
     @required Trail trail,
-    @required List<Flora> floraList,
-    @required List<Fauna> faunaList,
+    @required Map<int, Flora> floraMap,
+    @required Map<int, Fauna> faunaMap,
   }) {
     return TrailLocation(
       id: int.tryParse(key.split('-').last),
@@ -246,8 +246,8 @@ class TrailLocation implements DataObject {
           ? List.from(parsedJson['points']).map((point) {
               final entityPosition = EntityPosition.fromJson(
                 point, 
-                floraList: floraList,
-                faunaList: faunaList,
+                floraMap: floraMap,
+                faunaMap: faunaMap,
               );
               if (entityPosition.isValid) return entityPosition;
               else return null;
@@ -298,20 +298,16 @@ class EntityPosition {
 
   factory EntityPosition.fromJson(
     dynamic parsedJson, {
-    @required List<Flora> floraList,
-    @required List<Fauna> faunaList,
+    @required Map<int, Flora> floraMap,
+    @required Map<int, Fauna> faunaMap,
   }) {
     final name = parsedJson['params']['name'];
     final id = int.tryParse(name.split('-').last);
     Entity entity;
     if (name.startsWith('flora')) {
-      entity = floraList.firstWhere((flora) {
-        return flora.id == id;
-      }, orElse: () => null);
+      entity = floraMap[id];
     } else if (name.startsWith('fauna')) {
-      entity = faunaList.firstWhere((fauna) {
-        return fauna.id == id;
-      }, orElse: () => null);
+      entity = faunaMap[id];
     }
     return EntityPosition(
       entity: entity,
@@ -613,7 +609,7 @@ class AppNotifier extends ChangeNotifier {
             !heightTooSmall;
         mapNotifier.animateToTrail(
           locations: Provider.of<FirebaseData>(context, listen: false)
-              .trails[routeInfo.data],
+              .trails[routeInfo.data].values.toList(),
           adjusted: adjusted,
           mapSize: Size(
             width,

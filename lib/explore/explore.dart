@@ -141,22 +141,22 @@ class ExplorePage extends StatelessWidget {
                     TabBarView(
                       controller: tabController,
                       children: <Widget>[
-                        Selector<FirebaseData, List<Flora>>(
+                        Selector<FirebaseData, Map<int, Flora>>(
                           selector: (context, firebaseData) =>
-                              firebaseData.floraList,
-                          builder: (context, floraList, child) {
+                              firebaseData.floraMap,
+                          builder: (context, floraMap, child) {
                             return EntityListPage(
-                              entityList: floraList,
+                              entityList: floraMap.values.toList()..sort((a, b) => a.name.compareTo(b.name)),
                               scrollController: scrollControllers[0],
                             );
                           },
                         ),
-                        Selector<FirebaseData, List<Fauna>>(
+                        Selector<FirebaseData, Map<int, Fauna>>(
                           selector: (context, firebaseData) =>
-                              firebaseData.faunaList,
-                          builder: (context, faunaList, child) {
+                              firebaseData.faunaMap,
+                          builder: (context, faunaMap, child) {
                             return EntityListPage(
-                              entityList: faunaList,
+                              entityList: faunaMap.values.toList()..sort((a, b) => a.name.compareTo(b.name)),
                               scrollController: scrollControllers[1],
                             );
                           },

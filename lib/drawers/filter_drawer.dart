@@ -98,31 +98,94 @@ class FilterDrawer extends StatelessWidget {
                         style: Theme.of(context).textTheme.subtitle,
                       ),
                     ),
-                    RadioListTile<bool>(
-                      dense: true,
-                      controlAffinity: ListTileControlAffinity.trailing,
-                      groupValue: true,
-                      value: true,
-                      title: Text(
-                        'Alphabetical',
-                        style: Theme.of(context).textTheme.body1,
-                      ),
-                      onChanged: (_) {},
-                    ),
-                    RadioListTile<bool>(
-                      dense: true,
-                      controlAffinity: ListTileControlAffinity.trailing,
-                      groupValue: true,
-                      value: false,
-                      title: Text(
-                        'Distance',
-                        style: Theme.of(context).textTheme.body1.copyWith(
-                          color: Theme.of(context).disabledColor,
-                        ),
-                      ),
-                      subtitle: const Text('Coming Soon'),
-                      onChanged: null,
-                    ),
+                    Selector<FilterNotifier, bool>(
+                      selector: (context, filterNotifier) {
+                        return filterNotifier.groupValue;
+                      },
+                      builder: (context, groupValue, child) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            RadioListTile<bool>(
+                              dense: true,
+                              controlAffinity: ListTileControlAffinity.trailing,
+                              groupValue: groupValue,
+                              value: true,
+                              title: Text(
+                                'Alphabetical',
+                                style: Theme.of(context).textTheme.body1,
+                              ),
+                              onChanged: (value) {
+                                Provider.of<FilterNotifier>(
+                                  context,
+                                  listen: false,
+                                ).groupValue = value;
+                              },
+                            ),
+                            RadioListTile<bool>(
+                              dense: true,
+                              controlAffinity: ListTileControlAffinity.trailing,
+                              groupValue: groupValue,
+                              value: false,
+                              title: Text(
+                                'Distance',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .body1
+                                    .copyWith(
+                                      color: Theme.of(context).disabledColor,
+                                    ),
+                              ),
+                              onChanged: (value) async {
+                                final filterNotifier =
+                                    Provider.of<FilterNotifier>(
+                                  context,
+                                  listen: false,
+                                );
+
+                                final location = Location();
+                                final locationData =
+                                    await location.getLocation();
+                                final firebaseData = Provider.of<FirebaseData>(
+                                    context,
+                                    listen: false);
+
+                                final floraListByDist = [];
+                                final faunaListByDist = [];
+
+                                firebaseData.floraMap.forEach((key, value) {
+                                  
+                                  for (var location in value.locations) {
+                                    final trail = firebaseData.trails.keys
+                                        .firstWhere((trail) {
+                                      return trail.id == location[0];
+                                    });
+                                    final trailLocation =
+                                        firebaseData.trails[trail][location[1]];
+                                    final dist = sqrt(
+                                      pow(
+                                            trailLocation.coordinates.latitude -
+                                                locationData.latitude,
+                                            2,
+                                          ) +
+                                          pow(
+                                            trailLocation
+                                                    .coordinates.longitude -
+                                                locationData.longitude,
+                                            2,
+                                          ),
+                                    );
+                                  }
+                                });
+
+                                ///_filterNotifier.updateLists(faunaList, floraList);
+                                filterNotifier.groupValue = value;
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    )
                   ],
                 ),
                 const SizedBox.shrink(),
@@ -136,10 +199,27 @@ class FilterDrawer extends StatelessWidget {
 }
 
 class FilterNotifier extends ChangeNotifier {
+  bool _groupValue = true;
+  bool get groupValue => _groupValue;
+  set groupValue(bool groupValue) {
+    _groupValue = groupValue;
+    notifyListeners();
+  }
+
   List<Trail> _selectedTrails;
   List<Trail> get selectedTrails => _selectedTrails;
   set selectedTrails(List<Trail> selectedTrails) {
     _selectedTrails = selectedTrails;
+    notifyListeners();
+  }
+
+  List<Fauna> _faunaList;
+  List<Fauna> get faunaList => _faunaList;
+  List<Flora> _floraList;
+  List<Flora> get floraList => _floraList;
+  void updateLists(List<Fauna> faunaList, List<Flora> floraList) {
+    _faunaList = faunaList;
+    _floraList = floraList;
     notifyListeners();
   }
 

@@ -82,39 +82,35 @@ class _HcGardenAppState extends State<HcGardenApp> {
 
       // Add list of entities
       final Map parsedJson = event.snapshot.value;
-      List<Flora> floraList = [];
-      List<Fauna> faunaList = [];
+      Map<int, Flora> floraMap = {};
+      Map<int, Fauna> faunaMap = {};
       parsedJson['flora&fauna'].forEach((key, value) {
         if (key.contains('flora')) {
           final flora = Flora.fromJson(key, value);
-          if (flora.isValid) floraList.add(flora);
+          if (flora.isValid) floraMap[flora.id] = flora;
         } else {
           final fauna = Fauna.fromJson(key, value);
-          if (fauna.isValid) faunaList.add(fauna);
+          if (fauna.isValid) faunaMap[fauna.id] = fauna;
         }
       });
-      floraList.sort((a, b) => a.name.compareTo(b.name));
-      faunaList.sort((a, b) => a.name.compareTo(b.name));
 
       // Add trails and locations
-      Map<Trail, List<TrailLocation>> trails = {};
+      Map<Trail, Map<int, TrailLocation>> trails = {};
       parsedJson['map'].forEach((key, value) {
         final trail = Trail.fromJson(key, value);
         print('$key, ${trail.isValid}');
         if (trail.isValid) {
-          print(trail.name);
-          trails[trail] = [];
+          trails[trail] = {};
           value['route'].forEach((key, value) {
             final location = TrailLocation.fromJson(
               key,
               value,
               trail: trail,
-              floraList: floraList,
-              faunaList: faunaList,
+              floraMap: floraMap,
+              faunaMap: faunaMap,
             );
-            if (location.isValid) trails[trail].add(location);
+            if (location.isValid) trails[trail][location.id] = location;
           });
-          trails[trail].sort((a, b) => a.name.compareTo(b.name));
         }
       });
 
@@ -122,7 +118,7 @@ class _HcGardenAppState extends State<HcGardenApp> {
       List<HistoricalData> historicalDataList = [];
       parsedJson['historical'].forEach((key, value) {
         final historicalData = HistoricalData.fromJson(key, value);
-        if(historicalData.isValid) historicalDataList.add(historicalData);
+        if (historicalData.isValid) historicalDataList.add(historicalData);
       });
       historicalDataList.sort((a, b) => a.id.compareTo(b.id));
 
@@ -130,15 +126,15 @@ class _HcGardenAppState extends State<HcGardenApp> {
       List<AboutPageData> aboutPageDataList = [];
       parsedJson['about'].forEach((key, value) {
         final aboutPageData = AboutPageData.fromJson(key, value);
-        if(aboutPageData.isValid) aboutPageDataList.add(aboutPageData);
+        if (aboutPageData.isValid) aboutPageDataList.add(aboutPageData);
       });
       aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
 
       // TODO: handle cases of invalid data
       // i.e. filter those whose data fields are null out
       return FirebaseData(
-        floraList: floraList,
-        faunaList: faunaList,
+        floraMap: floraMap,
+        faunaMap: faunaMap,
         trails: trails,
         historicalDataList: historicalDataList,
         aboutPageDataList: aboutPageDataList,
@@ -193,8 +189,8 @@ class _HcGardenAppState extends State<HcGardenApp> {
         // Provider for all data from Firebase
         StreamProvider.value(
           initialData: FirebaseData(
-            floraList: [],
-            faunaList: [],
+            floraMap: {},
+            faunaMap: {},
             trails: {},
             historicalDataList: [],
             aboutPageDataList: [],

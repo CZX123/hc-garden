@@ -198,7 +198,7 @@ class TrailButtonsRow extends StatelessWidget {
                           final trailLocations = firebaseData.trails[trail];
                           return TrailDetailsPage(
                             trail: trail,
-                            trailLocations: trailLocations,
+                            trailLocations: trailLocations.values.toList()..sort((a, b) => a.name.compareTo(b.name)),
                           );
                         },
                       ),
