@@ -129,12 +129,7 @@ class FilterDrawer extends StatelessWidget {
                               value: false,
                               title: Text(
                                 'Distance',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .body1
-                                    .copyWith(
-                                      color: Theme.of(context).disabledColor,
-                                    ),
+                                style: Theme.of(context).textTheme.body1,
                               ),
                               onChanged: (value) async {
                                 final filterNotifier =
@@ -142,43 +137,26 @@ class FilterDrawer extends StatelessWidget {
                                   context,
                                   listen: false,
                                 );
-
-                                final location = Location();
-                                final locationData =
-                                    await location.getLocation();
                                 final firebaseData = Provider.of<FirebaseData>(
                                     context,
                                     listen: false);
-
-                                final floraListByDist = [];
-                                final faunaListByDist = [];
-
-                                firebaseData.floraMap.forEach((key, value) {
-                                  
-                                  for (var location in value.locations) {
-                                    final trail = firebaseData.trails.keys
-                                        .firstWhere((trail) {
-                                      return trail.id == location[0];
-                                    });
-                                    final trailLocation =
-                                        firebaseData.trails[trail][location[1]];
-                                    final dist = sqrt(
-                                      pow(
-                                            trailLocation.coordinates.latitude -
-                                                locationData.latitude,
-                                            2,
-                                          ) +
-                                          pow(
-                                            trailLocation
-                                                    .coordinates.longitude -
-                                                locationData.longitude,
-                                            2,
-                                          ),
-                                    );
-                                  }
-                                });
-
-                                ///_filterNotifier.updateLists(faunaList, floraList);
+                                final location = Location();
+                                final locationData =
+                                    await location.getLocation();
+                                final floraListByDist =
+                                    filterNotifier.sortEntityByDist(
+                                        firebaseData.floraMap,
+                                        firebaseData.trails,
+                                        locationData);
+                                final faunaListByDist =
+                                    filterNotifier.sortEntityByDist(
+                                        firebaseData.faunaMap,
+                                        firebaseData.trails,
+                                        locationData);
+                                floraListByDist.sort((a, b) => a.distMin.compareTo(b.distMin));
+                                faunaListByDist.sort((a, b) => a.distMin.compareTo(b.distMin));
+                                filterNotifier.updateLists(
+                                    floraListByDist, faunaListByDist);
                                 filterNotifier.groupValue = value;
                               },
                             ),
@@ -213,14 +191,40 @@ class FilterNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Fauna> _faunaList;
-  List<Fauna> get faunaList => _faunaList;
-  List<Flora> _floraList;
-  List<Flora> get floraList => _floraList;
-  void updateLists(List<Fauna> faunaList, List<Flora> floraList) {
-    _faunaList = faunaList;
+  List<Entity> _floraList;
+  List<Entity> get floraList => _floraList;
+  List<Entity> _faunaList;
+  List<Entity> get faunaList => _faunaList;
+  void updateLists(List<Entity> floraList, List<Entity> faunaList) {
     _floraList = floraList;
+    _faunaList = faunaList;
     notifyListeners();
+  }
+
+  List<Entity> sortEntityByDist(Map<int, Entity> entityMap,
+      Map<Trail, Map<int, TrailLocation>> trails, LocationData locationData) {
+    final List<Entity> entityListByDist = [];
+    entityMap.forEach((key, value) {
+      for (var location in value.locations) {
+        final trail = trails.keys.firstWhere((trail) {
+          return trail.id == location[0];
+        });
+        final trailLocation = trails[trail][location[1]];
+        final dist = sqrt(
+          pow(
+                trailLocation.coordinates.latitude - locationData.latitude,
+                2,
+              ) +
+              pow(
+                trailLocation.coordinates.longitude - locationData.longitude,
+                2,
+              ),
+        );
+        if (dist < value.distMin) value.distMin = dist;
+      }
+      entityListByDist.add(value);
+    });
+    return entityListByDist;
   }
 
   void updateSelectedTrailsDiscreetly(List<Trail> selectedTrails) {

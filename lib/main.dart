@@ -98,7 +98,6 @@ class _HcGardenAppState extends State<HcGardenApp> {
       Map<Trail, Map<int, TrailLocation>> trails = {};
       parsedJson['map'].forEach((key, value) {
         final trail = Trail.fromJson(key, value);
-        print('$key, ${trail.isValid}');
         if (trail.isValid) {
           trails[trail] = {};
           value['route'].forEach((key, value) {

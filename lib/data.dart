@@ -47,6 +47,7 @@ abstract class Entity implements DataObject {
   final String smallImage;
   final List<String> images;
   final List<Tuple<int, int>> locations;
+  double distMin = double.infinity;
 
   Entity.fromJson(String key, dynamic parsedJson)
       : id = int.tryParse(key.split('-').last),
@@ -342,6 +343,7 @@ class HistoricalData {
   final int id;
   final String description;
   final String image;
+  final String newImage;
   final String name;
   final num height;
   final num width;
@@ -349,6 +351,7 @@ class HistoricalData {
     this.id,
     this.description,
     this.image,
+    this.newImage,
     this.name,
     this.height,
     this.width,
@@ -359,12 +362,14 @@ class HistoricalData {
       id: int.tryParse(key.split('-').last),
       description: parsedJson['description'],
       image: parsedJson['imageRef'],
+      newImage: parsedJson['newImageRef'],
       name: parsedJson['name'],
       height: parsedJson['height'],
       width: parsedJson['width'],
     );
   }
 
+  // TODO: Update 
   bool get isValid {
     return id != null &&
         description != null &&
