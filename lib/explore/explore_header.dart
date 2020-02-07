@@ -186,7 +186,7 @@ class TrailButtonsRow extends StatelessWidget {
                   final trail = firebaseData.trails.keys.firstWhere((trail) {
                     return trail.name.contains(_trails[i].substring(0, 5));
                   });
-                  Provider.of<AppNotifier>(context).push(
+                  Provider.of<AppNotifier>(context, listen: false).push(
                     context: context,
                     routeInfo: RouteInfo(
                       name: trail.name.split('(').first.trimRight(),

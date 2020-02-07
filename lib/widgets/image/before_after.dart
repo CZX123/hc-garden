@@ -40,8 +40,8 @@ class _BeforeAfterState extends State<BeforeAfter> {
       children: <Widget>[
         Padding(
           padding: widget.isVertical
-              ? const EdgeInsets.symmetric(vertical: 16.0)
-              : const EdgeInsets.symmetric(horizontal: 16.0),
+              ? const EdgeInsets.symmetric(vertical: 24.0)
+              : const EdgeInsets.symmetric(horizontal: 24.0),
           child: SizedImage(
             widget.afterImage,
             widget.imageHeight,
@@ -51,8 +51,8 @@ class _BeforeAfterState extends State<BeforeAfter> {
         ),
         Padding(
           padding: widget.isVertical
-              ? const EdgeInsets.symmetric(vertical: 16.0)
-              : const EdgeInsets.symmetric(horizontal: 16.0),
+              ? const EdgeInsets.symmetric(vertical: 24.0)
+              : const EdgeInsets.symmetric(horizontal: 24.0),
           child: ClipPath(
             clipper: widget.isVertical
                 ? RectClipperVertical(_clipFactor)
@@ -68,6 +68,7 @@ class _BeforeAfterState extends State<BeforeAfter> {
         Positioned.fill(
           child: SliderTheme(
             data: SliderThemeData(
+              
               trackHeight: 0.0,
               overlayColor: widget.overlayColor,
               thumbShape:
@@ -99,9 +100,12 @@ class SizedImage extends StatelessWidget {
   final double _height, _width, _imageCornerRadius;
 
   const SizedImage(
-      this._image, this._height, this._width, this._imageCornerRadius,
-      {Key key})
-      : super(key: key);
+    this._image,
+    this._height,
+    this._width,
+    this._imageCornerRadius, {
+    Key key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -128,15 +132,18 @@ class CustomThumbShape extends SliderComponentShape {
   }
 
   @override
-  void paint(PaintingContext context, Offset center,
-      {Animation<double> activationAnimation,
-      Animation<double> enableAnimation,
-      bool isDiscrete,
-      TextPainter labelPainter,
-      RenderBox parentBox,
-      SliderThemeData sliderTheme,
-      TextDirection textDirection,
-      double value}) {
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    Animation<double> activationAnimation,
+    Animation<double> enableAnimation,
+    bool isDiscrete,
+    TextPainter labelPainter,
+    RenderBox parentBox,
+    SliderThemeData sliderTheme,
+    TextDirection textDirection,
+    double value,
+  }) {
     final Canvas canvas = context.canvas;
 
     final Paint paint = Paint()
@@ -164,9 +171,13 @@ class CustomThumbShape extends SliderComponentShape {
     );
 
     canvas.drawRect(
-        Rect.fromCenter(
-            center: center, width: 4.0, height: parentBox.size.height),
-        paint);
+      Rect.fromCenter(
+        center: center,
+        width: 4.0,
+        height: parentBox.size.height,
+      ),
+      paint,
+    );
   }
 }
 

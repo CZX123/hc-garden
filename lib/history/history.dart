@@ -72,7 +72,7 @@ class _HistoryPageState extends State<HistoryPage>
                 selector: (context, firebaseData) =>
                     firebaseData.historicalDataList,
                 builder: (context, historicalData, child) {
-                  final newImages = historicalData.map((h) {
+                  final lowerResImages = historicalData.map((h) {
                     return lowerRes(h.image);
                   }).toList();
                   return ListView.builder(
@@ -80,7 +80,7 @@ class _HistoryPageState extends State<HistoryPage>
                     itemBuilder: (context, index) {
                       if (index == 0) {
                         return Padding(
-                          padding: EdgeInsets.fromLTRB(16, 96, 16, 16),
+                          padding: EdgeInsets.fromLTRB(24, 96, 24, 16),
                           child: ScaleTransition(
                             scale: scale,
                             child: FadeTransition(
@@ -101,19 +101,19 @@ class _HistoryPageState extends State<HistoryPage>
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          if (newImages[i].isNotEmpty)
+                          if (lowerResImages[i].isNotEmpty)
                             Stack(
                               children: <Widget>[
                                 BeforeAfter(
                                   imageHeight: height,
                                   imageWidth: width,
                                   beforeImage: CustomImage(
-                                    newImages[i],
+                                    lowerResImages[i],
                                     placeholderColor:
                                         Theme.of(context).dividerColor,
                                   ),
                                   afterImage: CustomImage(
-                                    newImages[i],
+                                    'https://imgur.com/1dv73vB.jpg',
                                     placeholderColor:
                                         Theme.of(context).dividerColor,
                                   ),
@@ -135,10 +135,10 @@ class _HistoryPageState extends State<HistoryPage>
                                 //             pageBuilder: (context, _, __) {
                                 //               return ImageGallery(
                                 //                 images:
-                                //                     newImages.where((image) {
+                                //                     lowerResImages.where((image) {
                                 //                   return image.isNotEmpty;
                                 //                 }).toList(),
-                                //                 initialImage: newImages[i],
+                                //                 initialImage: lowerResImages[i],
                                 //                 title: 'Historical Photos',
                                 //                 fasterNavBarColourChange: true,
                                 //               );
@@ -159,7 +159,7 @@ class _HistoryPageState extends State<HistoryPage>
                           if (historicalData[i].description != '')
                             Padding(
                               padding:
-                                  const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                                  const EdgeInsets.fromLTRB(24, 16, 24, 24),
                               child: Text(
                                 historicalData[i].description,
                                 style: TextStyle(
