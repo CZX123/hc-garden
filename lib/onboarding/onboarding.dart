@@ -21,81 +21,73 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return AnnotatedRegion(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Colors.black,
-        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.grey[50],
+        systemNavigationBarIconBrightness: Brightness.dark,
       ),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-            32, 64 + MediaQuery.of(context).padding.top, 32, 64),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemBuilder: (context, index) {
-                    if (index == 0)
-                      return OnboardingPageOne(
-                        pageController: _pageController,
-                      );
-                    return Center(
-                      child: Text(index.toString()),
+      child: Material(
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                itemBuilder: (context, index) {
+                  if (index == 0)
+                    return OnboardingPageOne(
+                      pageController: _pageController,
                     );
-                  },
-                  itemCount: 3,
-                ),
+                  return Center(
+                    child: Text(index.toString()),
+                  );
+                },
+                itemCount: 3,
               ),
-              Divider(
-                height: 1,
+            ),
+            Divider(
+              height: 1,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 4,
+                horizontal: 8,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 4,
-                  horizontal: 8,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Theme(
-                      data: ThemeData(
-                        fontFamily: 'Manrope',
-                        accentColor:
-                            Theme.of(context).brightness == Brightness.dark
-                                ? Color(0xFFF5730F)
-                                : Color(0xFF7A3735),
-                        buttonTheme: ButtonThemeData(
-                          minWidth: 0,
-                          textTheme: ButtonTextTheme.accent,
-                        ),
-                      ),
-                      child: FlatButton(
-                        child: const Text('Cancel'),
-                        onPressed: Navigator.of(context).pop,
-                      ),
-                    ),
-                    ButtonTheme(
-                      minWidth: 0,
-                      child: FlatButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Theme(
+                    data: ThemeData(
+                      fontFamily: 'Manrope',
+                      accentColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Color(0xFFF5730F)
+                              : Color(0xFF7A3735),
+                      buttonTheme: ButtonThemeData(
+                        minWidth: 0,
                         textTheme: ButtonTextTheme.accent,
-                        child: const Text('Next'),
-                        onPressed: () {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 280),
-                            curve: Curves.fastOutSlowIn,
-                          );
-                        },
                       ),
                     ),
-                  ],
-                ),
+                    child: FlatButton(
+                      child: const Text('Cancel'),
+                      onPressed: Navigator.of(context).pop,
+                    ),
+                  ),
+                  ButtonTheme(
+                    minWidth: 0,
+                    child: FlatButton(
+                      textTheme: ButtonTextTheme.accent,
+                      child: const Text('Next'),
+                      onPressed: () {
+                        _pageController.nextPage(
+                          duration: const Duration(milliseconds: 280),
+                          curve: Curves.fastOutSlowIn,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -123,8 +115,8 @@ class OnboardingPageOne extends StatelessWidget {
           Text(
             'Welcome to\nHC Garden!',
             style: Theme.of(context).textTheme.display2.copyWith(
-              color: Theme.of(context).accentColor,
-            ),
+                  color: Theme.of(context).accentColor,
+                ),
           ),
           Text('HC Garden is an amazing app!'),
         ],

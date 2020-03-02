@@ -75,6 +75,9 @@ class _HistoryPageState extends State<HistoryPage>
                   final lowerResImages = historicalData.map((h) {
                     return lowerRes(h.image);
                   }).toList();
+                  final lowerResNewImages = historicalData.map((h) {
+                    return lowerRes(h.newImage);
+                  }).toList();
                   return ListView.builder(
                     padding: EdgeInsets.only(top: topPadding),
                     itemBuilder: (context, index) {
@@ -113,7 +116,7 @@ class _HistoryPageState extends State<HistoryPage>
                                         Theme.of(context).dividerColor,
                                   ),
                                   afterImage: CustomImage(
-                                    'https://imgur.com/1dv73vB.jpg',
+                                    lowerResNewImages[i],
                                     placeholderColor:
                                         Theme.of(context).dividerColor,
                                   ),

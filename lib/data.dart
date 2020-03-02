@@ -105,10 +105,12 @@ abstract class Entity implements DataObject {
 
 class Fauna extends Entity {
   // A fauna has 2 extra keys: areas and coordinates. These are most likely not to be used.
+  final String type;
   final List<LatLng> area;
   final LatLng coordinates;
   Fauna.fromJson(String key, dynamic parsedJson)
-      : area = parsedJson.containsKey('area')
+      : type = parsedJson['type'],
+        area = parsedJson.containsKey('area')
             ? List.from(parsedJson['area']).map((position) {
                 return LatLng(position['latitude'], position['longitude']);
               }).toList()
@@ -374,6 +376,7 @@ class HistoricalData {
     return id != null &&
         description != null &&
         image != null &&
+        newImage != null &&
         name != null &&
         height != null &&
         width != null;
@@ -386,6 +389,7 @@ class HistoricalData {
             id == other.id &&
             description == other.description &&
             image == other.image &&
+            newImage == other.newImage &&
             name == other.name &&
             height == other.height &&
             width == other.width;
