@@ -104,62 +104,35 @@ class _HistoryPageState extends State<HistoryPage>
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          if (lowerResImages[i].isNotEmpty)
-                            Stack(
-                              children: <Widget>[
-                                BeforeAfter(
-                                  imageHeight: height,
-                                  imageWidth: width,
-                                  beforeImage: CustomImage(
-                                    lowerResImages[i],
-                                    placeholderColor:
-                                        Theme.of(context).dividerColor,
-                                  ),
-                                  afterImage: CustomImage(
-                                    lowerResNewImages[i],
-                                    placeholderColor:
-                                        Theme.of(context).dividerColor,
-                                  ),
+                          if (lowerResNewImages[i].isEmpty)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: CustomImage(
+                                  lowerResImages[i],
+                                  placeholderColor:
+                                      Theme.of(context).dividerColor,
                                 ),
-                                // Positioned.fill(
-                                //   child: Material(
-                                //     type: MaterialType.transparency,
-                                //     child: InkWell(
-                                //       onTap: () async {
-                                //         SystemChrome.setPreferredOrientations([
-                                //           DeviceOrientation.portraitUp,
-                                //           DeviceOrientation.landscapeLeft,
-                                //           DeviceOrientation.landscapeRight,
-                                //         ]);
-                                //         await Navigator.push(
-                                //           context,
-                                //           PageRouteBuilder(
-                                //             opaque: false,
-                                //             pageBuilder: (context, _, __) {
-                                //               return ImageGallery(
-                                //                 images:
-                                //                     lowerResImages.where((image) {
-                                //                   return image.isNotEmpty;
-                                //                 }).toList(),
-                                //                 initialImage: lowerResImages[i],
-                                //                 title: 'Historical Photos',
-                                //                 fasterNavBarColourChange: true,
-                                //               );
-                                //             },
-                                //             transitionDuration: const Duration(
-                                //                 milliseconds: 300),
-                                //           ),
-                                //         );
-                                //         SystemChrome.setPreferredOrientations([
-                                //           DeviceOrientation.portraitUp,
-                                //         ]);
-                                //       },
-                                //     ),
-                                //   ),
-                                // ),
-                              ],
+                              ),
+                            )
+                          else if (lowerResImages[i].isNotEmpty)
+                            BeforeAfter(
+                              imageHeight: height,
+                              imageWidth: width,
+                              beforeImage: CustomImage(
+                                lowerResImages[i],
+                                placeholderColor:
+                                    Theme.of(context).dividerColor,
+                              ),
+                              afterImage: CustomImage(
+                                lowerResNewImages[i],
+                                placeholderColor:
+                                    Theme.of(context).dividerColor,
+                              ),
                             ),
-                          if (historicalData[i].description != '')
+                          if (historicalData[i].description.isNotEmpty)
                             Padding(
                               padding:
                                   const EdgeInsets.fromLTRB(24, 16, 24, 24),
