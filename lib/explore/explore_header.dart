@@ -181,24 +181,16 @@ class TrailButtonsRow extends StatelessWidget {
                 textColor: _textColors[i],
                 trailName: _trails[i],
                 onPressed: () {
-                  final firebaseData =
-                      Provider.of<FirebaseData>(context, listen: false);
-                  final trail = firebaseData.trails.keys.firstWhere((trail) {
-                    return trail.name.contains(_trails[i].substring(0, 5));
-                  });
+                  final trailKey = TrailKey(id: 2-i);
                   Provider.of<AppNotifier>(context, listen: false).push(
                     context: context,
                     routeInfo: RouteInfo(
-                      name: trail.name.split('(').first.trimRight(),
-                      data: trail,
+                      name: FirebaseData.trailNames[2-i],
+                      dataKey: trailKey,
                       route: CrossFadePageRoute(
                         builder: (context) {
-                          final firebaseData =
-                              Provider.of<FirebaseData>(context);
-                          final trailLocations = firebaseData.trails[trail];
                           return TrailDetailsPage(
-                            trail: trail,
-                            trailLocations: trailLocations.values.toList()..sort((a, b) => a.name.compareTo(b.name)),
+                            trailKey: trailKey,
                           );
                         },
                       ),

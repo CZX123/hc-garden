@@ -7,71 +7,169 @@ String lowerRes(String image) {
   return split.join('.') + 'h' + end;
 }
 
-class Tuple<A, B> {
-  final A item1;
-  final B item2;
-  const Tuple(this.item1, this.item2);
-  operator [](int i) {
-    if (i == 0)
-      return item1;
-    else if (i == 1)
-      return item2;
-    else
-      throw RangeError.range(i, 0, 1);
+// /// Data Object is either an [Entity], a [Trail] or a [TrailLocation].
+// /// Used as an argument when pushing routes in AppNotifier.
+// abstract class DataObject {
+//   const DataObject();
+//   bool operator ==(Object other);
+//   int get hashCode;
+// }
+
+/// Data Key is used for the id of an [Entity], a [Trail] or a [TrailLocation].
+/// Used as an argument when pushing routes in AppNotifier.
+abstract class DataKey {
+  final int id;
+  const DataKey({@required this.id});
+  bool operator ==(Object other);
+  int get hashCode;
+  bool get isValid {
+    return id != null;
   }
+}
+
+/// A unique identifier for each [Entity]. Consists of its `category` and `id`.
+class EntityKey extends DataKey {
+  final String category;
+  EntityKey({@required this.category, @required int id}) : super(id: id);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        other is Tuple<A, B> && item1 == other.item1 && item2 == other.item2;
+        other is EntityKey && category == other.category && id == other.id;
   }
 
   @override
-  int get hashCode => hashValues(item1, item2);
+  int get hashCode => hashValues(category, id);
+
+  @override
+  bool get isValid {
+    return category != null && id != null;
+  }
+
+  @override
+  String toString() {
+    return 'EntityKey(category: $category, id: $id)';
+  }
 }
 
-/// Data Object is either an [Entity], a [Trail] or a [TrailLocation].
-/// Used as an argument when pushing routes in AppNotifier.
-abstract class DataObject {
-  const DataObject();
-  bool operator ==(Object other);
-  int get hashCode;
+/// A unique identifier for a [Trail]. Wraps its `id`.
+class TrailKey extends DataKey {
+  TrailKey({@required int id}) : super(id: id);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) || other is TrailKey && id == other.id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  String toString() {
+    return 'TrailKey(id: $id)';
+  }
 }
 
-/// An [Entity] is a super class of a [Flora] or a [Fauna]
-abstract class Entity implements DataObject {
-  final int id;
+/// A unique identifier for a [TrailLocation]. Wraps its `id`.
+class TrailLocationKey extends DataKey {
+  final TrailKey trailKey;
+  TrailLocationKey({@required this.trailKey, @required int id}) : super(id: id);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is TrailLocationKey &&
+            trailKey == other.trailKey &&
+            id == other.id;
+  }
+
+  @override
+  int get hashCode => hashValues(trailKey, id);
+
+  @override
+  bool get isValid {
+    return trailKey.isValid && id != null;
+  }
+
+  @override
+  String toString() {
+    return 'TrailLocationKey(trailId: ${trailKey.id}, id: $id)';
+  }
+}
+
+/// An [Entity] refers to any flora or fauna, and fauna may include any birds, butterflies, etc.
+class Entity implements Comparable{
+  final EntityKey key;
   final String name;
   final String sciName;
   final String description;
   final String smallImage;
   final List<String> images;
-  final List<Tuple<int, int>> locations;
-  double distMin = double.infinity;
+  final List<EntityLocation> locations;
 
-  Entity.fromJson(String key, dynamic parsedJson)
-      : id = int.tryParse(key.split('-').last),
-        name = parsedJson['name'],
-        sciName = parsedJson['sciName'],
-        description = parsedJson['description'],
-        smallImage = parsedJson['smallImage'],
-        images = (parsedJson['imageRef'] == null)
-            ? null
-            : List<String>.from(parsedJson['imageRef']),
-        locations = (parsedJson['locations'] == null)
-            ? null
-            : List.from(parsedJson['locations'].split(',')).where((value) {
-                return value != null && value.isNotEmpty;
-              }).map((value) {
-                final split = value.split('/');
-                return Tuple(
-                  int.tryParse(split.first.split('-').last),
-                  int.tryParse(split.last.split('-').last),
-                );
-              }).toList();
+  const Entity({
+    this.key,
+    this.name,
+    this.sciName,
+    this.description,
+    this.smallImage,
+    this.images,
+    this.locations,
+  });
+
+  factory Entity.fromJson({
+    @required String category,
+    @required int id,
+    @required dynamic data,
+  }) {
+    final images = List<String>.from(data['imageRef']);
+    List<EntityLocation> locations;
+
+    /// `data['locations']` is in the format of `"trail-01/route-09,trail-02/route-06"`.
+    if (data.containsKey('locations')) {
+      final List<String> strings = data['locations'].split(',');
+      // There may be trailing commas, so need to filter out invalid values.
+      strings.removeWhere((value) => value == null || value.isEmpty);
+      locations = [];
+      strings.forEach((value) {
+        final split = value.split('/');
+        final trailKey = TrailKey(
+          id: int.tryParse(split.first.split('-').last),
+        );
+        final location = EntityLocation(
+          trailLocationKey: TrailLocationKey(
+            trailKey: trailKey,
+            id: int.tryParse(split.last.split('-').last),
+          ),
+        );
+        if (location.isValid) locations.add(location);
+      });
+    }
+
+    return Entity(
+      key: EntityKey(category: category, id: id),
+      name: data['name'],
+      sciName: data['sciName'],
+      description: data['description'],
+      smallImage: data['smallImage'],
+      images: images,
+      locations: locations,
+    );
+  }
+
+  /// Returns whether the [Entity] satisfies the `searchTerm`
+  bool satisfies(String searchTerm) {
+    if (searchTerm.isEmpty || searchTerm == '*') return true;
+    return !name.split(' ').every((name) {
+          return !name.toLowerCase().startsWith(searchTerm.toLowerCase());
+        }) ||
+        !sciName.split(' ').every((name) {
+          return !name.toLowerCase().startsWith(searchTerm.toLowerCase());
+        });
+  }
 
   bool get isValid {
-    return id != null &&
+    return key.isValid &&
         name != null &&
         sciName != null &&
         description != null &&
@@ -81,10 +179,16 @@ abstract class Entity implements DataObject {
   }
 
   @override
+  int compareTo(other) {
+    final Entity typedOther = other;
+    return name.compareTo(typedOther.name);
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is Entity &&
-            id == other.id &&
+            key == other.key &&
             name == other.name &&
             sciName == other.sciName &&
             description == other.description &&
@@ -94,174 +198,200 @@ abstract class Entity implements DataObject {
   }
 
   @override
-  int get hashCode => hashValues(id, name, sciName, description, smallImage,
-      hashList(images), hashList(locations));
-
-  @override
-  String toString() {
-    return 'Entity(name: $name, sciName: $sciName)';
-  }
-}
-
-class Fauna extends Entity {
-  // A fauna has 2 extra keys: areas and coordinates. These are most likely not to be used.
-  final String type;
-  final List<LatLng> area;
-  final LatLng coordinates;
-  Fauna.fromJson(String key, dynamic parsedJson)
-      : type = parsedJson['type'],
-        area = parsedJson.containsKey('area')
-            ? List.from(parsedJson['area']).map((position) {
-                return LatLng(position['latitude'], position['longitude']);
-              }).toList()
-            : null,
-        coordinates = parsedJson.containsKey('latitude')
-            ? LatLng(parsedJson['latitude'], parsedJson['longitude'])
-            : null,
-        super.fromJson(key, parsedJson);
-
-  @override
-  bool get isValid {
-    return super.isValid && area != null && coordinates != null;
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return super == other &&
-        other is Fauna &&
-        listEquals(area, other.area) &&
-        coordinates == other.coordinates;
-  }
-
-  @override
-  int get hashCode => hashValues(id, name, sciName, description, smallImage,
-      hashList(images), hashList(locations), hashList(area), coordinates);
-}
-
-class Flora extends Entity {
-  Flora.fromJson(String key, dynamic parsedJson)
-      : super.fromJson(key, parsedJson);
-
-  @override
-  bool operator ==(Object other) {
-    return super == other && other is Flora;
-  }
-
-  @override
-  int get hashCode => super.hashCode;
-}
-
-class FirebaseData {
-  final Map<int, Flora> floraMap;
-  final Map<int, Fauna> faunaMap;
-  final Map<Trail, Map<int, TrailLocation>> trails;
-  final List<HistoricalData> historicalDataList;
-  final List<AboutPageData> aboutPageDataList;
-  const FirebaseData({
-    this.floraMap,
-    this.faunaMap,
-    this.trails,
-    this.historicalDataList,
-    this.aboutPageDataList,
-  });
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is FirebaseData &&
-            mapEquals(floraMap, other.floraMap) &&
-            mapEquals(faunaMap, other.faunaMap) &&
-            listEquals(historicalDataList, other.historicalDataList) &&
-            listEquals(aboutPageDataList, other.aboutPageDataList) &&
-            mapEquals(trails, other.trails);
-  }
-
-  @override
-  int get hashCode => hashValues(
-        floraMap,
-        faunaMap,
-        hashList(historicalDataList),
-        hashList(aboutPageDataList),
-        trails,
-      );
-}
-
-class Trail implements DataObject {
-  final int id;
-  final String name;
-  const Trail({this.id, this.name});
-  factory Trail.fromJson(String key, dynamic parsedJson) {
-    return Trail(
-      id: int.tryParse(key.split('-').last),
-      name: parsedJson is Map ? parsedJson['name'] : null,
+  int get hashCode {
+    return hashValues(
+      key,
+      name,
+      sciName,
+      description,
+      smallImage,
+      hashList(images),
+      hashList(locations),
     );
   }
 
-  bool get isValid {
-    return id != null && name != null;
+  @override
+  String toString() {
+    return 'Entity(category: ${key.category}, id: ${key.id}, name: $name)';
   }
+}
+
+/// Used in [Entity]
+class EntityLocation {
+  final TrailLocationKey trailLocationKey;
+  const EntityLocation({@required this.trailLocationKey});
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        other is Trail && id == other.id && name == other.name;
+        other is EntityLocation &&
+            trailLocationKey == other.trailLocationKey;
   }
 
   @override
-  int get hashCode => hashValues(id, name);
+  int get hashCode => trailLocationKey.hashCode;
+
+  bool get isValid {
+    return trailLocationKey.isValid;
+  }
 }
 
+/// NOTE: [Flora] & [Fauna] are now removed due to multiple different kinds of [Fauna],
+/// and also because of the redundance of `area` and `coordinates` attributes in [Fauna].
+/// All subsequent mentions should always use [Entity]. [Entity] is also no longer abstract.
+/// TODO: Remove this entirely.
+// class Fauna extends Entity {
+//   // A fauna has 2 extra keys: areas and coordinates. These are most likely not to be used.
+//   final String type;
+//   final List<LatLng> area;
+//   final LatLng coordinates;
+//   Fauna.fromJson(String key, dynamic data)
+//       : type = data['type'],
+//         area = data.containsKey('area')
+//             ? List.from(data['area']).map((position) {
+//                 return LatLng(position['latitude'], position['longitude']);
+//               }).toList()
+//             : null,
+//         coordinates = data.containsKey('latitude')
+//             ? LatLng(data['latitude'], data['longitude'])
+//             : null,
+//         super.fromJson(key, data);
+
+//   // @override
+//   // bool get isValid {
+//   //   return super.isValid && area != null && coordinates != null;
+//   // }
+
+//   @override
+//   bool operator ==(Object other) {
+//     return super == other &&
+//         other is Fauna &&
+//         listEquals(area, other.area) &&
+//         coordinates == other.coordinates;
+//   }
+
+//   @override
+//   int get hashCode => hashValues(id, name, sciName, description, smallImage,
+//       hashList(images), hashList(locations), hashList(area), coordinates);
+// }
+
+// class Flora extends Entity {
+//   Flora.fromJson(String key, dynamic data)
+//       : super.fromJson(key, data);
+
+//   @override
+//   bool operator ==(Object other) {
+//     return super == other && other is Flora;
+//   }
+
+//   @override
+//   int get hashCode => super.hashCode;
+// }
+
+// class FirebaseData {
+//   final Map<int, Flora> floraMap;
+//   final Map<int, Fauna> faunaMap;
+//   final Map<Trail, Map<int, TrailLocation>> trails;
+//   final List<HistoricalData> historicalDataList;
+//   final List<AboutPageData> aboutPageDataList;
+//   const FirebaseData({
+//     this.floraMap,
+//     this.faunaMap,
+//     this.trails,
+//     this.historicalDataList,
+//     this.aboutPageDataList,
+//   });
+
+//   @override
+//   bool operator ==(Object other) {
+//     return identical(this, other) ||
+//         other is FirebaseData &&
+//             mapEquals(floraMap, other.floraMap) &&
+//             mapEquals(faunaMap, other.faunaMap) &&
+//             listEquals(historicalDataList, other.historicalDataList) &&
+//             listEquals(aboutPageDataList, other.aboutPageDataList) &&
+//             mapEquals(trails, other.trails);
+//   }
+
+//   @override
+//   int get hashCode => hashValues(
+//         floraMap,
+//         faunaMap,
+//         hashList(historicalDataList),
+//         hashList(aboutPageDataList),
+//         trails,
+//       );
+// }
+
+// class Trail {
+//   final TrailKey key;
+//   final String name;
+//   const Trail({this.key, this.name});
+//   factory Trail.fromJson(String key, dynamic data) {
+//     return Trail(
+//       key: TrailKey(id: int.tryParse(key.split('-').last)),
+//       name: data is Map ? data['name'] : null,
+//     );
+//   }
+
+//   bool get isValid {
+//     return key.isValid && name != null;
+//   }
+
+//   @override
+//   bool operator ==(Object other) {
+//     return identical(this, other) ||
+//         other is Trail && key == other.key && name == other.name;
+//   }
+
+//   @override
+//   int get hashCode => hashValues(key, name);
+// }
+
 /// A TrailLocation is a point on the trail
-class TrailLocation implements DataObject {
-  final int id;
-  final Trail trail;
+class TrailLocation {
+  final TrailLocationKey key;
   final String name;
   final String image;
   final String smallImage;
   final LatLng coordinates;
   final List<EntityPosition> entityPositions;
   const TrailLocation({
-    this.id,
-    this.trail,
+    this.key,
     this.name,
     this.image,
     this.smallImage,
     this.coordinates,
     this.entityPositions,
   });
-  factory TrailLocation.fromJson(
-    String key,
-    dynamic parsedJson, {
-    @required Trail trail,
-    @required Map<int, Flora> floraMap,
-    @required Map<int, Fauna> faunaMap,
+  factory TrailLocation.fromJson({
+    @required TrailLocationKey key,
+    @required TrailKey trailKey,
+    @required dynamic data,
   }) {
+    List<EntityPosition> entityPositions;
+    if (data.containsKey('points')) {
+      entityPositions = [];
+      for (dynamic point in data['points']) {
+        final entityPosition = EntityPosition.fromJson(point);
+        if (entityPosition.isValid) entityPositions.add(entityPosition);
+      }
+      entityPositions.sort((a, b) => a.left.compareTo(b.left));
+    }
     return TrailLocation(
-      id: int.tryParse(key.split('-').last),
-      trail: trail,
-      name: parsedJson['title'],
-      image: parsedJson['imageRef'],
-      smallImage: parsedJson['smallImage'],
-      coordinates: parsedJson.containsKey('latitude')
-          ? LatLng(parsedJson['latitude'], parsedJson['longitude'])
+      key: key,
+      name: data['title'],
+      image: data['imageRef'],
+      smallImage: data['smallImage'],
+      coordinates: data.containsKey('latitude')
+          ? LatLng(data['latitude'], data['longitude'])
           : null,
-      entityPositions: parsedJson.containsKey('points')
-          ? List.from(parsedJson['points']).map((point) {
-              final entityPosition = EntityPosition.fromJson(
-                point, 
-                floraMap: floraMap,
-                faunaMap: faunaMap,
-              );
-              if (entityPosition.isValid) return entityPosition;
-              else return null;
-            }).where((position) => position != null).toList()
-          : null,
+      entityPositions: entityPositions,
     );
   }
 
   bool get isValid {
-    return id != null &&
-        trail != null &&
+    return key.isValid &&
         name != null &&
         image != null &&
         smallImage != null &&
@@ -273,8 +403,7 @@ class TrailLocation implements DataObject {
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is TrailLocation &&
-            id == other.id &&
-            trail == other.trail &&
+            key == other.key &&
             name == other.name &&
             image == other.image &&
             smallImage == other.smallImage &&
@@ -283,62 +412,56 @@ class TrailLocation implements DataObject {
   }
 
   @override
-  int get hashCode => hashValues(id, trail, name, image, smallImage,
-      coordinates, hashList(entityPositions));
+  int get hashCode => hashValues(
+        key,
+        name,
+        image,
+        smallImage,
+        coordinates,
+        hashList(entityPositions),
+      );
 }
 
 class EntityPosition {
-  final Entity entity;
+  final EntityKey entityKey;
   final double left;
   final double top;
   final num size;
   const EntityPosition({
-    this.entity,
+    this.entityKey,
     this.left,
     this.top,
     this.size,
   });
 
-  factory EntityPosition.fromJson(
-    dynamic parsedJson, {
-    @required Map<int, Flora> floraMap,
-    @required Map<int, Fauna> faunaMap,
-  }) {
-    final name = parsedJson['params']['name'];
-    final id = int.tryParse(name.split('-').last);
-    Entity entity;
-    if (name.startsWith('flora')) {
-      entity = floraMap[id];
-    } else if (name.startsWith('fauna')) {
-      entity = faunaMap[id];
-    }
+  factory EntityPosition.fromJson(dynamic data) {
     return EntityPosition(
-      entity: entity,
-      left: parsedJson['left'],
-      top: parsedJson['top'],
-      size: parsedJson['size'],
+      entityKey: EntityKey(
+        category: data['params']['category'],
+        id: data['params']['id'],
+      ),
+      left: data['left'],
+      top: data['top'],
+      size: data['size'],
     );
   }
 
-  bool get isValid{
-    return entity != null &&
-            left != null &&
-            top != null &&
-            size != null;
+  bool get isValid {
+    return entityKey.isValid && left != null && top != null && size != null;
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is EntityPosition &&
-            entity == other.entity &&
+            entityKey == other.entityKey &&
             left == other.left &&
             top == other.top &&
             size == other.size;
   }
 
   @override
-  int get hashCode => hashValues(entity, left, top, size);
+  int get hashCode => hashValues(entityKey, left, top, size);
 }
 
 class HistoricalData {
@@ -359,19 +482,18 @@ class HistoricalData {
     this.width,
   });
 
-  factory HistoricalData.fromJson(String key, dynamic parsedJson) {
+  factory HistoricalData.fromJson(dynamic key, dynamic data) {
     return HistoricalData(
-      id: int.tryParse(key.split('-').last),
-      description: parsedJson['description'],
-      image: parsedJson['imageRef'],
-      newImage: parsedJson['newImageRef'],
-      name: parsedJson['name'],
-      height: parsedJson['height'],
-      width: parsedJson['width'],
+      id: key,
+      description: data['description'],
+      image: data['imageRef'],
+      newImage: data['newImageRef'],
+      name: data['name'],
+      height: data['height'],
+      width: data['width'],
     );
   }
 
-  // TODO: Update 
   bool get isValid {
     return id != null &&
         description != null &&
@@ -412,12 +534,12 @@ class AboutPageData {
   bool isExpanded = false;
   AboutPageData({this.body, this.id, this.quote, this.title, this.isExpanded});
 
-  factory AboutPageData.fromJson(String key, dynamic parsedJson) {
+  factory AboutPageData.fromJson(String key, dynamic data) {
     return AboutPageData(
-      body: parsedJson['body'],
-      id: parsedJson['id'],
-      quote: parsedJson['quote'],
-      title: parsedJson['title'],
+      body: data['body'],
+      id: data['id'],
+      quote: data['quote'],
+      title: data['title'],
       isExpanded: false,
     );
   }
@@ -449,8 +571,8 @@ class RouteInfo<T> {
   /// The [Route] to be pushed to the custom [Navigator] within the bottom sheet
   final Route<T> route;
 
-  /// An [Entity], [Trail] or [TrailLocation]
-  final DataObject data;
+  /// An [EntityKey], [TrailKey] or [TrailLocationKey]
+  final DataKey dataKey;
 
   /// The [ScrollController] within the new route. Usually updated after the route is pushed, and on first creation of the new screen, using the [AppNotifier.updateScrollController] function.
   ScrollController scrollController;
@@ -458,7 +580,7 @@ class RouteInfo<T> {
   RouteInfo({
     @required this.name,
     @required this.route,
-    this.data,
+    this.dataKey,
     this.scrollController,
   })  : assert(name != null),
         assert(route != null);
@@ -524,12 +646,12 @@ class AppNotifier extends ChangeNotifier {
   /// The 'data' argument is still needed for checking if the last [RouteInfo] is still equivalent.
   void updateScrollController({
     @required BuildContext context,
-    @required DataObject data,
+    @required DataKey dataKey,
     @required ScrollController scrollController,
   }) {
     final bottomSheetNotifier =
         Provider.of<BottomSheetNotifier>(context, listen: false);
-    if (routes.last.data == data) {
+    if (routes.last.dataKey == dataKey) {
       routes.last.scrollController = scrollController;
       bottomSheetNotifier.activeScrollController = scrollController;
       // print('Updated scroll controller for ${routes.last.name}');
@@ -587,7 +709,7 @@ class AppNotifier extends ChangeNotifier {
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
-    if (isHome || routeInfo.data is Trail) {
+    if (isHome || routeInfo.dataKey is TrailKey) {
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
       _state = 0;
       mapNotifier.bottomSheetHeight = heightTooSmall
@@ -617,8 +739,11 @@ class AppNotifier extends ChangeNotifier {
                 height - Sizes.kCollapsedHeight &&
             !heightTooSmall;
         mapNotifier.animateToTrail(
-          locations: Provider.of<FirebaseData>(context, listen: false)
-              .trails[routeInfo.data].values.toList(),
+          locations: FirebaseData.getTrail(
+            context: context,
+            key: routeInfo.dataKey,
+            listen: false,
+          ).values.toList(),
           adjusted: adjusted,
           mapSize: Size(
             width,
@@ -638,12 +763,17 @@ class AppNotifier extends ChangeNotifier {
       final adjusted = bottomSheetNotifier.animation.value <
               height - Sizes.kCollapsedHeight &&
           !heightTooSmall;
-      if (routeInfo.data is Entity) {
+      if (routeInfo.dataKey is EntityKey) {
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
         Provider.of<SearchNotifier>(context, listen: false).unfocus();
+        final firebaseData = Provider.of<FirebaseData>(context, listen: false);
         mapNotifier.animateToEntity(
-          entity: routeInfo.data,
-          trails: Provider.of<FirebaseData>(context, listen: false).trails,
+          entity: FirebaseData.getEntity(
+            context: context,
+            key: routeInfo.dataKey,
+            listen: false,
+          ),
+          trails: firebaseData.trails,
           adjusted: adjusted,
           mapSize: Size(
             width,
@@ -654,7 +784,11 @@ class AppNotifier extends ChangeNotifier {
         );
       } else {
         mapNotifier.animateToLocation(
-          location: routeInfo.data as TrailLocation,
+          location: FirebaseData.getTrailLocation(
+            context: context,
+            key: routeInfo.dataKey,
+            listen: false,
+          ),
           adjusted: adjusted,
           changeMarkerColor: true,
         );

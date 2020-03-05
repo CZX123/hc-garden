@@ -20,6 +20,7 @@ export 'package:shared_preferences/shared_preferences.dart';
 
 export 'main.dart';
 export 'data.dart';
+export 'firebase.dart';
 export 'sizes.dart';
 export 'theme.dart';
 export 'about/about.dart';
@@ -46,6 +47,7 @@ export 'widgets/general_widgets.dart';
 export 'widgets/animation/cross_fade_page_route.dart';
 export 'widgets/animation/expand_page_route.dart';
 export 'widgets/animation/custom_animation_switcher.dart';
+export 'widgets/animation/sliding_up_page_route.dart';
 export 'widgets/image/before_after.dart';
 export 'widgets/image/custom_image.dart';
 export 'widgets/image/image_gallery.dart';

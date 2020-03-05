@@ -2,26 +2,46 @@ import '../library.dart';
 
 /// An [InfoRow] is the top row of elements typically found in [EntityDetailsPage] or [TrailLocationOverviewPage], containing the image of an [Entity] or a [TrailLocation], with its name and additional description.
 class InfoRow extends StatelessWidget {
+  final Object heroTag;
   final String image;
   final String title;
+  final TextStyle titleStyle;
   final String subtitle;
-  final bool italicised;
+  final TextStyle subtitleStyle;
+  final bool isThreeLine;
   final double height;
+
+  /// Whether tapping the [InfoRow] should open or close the [CustomBottomSheet]
   final bool tapToAnimate;
+
   const InfoRow({
     Key key,
+    this.heroTag,
     @required this.image,
     @required this.title,
+    this.titleStyle,
     @required this.subtitle,
-    this.italicised = false,
+    this.subtitleStyle,
+    this.isThreeLine = false,
     this.height = Sizes.kInfoRowHeight,
     this.tapToAnimate = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final bottomSheetNotifier =
-        Provider.of<BottomSheetNotifier>(context, listen: false);
+    final avatar = ClipRRect(
+      borderRadius: BorderRadius.circular(32),
+      child: CustomImage(
+        image,
+        height: 64,
+        width: 64,
+        placeholderColor: Theme.of(context).dividerColor,
+      ),
+    );
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+      context,
+      listen: false,
+    );
     return InkWell(
       onTap: tapToAnimate
           ? () {
@@ -41,15 +61,7 @@ class InfoRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Row(
           children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: CustomImage(
-                image,
-                height: 64,
-                width: 64,
-                placeholderColor: Theme.of(context).dividerColor,
-              ),
-            ),
+            if (heroTag != null) Hero(tag: heroTag, child: avatar) else avatar,
             const SizedBox(
               width: 16,
             ),
@@ -60,19 +72,15 @@ class InfoRow extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     title,
-                    style: Theme.of(context).textTheme.subhead,
+                    style: titleStyle ?? Theme.of(context).textTheme.subhead,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                   Text(
                     subtitle,
-                    style: italicised
-                        ? Theme.of(context).textTheme.overline
-                        : Theme.of(context).textTheme.caption.copyWith(
-                              fontSize: 13.5,
-                            ),
+                    style: subtitleStyle ?? Theme.of(context).textTheme.caption,
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                    maxLines: isThreeLine ?  3 : 1,
                   ),
                   const SizedBox(
                     height: 2,

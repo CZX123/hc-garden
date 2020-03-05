@@ -263,10 +263,10 @@ class BottomNavbarButton extends StatelessWidget {
                 TweenAnimationBuilder<Color>(
                   tween: ColorTween(
                     begin: active
-                        ? Theme.of(context).primaryColor
+                        ? Theme.of(context).accentColor
                         : Theme.of(context).hintColor,
                     end: active
-                        ? Theme.of(context).primaryColor
+                        ? Theme.of(context).accentColor
                         : Theme.of(context).hintColor,
                   ),
                   duration: const Duration(milliseconds: 200),
@@ -285,7 +285,7 @@ class BottomNavbarButton extends StatelessWidget {
                 AnimatedDefaultTextStyle(
                   style: TextStyle(
                     color: active
-                        ? Theme.of(context).primaryColor
+                        ? Theme.of(context).accentColor
                         : Theme.of(context).hintColor,
                     fontFamily: 'Manrope',
                     fontSize: active ? 14 : 12,

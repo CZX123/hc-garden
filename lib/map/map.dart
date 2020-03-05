@@ -134,7 +134,6 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
 
   Marker _generateMarker({
     BuildContext context,
-    Trail trail,
     TrailLocation location,
   }) {
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
@@ -145,8 +144,8 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
           listen: false,
         );
         if (appNotifier.routes.isNotEmpty &&
-            appNotifier.routes.last.data is TrailLocation &&
-            appNotifier.routes.last.data == location) {
+            appNotifier.routes.last.dataKey is TrailLocationKey &&
+            appNotifier.routes.last.dataKey == location.key) {
           Provider.of<BottomSheetNotifier>(
             context,
             listen: false,
@@ -156,13 +155,13 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
             context: context,
             routeInfo: RouteInfo(
               name: location.name,
-              data: location,
+              dataKey: location.key,
               route: CrossFadePageRoute(
                 builder: (context) {
                   return Material(
                     color: Theme.of(context).bottomAppBarColor,
                     child: TrailLocationOverviewPage(
-                      trailLocation: location,
+                      trailLocationKey: location.key,
                     ),
                   );
                 },
@@ -171,7 +170,7 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
           );
         }
       },
-      markerId: MarkerId('${trail.id} ${location.id}'),
+      markerId: MarkerId('${location.key.trailKey.id} ${location.key.id}'),
       position: location.coordinates,
       infoWindow: InfoWindow(
         title: location.name,
@@ -181,8 +180,8 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
             listen: false,
           );
           if (appNotifier.routes.isNotEmpty &&
-              appNotifier.routes.last.data is TrailLocation &&
-              appNotifier.routes.last.data == location) {
+              appNotifier.routes.last.dataKey is TrailLocationKey &&
+              appNotifier.routes.last.dataKey == location.key) {
             Provider.of<BottomSheetNotifier>(
               context,
               listen: false,
@@ -192,13 +191,13 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
               context: context,
               routeInfo: RouteInfo(
                 name: location.name,
-                data: location,
+                dataKey: location.key,
                 route: CrossFadePageRoute(
                   builder: (context) {
                     return Material(
                       color: Theme.of(context).bottomAppBarColor,
                       child: TrailLocationOverviewPage(
-                        trailLocation: location,
+                        trailLocationKey: location.key,
                       ),
                     );
                   },
@@ -209,23 +208,22 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
         },
       ),
       icon: mapNotifier.mapType == CustomMapType.dark
-          ? mapNotifier.darkThemeMarkerIcons[trail.id - 1]
-          : mapNotifier.lightThemeMarkerIcons[trail.id - 1],
+          ? mapNotifier.darkThemeMarkerIcons[location.key.trailKey.id]
+          : mapNotifier.lightThemeMarkerIcons[location.key.trailKey.id],
     );
   }
 
   void onData(FirebaseData data, {bool notify = true}) {
     Map<MarkerId, Marker> mapMarkers = {};
-    data.trails.forEach((trail, locations) {
+    data?.trails?.forEach((trailKey, locations) {
       locations.forEach((key, value) {
-        mapMarkers[MarkerId('${trail.id} $key')] = _generateMarker(
+        mapMarkers[MarkerId('${trailKey.id} ${key.id}')] = _generateMarker(
           context: context,
-          trail: trail,
           location: value,
         );
       });
     });
-    if (data.trails.isNotEmpty) {
+    if (mapMarkers.isNotEmpty) {
       Provider.of<MapNotifier>(context, listen: false).setDefaultMarkers(
         mapMarkers,
         notify: notify,

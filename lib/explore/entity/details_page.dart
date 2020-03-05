@@ -1,14 +1,10 @@
 import '../../library.dart';
 
 class EntityDetailsPage extends StatefulWidget {
-  final ValueNotifier<Offset> endContentOffset;
-  final Entity entity;
-  final bool hideInfoRowOnExpand;
+  final EntityKey entityKey;
   const EntityDetailsPage({
     Key key,
-    this.endContentOffset,
-    @required this.entity,
-    this.hideInfoRowOnExpand = false,
+    @required this.entityKey,
   }) : super(key: key);
 
   @override
@@ -32,60 +28,15 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
     }
   }
 
-  List<Widget> locations(
-    BuildContext context,
-    Map<Trail, Map<int, TrailLocation>> trails,
-  ) {
-    final height = MediaQuery.of(context).size.height;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-    List<Widget> children = [];
-    for (var loc in widget.entity.locations) {
-      final int trailId = loc[0];
-      final int locationId = loc[1];
-      final trail = trails.keys.firstWhere((trail) {
-        return trail.id == trailId;
-      });
-      final location = trails[trail][locationId];
-      children.add(ListTile(
-        dense: true,
-        leading: Icon(Icons.location_on),
-        title: Text(
-          '${location.name}',
-          style: Theme.of(context).textTheme.body1,
-        ),
-        onTap: () {
-          _scrollController.animateTo(
-            0,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.fastOutSlowIn,
-          );
-          Provider.of<BottomSheetNotifier>(
-            context,
-            listen: false,
-          ).animateTo(height - Sizes.kCollapsedHeight - bottomPadding);
-          Provider.of<MapNotifier>(
-            context,
-            listen: false,
-          ).animateToLocation(location: location);
-        },
-      ));
-    }
-    return children;
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_init) {
       Provider.of<AppNotifier>(context, listen: false).updateScrollController(
         context: context,
-        data: widget.entity,
+        dataKey: widget.entityKey,
         scrollController: _scrollController,
       );
-      if (widget.hideInfoRowOnExpand ?? false) {
-        animation = ModalRoute.of(context).animation..addListener(listener);
-        hidden.value = true;
-      }
       _init = true;
     }
   }
@@ -103,136 +54,16 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
-    final bottomSheetNotifier =
-        Provider.of<BottomSheetNotifier>(context, listen: false);
-    final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
-    final newImages = widget.entity.images.map(lowerRes).toList();
-    final child = SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
-      controller: _scrollController,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          ValueListenableBuilder(
-            valueListenable: bottomSheetNotifier.animation,
-            builder: (context, value, child) {
-              double h = 0;
-              if (value < paddingBreakpoint) {
-                h = (1 - value / paddingBreakpoint) * topPadding;
-                if (value > 1)
-                  widget.endContentOffset?.value = Offset(0, h + 16);
-              }
-              return SizedBox(
-                height: h,
-              );
-            },
-          ),
-          ValueListenableBuilder<bool>(
-            valueListenable: hidden,
-            builder: (context, value, child) {
-              return Visibility(
-                visible: !value,
-                maintainState: true,
-                maintainAnimation: true,
-                maintainSize: true,
-                child: child,
-              );
-            },
-            child: InfoRow(
-              image: widget.entity.smallImage,
-              title: widget.entity.name,
-              subtitle: widget.entity.sciName,
-              italicised: true,
-            ),
-          ),
-          Container(
-            height: Sizes.kImageHeight,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: <Widget>[
-                  for (var image in newImages)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: Stack(
-                        children: <Widget>[
-                          CustomImage(
-                            image,
-                            height: Sizes.kImageHeight,
-                            width: newImages.length == 1
-                                ? width - 32
-                                : Sizes.kImageHeight / 2 * 3,
-                            fit: BoxFit.cover,
-                            placeholderColor: Theme.of(context).dividerColor,
-                          ),
-                          Positioned.fill(
-                            child: Material(
-                              type: MaterialType.transparency,
-                              child: InkWell(
-                                onTap: () {
-                                  Provider.of<AppNotifier>(
-                                    context,
-                                    listen: false,
-                                  ).push(
-                                    context: context,
-                                    routeInfo: RouteInfo(
-                                      name: 'Gallery',
-                                      route: PageRouteBuilder(
-                                        opaque: false,
-                                        pageBuilder: (context, _, __) {
-                                          return ImageGallery(
-                                            images: newImages,
-                                            initialImage: image,
-                                          );
-                                        },
-                                        transitionDuration:
-                                            const Duration(milliseconds: 300),
-                                      ),
-                                    ),
-                                    disableDragging: true,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          for (var para in widget.entity.description.split('\n'))
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: Text(
-                para,
-                textAlign: TextAlign.justify,
-              ),
-            ),
-          const SizedBox(
-            height: 8,
-          ),
-          Selector<FirebaseData, Map<Trail, Map<int, TrailLocation>>>(
-            selector: (context, firebaseData) => firebaseData.trails,
-            builder: (context, trails, child) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: locations(context, trails),
-              );
-            },
-          ),
-          const SizedBox(
-            height: Sizes.kBottomBarHeight + 8,
-          ),
-          const BottomPadding(),
-        ],
-      ),
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+      context,
+      listen: false,
     );
+    final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
+    final entity = FirebaseData.getEntity(
+      context: context,
+      key: widget.entityKey,
+    );
+    final newImages = entity.images.map(lowerRes).toList();
     return ValueListenableBuilder<double>(
       valueListenable: ModalRoute.of(context).secondaryAnimation,
       builder: (context, value, child) {
@@ -250,20 +81,169 @@ class _EntityDetailsPageState extends State<EntityDetailsPage> {
       },
       child: Material(
         type: MaterialType.transparency,
-        child: widget.endContentOffset != null
-            ? NotificationListener(
-                onNotification: (notification) {
-                  if (notification is ScrollUpdateNotification &&
-                      notification.depth == 0) {
-                    widget.endContentOffset.value -=
-                        Offset(0, notification.scrollDelta);
+        child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          controller: _scrollController,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              ValueListenableBuilder(
+                valueListenable: bottomSheetNotifier.animation,
+                builder: (context, value, child) {
+                  double h = 0;
+                  if (value < paddingBreakpoint) {
+                    h = (1 - value / paddingBreakpoint) * topPadding;
                   }
-                  return false;
+                  return SizedBox(
+                    height: h,
+                  );
                 },
-                child: child,
-              )
-            : child,
+              ),
+              InfoRow(
+                heroTag: widget.entityKey,
+                image: entity.smallImage,
+                title: entity.name,
+                subtitle: entity.sciName,
+                subtitleStyle: Theme.of(context).textTheme.overline,
+              ),
+              Container(
+                height: Sizes.kImageHeight,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: <Widget>[
+                      for (var image in newImages)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Stack(
+                            children: <Widget>[
+                              CustomImage(
+                                image,
+                                height: Sizes.kImageHeight,
+                                width: newImages.length == 1
+                                    ? width - 32
+                                    : Sizes.kImageHeight / 2 * 3,
+                                fit: BoxFit.cover,
+                                placeholderColor:
+                                    Theme.of(context).dividerColor,
+                              ),
+                              Positioned.fill(
+                                child: Material(
+                                  type: MaterialType.transparency,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Provider.of<AppNotifier>(
+                                        context,
+                                        listen: false,
+                                      ).push(
+                                        context: context,
+                                        routeInfo: RouteInfo(
+                                          name: 'Gallery',
+                                          route: PageRouteBuilder(
+                                            opaque: false,
+                                            pageBuilder: (context, _, __) {
+                                              return ImageGallery(
+                                                images: newImages,
+                                                initialImage: image,
+                                              );
+                                            },
+                                            transitionDuration: const Duration(
+                                                milliseconds: 300),
+                                          ),
+                                        ),
+                                        disableDragging: true,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              for (var para in entity.description.split('\n'))
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: Text(
+                    para,
+                    textAlign: TextAlign.justify,
+                  ),
+                ),
+              const SizedBox(
+                height: 8,
+              ),
+              EntityLocationsWidget(
+                locations: entity.locations,
+                scrollController: _scrollController,
+              ),
+              const SizedBox(
+                height: Sizes.kBottomBarHeight + 8,
+              ),
+              const BottomPadding(),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+}
+
+class EntityLocationsWidget extends StatelessWidget {
+  final List<EntityLocation> locations;
+  final ScrollController scrollController;
+  const EntityLocationsWidget({
+    Key key,
+    @required this.locations,
+    @required this.scrollController,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    final List<Widget> children = [];
+    for (final entityLocation in locations) {
+      final trailLocation = FirebaseData.getTrailLocation(
+        context: context,
+        key: entityLocation.trailLocationKey,
+      );
+      if (trailLocation != null) {
+        children.add(ListTile(
+          dense: true,
+          leading: Icon(Icons.location_on),
+          title: Text(
+            '${trailLocation.name}',
+            style: Theme.of(context).textTheme.body1,
+          ),
+          onTap: () {
+            scrollController.animateTo(
+              0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.fastOutSlowIn,
+            );
+            Provider.of<BottomSheetNotifier>(
+              context,
+              listen: false,
+            ).animateTo(height - Sizes.kCollapsedHeight - bottomPadding);
+            Provider.of<MapNotifier>(
+              context,
+              listen: false,
+            ).animateToLocation(location: trailLocation);
+          },
+        ));
+      }
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: children,
     );
   }
 }

@@ -18,12 +18,11 @@ class ThemeNotifier extends ValueNotifier<bool> {
 
   @override
   set value(bool newValue) {
-    if (super.value != newValue) {
-      SharedPreferences.getInstance().then((prefs) {
-        prefs.setBool('isDark', newValue);
-      });
-      super.value = newValue;
-    }
+    if (super.value == newValue) return;
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool('isDark', newValue);
+    });
+    super.value = newValue;
   }
 }
 

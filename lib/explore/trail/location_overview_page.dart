@@ -1,14 +1,10 @@
 import '../../library.dart';
 
 class TrailLocationOverviewPage extends StatefulWidget {
-  final TrailLocation trailLocation;
-  final ValueNotifier<Offset> endContentOffset;
-  final bool hideInfoRowOnExpand;
+  final TrailLocationKey trailLocationKey;
   const TrailLocationOverviewPage({
     Key key,
-    @required this.trailLocation,
-    this.endContentOffset,
-    this.hideInfoRowOnExpand = false,
+    @required this.trailLocationKey,
   }) : super(key: key);
 
   @override
@@ -20,36 +16,6 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   bool _init = false;
   final _scrollController = ScrollController();
   double aspectRatio;
-  final _aspectRatio = ValueNotifier<double>(null);
-  static const double sizeScaling = 500;
-  final hidden = ValueNotifier(false);
-  Animation<double> animation;
-
-  void listener() {
-    if (animation.value < 1) {
-      hidden.value = true;
-    } else if (animation.isCompleted) {
-      hidden.value = false;
-    }
-  }
-
-  void _onTap(Entity entity) {
-    Provider.of<AppNotifier>(context, listen: false).push(
-      context: context,
-      routeInfo: RouteInfo(
-        name: entity.name,
-        data: entity,
-        route: CrossFadePageRoute(
-          builder: (context) => Material(
-            color: Theme.of(context).bottomAppBarColor,
-            child: EntityDetailsPage(
-              entity: entity,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   @override
   void didChangeDependencies() {
@@ -57,21 +23,15 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
     if (!_init) {
       Provider.of<AppNotifier>(context, listen: false).updateScrollController(
         context: context,
-        data: widget.trailLocation,
+        dataKey: widget.trailLocationKey,
         scrollController: _scrollController,
       );
-      if (widget.hideInfoRowOnExpand ?? false) {
-        animation = ModalRoute.of(context).animation..addListener(listener);
-        hidden.value = true;
-      }
       _init = true;
     }
   }
 
   @override
   void dispose() {
-    animation?.removeListener(listener);
-    _aspectRatio.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -84,168 +44,171 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
     final width = MediaQuery.of(context).size.width;
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-    final bottomSheetNotifier =
-        Provider.of<BottomSheetNotifier>(context, listen: false);
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+      context,
+      listen: false,
+    );
+    final trailLocation = FirebaseData.getTrailLocation(
+      context: context,
+      key: widget.trailLocationKey,
+    );
     final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
     final maxImageHeight = height - Sizes.kBottomBarHeight - bottomPadding;
-    final child = Stack(
-      children: [
-        SingleChildScrollView(
-          controller: _scrollController,
-          physics: NeverScrollableScrollPhysics(),
-          child: Column(
-            children: <Widget>[
-              ValueListenableBuilder<double>(
-                valueListenable: bottomSheetNotifier.animation,
-                builder: (context, value, child) {
-                  double h = 0;
-                  if (value < paddingBreakpoint) {
-                    h = (1 - value / paddingBreakpoint) * topPadding;
-                    if (value > 1)
-                      widget.endContentOffset?.value = Offset(0, h + 16);
-                  }
-                  return SizedBox(
-                    height: h,
-                  );
-                },
-              ),
-              ValueListenableBuilder<bool>(
-                valueListenable: hidden,
-                builder: (context, value, child) {
-                  return Visibility(
-                    visible: !value,
-                    maintainState: true,
-                    maintainAnimation: true,
-                    maintainSize: true,
-                    child: child,
-                  );
-                },
-                child: InfoRow(
-                  image: widget.trailLocation.smallImage,
-                  title: widget.trailLocation.name,
-                  subtitle: (widget.trailLocation.entityPositions
-                          .where((position) => position.entity != null)
-                          .toList()
-                            ..sort((a, b) {
-                              return a.left.compareTo(b.left);
-                            }))
-                      .map((position) => position.entity.name)
-                      .toList()
-                      .join(', '),
-                ),
-              ),
-              ValueListenableBuilder<double>(
-                valueListenable: bottomSheetNotifier.animation,
-                builder: (context, value, child) {
-                  return Container(
-                    alignment: Alignment.center,
-                    constraints: BoxConstraints(
-                      minHeight: isLandscape &&
-                              maxImageHeight < width / aspectRatio
-                          ? maxImageHeight
-                          : max(
-                              height -
-                                  value -
-                                  Sizes.kBottomBarHeight -
-                                  bottomPadding -
-                                  Sizes.kInfoRowHeight -
-                                  (1 - value / paddingBreakpoint) * topPadding,
-                              0,
-                            ),
-                    ),
-                    child: child,
-                  );
-                },
-                child: Stack(
-                  children: <Widget>[
-                    CustomImage(
-                      lowerRes(widget.trailLocation.image),
-                      fit: BoxFit.contain,
-                      onLoad: (double aspectRatio) {
-                        _aspectRatio.value = aspectRatio;
-                        setState(() {
-                          this.aspectRatio = aspectRatio;
-                        });
-                      },
-                    ),
-                    for (var entityPosition
-                        in widget.trailLocation.entityPositions)
-                      new Positioned(
-                        left: entityPosition.left * width -
-                            (entityPosition.size / sizeScaling) * width / 2,
-                        top: aspectRatio == null
-                            ? height
-                            : entityPosition.top * (width / aspectRatio) -
-                                (entityPosition.size / sizeScaling) * width / 2,
-                        width: (entityPosition.size / sizeScaling) * width,
-                        height: (entityPosition.size / sizeScaling) * width,
-                        child: entityPosition.entity is Fauna
-                            ? FaunaCircle(
-                                fauna: entityPosition.entity,
-                                height:
-                                    (entityPosition.size / sizeScaling) * width,
-                                onTap: () => _onTap(entityPosition.entity),
-                              )
-                            : AnimatedPulseCircle(
-                                height:
-                                    (entityPosition.size / sizeScaling) * width,
-                                onTap: () => _onTap(entityPosition.entity),
-                              ),
-                      ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: Sizes.kBottomBarHeight + bottomPadding,
-              ),
-            ],
-          ),
-        ),
-        // ValueListenableBuilder<double>(
-        //   valueListenable: bottomSheetNotifier.animation,
-        //   builder: (context, value, child) {
-        //     return Positioned(
-        //       right: 16,
-        //       bottom: Sizes.kBottomBarHeight + bottomPadding + 16 + value,
-        //       height: 48,
-        //       width: 48,
-        //       child: child,
-        //     );
-        //   },
-        //   child: Material(
-        //     type: MaterialType.circle,
-        //     color: Colors.black45,
-        //     clipBehavior: Clip.antiAlias,
-        //     child: IconButton(
-        //       icon: Icon(Icons.zoom_in),
-        //       color: Colors.white,
-        //       onPressed: () {},
-        //     ),
-        //   ),
-        // ),
-      ],
-    );
     return Material(
       type: MaterialType.transparency,
-      child: widget.endContentOffset != null
-          ? NotificationListener(
-              onNotification: (notification) {
-                if (notification is ScrollUpdateNotification &&
-                    notification.depth == 0) {
-                  widget.endContentOffset.value -=
-                      Offset(0, notification.scrollDelta);
-                }
-                return false;
-              },
-              child: child,
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            controller: _scrollController,
+            physics: NeverScrollableScrollPhysics(),
+            child: Column(
+              children: <Widget>[
+                ValueListenableBuilder<double>(
+                  valueListenable: bottomSheetNotifier.animation,
+                  builder: (context, value, child) {
+                    double h = 0;
+                    if (value < paddingBreakpoint) {
+                      h = (1 - value / paddingBreakpoint) * topPadding;
+                    }
+                    return SizedBox(
+                      height: h,
+                    );
+                  },
+                ),
+                Hero(
+                  tag: widget.trailLocationKey,
+                  child: InfoRow(
+                    image: trailLocation.smallImage,
+                    title: trailLocation.name,
+                    subtitle: trailLocation.entityPositions
+                        .map((position) {
+                          return FirebaseData.getEntity(
+                            context: context,
+                            key: position.entityKey,
+                          )?.name;
+                        })
+                        .where((name) => name != null)
+                        .join(', '),
+                    subtitleStyle: Theme.of(context).textTheme.caption.copyWith(
+                          fontSize: 13.5,
+                        ),
+                  ),
+                ),
+                ValueListenableBuilder<double>(
+                  valueListenable: bottomSheetNotifier.animation,
+                  builder: (context, value, child) {
+                    return Container(
+                      alignment: Alignment.center,
+                      constraints: BoxConstraints(
+                        minHeight:
+                            isLandscape && maxImageHeight < width / aspectRatio
+                                ? maxImageHeight
+                                : max(
+                                    height -
+                                        value -
+                                        Sizes.kBottomBarHeight -
+                                        bottomPadding -
+                                        Sizes.kInfoRowHeight -
+                                        (1 - value / paddingBreakpoint) *
+                                            topPadding,
+                                    0,
+                                  ),
+                      ),
+                      child: child,
+                    );
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      CustomImage(
+                        lowerRes(trailLocation.image),
+                        fit: BoxFit.contain,
+                        onLoad: (double aspectRatio) {
+                          setState(() {
+                            this.aspectRatio = aspectRatio;
+                          });
+                        },
+                      ),
+                      if (aspectRatio != null)
+                        for (var entityPosition
+                            in trailLocation.entityPositions)
+                          EntityPositionWidget(
+                            entityPosition: entityPosition,
+                            aspectRatio: aspectRatio,
+                          ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: Sizes.kBottomBarHeight + bottomPadding,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EntityPositionWidget extends StatelessWidget {
+  final EntityPosition entityPosition;
+  final double aspectRatio;
+  const EntityPositionWidget({
+    Key key,
+    @required this.entityPosition,
+    @required this.aspectRatio,
+  }) : super(key: key);
+
+  static const double sizeScaling = 500;
+
+  void _onTap(BuildContext context, Entity entity) {
+    Provider.of<AppNotifier>(context, listen: false).push(
+      context: context,
+      routeInfo: RouteInfo(
+        name: entity.name,
+        dataKey: entity.key,
+        route: CrossFadePageRoute(
+          builder: (context) => Material(
+            color: Theme.of(context).bottomAppBarColor,
+            child: EntityDetailsPage(
+              entityKey: entity.key,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final entity = FirebaseData.getEntity(
+      context: context,
+      key: entityPosition.entityKey,
+    );
+    return Positioned(
+      left: entityPosition.left * width -
+          (entityPosition.size / sizeScaling) * width / 2,
+      top: entityPosition.top * (width / aspectRatio) -
+          (entityPosition.size / sizeScaling) * width / 2,
+      width: (entityPosition.size / sizeScaling) * width,
+      height: (entityPosition.size / sizeScaling) * width,
+      child: entityPosition.entityKey.category == 'flora'
+          ? AnimatedPulseCircle(
+              height: (entityPosition.size / sizeScaling) * width,
+              onTap: () => _onTap(context, entity),
             )
-          : child,
+          : FaunaCircle(
+              fauna: entity,
+              height: (entityPosition.size / sizeScaling) * width,
+              onTap: () => _onTap(context, entity),
+            ),
     );
   }
 }
 
 class FaunaCircle extends StatefulWidget {
-  final Fauna fauna;
+  final Entity fauna;
   final double height;
   final VoidCallback onTap;
   const FaunaCircle({
@@ -336,7 +299,9 @@ class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
   void initState() {
     super.initState();
     controller = AnimationController(
-        duration: const Duration(milliseconds: 2000), vsync: this);
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
     scale = Tween<double>(begin: 1, end: 1.8).animate(CurvedAnimation(
       parent: controller,
       curve: Curves.fastOutSlowIn,
@@ -363,48 +328,47 @@ class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
     return GestureDetector(
       child: Material(
         color: Colors.transparent,
-        child: Transform.scale(
-          scale: .75,
-          child: Stack(
-            children: <Widget>[
-              ScaleTransition(
-                scale: scale,
-                child: ValueListenableBuilder<double>(
-                  valueListenable: controller,
-                  builder: (context, value, child) {
-                    double height = widget.height;
-                    return Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: color.value,
-                          width: height *
-                              .4 *
-                              curve.transform(value) /
-                              scale.value,
-                        ),
-                        shape: BoxShape.circle,
+        child: Stack(
+          children: <Widget>[
+            ScaleTransition(
+              scale: scale,
+              child: ValueListenableBuilder<double>(
+                valueListenable: controller,
+                builder: (context, value, child) {
+                  double height = widget.height;
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: color.value,
+                        width:
+                            height * .4 * curve.transform(value) / scale.value,
                       ),
-                    );
-                  },
-                ),
+                      shape: BoxShape.circle,
+                    ),
+                  );
+                },
               ),
-              Positioned.fill(
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: _isPressed,
-                  builder: (context, value, _) {
-                    return AnimatedContainer(
-                      duration: Duration(milliseconds: value ? 100 : 300),
-                      decoration: BoxDecoration(
-                        color: value ? Colors.white38 : Colors.white70,
-                        shape: BoxShape.circle,
-                        boxShadow: kElevationToShadow[4],
+            ),
+            Positioned.fill(
+              child: ValueListenableBuilder<bool>(
+                valueListenable: _isPressed,
+                builder: (context, value, _) {
+                  return AnimatedContainer(
+                    duration: Duration(milliseconds: value ? 100 : 300),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: value
+                            ? Colors.white38
+                            : Colors.white.withOpacity(.8),
+                        width: 3,
                       ),
-                    );
-                  },
-                ),
+                      shape: BoxShape.circle,
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       onTapDown: (_) {
@@ -420,4 +384,3 @@ class _AnimatedPulseCircleState extends State<AnimatedPulseCircle>
     );
   }
 }
-

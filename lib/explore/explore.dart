@@ -14,19 +14,19 @@ class ExploreBody extends StatefulWidget {
 }
 
 class _ExploreBodyState extends State<ExploreBody> {
-  // HeroController _heroController;
-  // List<NavigatorObserver> _navigatorObservers = [];
+  HeroController _heroController;
+  List<NavigatorObserver> _navigatorObservers = [];
 
-  // RectTween _createRectTween(Rect begin, Rect end) {
-  //   return MaterialRectArcTween(begin: begin, end: end);
-  // }
+  RectTween _createRectTween(Rect begin, Rect end) {
+    return FastOutSlowInRectTween(begin: begin, end: end);
+  }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   //_heroController = HeroController(createRectTween: _createRectTween);
-  //   //_navigatorObservers.add(_heroController);
-  // }
+  @override
+  void initState() {
+    super.initState();
+    _heroController = HeroController(createRectTween: _createRectTween);
+    _navigatorObservers.add(_heroController);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class _ExploreBodyState extends State<ExploreBody> {
             if (settings.isInitialRoute) return initialRoute;
             return null;
           },
-          //observers: _navigatorObservers,
+          observers: _navigatorObservers,
         ),
         Selector<AppNotifier, bool>(
           selector: (context, appNotifier) => appNotifier.state == 0,
@@ -141,25 +141,13 @@ class ExplorePage extends StatelessWidget {
                     TabBarView(
                       controller: tabController,
                       children: <Widget>[
-                        Selector<FirebaseData, Map<int, Flora>>(
-                          selector: (context, firebaseData) =>
-                              firebaseData.floraMap,
-                          builder: (context, floraMap, child) {
-                            return EntityListPage(
-                              entityList: floraMap.values.toList()..sort((a, b) => a.name.compareTo(b.name)),
-                              scrollController: scrollControllers[0],
-                            );
-                          },
+                        EntityListPage(
+                          isFlora: true,
+                          scrollController: scrollControllers[0],
                         ),
-                        Selector<FirebaseData, Map<int, Fauna>>(
-                          selector: (context, firebaseData) =>
-                              firebaseData.faunaMap,
-                          builder: (context, faunaMap, child) {
-                            return EntityListPage(
-                              entityList: faunaMap.values.toList()..sort((a, b) => a.name.compareTo(b.name)),
-                              scrollController: scrollControllers[1],
-                            );
-                          },
+                        EntityListPage(
+                          isFlora: false,
+                          scrollController: scrollControllers[1],
                         ),
                       ],
                     ),

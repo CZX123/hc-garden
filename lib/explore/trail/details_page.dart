@@ -1,12 +1,10 @@
 import '../../library.dart';
 
 class TrailDetailsPage extends StatefulWidget {
-  final Trail trail;
-  final List<TrailLocation> trailLocations;
+  final TrailKey trailKey;
   const TrailDetailsPage({
     Key key,
-    @required this.trail,
-    @required this.trailLocations,
+    @required this.trailKey,
   }) : super(key: key);
 
   @override
@@ -41,7 +39,7 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
     if (!_init) {
       _appNotifier.updateScrollController(
         context: context,
-        data: widget.trail,
+        dataKey: widget.trailKey,
         scrollController: _scrollController,
       );
       _init = true;
@@ -57,8 +55,17 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final bottomSheetNotifier =
-        Provider.of<BottomSheetNotifier>(context, listen: false);
+    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
+      context,
+      listen: false,
+    );
+    final trailLocations = FirebaseData.getTrail(
+      context: context,
+      key: widget.trailKey,
+    ).values.toList()
+      ..sort((a, b) {
+        return a.name.compareTo(b.name);
+      });
     final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
     return Padding(
       padding: EdgeInsets.only(
@@ -87,7 +94,7 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(0, 32, 0, 16),
                     child: Text(
-                      widget.trail.name,
+                      FirebaseData.trailNames[widget.trailKey.id],
                       style: Theme.of(context).textTheme.display1,
                       textAlign: TextAlign.center,
                     ),
@@ -114,12 +121,12 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     return LocationListRow(
-                      location: widget.trailLocations[index],
+                      location: trailLocations[index],
                       index: index,
                       scrollController: _scrollController,
                     );
                   },
-                  childCount: widget.trailLocations.length,
+                  childCount: trailLocations.length,
                 ),
                 itemExtent: 84,
               ),
@@ -147,95 +154,76 @@ class LocationListRow extends StatefulWidget {
 }
 
 class _LocationListRowState extends State<LocationListRow> {
-  final hidden = ValueNotifier(false);
-  Animation<double> secondaryAnimation;
+  static const _rowHeight = 84.0;
+  Animation<double> _bottomSheetAnimation;
+  Tween<double> _topSpaceTween;
+  Tween<double> _contentOffsetTween;
 
-  void listener() {
-    if (secondaryAnimation.isDismissed) {
-      if (mounted) hidden.value = false;
-      secondaryAnimation.removeListener(listener);
-    } else {
-      hidden.value = true;
-    }
+  double _getSourceTop() {
+    return _topSpaceTween.evaluate(_bottomSheetAnimation) +
+        _rowHeight * widget.index -
+        widget.scrollController.offset;
   }
 
-  @override
-  void dispose() {
-    hidden.dispose();
-    super.dispose();
+  double _getContentOffset() {
+    return _contentOffsetTween.evaluate(_bottomSheetAnimation);
   }
 
   @override
   Widget build(BuildContext context) {
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-    var names = (widget.location.entityPositions
-            .where((position) => position.entity != null)
-            .toList()
-              ..sort((a, b) {
-                return a.left.compareTo(b.left);
-              }))
-        .map((position) => position.entity.name)
-        .toList();
-    final child = InfoRow(
-      height: 84,
-      image: widget.location.smallImage,
-      title: widget.location.name,
-      subtitle: names.join(', '),
-      tapToAnimate: false,
+
+    _bottomSheetAnimation = Tween<double>(
+      begin: 0,
+      end: 1 / (height - Sizes.kBottomHeight),
+    ).animate(
+      Provider.of<BottomSheetNotifier>(context, listen: false).animation,
     );
+    _topSpaceTween = Tween(
+      begin: Sizes.hEntityButtonHeightCollapsed + 24 + topPadding,
+      end: Sizes.kBottomHeight - Sizes.hBottomBarHeight + 8,
+    );
+    _contentOffsetTween = Tween(
+      begin: topPadding + 16 - (_rowHeight - 64) / 2,
+      end: 16 - (_rowHeight - 64) / 2,
+    );
+
+    final List<String> names = [];
+    for (final position in widget.location.entityPositions) {
+      final entity =
+          FirebaseData.getEntity(context: context, key: position.entityKey);
+      if (entity != null) names.add(entity.name);
+    }
     return InkWell(
-      child: ValueListenableBuilder<bool>(
-        valueListenable: hidden,
-        builder: (context, value, child) {
-          return Visibility(
-            visible: !value,
-            child: child,
-          );
-        },
-        child: child,
+      child: Hero(
+        tag: widget.location.key,
+        child: InfoRow(
+          height: _rowHeight,
+          image: widget.location.smallImage,
+          title: widget.location.name,
+          subtitle: names.join(', '),
+          subtitleStyle: Theme.of(context).textTheme.caption.copyWith(
+                fontSize: 13.5,
+              ),
+          tapToAnimate: false,
+        ),
       ),
       onTap: () {
-        final sourceRect = Rect.fromLTWH(0, 69, width, 84);
-        final anim = Tween<double>(
-          begin: 0,
-          end: 1 / (height - Sizes.kBottomHeight),
-        ).animate(
-          Provider.of<BottomSheetNotifier>(context, listen: false).animation,
-        );
-        final topSpace = Tween<double>(
-          begin: 72 + topPadding,
-          end: 72,
-        ).animate(anim);
-        final startContentOffset = ValueNotifier(Offset(0, 10));
-        final endContentOffset = ValueNotifier(
-          Offset(0, (1 - anim.value) * topPadding + 16),
-        );
-        secondaryAnimation = ModalRoute.of(context).secondaryAnimation
-          ..addListener(listener);
-        appNotifier.push(
+        Provider.of<AppNotifier>(context, listen: false).push(
           context: context,
           routeInfo: RouteInfo(
             name: widget.location.name,
-            data: widget.location,
-            route: ExpandPageRoute(
+            dataKey: widget.location.key,
+            route: SlidingUpPageRoute(
+              getSourceTop: _getSourceTop,
+              sourceHeight: _rowHeight,
+              getContentOffset: _getContentOffset,
               builder: (context) {
                 return TrailLocationOverviewPage(
-                  trailLocation: widget.location,
-                  endContentOffset: endContentOffset,
-                  hideInfoRowOnExpand: true,
+                  trailLocationKey: widget.location.key,
                 );
               },
-              sourceRect: sourceRect,
-              startContentOffset: startContentOffset,
-              endContentOffset: endContentOffset,
-              rowOffset: 84.0 * widget.index,
-              oldScrollController: widget.scrollController,
-              topSpace: topSpace,
-              persistentOldChild: child,
-              disappear: () => appNotifier.routes.isEmpty,
             ),
           ),
         );

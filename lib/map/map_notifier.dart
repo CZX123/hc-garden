@@ -219,7 +219,8 @@ class MapNotifier extends ChangeNotifier {
     if (changeMarkerColor) {
       final newMarkers = Map<MarkerId, Marker>.from(defaultMarkers);
       greenMarkers = [];
-      final markerId = MarkerId('${location.trail.id} ${location.id}');
+      final markerId =
+          MarkerId('${location.key.trailKey.id} ${location.key.id}');
       _replaceWithGreenMarker(newMarkers, markerId);
       markers = newMarkers;
     }
@@ -232,21 +233,20 @@ class MapNotifier extends ChangeNotifier {
   /// Moves the map to the bounding box of all locations of the entity
   void animateToEntity({
     @required Entity entity,
-    @required Map<Trail, Map<int, TrailLocation>> trails,
+    @required TrailMap trails,
     @required Size mapSize,
     bool adjusted = false,
   }) {
     greenMarkers = [];
     final newMarkers = Map<MarkerId, Marker>.from(defaultMarkers);
-    final points = entity.locations.map((tuple) {
-      final int trailId = tuple[0];
-      final int locationId = tuple[1];
-      final markerId = MarkerId('$trailId $locationId');
+    final points = entity.locations.map((entityLocation) {
+      final trailLocationKey = entityLocation.trailLocationKey;
+      final markerId =
+          MarkerId('${trailLocationKey.trailKey.id} ${trailLocationKey.id}');
+      print(markerId);
+      print(newMarkers.keys);
       _replaceWithGreenMarker(newMarkers, markerId);
-      final trail = trails.keys.firstWhere((trail) {
-        return trail.id == trailId;
-      });
-      final location = trails[trail][locationId];
+      final location = trails[trailLocationKey.trailKey][trailLocationKey];
       return location.coordinates;
     }).toList();
     markers = newMarkers;
@@ -273,4 +273,3 @@ class MapNotifier extends ChangeNotifier {
     mapController?.moveCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 }
-

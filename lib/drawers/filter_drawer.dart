@@ -38,56 +38,46 @@ class FilterDrawer extends StatelessWidget {
                         style: Theme.of(context).textTheme.subtitle,
                       ),
                     ),
-                    Selector<FirebaseData, List<Trail>>(
-                      selector: (context, firebaseData) {
-                        return firebaseData.trails.keys.toList();
+                    Selector<FilterNotifier, List<TrailKey>>(
+                      selector: (context, filterNotifier) {
+                        return filterNotifier.selectedTrailKeys;
                       },
-                      builder: (context, allTrails, child) {
-                        return Selector<FilterNotifier, List<Trail>>(
-                          selector: (context, sortNotifier) {
-                            return sortNotifier.selectedTrails;
-                          },
-                          builder: (context, selectedTrails, child) {
-                            if (selectedTrails == null) {
-                              if (allTrails == null)
-                                return const SizedBox.shrink();
-                              else {
-                                selectedTrails = List.from(allTrails);
-                                Provider.of<FilterNotifier>(context,
-                                        listen: false)
-                                    .updateSelectedTrailsDiscreetly(
-                                        selectedTrails);
-                              }
-                            }
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: allTrails.map((trail) {
-                                return CheckboxListTile(
-                                  dense: true,
-                                  controlAffinity:
-                                      ListTileControlAffinity.trailing,
-                                  value: selectedTrails.contains(trail),
-                                  title: Text(
-                                    trail.name.split('(').first.trimRight(),
-                                    style: Theme.of(context).textTheme.body1,
-                                  ),
-                                  checkColor: Theme.of(context).canvasColor,
-                                  onChanged: (value) {
-                                    final sortNotifier =
-                                        Provider.of<FilterNotifier>(context,
-                                            listen: false);
-                                    List<Trail> newTrails =
-                                        List.from(sortNotifier.selectedTrails);
-                                    newTrails.remove(trail);
-                                    if (value) {
-                                      newTrails.add(trail);
-                                    }
-                                    sortNotifier.selectedTrails = newTrails;
-                                  },
+                      builder: (context, selectedTrailKeys, child) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: FirebaseData.trailNames
+                              .asMap()
+                              .entries
+                              .map((trailEntry) {
+                            return CheckboxListTile(
+                              dense: true,
+                              controlAffinity: ListTileControlAffinity.trailing,
+                              value: !selectedTrailKeys.every((key) {
+                                return key.id != trailEntry.key;
+                              }),
+                              title: Text(
+                                trailEntry.value,
+                                style: Theme.of(context).textTheme.body1,
+                              ),
+                              checkColor: Theme.of(context).canvasColor,
+                              onChanged: (value) {
+                                final filterNotifier =
+                                    Provider.of<FilterNotifier>(
+                                  context,
+                                  listen: false,
                                 );
-                              }).toList(),
+                                final newTrailKeys = List<TrailKey>.from(
+                                  filterNotifier.selectedTrailKeys,
+                                );
+                                final trailKey = TrailKey(id: trailEntry.key);
+                                newTrailKeys.remove(trailKey);
+                                if (value) {
+                                  newTrailKeys.add(trailKey);
+                                }
+                                filterNotifier.selectedTrailKeys = newTrailKeys;
+                              },
                             );
-                          },
+                          }).toList(),
                         );
                       },
                     ),
@@ -100,7 +90,7 @@ class FilterDrawer extends StatelessWidget {
                     ),
                     Selector<FilterNotifier, bool>(
                       selector: (context, filterNotifier) {
-                        return filterNotifier.groupValue;
+                        return filterNotifier.isSortedByDistance;
                       },
                       builder: (context, groupValue, child) {
                         return Column(
@@ -110,7 +100,7 @@ class FilterDrawer extends StatelessWidget {
                               dense: true,
                               controlAffinity: ListTileControlAffinity.trailing,
                               groupValue: groupValue,
-                              value: true,
+                              value: false,
                               title: Text(
                                 'Alphabetical',
                                 style: Theme.of(context).textTheme.body1,
@@ -119,45 +109,23 @@ class FilterDrawer extends StatelessWidget {
                                 Provider.of<FilterNotifier>(
                                   context,
                                   listen: false,
-                                ).groupValue = value;
+                                ).toggleSortByDist(context);
                               },
                             ),
                             RadioListTile<bool>(
                               dense: true,
                               controlAffinity: ListTileControlAffinity.trailing,
                               groupValue: groupValue,
-                              value: false,
+                              value: true,
                               title: Text(
                                 'Distance',
                                 style: Theme.of(context).textTheme.body1,
                               ),
-                              onChanged: (value) async {
-                                final filterNotifier =
-                                    Provider.of<FilterNotifier>(
+                              onChanged: (value) {
+                                Provider.of<FilterNotifier>(
                                   context,
                                   listen: false,
-                                );
-                                final firebaseData = Provider.of<FirebaseData>(
-                                    context,
-                                    listen: false);
-                                final location = Location();
-                                final locationData =
-                                    await location.getLocation();
-                                final floraListByDist =
-                                    filterNotifier.sortEntityByDist(
-                                        firebaseData.floraMap,
-                                        firebaseData.trails,
-                                        locationData);
-                                final faunaListByDist =
-                                    filterNotifier.sortEntityByDist(
-                                        firebaseData.faunaMap,
-                                        firebaseData.trails,
-                                        locationData);
-                                floraListByDist.sort((a, b) => a.distMin.compareTo(b.distMin));
-                                faunaListByDist.sort((a, b) => a.distMin.compareTo(b.distMin));
-                                filterNotifier.updateLists(
-                                    floraListByDist, faunaListByDist);
-                                filterNotifier.groupValue = value;
+                                ).toggleSortByDist(context);
                               },
                             ),
                           ],
@@ -177,57 +145,87 @@ class FilterDrawer extends StatelessWidget {
 }
 
 class FilterNotifier extends ChangeNotifier {
-  bool _groupValue = true;
-  bool get groupValue => _groupValue;
-  set groupValue(bool groupValue) {
-    _groupValue = groupValue;
+  /// All trails are selected by default
+  List<TrailKey> _selectedTrailKeys = [
+    for (final i in [0, 1, 2]) TrailKey(id: i)
+  ];
+  List<TrailKey> get selectedTrailKeys => _selectedTrailKeys;
+  set selectedTrailKeys(List<TrailKey> selectedTrailKeys) {
+    _selectedTrailKeys = selectedTrailKeys;
     notifyListeners();
   }
 
-  List<Trail> _selectedTrails;
-  List<Trail> get selectedTrails => _selectedTrails;
-  set selectedTrails(List<Trail> selectedTrails) {
-    _selectedTrails = selectedTrails;
+  bool _isSortedByDistance = false;
+  bool get isSortedByDistance => _isSortedByDistance;
+
+  Map<String, List<EntityDistance>> entitiesByDist = {};
+
+  void toggleSortByDist(BuildContext context) async {
+    if (_isSortedByDistance) {
+      entitiesByDist.clear();
+    } else {
+      final firebaseData = Provider.of<FirebaseData>(
+        context,
+        listen: false,
+      );
+      final location = Location();
+      final locationData = await location.getLocation();
+      _sortEntitiesByDist(
+        firebaseData.entities,
+        firebaseData.trails,
+        locationData,
+      );
+    }
     notifyListeners();
+    _isSortedByDistance = !_isSortedByDistance;
   }
 
-  List<Entity> _floraList;
-  List<Entity> get floraList => _floraList;
-  List<Entity> _faunaList;
-  List<Entity> get faunaList => _faunaList;
-  void updateLists(List<Entity> floraList, List<Entity> faunaList) {
-    _floraList = floraList;
-    _faunaList = faunaList;
-    notifyListeners();
-  }
-
-  List<Entity> sortEntityByDist(Map<int, Entity> entityMap,
-      Map<Trail, Map<int, TrailLocation>> trails, LocationData locationData) {
-    final List<Entity> entityListByDist = [];
-    entityMap.forEach((key, value) {
-      for (var location in value.locations) {
-        final trail = trails.keys.firstWhere((trail) {
-          return trail.id == location[0];
-        });
-        final trailLocation = trails[trail][location[1]];
-        final dist = sqrt(
-          pow(
-                trailLocation.coordinates.latitude - locationData.latitude,
-                2,
-              ) +
-              pow(
-                trailLocation.coordinates.longitude - locationData.longitude,
-                2,
-              ),
-        );
-        if (dist < value.distMin) value.distMin = dist;
+  void _sortEntitiesByDist(
+    EntityMap entities,
+    TrailMap trails,
+    LocationData locationData,
+  ) {
+    entities.forEach((category, entityList) {
+      entitiesByDist[category] = [];
+      for (final entity in entityList) {
+        double minDist = double.infinity;
+        for (var location in entity.locations) {
+          final trailLocation = trails[location.trailLocationKey.trailKey]
+              [location.trailLocationKey];
+          final dist = sqrt(
+            pow(
+                  trailLocation.coordinates.latitude - locationData.latitude,
+                  2,
+                ) +
+                pow(
+                  trailLocation.coordinates.longitude - locationData.longitude,
+                  2,
+                ),
+          );
+          if (dist < minDist) minDist = dist;
+        }
+        entitiesByDist[category].add(EntityDistance(
+          key: entity.key,
+          name: entity.name,
+          distance: minDist,
+        ));
       }
-      entityListByDist.add(value);
+      entitiesByDist[category].sort();
     });
-    return entityListByDist;
   }
+}
 
-  void updateSelectedTrailsDiscreetly(List<Trail> selectedTrails) {
-    _selectedTrails = selectedTrails;
+class EntityDistance implements Comparable {
+  final EntityKey key;
+  final String name;
+  final double distance;
+  const EntityDistance({this.key, this.name, this.distance});
+
+  @override
+  int compareTo(other) {
+    final EntityDistance typedOther = other;
+    final int comparison = distance.compareTo(typedOther.distance);
+    if (comparison == 0) return name.compareTo(typedOther.name);
+    return comparison;
   }
 }

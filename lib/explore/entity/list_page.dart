@@ -1,122 +1,183 @@
 import '../../library.dart';
 
 class EntityListPage extends StatelessWidget {
-  final List<Entity> entityList;
+  final bool isFlora;
   final ScrollController scrollController;
+
   const EntityListPage({
     Key key,
-    @required this.entityList,
+    @required this.isFlora,
     @required this.scrollController,
   }) : super(key: key);
-
-  static bool _isValid(Entity entity, String searchTerm) {
-    return !entity.name.split(' ').every((name) {
-          return !name.toLowerCase().startsWith(searchTerm.toLowerCase());
-        }) ||
-        !entity.sciName.split(' ').every((name) {
-          return !name.toLowerCase().startsWith(searchTerm.toLowerCase());
-        });
-  }
 
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final floraIcons = [
-      Icons.nature_people,
-      Icons.filter_vintage,
-      Icons.spa,
-    ];
-    final faunaIcons = [
-      Icons.bug_report,
-      Icons.pets,
-    ];
-    if (entityList.length == 0) return SizedBox.shrink();
-    final isFlora = entityList[0] is Flora;
+    final searchTerm = Provider.of<SearchNotifier>(context).searchTerm;
+    // TODO: Only update when no. of categories change
+    final entities = Provider.of<FirebaseData>(context)?.entities;
+    if (entities == null) return const SizedBox.shrink();
+    final faunaCategories = entities.keys.where((category) {
+      return category != 'flora';
+    }).toList()
+      ..sort();
+    return CustomAnimatedSwitcher(
+      child: CustomScrollView(
+        key: ValueKey(searchTerm),
+        controller: scrollController,
+        physics: NeverScrollableScrollPhysics(),
+        slivers: <Widget>[
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 16,
+            ),
+          ),
+          if (isFlora)
+            EntityCategoryWidget(
+              category: 'flora',
+              scrollController: scrollController,
+            )
+          else
+            for (final category in faunaCategories)
+              EntityCategoryWidget(
+                category: category,
+                scrollController: scrollController,
+              ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: bottomPadding + Sizes.kBottomBarHeight + 8,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EntityCategoryWidget extends StatelessWidget {
+  final String category;
+  final ScrollController scrollController;
+  const EntityCategoryWidget({
+    Key key,
+    @required this.category,
+    @required this.scrollController,
+  }) : super(key: key);
+
+  static const floraIcons = [
+    Icons.nature_people,
+    Icons.filter_vintage,
+    Icons.spa,
+  ];
+  static const faunaIcons = [
+    Icons.bug_report,
+    Icons.pets,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final isFlora = category == 'flora';
     final filterNotifier = Provider.of<FilterNotifier>(context);
-    var selectedTrails = filterNotifier.selectedTrails;
-    if (selectedTrails == null) {
-      selectedTrails = List.from(
-          Provider.of<FirebaseData>(context, listen: false)?.trails?.keys);
-      if (selectedTrails == null) return const SizedBox.shrink();
-      Provider.of<FilterNotifier>(context, listen: false)
-          .updateSelectedTrailsDiscreetly(selectedTrails);
-    }
-    List<Entity> updatedEntityList = entityList;
-    if (!filterNotifier.groupValue)
-      updatedEntityList =
-          isFlora ? filterNotifier.floraList : filterNotifier.faunaList;
-    if (selectedTrails.length != 3) {
-      updatedEntityList = updatedEntityList.where((entity) {
-        return !entity.locations.every((location) {
-          return selectedTrails.every((trail) {
-            return trail.id != location[0];
-          });
-        });
-      }).toList();
-    }
-    return Selector<SearchNotifier, String>(
-      selector: (context, searchNotifier) => searchNotifier.searchTerm,
-      builder: (context, searchTerm, child) {
-        List<Entity> _list = [];
-        if (searchTerm != '*') {
-          updatedEntityList.forEach((entity) {
-            if (_isValid(entity, searchTerm)) {
-              _list.add(entity);
-            }
-          });
-        } else {
-          _list = updatedEntityList;
+    final searchTerm = Provider.of<SearchNotifier>(context).searchTerm;
+    final firebaseData = Provider.of<FirebaseData>(context);
+    var selectedTrailKeys = filterNotifier.selectedTrailKeys;
+    List<Entity> entityList;
+
+    // Sort by distance and does filtering based on trails and search inside as well
+    if (filterNotifier.isSortedByDistance) {
+      entityList = [];
+      for (final entityDistance in filterNotifier.entitiesByDist[category]) {
+        if (selectedTrailKeys.contains(entityDistance.key)) {
+          final entity = firebaseData.entities[category][entityDistance.key.id];
+          if (entity.satisfies(searchTerm)) entityList.add(entity);
         }
-        if (isFlora)
-          floraIcons.shuffle();
-        else
-          faunaIcons.shuffle();
-        return CustomAnimatedSwitcher(
-          child: _list.length == 0
-              ? Padding(
-                  key: ValueKey(searchTerm + '!'),
-                  padding: EdgeInsets.fromLTRB(
-                      0, 16, 0, bottomPadding + Sizes.kBottomBarHeight + 8),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        isFlora ? floraIcons[0] : faunaIcons[0],
-                        size: 64,
-                        color: Theme.of(context).disabledColor,
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        'No matching ${isFlora ? 'flora' : 'fauna'}',
-                        style: TextStyle(
-                          color: Theme.of(context).disabledColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  key: ValueKey(
-                      searchTerm + updatedEntityList.length.toString()),
-                  padding: EdgeInsets.fromLTRB(
-                      0, 16, 0, bottomPadding + Sizes.kBottomBarHeight + 8),
-                  controller: scrollController,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: _list.length,
-                  itemExtent: searchTerm.isEmpty ? 104 : 84,
-                  itemBuilder: (context, index) {
-                    return EntityListRow(
-                      searchTerm: searchTerm,
-                      entity: _list[index],
-                      index: index,
-                      scrollController: scrollController,
-                    );
-                  },
+      }
+    }
+    // Filter by trail, no sorting by distance
+    else {
+      if (selectedTrailKeys.length == 3) {
+        entityList = firebaseData.entities[category].where((entity) {
+          return entity.satisfies(searchTerm);
+        }).toList();
+      } else {
+        entityList = firebaseData.entities[category].where((entity) {
+          return selectedTrailKeys.contains(entity.key) &&
+              entity.satisfies(searchTerm);
+        }).toList();
+      }
+      entityList.sort();
+    }
+
+    if (entityList.isEmpty) {
+      return SliverPadding(
+        padding: EdgeInsets.symmetric(vertical: isFlora ? 24 : 12),
+        sliver: SliverToBoxAdapter(
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 94,
+                alignment: Alignment.center,
+                child: Icon(
+                  isFlora
+                      ? floraIcons[Random().nextInt(floraIcons.length)]
+                      : faunaIcons[Random().nextInt(faunaIcons.length)],
+                  size: 36,
+                  color: Theme.of(context).disabledColor,
                 ),
-        );
-      },
+              ),
+              Text(
+                'No matching $category',
+                style: TextStyle(
+                  color: Theme.of(context).disabledColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (isFlora) {
+      return SliverFixedExtentList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            return EntityListRow(
+              searchTerm: searchTerm,
+              entity: entityList[index],
+              index: index,
+              scrollController: scrollController,
+            );
+          },
+          childCount: entityList.length,
+        ),
+        itemExtent: searchTerm.isEmpty ? 104 : 84,
+      );
+    }
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          if (index == 0) {
+            return Container(
+              height: 48,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                category[0].toUpperCase() + category.substring(1),
+                style: Theme.of(context).textTheme.subtitle,
+              ),
+            );
+          }
+          return SizedBox(
+            height: searchTerm.isEmpty ? 104 : 84,
+            child: EntityListRow(
+              searchTerm: searchTerm,
+              entity: entityList[index - 1],
+              index: index,
+              scrollController: scrollController,
+            ),
+          );
+        },
+        childCount: entityList.length + 1,
+      ),
     );
   }
 }
@@ -139,158 +200,97 @@ class EntityListRow extends StatefulWidget {
 }
 
 class _EntityListRowState extends State<EntityListRow> {
-  final hidden = ValueNotifier(false);
-  Animation<double> secondaryAnimation;
+  EntityMap _entities;
+  double _rowHeight;
+  Animation<double> _bottomSheetAnimation;
+  Tween<double> _topSpaceTween;
+  Tween<double> _contentOffsetTween;
 
-  void listener() {
-    if (secondaryAnimation.isDismissed) {
-      if (mounted) hidden.value = false;
-      secondaryAnimation.removeListener(listener);
-    } else {
-      hidden.value = true;
-    }
+  /// Needed for fauna, where the space for previous categories also\
+  /// needs to be correctly calculated
+  double _previousCategoriesHeight = 0;
+
+  double _getSourceTop() {
+    return _topSpaceTween.evaluate(_bottomSheetAnimation) +
+        _rowHeight * widget.index -
+        widget.scrollController.offset +
+        _previousCategoriesHeight;
   }
 
-  @override
-  void dispose() {
-    hidden.dispose();
-    super.dispose();
+  double _getContentOffset() {
+    return _contentOffsetTween.evaluate(_bottomSheetAnimation);
   }
 
   @override
   Widget build(BuildContext context) {
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
-    final bottomSheetNotifier =
-        Provider.of<BottomSheetNotifier>(context, listen: false);
-    final rowHeight = widget.searchTerm.isEmpty ? 104.0 : 84.0;
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-    final thumbnail = ClipRRect(
-      borderRadius: BorderRadius.circular(32),
-      child: CustomImage(
-        widget.entity.smallImage,
-        height: 64,
-        width: 64,
-        placeholderColor: Theme.of(context).dividerColor,
-        fadeInDuration: const Duration(milliseconds: 300),
-      ),
+
+    _rowHeight = widget.searchTerm.isEmpty ? 104 : 84;
+    _entities = Provider.of<FirebaseData>(context).entities;
+    if (widget.entity.key.category != 'flora') {
+      _previousCategoriesHeight += 48;
+      final faunaCategories = _entities.keys.where((category) {
+        return category != 'flora';
+      }).toList()
+        ..sort();
+      final previousCategories = faunaCategories.takeWhile((category) {
+        return category != widget.entity.key.category;
+      });
+      for (final category in previousCategories) {
+        _previousCategoriesHeight += 48 + _rowHeight * _entities[category].length;
+      }
+    }
+
+    _bottomSheetAnimation = Tween<double>(
+      begin: 0,
+      end: 1 / (height - Sizes.kBottomHeight),
+    ).animate(
+      Provider.of<BottomSheetNotifier>(context, listen: false).animation,
     );
-    final rightColumn = Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            widget.entity.name,
-            style: Theme.of(context).textTheme.subhead.copyWith(
-                  fontSize: 16,
-                ),
-          ),
-          Text(
-            widget.entity.description,
-            style: Theme.of(context).textTheme.caption,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 3,
-          ),
-          const SizedBox(
-            height: 4,
-          ),
-        ],
-      ),
+    _topSpaceTween = Tween(
+      begin: Sizes.hEntityButtonHeightCollapsed + 24 + topPadding,
+      end: Sizes.kBottomHeight - Sizes.hBottomBarHeight + 8,
     );
-    final infoRow = InfoRow(
-      height: 84,
-      image: widget.entity.smallImage,
-      title: widget.entity.name,
-      subtitle: widget.entity.sciName,
-      italicised: true,
-      tapToAnimate: false,
+    _contentOffsetTween = Tween(
+      begin: topPadding + 16 - (_rowHeight - 64) / 2,
+      end: 16 - (_rowHeight - 64) / 2,
     );
+
+    final heroTag = widget.entity.key;
     return InkWell(
-      child: ValueListenableBuilder<bool>(
-        valueListenable: hidden,
-        builder: (context, value, child) {
-          return Visibility(
-            visible: !value,
-            child: child,
-          );
-        },
-        child: widget.searchTerm.isEmpty
-            ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: Row(
-                  children: <Widget>[
-                    thumbnail,
-                    const SizedBox(
-                      width: 16,
-                    ),
-                    rightColumn,
-                  ],
-                ),
-              )
-            : infoRow,
+      child: InfoRow(
+        height: _rowHeight,
+        heroTag: heroTag,
+        image: widget.entity.smallImage,
+        title: widget.entity.name,
+        titleStyle: widget.searchTerm.isEmpty
+            ? Theme.of(context).textTheme.subhead.copyWith(
+                  fontSize: 16,
+                )
+            : null,
+        subtitle: widget.searchTerm.isEmpty
+            ? widget.entity.description
+            : widget.entity.sciName,
+        subtitleStyle: widget.searchTerm.isEmpty
+            ? null
+            : Theme.of(context).textTheme.overline,
+        tapToAnimate: false,
+        isThreeLine: widget.searchTerm.isEmpty,
       ),
       onTap: () {
-        final oldChild = widget.searchTerm.isEmpty
-            ? Container(
-                height: rowHeight,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: Row(
-                  children: <Widget>[
-                    const SizedBox(
-                      width: 80,
-                    ),
-                    rightColumn,
-                  ],
-                ),
-              )
-            : null;
-        final persistentOldChild = widget.searchTerm.isEmpty
-            ? Container(
-                height: rowHeight,
-                padding: const EdgeInsets.only(left: 14),
-                alignment: Alignment.centerLeft,
-                child: thumbnail,
-              )
-            : infoRow;
-        final startContentOffset =
-            ValueNotifier(Offset(0, (rowHeight - 64) / 2));
-        final endContentOffset = ValueNotifier(Offset(0, topPadding + 16));
-        final sourceRect = Rect.fromLTWH(0, 69, width, rowHeight);
-        final anim = Tween<double>(
-          begin: 0,
-          end: 1 / (height - Sizes.kBottomHeight),
-        ).animate(bottomSheetNotifier.animation);
-        final topSpace = Tween(
-          begin: Sizes.hEntityButtonHeightCollapsed + 24 + topPadding,
-          end: Sizes.kBottomHeight - Sizes.hBottomBarHeight + 8,
-        ).animate(anim);
-        secondaryAnimation = ModalRoute.of(context).secondaryAnimation
-          ..addListener(listener);
         Provider.of<AppNotifier>(context, listen: false).push(
           context: context,
           routeInfo: RouteInfo(
             name: widget.entity.name,
-            data: widget.entity,
-            route: ExpandPageRoute(
+            dataKey: widget.entity.key,
+            route: SlidingUpPageRoute(
+              getSourceTop: _getSourceTop,
+              sourceHeight: _rowHeight,
+              getContentOffset: _getContentOffset,
               builder: (context) => EntityDetailsPage(
-                endContentOffset: endContentOffset,
-                entity: widget.entity,
-                hideInfoRowOnExpand: widget.searchTerm.isNotEmpty,
+                entityKey: widget.entity.key,
               ),
-              sourceRect: sourceRect,
-              oldChild: oldChild,
-              startContentOffset: startContentOffset,
-              endContentOffset: endContentOffset,
-              persistentOldChild: persistentOldChild,
-              rowOffset: rowHeight * widget.index,
-              oldScrollController: widget.scrollController,
-              topSpace: topSpace,
-              disappear: () {
-                return appNotifier.routes.isEmpty &&
-                    bottomSheetNotifier.animation.value > 8;
-              },
             ),
           ),
         );

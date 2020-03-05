@@ -264,7 +264,8 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
     final appNotifier = Provider.of<AppNotifier>(context, listen: false);
     if (MediaQuery.of(context).orientation == Orientation.landscape &&
         appNotifier.routes.isNotEmpty &&
-        appNotifier.routes.last.data is TrailLocationOverviewPage) {
+        appNotifier.routes.last.dataKey is TrailLocationKey) {
+          // TODO: revisit this
       animateTo(0);
     }
     if (!_init) {

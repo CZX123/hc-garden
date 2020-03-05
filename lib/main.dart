@@ -79,65 +79,8 @@ class _HcGardenAppState extends State<HcGardenApp> {
       if (event.snapshot.value == null) {
         throw Exception('Value is empty!');
       }
-
-      // Add list of entities
-      final Map parsedJson = event.snapshot.value;
-      Map<int, Flora> floraMap = {};
-      Map<int, Fauna> faunaMap = {};
-      parsedJson['flora&fauna'].forEach((key, value) {
-        if (key.contains('flora')) {
-          final flora = Flora.fromJson(key, value);
-          if (flora.isValid) floraMap[flora.id] = flora;
-        } else {
-          final fauna = Fauna.fromJson(key, value);
-          if (fauna.isValid) faunaMap[fauna.id] = fauna;
-        }
-      });
-
-      // Add trails and locations
-      Map<Trail, Map<int, TrailLocation>> trails = {};
-      parsedJson['map'].forEach((key, value) {
-        final trail = Trail.fromJson(key, value);
-        if (trail.isValid) {
-          trails[trail] = {};
-          value['route'].forEach((key, value) {
-            final location = TrailLocation.fromJson(
-              key,
-              value,
-              trail: trail,
-              floraMap: floraMap,
-              faunaMap: faunaMap,
-            );
-            if (location.isValid) trails[trail][location.id] = location;
-          });
-        }
-      });
-
-      // Add historical data
-      List<HistoricalData> historicalDataList = [];
-      parsedJson['historical'].forEach((key, value) {
-        final historicalData = HistoricalData.fromJson(key, value);
-        if (historicalData.isValid) historicalDataList.add(historicalData);
-      });
-      historicalDataList.sort((a, b) => a.id.compareTo(b.id));
-
-      // Add AboutPage data
-      List<AboutPageData> aboutPageDataList = [];
-      parsedJson['about'].forEach((key, value) {
-        final aboutPageData = AboutPageData.fromJson(key, value);
-        if (aboutPageData.isValid) aboutPageDataList.add(aboutPageData);
-      });
-      aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
-
-      // TODO: handle cases of invalid data
-      // i.e. filter those whose data fields are null out
-      return FirebaseData(
-        floraMap: floraMap,
-        faunaMap: faunaMap,
-        trails: trails,
-        historicalDataList: historicalDataList,
-        aboutPageDataList: aboutPageDataList,
-      );
+      final Map data = event.snapshot.value;
+      return FirebaseData.fromJson(data);
     });
   }
 
@@ -187,13 +130,6 @@ class _HcGardenAppState extends State<HcGardenApp> {
         ),
         // Provider for all data from Firebase
         StreamProvider.value(
-          initialData: FirebaseData(
-            floraMap: {},
-            faunaMap: {},
-            trails: {},
-            historicalDataList: [],
-            aboutPageDataList: [],
-          ),
           value: _stream,
         ),
       ],
