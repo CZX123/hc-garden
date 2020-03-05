@@ -534,10 +534,10 @@ class AboutPageData {
   bool isExpanded = false;
   AboutPageData({this.body, this.id, this.quote, this.title, this.isExpanded});
 
-  factory AboutPageData.fromJson(String key, dynamic data) {
+  factory AboutPageData.fromJson(int key, dynamic data) {
     return AboutPageData(
       body: data['body'],
-      id: data['id'],
+      id: key,
       quote: data['quote'],
       title: data['title'],
       isExpanded: false,

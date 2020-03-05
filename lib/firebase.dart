@@ -110,11 +110,11 @@ class FirebaseData {
     historicalDataList.sort((a, b) => a.id.compareTo(b.id));
 
     // Add AboutPage data
-    // _getMap(data['about']).forEach((key, value) {
-    //   final aboutPageData = AboutPageData.fromJson(key, value);
-    //   if (aboutPageData.isValid) aboutPageDataList.add(aboutPageData);
-    // });
-    // aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
+    _getMap(data['about']).forEach((key, value) {
+      final aboutPageData = AboutPageData.fromJson(key, value);
+      if (aboutPageData.isValid) aboutPageDataList.add(aboutPageData);
+    });
+    aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
 
     return FirebaseData(
       entities: entities,
