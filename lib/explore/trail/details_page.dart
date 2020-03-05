@@ -180,9 +180,9 @@ class _LocationListRowState extends State<LocationListRow> {
     ).animate(
       Provider.of<BottomSheetNotifier>(context, listen: false).animation,
     );
-    _topSpaceTween = Tween(
-      begin: Sizes.hEntityButtonHeightCollapsed + 24 + topPadding,
-      end: Sizes.kBottomHeight - Sizes.hBottomBarHeight + 8,
+    _topSpaceTween = Tween<double>(
+      begin: 72 + topPadding,
+      end: 72,
     );
     _contentOffsetTween = Tween(
       begin: topPadding + 16 - (_rowHeight - 64) / 2,

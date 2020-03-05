@@ -240,36 +240,35 @@ class InverseMaterialPointArcTween extends Tween<Offset> {
 
     // An explanation with a diagram can be found at https://goo.gl/vMSdRg
     final Offset delta = end - begin;
-    final double deltaY = delta.dy.abs();
     final double deltaX = delta.dx.abs();
+    final double deltaY = delta.dy.abs();
     final double distanceFromAtoB = delta.distance;
-    final Offset c = Offset(end.dy, begin.dx);
+    final Offset c = Offset(end.dx, begin.dy);
 
     double sweepAngle() => 2.0 * asin(distanceFromAtoB / (2.0 * _radius));
 
-    if (deltaY > _kOnAxisDelta && deltaX > _kOnAxisDelta) {
-      if (deltaY < deltaX) {
-        _radius =
-            distanceFromAtoB * distanceFromAtoB / (c - begin).distance / 2.0;
-        _center = Offset(end.dy + _radius * (begin.dy - end.dy).sign, end.dx);
-        if (begin.dy < end.dy) {
-          _beginAngle = sweepAngle() * (begin.dx - end.dx).sign;
+    if (deltaX > _kOnAxisDelta && deltaY > _kOnAxisDelta) {
+      if (deltaX < deltaY) {
+        // _radius = distanceFromAtoB * distanceFromAtoB / (c - begin).distance / 2.0;
+        _radius = 0;
+        _center = Offset(begin.dx + _radius * (end.dx - begin.dx).sign, begin.dy);
+        if (begin.dx > end.dx) {
+          _beginAngle = sweepAngle() * (begin.dy - end.dy).sign;
           _endAngle = 0.0;
         } else {
-          _beginAngle = pi + sweepAngle() * (end.dx - begin.dx).sign;
+          _beginAngle = pi + sweepAngle() * (end.dy - begin.dy).sign;
           _endAngle = pi;
         }
       } else {
-        _radius =
-            distanceFromAtoB * distanceFromAtoB / (c - end).distance / 2.0;
-        _center =
-            Offset(begin.dy, begin.dx + (end.dx - begin.dx).sign * _radius);
-        if (begin.dx < end.dx) {
+        // _radius = distanceFromAtoB * distanceFromAtoB / (c - end).distance / 2.0;
+        _radius = 0;
+        _center = Offset(end.dx, end.dy + (begin.dy - end.dy).sign * _radius);
+        if (begin.dy > end.dy) {
           _beginAngle = -pi / 2.0;
-          _endAngle = _beginAngle + sweepAngle() * (end.dy - begin.dy).sign;
+          _endAngle = _beginAngle + sweepAngle() * (end.dx - begin.dx).sign;
         } else {
           _beginAngle = pi / 2.0;
-          _endAngle = _beginAngle + sweepAngle() * (begin.dy - end.dy).sign;
+          _endAngle = _beginAngle + sweepAngle() * (begin.dx - end.dx).sign;
         }
       }
       assert(_beginAngle != null);

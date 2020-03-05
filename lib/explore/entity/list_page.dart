@@ -12,15 +12,59 @@ class EntityListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final searchTerm = Provider.of<SearchNotifier>(context).searchTerm;
-    // TODO: Only update when no. of categories change
+    // TODO: Only update when entities change
     final entities = Provider.of<FirebaseData>(context)?.entities;
     if (entities == null) return const SizedBox.shrink();
-    final faunaCategories = entities.keys.where((category) {
-      return category != 'flora';
-    }).toList()
-      ..sort();
+
+    List<String> categories = [];
+    if (isFlora) {
+      categories.add('flora');
+    } else {
+      categories = entities.keys.where((category) {
+        return category != 'flora';
+      }).toList()
+        ..sort();
+    }
+
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final filterNotifier = Provider.of<FilterNotifier>(context);
+    final searchTerm = Provider.of<SearchNotifier>(context).searchTerm;
+    final firebaseData = Provider.of<FirebaseData>(context);
+    var selectedTrailKeys = filterNotifier.selectedTrailKeys;
+    final newEntityMap = EntityMap();
+
+    for (final category in categories) {
+      // Sort by distance and does filtering based on trails and search inside as well
+      if (filterNotifier.isSortedByDistance) {
+        newEntityMap[category] = [];
+        for (final entityDistance in filterNotifier.entitiesByDist[category]) {
+          if (selectedTrailKeys.contains(entityDistance.key)) {
+            final entity =
+                firebaseData.entities[category][entityDistance.key.id];
+            if (entity.satisfies(searchTerm))
+              newEntityMap[category].add(entity);
+          }
+        }
+      }
+
+      // Filter by trail, no sorting by distance
+      else {
+        if (selectedTrailKeys.length == 3) {
+          newEntityMap[category] =
+              firebaseData.entities[category].where((entity) {
+            return entity.satisfies(searchTerm);
+          }).toList();
+        } else {
+          newEntityMap[category] =
+              firebaseData.entities[category].where((entity) {
+            return selectedTrailKeys.contains(entity.key) &&
+                entity.satisfies(searchTerm);
+          }).toList();
+        }
+        newEntityMap[category].sort();
+      }
+    }
+
     return CustomAnimatedSwitcher(
       child: CustomScrollView(
         key: ValueKey(searchTerm),
@@ -32,17 +76,13 @@ class EntityListPage extends StatelessWidget {
               height: 16,
             ),
           ),
-          if (isFlora)
-            EntityCategoryWidget(
-              category: 'flora',
+          for (final category in categories) ...[
+            if (!isFlora) SliverEntityHeaderSpace(),
+            SliverEntityList(
+              entities: newEntityMap[category],
               scrollController: scrollController,
-            )
-          else
-            for (final category in faunaCategories)
-              EntityCategoryWidget(
-                category: category,
-                scrollController: scrollController,
-              ),
+            ),
+          ],
           SliverToBoxAdapter(
             child: SizedBox(
               height: bottomPadding + Sizes.kBottomBarHeight + 8,
@@ -54,10 +94,132 @@ class EntityListPage extends StatelessWidget {
   }
 }
 
-class EntityCategoryWidget extends StatelessWidget {
+class FaunaListCategories extends StatefulWidget {
+  final ScrollController scrollController;
+  final List<String> categories;
+  const FaunaListCategories({
+    Key key,
+    @required this.scrollController,
+    @required this.categories,
+  }) : super(key: key);
+
+  @override
+  _FaunaListCategoriesState createState() => _FaunaListCategoriesState();
+}
+
+class _FaunaListCategoriesState extends State<FaunaListCategories> {
+  final List<double> _breakPoints = [0];
+
+  @override
+  void initState() {
+    super.initState();
+    final entities = Provider.of<FirebaseData>(context, listen: false).entities;
+    for (final category in widget.categories) {
+      // _breakPoints.add(48 + entities.)
+    }
+  }
+
+  @override
+  void didUpdateWidget(FaunaListCategories oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Row(
+            children: <Widget>[
+              // for (final category in widget.categories) 
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class SliverEntityHeaderSpace extends StatelessWidget {
+  const SliverEntityHeaderSpace({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 48,
+    );
+  }
+}
+
+class EntityCategoryButton extends StatelessWidget {
+  static const height = 36.0;
+
+  final String title;
+  final VoidCallback onTap;
+
+  const EntityCategoryButton({
+    Key key,
+    @required this.title,
+    @required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        child: Container(
+          height: height,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          alignment: Alignment.centerLeft,
+          child: Text(
+            title[0].toUpperCase() + title.substring(1),
+            style: Theme.of(context).textTheme.subtitle,
+          ),
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class SliverEntityList extends StatelessWidget {
+  final List<Entity> entities;
+  final ScrollController scrollController;
+  const SliverEntityList({
+    Key key,
+    @required this.entities,
+    @required this.scrollController,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final searchTerm = Provider.of<SearchNotifier>(
+      context,
+      listen: false,
+    ).searchTerm;
+    return SliverFixedExtentList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return EntityListRow(
+            entity: entities[index],
+            index: index,
+            scrollController: scrollController,
+          );
+        },
+        childCount: entities.length,
+      ),
+      itemExtent: searchTerm.isEmpty ? 104 : 84,
+    );
+  }
+}
+
+class EntityCategorySliver extends StatelessWidget {
   final String category;
   final ScrollController scrollController;
-  const EntityCategoryWidget({
+  const EntityCategorySliver({
     Key key,
     @required this.category,
     @required this.scrollController,
@@ -92,6 +254,7 @@ class EntityCategoryWidget extends StatelessWidget {
         }
       }
     }
+
     // Filter by trail, no sorting by distance
     else {
       if (selectedTrailKeys.length == 3) {
@@ -141,7 +304,6 @@ class EntityCategoryWidget extends StatelessWidget {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             return EntityListRow(
-              searchTerm: searchTerm,
               entity: entityList[index],
               index: index,
               scrollController: scrollController,
@@ -169,7 +331,6 @@ class EntityCategoryWidget extends StatelessWidget {
           return SizedBox(
             height: searchTerm.isEmpty ? 104 : 84,
             child: EntityListRow(
-              searchTerm: searchTerm,
               entity: entityList[index - 1],
               index: index,
               scrollController: scrollController,
@@ -183,13 +344,11 @@ class EntityCategoryWidget extends StatelessWidget {
 }
 
 class EntityListRow extends StatefulWidget {
-  final String searchTerm;
   final Entity entity;
   final int index;
   final ScrollController scrollController; // For getting scroll position
   const EntityListRow({
     Key key,
-    @required this.searchTerm,
     @required this.entity,
     @required this.index,
     @required this.scrollController,
@@ -226,7 +385,11 @@ class _EntityListRowState extends State<EntityListRow> {
     final topPadding = MediaQuery.of(context).padding.top;
     final height = MediaQuery.of(context).size.height;
 
-    _rowHeight = widget.searchTerm.isEmpty ? 104 : 84;
+    final searchTerm = Provider.of<SearchNotifier>(
+      context,
+      listen: false,
+    ).searchTerm;
+    _rowHeight = searchTerm.isEmpty ? 104 : 84;
     _entities = Provider.of<FirebaseData>(context).entities;
     if (widget.entity.key.category != 'flora') {
       _previousCategoriesHeight += 48;
@@ -238,7 +401,8 @@ class _EntityListRowState extends State<EntityListRow> {
         return category != widget.entity.key.category;
       });
       for (final category in previousCategories) {
-        _previousCategoriesHeight += 48 + _rowHeight * _entities[category].length;
+        _previousCategoriesHeight +=
+            48 + _rowHeight * _entities[category].length;
       }
     }
 
@@ -264,19 +428,18 @@ class _EntityListRowState extends State<EntityListRow> {
         heroTag: heroTag,
         image: widget.entity.smallImage,
         title: widget.entity.name,
-        titleStyle: widget.searchTerm.isEmpty
+        titleStyle: searchTerm.isEmpty
             ? Theme.of(context).textTheme.subhead.copyWith(
                   fontSize: 16,
                 )
             : null,
-        subtitle: widget.searchTerm.isEmpty
+        subtitle: searchTerm.isEmpty
             ? widget.entity.description
             : widget.entity.sciName,
-        subtitleStyle: widget.searchTerm.isEmpty
-            ? null
-            : Theme.of(context).textTheme.overline,
+        subtitleStyle:
+            searchTerm.isEmpty ? null : Theme.of(context).textTheme.overline,
         tapToAnimate: false,
-        isThreeLine: widget.searchTerm.isEmpty,
+        isThreeLine: searchTerm.isEmpty,
       ),
       onTap: () {
         Provider.of<AppNotifier>(context, listen: false).push(
