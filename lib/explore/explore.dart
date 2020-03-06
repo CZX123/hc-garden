@@ -18,7 +18,7 @@ class _ExploreBodyState extends State<ExploreBody> {
   List<NavigatorObserver> _navigatorObservers = [];
 
   RectTween _createRectTween(Rect begin, Rect end) {
-    return FastOutSlowInRectTween.inverse(begin: begin, end: end);
+    return MaterialRectArcTween(begin: begin, end: end);
   }
 
   @override

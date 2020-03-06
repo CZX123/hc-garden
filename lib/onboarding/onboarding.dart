@@ -119,6 +119,12 @@ class OnboardingPageOne extends StatelessWidget {
                 ),
           ),
           Text('HC Garden is an amazing app!'),
+          AnimatedBuilder(
+            animation: pageController,
+            builder: (context, child) {
+              return Text('${pageController.page}');
+            },
+          ),
         ],
       ),
     );
