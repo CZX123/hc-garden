@@ -61,7 +61,10 @@ class InfoRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Row(
           children: <Widget>[
-            if (heroTag != null) Hero(tag: heroTag, child: avatar) else avatar,
+            if (heroTag != null)
+              Hero(tag: heroTag, child: avatar)
+            else
+              avatar,
             const SizedBox(
               width: 16,
             ),
@@ -80,7 +83,7 @@ class InfoRow extends StatelessWidget {
                     subtitle,
                     style: subtitleStyle ?? Theme.of(context).textTheme.caption,
                     overflow: TextOverflow.ellipsis,
-                    maxLines: isThreeLine ?  3 : 1,
+                    maxLines: isThreeLine ? 3 : 1,
                   ),
                   const SizedBox(
                     height: 2,

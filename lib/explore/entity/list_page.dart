@@ -38,12 +38,13 @@ class EntityListPage extends StatelessWidget {
       if (filterNotifier.isSortedByDistance) {
         newEntityMap[category] = [];
         for (final entityDistance in filterNotifier.entitiesByDist[category]) {
-          if (selectedTrailKeys.contains(entityDistance.key)) {
-            final entity =
-                firebaseData.entities[category][entityDistance.key.id];
-            if (entity.satisfies(searchTerm))
-              newEntityMap[category].add(entity);
-          }
+          final entity = firebaseData.entities[category][entityDistance.key.id];
+          if (!selectedTrailKeys.every((trailKey) {
+                return entity.locations.every((location) {
+                  return location.trailLocationKey.trailKey != trailKey;
+                });
+              }) &&
+              entity.satisfies(searchTerm)) newEntityMap[category].add(entity);
         }
       }
 
@@ -57,7 +58,11 @@ class EntityListPage extends StatelessWidget {
         } else {
           newEntityMap[category] =
               firebaseData.entities[category].where((entity) {
-            return selectedTrailKeys.contains(entity.key) &&
+            return !selectedTrailKeys.every((trailKey) {
+                  return entity.locations.every((location) {
+                    return location.trailLocationKey.trailKey != trailKey;
+                  });
+                }) &&
                 entity.satisfies(searchTerm);
           }).toList();
         }
@@ -65,28 +70,41 @@ class EntityListPage extends StatelessWidget {
       }
     }
 
+    final categoriesEntityCount = newEntityMap.map((category, entities) {
+      return MapEntry(category, entities.length);
+    });
+
     return CustomAnimatedSwitcher(
-      child: CustomScrollView(
-        key: ValueKey(searchTerm),
-        controller: scrollController,
-        physics: NeverScrollableScrollPhysics(),
-        slivers: <Widget>[
-          const SliverToBoxAdapter(
-            child: SizedBox(
-              height: 16,
-            ),
+      child: Stack(
+        children: <Widget>[
+          CustomScrollView(
+            key: ValueKey(searchTerm),
+            controller: scrollController,
+            physics: NeverScrollableScrollPhysics(),
+            slivers: <Widget>[
+              const SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 16,
+                ),
+              ),
+              for (final category in categories) ...[
+                if (!isFlora) SliverEntityHeaderSpace(),
+                SliverEntityList(
+                  categoriesEntityCount: categoriesEntityCount,
+                  entities: newEntityMap[category],
+                  scrollController: scrollController,
+                ),
+              ],
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: bottomPadding + Sizes.kBottomBarHeight + 8,
+                ),
+              ),
+            ],
           ),
-          for (final category in categories) ...[
-            if (!isFlora) SliverEntityHeaderSpace(),
-            SliverEntityList(
-              entities: newEntityMap[category],
-              scrollController: scrollController,
-            ),
-          ],
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: bottomPadding + Sizes.kBottomBarHeight + 8,
-            ),
+          if (!isFlora) FaunaListCategories(
+            scrollController: scrollController,
+            categoriesEntityCount: categoriesEntityCount,
           ),
         ],
       ),
@@ -96,11 +114,11 @@ class EntityListPage extends StatelessWidget {
 
 class FaunaListCategories extends StatefulWidget {
   final ScrollController scrollController;
-  final List<String> categories;
+  final Map<String, int> categoriesEntityCount;
   const FaunaListCategories({
     Key key,
     @required this.scrollController,
-    @required this.categories,
+    @required this.categoriesEntityCount,
   }) : super(key: key);
 
   @override
@@ -113,15 +131,13 @@ class _FaunaListCategoriesState extends State<FaunaListCategories> {
   @override
   void initState() {
     super.initState();
-    final entities = Provider.of<FirebaseData>(context, listen: false).entities;
-    for (final category in widget.categories) {
+    for (final category in widget.categoriesEntityCount.keys) {
       // _breakPoints.add(48 + entities.)
     }
   }
 
   @override
   void didUpdateWidget(FaunaListCategories oldWidget) {
-    // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
   }
 
@@ -133,7 +149,11 @@ class _FaunaListCategoriesState extends State<FaunaListCategories> {
           alignment: Alignment.bottomCenter,
           child: Row(
             children: <Widget>[
-              // for (final category in widget.categories) 
+              for (final category in widget.categoriesEntityCount.keys)
+                EntityCategoryButton(
+                  title: category,
+                  onTap: () {},
+                ),
             ],
           ),
         ),
@@ -147,8 +167,10 @@ class SliverEntityHeaderSpace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
-      height: 48,
+    return const SliverToBoxAdapter(
+      child: SizedBox(
+        height: 48,
+      ),
     );
   }
 }
@@ -186,10 +208,12 @@ class EntityCategoryButton extends StatelessWidget {
 }
 
 class SliverEntityList extends StatelessWidget {
+  final Map<String, int> categoriesEntityCount;
   final List<Entity> entities;
   final ScrollController scrollController;
   const SliverEntityList({
     Key key,
+    @required this.categoriesEntityCount,
     @required this.entities,
     @required this.scrollController,
   }) : super(key: key);
@@ -204,6 +228,7 @@ class SliverEntityList extends StatelessWidget {
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           return EntityListRow(
+            categoriesEntityCount: categoriesEntityCount,
             entity: entities[index],
             index: index,
             scrollController: scrollController,
@@ -216,139 +241,141 @@ class SliverEntityList extends StatelessWidget {
   }
 }
 
-class EntityCategorySliver extends StatelessWidget {
-  final String category;
-  final ScrollController scrollController;
-  const EntityCategorySliver({
-    Key key,
-    @required this.category,
-    @required this.scrollController,
-  }) : super(key: key);
+// class EntityCategorySliver extends StatelessWidget {
+//   final String category;
+//   final ScrollController scrollController;
+//   const EntityCategorySliver({
+//     Key key,
+//     @required this.category,
+//     @required this.scrollController,
+//   }) : super(key: key);
 
-  static const floraIcons = [
-    Icons.nature_people,
-    Icons.filter_vintage,
-    Icons.spa,
-  ];
-  static const faunaIcons = [
-    Icons.bug_report,
-    Icons.pets,
-  ];
+//   static const floraIcons = [
+//     Icons.nature_people,
+//     Icons.filter_vintage,
+//     Icons.spa,
+//   ];
+//   static const faunaIcons = [
+//     Icons.bug_report,
+//     Icons.pets,
+//   ];
 
-  @override
-  Widget build(BuildContext context) {
-    final isFlora = category == 'flora';
-    final filterNotifier = Provider.of<FilterNotifier>(context);
-    final searchTerm = Provider.of<SearchNotifier>(context).searchTerm;
-    final firebaseData = Provider.of<FirebaseData>(context);
-    var selectedTrailKeys = filterNotifier.selectedTrailKeys;
-    List<Entity> entityList;
+//   @override
+//   Widget build(BuildContext context) {
+//     final isFlora = category == 'flora';
+//     final filterNotifier = Provider.of<FilterNotifier>(context);
+//     final searchTerm = Provider.of<SearchNotifier>(context).searchTerm;
+//     final firebaseData = Provider.of<FirebaseData>(context);
+//     var selectedTrailKeys = filterNotifier.selectedTrailKeys;
+//     List<Entity> entityList;
 
-    // Sort by distance and does filtering based on trails and search inside as well
-    if (filterNotifier.isSortedByDistance) {
-      entityList = [];
-      for (final entityDistance in filterNotifier.entitiesByDist[category]) {
-        if (selectedTrailKeys.contains(entityDistance.key)) {
-          final entity = firebaseData.entities[category][entityDistance.key.id];
-          if (entity.satisfies(searchTerm)) entityList.add(entity);
-        }
-      }
-    }
+//     // Sort by distance and does filtering based on trails and search inside as well
+//     if (filterNotifier.isSortedByDistance) {
+//       entityList = [];
+//       for (final entityDistance in filterNotifier.entitiesByDist[category]) {
+//         if (selectedTrailKeys.contains(entityDistance.key)) {
+//           final entity = firebaseData.entities[category][entityDistance.key.id];
+//           if (entity.satisfies(searchTerm)) entityList.add(entity);
+//         }
+//       }
+//     }
 
-    // Filter by trail, no sorting by distance
-    else {
-      if (selectedTrailKeys.length == 3) {
-        entityList = firebaseData.entities[category].where((entity) {
-          return entity.satisfies(searchTerm);
-        }).toList();
-      } else {
-        entityList = firebaseData.entities[category].where((entity) {
-          return selectedTrailKeys.contains(entity.key) &&
-              entity.satisfies(searchTerm);
-        }).toList();
-      }
-      entityList.sort();
-    }
+//     // Filter by trail, no sorting by distance
+//     else {
+//       if (selectedTrailKeys.length == 3) {
+//         entityList = firebaseData.entities[category].where((entity) {
+//           return entity.satisfies(searchTerm);
+//         }).toList();
+//       } else {
+//         entityList = firebaseData.entities[category].where((entity) {
+//           return selectedTrailKeys.contains(entity.key) &&
+//               entity.satisfies(searchTerm);
+//         }).toList();
+//       }
+//       entityList.sort();
+//     }
 
-    if (entityList.isEmpty) {
-      return SliverPadding(
-        padding: EdgeInsets.symmetric(vertical: isFlora ? 24 : 12),
-        sliver: SliverToBoxAdapter(
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: 94,
-                alignment: Alignment.center,
-                child: Icon(
-                  isFlora
-                      ? floraIcons[Random().nextInt(floraIcons.length)]
-                      : faunaIcons[Random().nextInt(faunaIcons.length)],
-                  size: 36,
-                  color: Theme.of(context).disabledColor,
-                ),
-              ),
-              Text(
-                'No matching $category',
-                style: TextStyle(
-                  color: Theme.of(context).disabledColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+//     if (entityList.isEmpty) {
+//       return SliverPadding(
+//         padding: EdgeInsets.symmetric(vertical: isFlora ? 24 : 12),
+//         sliver: SliverToBoxAdapter(
+//           child: Row(
+//             children: <Widget>[
+//               Container(
+//                 width: 94,
+//                 alignment: Alignment.center,
+//                 child: Icon(
+//                   isFlora
+//                       ? floraIcons[Random().nextInt(floraIcons.length)]
+//                       : faunaIcons[Random().nextInt(faunaIcons.length)],
+//                   size: 36,
+//                   color: Theme.of(context).disabledColor,
+//                 ),
+//               ),
+//               Text(
+//                 'No matching $category',
+//                 style: TextStyle(
+//                   color: Theme.of(context).disabledColor,
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       );
+//     }
 
-    if (isFlora) {
-      return SliverFixedExtentList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            return EntityListRow(
-              entity: entityList[index],
-              index: index,
-              scrollController: scrollController,
-            );
-          },
-          childCount: entityList.length,
-        ),
-        itemExtent: searchTerm.isEmpty ? 104 : 84,
-      );
-    }
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          if (index == 0) {
-            return Container(
-              height: 48,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                category[0].toUpperCase() + category.substring(1),
-                style: Theme.of(context).textTheme.subtitle,
-              ),
-            );
-          }
-          return SizedBox(
-            height: searchTerm.isEmpty ? 104 : 84,
-            child: EntityListRow(
-              entity: entityList[index - 1],
-              index: index,
-              scrollController: scrollController,
-            ),
-          );
-        },
-        childCount: entityList.length + 1,
-      ),
-    );
-  }
-}
+//     if (isFlora) {
+//       return SliverFixedExtentList(
+//         delegate: SliverChildBuilderDelegate(
+//           (context, index) {
+//             return EntityListRow(
+//               entity: entityList[index],
+//               index: index,
+//               scrollController: scrollController,
+//             );
+//           },
+//           childCount: entityList.length,
+//         ),
+//         itemExtent: searchTerm.isEmpty ? 104 : 84,
+//       );
+//     }
+//     return SliverList(
+//       delegate: SliverChildBuilderDelegate(
+//         (context, index) {
+//           if (index == 0) {
+//             return Container(
+//               height: 48,
+//               padding: const EdgeInsets.symmetric(horizontal: 14),
+//               alignment: Alignment.centerLeft,
+//               child: Text(
+//                 category[0].toUpperCase() + category.substring(1),
+//                 style: Theme.of(context).textTheme.subtitle,
+//               ),
+//             );
+//           }
+//           return SizedBox(
+//             height: searchTerm.isEmpty ? 104 : 84,
+//             child: EntityListRow(
+//               entity: entityList[index - 1],
+//               index: index,
+//               scrollController: scrollController,
+//             ),
+//           );
+//         },
+//         childCount: entityList.length + 1,
+//       ),
+//     );
+//   }
+// }
 
 class EntityListRow extends StatefulWidget {
+  final Map<String, int> categoriesEntityCount;
   final Entity entity;
   final int index;
   final ScrollController scrollController; // For getting scroll position
   const EntityListRow({
     Key key,
+    @required this.categoriesEntityCount,
     @required this.entity,
     @required this.index,
     @required this.scrollController,

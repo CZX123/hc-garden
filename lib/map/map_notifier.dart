@@ -243,8 +243,6 @@ class MapNotifier extends ChangeNotifier {
       final trailLocationKey = entityLocation.trailLocationKey;
       final markerId =
           MarkerId('${trailLocationKey.trailKey.id} ${trailLocationKey.id}');
-      print(markerId);
-      print(newMarkers.keys);
       _replaceWithGreenMarker(newMarkers, markerId);
       final location = trails[trailLocationKey.trailKey][trailLocationKey];
       return location.coordinates;
