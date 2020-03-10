@@ -29,18 +29,25 @@ class _OnboardingPageState extends State<OnboardingPage> {
         child: Column(
           children: <Widget>[
             Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemBuilder: (context, index) {
-                  if (index == 0)
-                    return OnboardingPageOne(
-                      pageController: _pageController,
-                    );
-                  return Center(
-                    child: Text(index.toString()),
-                  );
-                },
-                itemCount: 3,
+              child: Stack(
+                children: <Widget>[
+                  PageView.builder(
+                    controller: _pageController,
+                    itemBuilder: (context, index) {
+                      if (index == 0)
+                        return OnboardingPageOne(
+                          pageController: _pageController,
+                        );
+                      return Center(
+                        child: Text(index.toString()),
+                      );
+                    },
+                    itemCount: 3,
+                  ),
+                  OnboardingAnimationWidget(
+                    pageController: _pageController,
+                  ),
+                ],
               ),
             ),
             Divider(
@@ -124,3 +131,31 @@ class OnboardingPageOne extends StatelessWidget {
     );
   }
 }
+
+/* class OnboardingAnimationWidget extends StatefulWidget {
+  final PageController pageController;
+  const OnboardingAnimationWidget({Key key, @required this.pageController}) : super(key: key);
+
+  @override
+  _OnboardingAnimationWidgetState createState() => _OnboardingAnimationWidgetState();
+}
+
+class _OnboardingAnimationWidgetState extends State<OnboardingAnimationWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: widget.pageController,
+        builder: (context, child) {
+          final y = widget.pageController.page * 200;
+          return Transform.translate(offset: Offset(0, y),);
+        },
+        child: Container(
+          height: 200,
+          width: 200,
+          color: Colors.green,
+        ),
+      )
+    );
+  }
+} */
