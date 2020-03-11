@@ -73,12 +73,13 @@ class EntityListPage extends StatelessWidget {
     final categoriesEntityCount = newEntityMap.map((category, entities) {
       return MapEntry(category, entities.length);
     });
+    final key = searchTerm + categoriesEntityCount.values.join();
 
     return CustomAnimatedSwitcher(
       child: Stack(
+        key: ValueKey(key),
         children: <Widget>[
           CustomScrollView(
-            key: ValueKey(searchTerm),
             controller: scrollController,
             physics: NeverScrollableScrollPhysics(),
             slivers: <Widget>[
@@ -102,10 +103,11 @@ class EntityListPage extends StatelessWidget {
               ),
             ],
           ),
-          if (!isFlora) FaunaListCategories(
-            scrollController: scrollController,
-            categoriesEntityCount: categoriesEntityCount,
-          ),
+          if (!isFlora)
+            FaunaListCategories(
+              scrollController: scrollController,
+              categoriesEntityCount: categoriesEntityCount,
+            ),
         ],
       ),
     );
@@ -125,38 +127,228 @@ class FaunaListCategories extends StatefulWidget {
   _FaunaListCategoriesState createState() => _FaunaListCategoriesState();
 }
 
-class _FaunaListCategoriesState extends State<FaunaListCategories> {
-  final List<double> _breakPoints = [0];
+class _FaunaListCategoriesState extends State<FaunaListCategories>
+    with TickerProviderStateMixin {
+  // Needed when scroll scontroller throws an error, so this offset can be used instead
+  List<double> _breakPoints = [0];
+  List<Widget> _categoryButtons;
 
   @override
   void initState() {
     super.initState();
-    for (final category in widget.categoriesEntityCount.keys) {
-      // _breakPoints.add(48 + entities.)
-    }
+    final searchTerm = Provider.of<SearchNotifier>(
+      context,
+      listen: false,
+    ).searchTerm;
+    widget.categoriesEntityCount.forEach((category, count) {
+      _breakPoints.add(
+          48.0 + count * (searchTerm.isEmpty ? 104 : 84) + _breakPoints.last);
+    });
+    _breakPoints.removeLast();
+    _categoryButtons = [
+      for (int i = 0; i < widget.categoriesEntityCount.length; i++)
+        EntityCategoryButton(
+          title: widget.categoriesEntityCount.keys.elementAt(i),
+          onTap: () {
+            widget.scrollController.animateTo(
+              _breakPoints[i],
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.fastOutSlowIn,
+            );
+          },
+        ),
+    ];
   }
 
   @override
   void didUpdateWidget(FaunaListCategories oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final searchTerm = Provider.of<SearchNotifier>(
+      context,
+      listen: false,
+    ).searchTerm;
+    _breakPoints = [0];
+    widget.categoriesEntityCount.forEach((category, count) {
+      _breakPoints.add(
+          48.0 + count * (searchTerm.isEmpty ? 104 : 84) + _breakPoints.last);
+    });
+    _breakPoints.removeLast();
+    _categoryButtons = [
+      for (int i = 0; i < widget.categoriesEntityCount.length; i++)
+        EntityCategoryButton(
+          title: widget.categoriesEntityCount.keys.elementAt(i),
+          onTap: () {
+            widget.scrollController.animateTo(
+              _breakPoints[i] + 16,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.fastOutSlowIn,
+            );
+          },
+        ),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = Theme.of(context).canvasColor;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final height = MediaQuery.of(context).size.height;
     return Stack(
+      fit: StackFit.expand,
       children: [
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Row(
-            children: <Widget>[
-              for (final category in widget.categoriesEntityCount.keys)
-                EntityCategoryButton(
-                  title: category,
-                  onTap: () {},
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: bottomPadding + Sizes.kBottomBarHeight - 1,
+          child: AnimatedBuilder(
+            animation: widget.scrollController,
+            builder: (context, child) {
+              double current = 0;
+              try {
+                current = widget.scrollController.offset;
+              } catch (e) {}
+              final end = _breakPoints.last + 16;
+              final start = end -
+                  height +
+                  topPadding +
+                  Sizes.hEntityButtonHeightCollapsed +
+                  16 +
+                  bottomPadding +
+                  Sizes.kBottomBarHeight +
+                  40;
+              return Material(
+                shape: Border(
+                  top: BorderSide(
+                    color: current > start
+                        ? Colors.transparent
+                        : Theme.of(context).dividerColor,
+                  ),
                 ),
-            ],
+                color: current > start ? Colors.transparent : bgColor,
+                child: child,
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 9, top: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  for (int i = 0; i < _categoryButtons.length; i++)
+                    AnimatedBuilder(
+                      animation: widget.scrollController,
+                      builder: (context, child) {
+                        double current = 0;
+                        double speed = 0;
+                        try {
+                          current = widget.scrollController.offset;
+                          speed = widget
+                              .scrollController.position.activity.velocity
+                              .abs();
+                        } catch (e) {}
+                        final duration =
+                            speed == 0 ? 100 : min(100, 100000 ~/ speed);
+                        final end = _breakPoints[i] + 16;
+                        final start = end -
+                            height +
+                            topPadding +
+                            Sizes.hEntityButtonHeightCollapsed +
+                            16 +
+                            bottomPadding +
+                            Sizes.kBottomBarHeight +
+                            40;
+                        final widthFactor = current > start + 48 ? 0.0 : 1.0;
+                        return TweenAnimationBuilder(
+                          tween: Tween(
+                            begin: widthFactor,
+                            end: widthFactor,
+                          ),
+                          duration: Duration(milliseconds: duration),
+                          curve: Curves.easeOutQuad,
+                          builder: (context, value, child) {
+                            return Align(
+                              alignment: Alignment.centerLeft,
+                              widthFactor: value,
+                              child: Visibility(
+                                visible: current < start,
+                                maintainState: true,
+                                maintainAnimation: true,
+                                maintainSize: true,
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: child,
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 14),
+                        child: _categoryButtons[i],
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
         ),
+        for (int i = 0; i < _categoryButtons.length; i++)
+          AnimatedBuilder(
+            animation: widget.scrollController,
+            builder: (context, child) {
+              double current = 0;
+              try {
+                current = widget.scrollController.offset;
+              } catch (e) {}
+              final end = _breakPoints[i] + 16;
+              final start = end -
+                  height +
+                  topPadding +
+                  Sizes.hEntityButtonHeightCollapsed +
+                  16 +
+                  bottomPadding +
+                  Sizes.kBottomBarHeight +
+                  40;
+              final nextEnd = i + 1 == _categoryButtons.length
+                  ? double.infinity
+                  : _breakPoints[i + 1] + 16;
+              double y = 0;
+              if (current < start || current > nextEnd) {
+                return const SizedBox();
+              } else if (current >= start && current < end) {
+                y = end - current;
+              } else if (current > nextEnd - 48) {
+                y = nextEnd - 48 - current;
+              }
+              return Positioned(
+                top: y,
+                left: 0,
+                right: 0,
+                child: Material(
+                  shape: Border(
+                    bottom: BorderSide(
+                      color: current < end
+                          ? Colors.transparent
+                          : Theme.of(context).dividerColor,
+                    ),
+                  ),
+                  color: current < end ? Colors.transparent : null,
+                  child: child,
+                ),
+              );
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  child: _categoryButtons[i],
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -176,7 +368,7 @@ class SliverEntityHeaderSpace extends StatelessWidget {
 }
 
 class EntityCategoryButton extends StatelessWidget {
-  static const height = 36.0;
+  static const height = 32.0;
 
   final String title;
   final VoidCallback onTap;
@@ -190,11 +382,21 @@ class EntityCategoryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      type: MaterialType.transparency,
+      // elevation: 2,
+      // borderRadius: BorderRadius.circular(69),
+      // color: Theme.of(context).dividerColor,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(
+          color: Theme.of(context).dividerColor,
+        ),
+        borderRadius: BorderRadius.circular(69),
+      ),
+      // color: Colors.white,
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         child: Container(
           height: height,
-          padding: const EdgeInsets.symmetric(horizontal: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           alignment: Alignment.centerLeft,
           child: Text(
             title[0].toUpperCase() + title.substring(1),
@@ -386,7 +588,6 @@ class EntityListRow extends StatefulWidget {
 }
 
 class _EntityListRowState extends State<EntityListRow> {
-  EntityMap _entities;
   double _rowHeight;
   Animation<double> _bottomSheetAnimation;
   Tween<double> _topSpaceTween;
@@ -398,9 +599,9 @@ class _EntityListRowState extends State<EntityListRow> {
 
   double _getSourceTop() {
     return _topSpaceTween.evaluate(_bottomSheetAnimation) +
-        _rowHeight * widget.index -
-        widget.scrollController.offset +
-        _previousCategoriesHeight;
+        _rowHeight * widget.index +
+        _previousCategoriesHeight -
+        widget.scrollController.offset;
   }
 
   double _getContentOffset() {
@@ -417,19 +618,12 @@ class _EntityListRowState extends State<EntityListRow> {
       listen: false,
     ).searchTerm;
     _rowHeight = searchTerm.isEmpty ? 104 : 84;
-    _entities = Provider.of<FirebaseData>(context).entities;
+
     if (widget.entity.key.category != 'flora') {
       _previousCategoriesHeight += 48;
-      final faunaCategories = _entities.keys.where((category) {
-        return category != 'flora';
-      }).toList()
-        ..sort();
-      final previousCategories = faunaCategories.takeWhile((category) {
-        return category != widget.entity.key.category;
-      });
-      for (final category in previousCategories) {
-        _previousCategoriesHeight +=
-            48 + _rowHeight * _entities[category].length;
+      for (final entry in widget.categoriesEntityCount.entries) {
+        if (entry.key == widget.entity.key.category) break;
+        _previousCategoriesHeight += 48 + _rowHeight * entry.value;
       }
     }
 
