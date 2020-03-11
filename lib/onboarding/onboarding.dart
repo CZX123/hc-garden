@@ -35,9 +35,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     controller: _pageController,
                     itemBuilder: (context, index) {
                       if (index == 0)
-                        return OnboardingPageOne(
-                          pageController: _pageController,
-                        );
+                        return OnboardingPageOne();
+                      else if (index == 1) return OnboardingPageTwo();
                       return Center(
                         child: Text(index.toString()),
                       );
@@ -102,11 +101,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 }
 
 class OnboardingPageOne extends StatelessWidget {
-  final PageController pageController;
-  const OnboardingPageOne({
-    Key key,
-    @required this.pageController,
-  }) : super(key: key);
+  const OnboardingPageOne({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -126,42 +121,101 @@ class OnboardingPageOne extends StatelessWidget {
                 ),
           ),
           Text('HC Garden is an amazing app!'),
-          AnimatedBuilder(
-            animation: pageController,
-            builder: (context, child) {
-              return Text('${pageController.page}');
-            },
-          ),
         ],
       ),
     );
   }
 }
 
-/* class OnboardingAnimationWidget extends StatefulWidget {
-  final PageController pageController;
-  const OnboardingAnimationWidget({Key key, @required this.pageController}) : super(key: key);
+class OnboardingPageTwo extends StatelessWidget {
+  const OnboardingPageTwo({Key key}) : super(key: key);
 
   @override
-  _OnboardingAnimationWidgetState createState() => _OnboardingAnimationWidgetState();
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment(0, -0.7),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              "This is the homepage!",
+              style: Theme.of(context).textTheme.display1,
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              "You'll see it everytime you open HC Garden.",
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OnboardingAnimationWidget extends StatefulWidget {
+  final PageController pageController;
+  const OnboardingAnimationWidget({Key key, @required this.pageController})
+      : super(key: key);
+
+  @override
+  _OnboardingAnimationWidgetState createState() =>
+      _OnboardingAnimationWidgetState();
 }
 
 class _OnboardingAnimationWidgetState extends State<OnboardingAnimationWidget> {
+  void listener() {
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.pageController.addListener(listener);
+  }
+
+  @override
+  void dispose() {
+    widget.pageController.removeListener(listener);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height - topPadding - 45;
+    final page = widget.pageController.page ?? 0.0;
+    final scale = page;
+    final Widget homePageImage = Container(
+      height: 200,
+      // width: 200,
+      color: Colors.green,
+    );
     return IgnorePointer(
-      child: AnimatedBuilder(
-        animation: widget.pageController,
-        builder: (context, child) {
-          final y = widget.pageController.page * 200;
-          return Transform.translate(offset: Offset(0, y),);
-        },
-        child: Container(
-          height: 200,
-          width: 200,
-          color: Colors.green,
+      child: Padding(
+        padding: EdgeInsets.only(top: topPadding),
+        child: Stack(
+          children: <Widget>[
+            Transform.translate(
+              offset: Offset(screenWidth - screenWidth * page, 180),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: homePageImage,
+                ),
+              ),
+            ),
+            // Transform.translate(
+            //   offset: Offset(0, 200),
+            //   child: Transform.scale(scale: scale, child: homePageImage),
+            // ),
+          ],
         ),
-      )
+      ),
     );
   }
-} */
+}
