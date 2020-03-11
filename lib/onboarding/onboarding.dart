@@ -111,7 +111,7 @@ class OnboardingPageOne extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Image.asset(
-            'assets/images/app_logo/default.png',
+            'assets/images/app_logo/android.png',
             height: 108,
           ),
           Text(
@@ -189,10 +189,9 @@ class _OnboardingAnimationWidgetState extends State<OnboardingAnimationWidget> {
     final screenHeight = MediaQuery.of(context).size.height - topPadding - 45;
     final page = widget.pageController.page ?? 0.0;
     final scale = page;
-    final Widget homePageImage = Container(
+    final Widget homePageImage = Image.asset(
+      "assets/images/screenshots/homepage.png",
       height: 200,
-      // width: 200,
-      color: Colors.green,
     );
     return IgnorePointer(
       child: Padding(
