@@ -39,7 +39,7 @@ flutter_icons:
   android: true
   ios: true
   adaptive_icon_foreground: assets/images/app_logo/foreground.png
-  adaptive_icon_background: assets/images/app_logo/background.png
+  adaptive_icon_background: "#FFFFFF"
 
 
 # For information on the generic Dart part of this file, see the
@@ -53,13 +53,11 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/data/data.json
-    - assets/images/background.png
     - assets/images/flora.jpg
     - assets/images/fauna.jpg
     - assets/images/hci.png
-    - assets/images/app_logo.png
-    - assets/images/app_logo/default.png
+    - assets/images/app_logo/android.png
+    - assets/images/app_logo/app_logo.png
     - assets/images/google_maps/blue_marker.png
     - assets/images/google_maps/pink_marker.png
     - assets/images/google_maps/yellow_marker.png

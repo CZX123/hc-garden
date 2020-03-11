@@ -143,9 +143,9 @@ class AppLogo extends StatelessWidget {
             width: 12,
           ),
           Transform.scale(
-            scale: 1.1,
+            scale: 1.25,
             child: Image.asset(
-              'assets/images/app_logo/default.png',
+              'assets/images/app_logo/app_logo.png',
               height: Sizes.hLogoHeight,
             ),
           ),
