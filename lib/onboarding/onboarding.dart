@@ -43,9 +43,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     },
                     itemCount: 3,
                   ),
-                  OnboardingAnimationWidget(
-                    pageController: _pageController,
-                  ),
+                  // OnboardingAnimationWidget(
+                  //   pageController: _pageController,
+                  // ),
                 ],
               ),
             ),
