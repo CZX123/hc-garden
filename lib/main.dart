@@ -1,4 +1,4 @@
-import 'library.dart';
+import 'src/library.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +20,6 @@ class _HcGardenAppState extends State<HcGardenApp> {
 
   /// An instance of [Location]
   final _location = Location();
-  final _filterNotifier = FilterNotifier();
   final _themeNotifier = ThemeNotifier(null);
   final _mapNotifier = MapNotifier();
   bool _firstTime = false;
@@ -86,7 +85,6 @@ class _HcGardenAppState extends State<HcGardenApp> {
 
   @override
   void dispose() {
-    _filterNotifier.dispose();
     _themeNotifier.dispose();
     _mapNotifier.dispose();
     super.dispose();
@@ -120,13 +118,8 @@ class _HcGardenAppState extends State<HcGardenApp> {
         ChangeNotifierProvider(
           create: (context) => BottomSheetNotifier(),
         ),
-        // Simple ChangeNotifier for searching flora and fauna
         ChangeNotifierProvider(
-          create: (context) => SearchNotifier(),
-        ),
-        // Simple ChangeNotifier for filtering flora and fauna
-        ChangeNotifierProvider.value(
-          value: _filterNotifier,
+          create: (context) => FilterNotifier(),
         ),
         // Provider for all data from Firebase
         StreamProvider.value(
@@ -192,12 +185,10 @@ class _MyHomePageState extends State<MyHomePage>
     final scaffoldState = Scaffold.of(context);
     if (scaffoldState.isEndDrawerOpen || scaffoldState.isDrawerOpen)
       return true;
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
-    final bottomSheetNotifier = Provider.of<BottomSheetNotifier>(
-      context,
-      listen: false,
-    );
-    final searchNotifier = Provider.of<SearchNotifier>(context, listen: false);
+    final appNotifier = context.provide<AppNotifier>(listen: false);
+    final bottomSheetNotifier =
+        context.provide<BottomSheetNotifier>(listen: false);
+    final filterNotifier = context.provide<FilterNotifier>(listen: false);
     final animation = bottomSheetNotifier.animation;
     final state = appNotifier.state;
     if (state == 0) {
@@ -214,11 +205,11 @@ class _MyHomePageState extends State<MyHomePage>
         return false;
       }
       final paddingBreakpoint = bottomSheetNotifier.snappingPositions.value[1];
-      if (FocusScope.of(context).focusedChild == searchNotifier.focusNode ||
-          searchNotifier.searchTerm.isNotEmpty) {
-        searchNotifier
-          ..unfocus()
-          ..searchTerm = '';
+      if (FocusScope.of(context).focusedChild ==
+              filterNotifier.searchBarFocusNode ||
+          filterNotifier.searchTerm.isNotEmpty) {
+        filterNotifier.unfocusSearchBar();
+        filterNotifier.searchTerm = '';
         return false;
       } else if (animation.value < paddingBreakpoint) {
         bottomSheetNotifier.animateTo(paddingBreakpoint);
@@ -245,12 +236,9 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void tabListener() {
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final appNotifier = context.provide<AppNotifier>(listen: false);
     appNotifier.tabIndex = _tabController.index;
-    Provider.of<BottomSheetNotifier>(
-      context,
-      listen: false,
-    ).activeScrollController =
+    context.provide<BottomSheetNotifier>(listen: false).activeScrollController =
         appNotifier.homeScrollControllers[_tabController.index];
   }
 
@@ -271,7 +259,7 @@ class _MyHomePageState extends State<MyHomePage>
     if (height == 0) return;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final heightTooSmall = height - Sizes.kBottomHeight < 100;
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final appNotifier = context.provide<AppNotifier>(listen: false);
     if (!_init) {
       if (widget.firstTime) {
         Future.delayed(const Duration(seconds: 1), () {
@@ -324,7 +312,9 @@ class _MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     final heightTooSmall = height - Sizes.kBottomHeight < 100;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final appNotifier = Provider.of<AppNotifier>(context, listen: false);
+    final appNotifier = context.provide<AppNotifier>(listen: false);
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Selector<AppNotifier, bool>(
       selector: (context, appNotifier) => appNotifier.routes.isEmpty,
       builder: (context, routesIsEmpty, child) {
@@ -336,7 +326,6 @@ class _MyHomePageState extends State<MyHomePage>
         );
       },
       child: Builder(builder: (context) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
         return AnnotatedRegion(
           value: (isDark
                   ? ThemeNotifier.darkOverlayStyle
