@@ -18,6 +18,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
     return AnnotatedRegion(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -28,26 +29,32 @@ class _OnboardingPageState extends State<OnboardingPage> {
       child: Material(
         child: Column(
           children: <Widget>[
+            SizedBox(height: topPadding),
             Expanded(
-              child: Stack(
-                children: <Widget>[
-                  PageView.builder(
-                    controller: _pageController,
-                    itemBuilder: (context, index) {
-                      if (index == 0)
-                        return OnboardingPageOne();
-                      else if (index == 1) return OnboardingPageTwo();
-                      return Center(
-                        child: Text(index.toString()),
-                      );
-                    },
-                    itemCount: 3,
-                  ),
-                  // OnboardingAnimationWidget(
-                  //   pageController: _pageController,
-                  // ),
-                ],
-              ),
+              child: LayoutBuilder(builder: (context, constraints) {
+                //print(MediaQuery.of(context).size.height);
+                //print(constraints.maxHeight);
+                return Stack(
+                  children: <Widget>[
+                    PageView.builder(
+                      controller: _pageController,
+                      itemBuilder: (context, index) {
+                        if (index == 0)
+                          return _OnboardingPageOne();
+                        else if (index == 1) return _OnboardingPageTwo();
+                        return Center(
+                          child: Text(index.toString()),
+                        );
+                      },
+                      itemCount: 3,
+                    ),
+                    OnboardingAnimationWidget(
+                      pageController: _pageController,
+                      height: constraints.maxHeight,
+                    ),
+                  ],
+                );
+              }),
             ),
             Divider(
               height: 1,
@@ -100,8 +107,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 }
 
-class OnboardingPageOne extends StatelessWidget {
-  const OnboardingPageOne({Key key}) : super(key: key);
+class _OnboardingPageOne extends StatelessWidget {
+  const _OnboardingPageOne({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +117,10 @@ class OnboardingPageOne extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
+          SizedBox.shrink(),
           Image.asset(
-            'assets/images/app_logo/android.png',
-            height: 108,
+            'assets/images/app_logo/app_logo.png',
+            height: 216,
           ),
           Text(
             'Welcome to\nHC Garden!',
@@ -120,35 +128,42 @@ class OnboardingPageOne extends StatelessWidget {
                   color: Theme.of(context).accentColor,
                 ),
           ),
-          Text('HC Garden is an amazing app!'),
+          Text('Swipe right to learn more!! ->->'),
+          SizedBox.shrink(),
         ],
       ),
     );
   }
 }
 
-class OnboardingPageTwo extends StatelessWidget {
-  const OnboardingPageTwo({Key key}) : super(key: key);
+class _OnboardingPageTwo extends StatelessWidget {
+  const _OnboardingPageTwo({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment(0, -0.7),
+      alignment: Alignment.topCenter,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text(
-              "This is the homepage!",
-              style: Theme.of(context).textTheme.display1,
-              textAlign: TextAlign.center,
+        child: FractionallySizedBox(
+          heightFactor: 0.19,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  "This is the homepage!",
+                  style: Theme.of(context).textTheme.display1,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "You'll see it everytime you open HC Garden.",
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-            Text(
-              "You'll see it everytime you open HC Garden.",
-              textAlign: TextAlign.center,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -157,8 +172,12 @@ class OnboardingPageTwo extends StatelessWidget {
 
 class OnboardingAnimationWidget extends StatefulWidget {
   final PageController pageController;
-  const OnboardingAnimationWidget({Key key, @required this.pageController})
-      : super(key: key);
+  final double height;
+  const OnboardingAnimationWidget({
+    Key key,
+    @required this.pageController,
+    @required this.height,
+  }) : super(key: key);
 
   @override
   _OnboardingAnimationWidgetState createState() =>
@@ -184,37 +203,115 @@ class _OnboardingAnimationWidgetState extends State<OnboardingAnimationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final topPadding = MediaQuery.of(context).padding.top;
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height - topPadding - 45;
     final page = widget.pageController.page ?? 0.0;
-    final scale = page;
-    final Widget homePageImage = Image.asset(
-      "assets/images/screenshots/homepage.png",
-      height: 200,
+    final offset = HomePageImage.getImageOffset(
+      page: page,
+      screenWidth: screenWidth,
+      screenHeight: widget.height,
     );
-    return IgnorePointer(
-      child: Padding(
-        padding: EdgeInsets.only(top: topPadding),
-        child: Stack(
-          children: <Widget>[
-            Transform.translate(
-              offset: Offset(screenWidth - screenWidth * page, 180),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: homePageImage,
+    final scale = HomePageImage.getImageScale(
+      page: page,
+      screenWidth: screenWidth,
+      screenHeight: widget.height,
+    );
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: ClipRect(
+          child: Stack(
+            children: <Widget>[
+              // Transform(
+              //   transform: Matrix4.diagonal3Values(scale, scale, 0)
+              //     ..setTranslationRaw(offset.dx, offset.dy, 0),
+              //   child: Padding(
+              //     padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              //     child: HomePageImage(),
+              //   ),
+              // ),
+              Transform.translate(
+                offset: HomePageImage.getImageOffset(
+                  page: page,
+                  screenWidth: screenWidth,
+                  screenHeight: widget.height,
+                ),
+                child: Transform.scale(
+                  alignment: Alignment.topCenter,
+                  scale: HomePageImage.getImageScale(
+                    page: page,
+                    screenWidth: screenWidth,
+                    screenHeight: widget.height,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: HomePageImage(),
+                  ),
                 ),
               ),
-            ),
-            // Transform.translate(
-            //   offset: Offset(0, 200),
-            //   child: Transform.scale(scale: scale, child: homePageImage),
-            // ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+class HomePageImage extends StatelessWidget {
+  const HomePageImage({Key key}) : super(key: key);
+
+  static const borderWidth = 6.0;
+  static const aspectRatio =
+      (1440.0 + 2 * borderWidth) / (2960.0 + 2 * borderWidth);
+  static const mapAspectRatio =
+      (1440.0 + 2 * borderWidth) / (1532.0 + borderWidth);
+  static const imageWidthRatio = 0.9;
+
+  static Offset getImageOffset(
+      {double page, double screenWidth, double screenHeight}) {
+    // 0.19 is the height ratio of the text and 0.04 is the height ratio
+    // of the padding between the text and screenshot
+    if (page <= 1)
+      return Offset(screenWidth - screenWidth * page,
+          0.19 * screenHeight + 0.04 * screenHeight);
+    // mapAspectRatio is the aspect ratio of the map portion of the image
+    else if (page > 1 && page <= 2)
+      return Offset(
+          0,
+          0.23 * screenHeight +
+              (page - 1) *
+                  ((screenHeight -
+                          (imageWidthRatio * screenWidth / mapAspectRatio)) -
+                      0.23 * screenHeight));
+  }
+
+  static double getImageScale(
+      {double page, double screenWidth, double screenHeight}) {
+    // 0.73 is the height ratio of the screenshot
+    final smallScaleRatio =
+        0.73 * screenHeight / ((imageWidthRatio * screenWidth - 12.0)/ aspectRatio);
+    if (page <= 1)
+      return smallScaleRatio;
+    else if (page > 1 && page <= 2)
+      return 1.0 - (1.0 - smallScaleRatio) * (1 - (page - 1));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return Material(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: Colors.black.withOpacity(0.78),
+            width: borderWidth,
+          ),
+          borderRadius: BorderRadius.circular(24.0),
+        ),
+        child: Container(
+          width: imageWidthRatio * screenWidth,
+          padding: const EdgeInsets.all(borderWidth),
+          child: Image.asset(
+            "assets/images/screenshots/homepage.png",
+          ),
+        ));
+  }
+}
+
