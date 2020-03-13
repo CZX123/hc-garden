@@ -42,11 +42,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         if (index == 0)
                           return _OnboardingPageOne();
                         else if (index == 1) return _OnboardingPageTwo();
+                        else if (index == 2) return _OnboardingPageThree(
+                          height: constraints.maxHeight,
+                        );
                         return Center(
                           child: Text(index.toString()),
                         );
                       },
-                      itemCount: 3,
+                      itemCount: 4,
                     ),
                     OnboardingAnimationWidget(
                       pageController: _pageController,
@@ -170,9 +173,51 @@ class _OnboardingPageTwo extends StatelessWidget {
   }
 }
 
+class _OnboardingPageThree extends StatelessWidget {
+  final double height;
+  const _OnboardingPageThree({Key key, @required this.height}) : super(key: key);
+
+  static const borderWidth = 6.0;
+  static const mapAspectRatio =
+      (1440.0 + 2 * borderWidth) / (1523.0 + borderWidth);
+    static const imageWidthRatio = 0.85;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final containerHeight = height - (imageWidthRatio * screenWidth + 2 * borderWidth) / mapAspectRatio;
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          alignment: Alignment(0, 0.5),
+          height: containerHeight,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                "Explore our",
+                style: Theme.of(context).textTheme.display1,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                "school with Google Maps!",
+                style: Theme.of(context).textTheme.display1,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class OnboardingAnimationWidget extends StatefulWidget {
   final PageController pageController;
   final double height;
+  
   const OnboardingAnimationWidget({
     Key key,
     @required this.pageController,
@@ -205,29 +250,11 @@ class _OnboardingAnimationWidgetState extends State<OnboardingAnimationWidget> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final page = widget.pageController.page ?? 0.0;
-    final offset = HomePageImage.getImageOffset(
-      page: page,
-      screenWidth: screenWidth,
-      screenHeight: widget.height,
-    );
-    final scale = HomePageImage.getImageScale(
-      page: page,
-      screenWidth: screenWidth,
-      screenHeight: widget.height,
-    );
     return Positioned.fill(
       child: IgnorePointer(
         child: ClipRect(
           child: Stack(
             children: <Widget>[
-              // Transform(
-              //   transform: Matrix4.diagonal3Values(scale, scale, 0)
-              //     ..setTranslationRaw(offset.dx, offset.dy, 0),
-              //   child: Padding(
-              //     padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              //     child: HomePageImage(),
-              //   ),
-              // ),
               Transform.translate(
                 offset: HomePageImage.getImageOffset(
                   page: page,
@@ -241,8 +268,8 @@ class _OnboardingAnimationWidgetState extends State<OnboardingAnimationWidget> {
                     screenWidth: screenWidth,
                     screenHeight: widget.height,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Align(
+                    alignment: Alignment.topCenter,
                     child: HomePageImage(),
                   ),
                 ),
@@ -262,8 +289,8 @@ class HomePageImage extends StatelessWidget {
   static const aspectRatio =
       (1440.0 + 2 * borderWidth) / (2960.0 + 2 * borderWidth);
   static const mapAspectRatio =
-      (1440.0 + 2 * borderWidth) / (1532.0 + borderWidth);
-  static const imageWidthRatio = 0.9;
+      (1440.0 + 2 * borderWidth) / (1523.0 + borderWidth);
+  static const imageWidthRatio = 0.85;
 
   static Offset getImageOffset(
       {double page, double screenWidth, double screenHeight}) {
@@ -279,25 +306,34 @@ class HomePageImage extends StatelessWidget {
           0.23 * screenHeight +
               (page - 1) *
                   ((screenHeight -
-                          (imageWidthRatio * screenWidth / mapAspectRatio)) -
+                          ((imageWidthRatio * screenWidth + 2 * borderWidth) /
+                              mapAspectRatio)) -
                       0.23 * screenHeight));
   }
 
   static double getImageScale(
       {double page, double screenWidth, double screenHeight}) {
     // 0.73 is the height ratio of the screenshot
-    final smallScaleRatio =
-        0.73 * screenHeight / ((imageWidthRatio * screenWidth - 12.0)/ aspectRatio);
+    final smallScaleRatio = 0.73 *
+        screenHeight /
+        ((imageWidthRatio * screenWidth + 2 * borderWidth) / aspectRatio);
     if (page <= 1)
       return smallScaleRatio;
     else if (page > 1 && page <= 2)
       return 1.0 - (1.0 - smallScaleRatio) * (1 - (page - 1));
+    else if (page > 2 && page <= 3) return 1.0;
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    // final key = GlobalKey();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   print(key.currentContext.size.width);
+    // });
+    // print(screenWidth);
     return Material(
+      elevation: 4,
         shape: RoundedRectangleBorder(
           side: BorderSide(
             color: Colors.black.withOpacity(0.78),
@@ -306,12 +342,12 @@ class HomePageImage extends StatelessWidget {
           borderRadius: BorderRadius.circular(24.0),
         ),
         child: Container(
-          width: imageWidthRatio * screenWidth,
+          width: imageWidthRatio * screenWidth + 2 * borderWidth,
           padding: const EdgeInsets.all(borderWidth),
           child: Image.asset(
             "assets/images/screenshots/homepage.png",
+          // key: key,
           ),
         ));
   }
 }
-
