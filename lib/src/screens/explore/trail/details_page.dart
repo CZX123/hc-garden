@@ -54,7 +54,8 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomSheetNotifier = context.provide<BottomSheetNotifier>(listen: false);
+    final bottomSheetNotifier =
+        context.provide<BottomSheetNotifier>(listen: false);
     final trailLocations = FirebaseData.getTrail(
       context: context,
       key: widget.trailKey,
@@ -145,6 +146,7 @@ class _LocationListRowState extends State<LocationListRow> {
   Tween<double> _contentOffsetTween;
 
   double _getSourceTop() {
+    if (!widget.scrollController.hasClients) return null;
     return _topSpaceTween.evaluate(_bottomSheetAnimation) +
         _rowHeight * widget.index -
         widget.scrollController.offset;
@@ -196,22 +198,22 @@ class _LocationListRowState extends State<LocationListRow> {
       ),
       onTap: () {
         context.provide<AppNotifier>(listen: false).push(
-          context: context,
-          routeInfo: RouteInfo(
-            name: widget.location.name,
-            dataKey: widget.location.key,
-            route: SlidingUpPageRoute(
-              getSourceTop: _getSourceTop,
-              sourceHeight: _rowHeight,
-              getContentOffset: _getContentOffset,
-              builder: (context) {
-                return TrailLocationOverviewPage(
-                  trailLocationKey: widget.location.key,
-                );
-              },
-            ),
-          ),
-        );
+              context: context,
+              routeInfo: RouteInfo(
+                name: widget.location.name,
+                dataKey: widget.location.key,
+                route: SlidingUpPageRoute(
+                  getSourceTop: _getSourceTop,
+                  sourceHeight: _rowHeight,
+                  getContentOffset: _getContentOffset,
+                  builder: (context) {
+                    return TrailLocationOverviewPage(
+                      trailLocationKey: widget.location.key,
+                    );
+                  },
+                ),
+              ),
+            );
       },
     );
   }

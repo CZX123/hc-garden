@@ -109,6 +109,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
               },
               initialCameraPosition: _initialCameraPosition,
               markers: mapNotifier.markers.values.toSet(),
+              polygons: polygons,
             ),
     );
   }

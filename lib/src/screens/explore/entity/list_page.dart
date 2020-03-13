@@ -498,6 +498,7 @@ class _EntityListRowState extends State<EntityListRow> {
   double _previousCategoriesHeight = 0;
 
   double _getSourceTop() {
+    if (!widget.scrollController.hasClients) return null;
     return _topSpaceTween.evaluate(_bottomSheetAnimation) +
         _rowHeight * widget.index +
         _previousCategoriesHeight -

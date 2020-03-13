@@ -7,7 +7,6 @@ export 'bottom_sheet/custom_bottom_sheet.dart';
 export 'image/before_after.dart';
 export 'image/custom_image.dart';
 export 'image/image_gallery.dart';
-export 'image/transparent_image.dart';
 
 /// An [InfoRow] is the top row of elements typically found in [EntityDetailsPage] or [TrailLocationOverviewPage], containing the image of an [Entity] or a [TrailLocation], with its name and additional description.
 class InfoRow extends StatelessWidget {

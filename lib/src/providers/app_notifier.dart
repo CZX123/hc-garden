@@ -124,7 +124,8 @@ class AppNotifier extends ChangeNotifier {
     bool disableDragging = false,
     bool notify = true,
   }) {
-    final bottomSheetNotifier = context.provide<BottomSheetNotifier>(listen: false);
+    final bottomSheetNotifier =
+        context.provide<BottomSheetNotifier>(listen: false);
     if (disableDragging && !isHome) {
       _state = 2;
       SystemChrome.setPreferredOrientations([
@@ -147,8 +148,8 @@ class AppNotifier extends ChangeNotifier {
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     if (isHome || routeInfo.dataKey is TrailKey) {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
       _state = 0;
       mapNotifier.bottomSheetHeight = heightTooSmall
           ? Sizes.kBottomHeight -
@@ -202,7 +203,6 @@ class AppNotifier extends ChangeNotifier {
               height - Sizes.kCollapsedHeight &&
           !heightTooSmall;
       if (routeInfo.dataKey is EntityKey) {
-        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
         Provider.of<FilterNotifier>(context, listen: false).unfocusSearchBar();
         final firebaseData = Provider.of<FirebaseData>(context, listen: false);
         mapNotifier.animateToEntity(
@@ -230,11 +230,6 @@ class AppNotifier extends ChangeNotifier {
           adjusted: adjusted,
           changeMarkerColor: true,
         );
-        SystemChrome.setPreferredOrientations([
-          DeviceOrientation.portraitUp,
-          DeviceOrientation.landscapeLeft,
-          DeviceOrientation.landscapeRight,
-        ]);
       }
     }
     if (notify) notifyListeners();

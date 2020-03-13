@@ -135,7 +135,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
 }
 
 /// A widget that takes in an image `url` and fetches or saves the image from
-/// or to the local storage, so subsequent fetches do not require internet
+/// or to the local storage, so subsequent fetches do not require internet.
 class CustomImage extends StatefulWidget {
   final String url;
   final Uint8List fallbackMemoryImage;
@@ -166,11 +166,18 @@ class _CustomImageState extends State<CustomImage> {
   ImageProvider _imageProvider;
   String _dirPath;
   bool _isFadingIn;
+  bool _loaded = false;
 
   void _resolveImage([Duration _]) {
     _imageProvider.resolve(ImageConfiguration()).addListener(
       ImageStreamListener((image, synchronousCall) {
-        if (mounted) widget.onLoad(image.image.width / image.image.height);
+        if (mounted) {
+          if (widget.onLoad != null) {
+            widget.onLoad(image.image.width / image.image.height);
+          }
+          _loaded = true;
+          if (_isFadingIn) setState(() {});
+        }
       }),
     );
   }
@@ -190,8 +197,7 @@ class _CustomImageState extends State<CustomImage> {
         file: file,
         url: widget.url,
       );
-      if (widget.onLoad != null)
-        WidgetsBinding.instance.addPostFrameCallback(_resolveImage);
+      WidgetsBinding.instance.addPostFrameCallback(_resolveImage);
       _init = true;
     }
   }
@@ -209,9 +215,7 @@ class _CustomImageState extends State<CustomImage> {
         file: file,
         url: widget.url,
       );
-      if (widget.onLoad != null) {
-        WidgetsBinding.instance.addPostFrameCallback(_resolveImage);
-      }
+      WidgetsBinding.instance.addPostFrameCallback(_resolveImage);
     }
   }
 
@@ -224,9 +228,9 @@ class _CustomImageState extends State<CustomImage> {
       child: _dirPath == null
           ? null
           : _isFadingIn
-              ? FadeInImage(
-                  fadeInDuration: widget.fadeInDuration,
-                  placeholder: MemoryImage(kTransparentImage),
+              ? _CustomFadeInImage(
+                  duration: widget.fadeInDuration,
+                  loaded: _loaded,
                   image: _imageProvider,
                   width: widget.width,
                   height: widget.height,
@@ -239,6 +243,68 @@ class _CustomImageState extends State<CustomImage> {
                   height: widget.height,
                   fit: widget.fit,
                 ),
+    );
+  }
+}
+
+/// The [FadeInImage] class is inadequte since it requires a placholder image,
+/// which in our case is not needed, and also cause layout problems since the
+/// transparent placeholder is a square, so the resulting image will be a square as well.
+/// This causes problems when the [CustomImage] tries to be as small as possible,
+/// and the resultant height and width does not actually represent the image,
+/// but the placeholder.
+/// 
+/// Hence, we have a [_CustomFadeInImage] that mimics the implementation of
+/// [FadeInImage], without the need of a placeholder.
+
+class _CustomFadeInImage extends ImplicitlyAnimatedWidget {
+  final ImageProvider image;
+  final bool loaded;
+  final double width;
+  final double height;
+  final BoxFit fit;
+
+  _CustomFadeInImage({
+    @required this.image,
+    @required this.loaded,
+    this.width,
+    this.height,
+    this.fit: BoxFit.cover,
+    Duration duration = const Duration(milliseconds: 200),
+    Curve curve = Curves.easeIn,
+  }) : super(
+          duration: duration,
+          curve: curve,
+        );
+
+  @override
+  _CustomFadeInImageState createState() => _CustomFadeInImageState();
+}
+
+class _CustomFadeInImageState
+    extends ImplicitlyAnimatedWidgetState<_CustomFadeInImage> {
+  Tween<double> opacity;
+
+  @override
+  void forEachTween(visitor) {
+    opacity = visitor(
+      opacity,
+      widget.loaded ? 1.0 : 0.0,
+      (dynamic value) => Tween<double>(begin: value),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: opacity.animate(animation),
+      child: Image(
+        gaplessPlayback: true,
+        image: widget.image,
+        width: widget.width,
+        height: widget.height,
+        fit: widget.fit,
+      ),
     );
   }
 }

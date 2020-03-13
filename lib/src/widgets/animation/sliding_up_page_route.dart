@@ -103,9 +103,9 @@ class SlidingUpPageRouteTransition extends StatelessWidget {
     final Animation<RelativeRect> itemPosition = RelativeRectTween(
       begin: RelativeRect.fromLTRB(
         0,
-        getSourceTop(),
+        getSourceTop() ?? 500,
         0,
-        height - getSourceTop() - sourceHeight,
+        height - (getSourceTop() ?? 500) - sourceHeight,
       ),
       end: RelativeRect.fill,
     ).animate(positionAnimation);
@@ -137,33 +137,38 @@ class SlidingUpPageRouteTransition extends StatelessWidget {
       children: <Widget>[
         PositionedTransition(
           rect: itemPosition,
-          child: ClipRect(
-            child: OverflowBox(
-              alignment: Alignment.topLeft,
-              minHeight: height,
-              maxHeight: height,
-              child: AnimatedBuilder(
-                animation: contentOffsetAnim,
-                child: FadeTransition(
-                  opacity: fadeMaterialBackground,
-                  child: Material(
-                    color: Theme.of(context).bottomAppBarColor,
-                    elevation: 2,
-                    child: FadeTransition(
-                      opacity: contentFade,
+          child: FadeTransition(
+            opacity: getSourceTop() == null
+                ? contentFade
+                : AlwaysStoppedAnimation(1),
+            child: ClipRect(
+              child: OverflowBox(
+                alignment: Alignment.topLeft,
+                minHeight: height,
+                maxHeight: height,
+                child: AnimatedBuilder(
+                  animation: contentOffsetAnim,
+                  child: FadeTransition(
+                    opacity: fadeMaterialBackground,
+                    child: Material(
+                      color: Theme.of(context).bottomAppBarColor,
+                      elevation: 2,
                       child: FadeTransition(
-                        opacity: contentFadeSecondary,
-                        child: child,
+                        opacity: contentFade,
+                        child: FadeTransition(
+                          opacity: contentFadeSecondary,
+                          child: child,
+                        ),
                       ),
                     ),
                   ),
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: contentOffsetAnim.value,
+                      child: child,
+                    );
+                  },
                 ),
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: contentOffsetAnim.value,
-                    child: child,
-                  );
-                },
               ),
             ),
           ),
