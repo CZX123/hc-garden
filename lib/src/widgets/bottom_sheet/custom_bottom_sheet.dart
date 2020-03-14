@@ -261,13 +261,6 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
     super.didChangeDependencies();
     _bottomSheetNotifier =
         Provider.of<BottomSheetNotifier>(context, listen: false);
-    final appNotifier = context.provide<AppNotifier>(listen: false);
-    if (MediaQuery.of(context).orientation == Orientation.landscape &&
-        appNotifier.routes.isNotEmpty &&
-        appNotifier.routes.last.dataKey is TrailLocationKey) {
-      // TODO: revisit this
-      animateTo(0);
-    }
     if (!_init) {
       final height = MediaQuery.of(context).size.height;
       if (height == 0) return;

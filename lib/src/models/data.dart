@@ -1,7 +1,7 @@
 import 'package:hc_garden/src/library.dart';
 
 /// An [Entity] refers to any flora or fauna, and fauna may include any birds, butterflies, etc.
-/// 
+///
 /// Implmenting [Comparable] allows [Entities]s in a list to be sorted without a
 /// comparator function, i.e. the `sort()` function can be used without arguments.
 class Entity implements Comparable {
@@ -131,8 +131,7 @@ class EntityLocation {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        other is EntityLocation &&
-            trailLocationKey == other.trailLocationKey;
+        other is EntityLocation && trailLocationKey == other.trailLocationKey;
   }
 
   @override
@@ -324,16 +323,32 @@ class HistoricalData {
 
 class AboutPageData {
   final String body;
+  final List<AboutPageDropdown> dropdowns;
   final int id;
   final String quote;
   final String title;
   bool isExpanded = false;
 
-  AboutPageData({this.body, this.id, this.quote, this.title, this.isExpanded});
+  AboutPageData({
+    this.body,
+    this.dropdowns,
+    this.id,
+    this.quote,
+    this.title,
+    this.isExpanded,
+  });
 
   factory AboutPageData.fromJson(int key, dynamic data) {
     return AboutPageData(
       body: data['body'],
+      dropdowns: data['dropdowns'] != null
+          ? List.from(data['dropdowns'])
+              .map((data) {
+                return AboutPageDropdown.fromJson(data);
+              })
+              .where((dropdown) => dropdown.isValid)
+              .toList()
+          : null,
       id: key,
       quote: data['quote'],
       title: data['title'],
@@ -358,4 +373,31 @@ class AboutPageData {
 
   @override
   int get hashCode => hashValues(body, id, quote, title, isExpanded);
+}
+
+class AboutPageDropdown {
+  final String title;
+  final String body;
+
+  const AboutPageDropdown({this.title, this.body});
+
+  factory AboutPageDropdown.fromJson(dynamic data) {
+    return AboutPageDropdown(
+      title: data['title'],
+      body: data['body'],
+    );
+  }
+
+  bool get isValid {
+    return title != null && body != null;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is AboutPageData && title == other.title && body == other.body;
+  }
+
+  @override
+  int get hashCode => hashValues(title, body);
 }

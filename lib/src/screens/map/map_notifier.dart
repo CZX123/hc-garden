@@ -170,11 +170,9 @@ class MapNotifier extends ChangeNotifier {
       final markerId =
           MarkerId('${location.key.trailKey.id} ${location.key.id}');
       _replaceWithGreenMarker(newMarkers, markerId);
+      mapController.showMarkerInfoWindow(markerId);
       markers = newMarkers;
     }
-    // TODO: Focus on the specific marker as well
-    // (need to wait for upcoming update for google maps plugin)
-    // https://github.com/flutter/flutter/issues/33481
     _animateToPoint(location.coordinates, zoom ?? 18.5, adjusted);
   }
 

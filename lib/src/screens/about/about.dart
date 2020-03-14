@@ -137,8 +137,12 @@ class _AboutPageState extends State<AboutPage>
                                       : null,
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                                  padding: EdgeInsets.fromLTRB(
+                                    24,
+                                    aboutPageData.quote != null ? 8 : 0,
+                                    24,
+                                    0,
+                                  ),
                                   child: Column(
                                     children: <Widget>[
                                       for (var bodyString in bodyStrings)
@@ -160,6 +164,14 @@ class _AboutPageState extends State<AboutPage>
                                     ],
                                   ),
                                 ),
+                                if (aboutPageData.dropdowns != null)
+                                  Column(
+                                    children: <Widget>[
+                                      for (final dropdown
+                                          in aboutPageData.dropdowns)
+                                        _DropdownWidget(dropdown: dropdown),
+                                    ],
+                                  ),
                               ],
                             )),
                         isExpanded: aboutPageData.isExpanded,
@@ -173,6 +185,91 @@ class _AboutPageState extends State<AboutPage>
           },
         ),
       ),
+    );
+  }
+}
+
+class _DropdownWidget extends StatefulWidget {
+  final AboutPageDropdown dropdown;
+  const _DropdownWidget({Key key, @required this.dropdown}) : super(key: key);
+
+  @override
+  __DropdownWidgetState createState() => __DropdownWidgetState();
+}
+
+class __DropdownWidgetState extends State<_DropdownWidget>
+    with SingleTickerProviderStateMixin {
+  bool _expand = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final rotation = _expand ? 0.0 : -pi / 2;
+    final heightFactor = _expand ? 1.0 : 0.0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                TweenAnimationBuilder(
+                  tween: Tween(begin: rotation, end: rotation),
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.fastOutSlowIn,
+                  builder: (context, rotation, child) {
+                    return Transform.rotate(
+                      angle: rotation,
+                      child: child,
+                    );
+                  },
+                  child: Icon(Icons.arrow_drop_down),
+                ),
+                Text(
+                  widget.dropdown.title,
+                  style: Theme.of(context).textTheme.subtitle,
+                ),
+              ],
+            ),
+          ),
+          onTap: () {
+            setState(() {
+              _expand = !_expand;
+            });
+          },
+        ),
+        ClipRect(
+          child: TweenAnimationBuilder(
+            tween: Tween(begin: heightFactor, end: heightFactor),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.fastOutSlowIn,
+            builder: (context, heightFactor, child) {
+              return Align(
+                heightFactor: heightFactor,
+                alignment: Alignment.centerLeft,
+                child: AnimatedOpacity(
+                  opacity: _expand ? 1 : 0,
+                  duration: Duration(milliseconds: 300),
+                  curve: _expand
+                      ? Interval(.6, 1, curve: Curves.ease)
+                      : Interval(0, .2, curve: Curves.ease),
+                  child: child,
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 10),
+              child: Text(
+                widget.dropdown.body,
+                style: TextStyle(
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

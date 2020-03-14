@@ -5,8 +5,8 @@ import 'package:hc_garden/src/library.dart';
 const center = const LatLng(1.326580, 103.805239);
 Set<Polygon> polygons = {
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("salt centre"),
     points: [
       LatLng(1.327181, 103.801500),
@@ -17,8 +17,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fffecb3),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("hs staffroom"),
     points: [
       LatLng(1.327135, 103.801910),
@@ -37,8 +37,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fffe082),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("hs block e"),
     points: [
       LatLng(1.327964, 103.802615),
@@ -52,8 +52,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fffd54f),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("hs block b"),
     points: [
       LatLng(1.326797, 103.802578),
@@ -64,8 +64,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fffca28),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("hs block c"),
     points: [
       LatLng(1.326579, 103.801651),
@@ -85,8 +85,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fffc107),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("clock tower"),
     points: [
       LatLng(1.326689, 103.803328),
@@ -97,8 +97,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fffb300),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("kkh"),
     points: [
       LatLng(1.325646, 103.803081),
@@ -115,8 +115,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fffa000),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("heritage bldg"),
     points: [
       LatLng(1.326228, 103.803928),
@@ -127,8 +127,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fff8f00),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("com labs"),
     points: [
       LatLng(1.326048, 103.803808),
@@ -139,8 +139,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fff6f00),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("hs labs"),
     points: [
       LatLng(1.326011, 103.803515),
@@ -163,8 +163,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fef6c00),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("ep3 shed"),
     points: [
       LatLng(1.325689, 103.804031),
@@ -175,8 +175,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fe65100),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("admin centre"),
     points: [
       LatLng(1.325853, 103.804453),
@@ -197,8 +197,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7fd84315),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("src"),
     points: [
       LatLng(1.325468, 103.804206),
@@ -223,8 +223,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7f002171),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("oth"),
     points: [
       LatLng(1.326524, 103.803362),
@@ -235,8 +235,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7ffbc02d),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("hs canteen"),
     points: [
       LatLng(1.326021, 103.802587),
@@ -279,8 +279,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7ffdd835),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("college block a"),
     points: [
       LatLng(1.325897, 103.806353),
@@ -305,8 +305,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7f1e88e5),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("colleege block b part 1"),
     points: [
       LatLng(1.324993, 103.806103),
@@ -334,8 +334,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7f1976d2),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("colleege block b part 2"),
     points: [
       LatLng(1.325215, 103.805220),
@@ -348,8 +348,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7f1976d2),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("colleege block b part 3"),
     points: [
       LatLng(1.325083, 103.805220),
@@ -360,8 +360,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7f1976d2),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("college block c"),
     points: [
       LatLng(1.325507, 103.806809),
@@ -380,8 +380,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7f42a5f5),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("college block d"),
     points: [
       LatLng(1.325669, 103.807502),
@@ -395,8 +395,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7f64b5f6),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("college block e"),
     points: [
       LatLng(1.326049, 103.805718),
@@ -425,8 +425,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7f1565c0),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("college staffroom"),
     points: [
       LatLng(1.324993, 103.806103),
@@ -439,8 +439,8 @@ Set<Polygon> polygons = {
     fillColor: Color(0x7f2196f3),
   ),
   Polygon(
-    strokeWidth: 4,
-    strokeColor: Colors.black38,
+    strokeWidth: 1,
+    strokeColor: Color(0xFFAAAAAA),
     polygonId: PolygonId("college block f"),
     points: [
       LatLng(1.325095, 103.805490),

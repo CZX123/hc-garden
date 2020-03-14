@@ -98,13 +98,14 @@ class _HistoryPageState extends State<HistoryPage>
                         );
                       }
                       final i = index - 1;
-                      final height = width *
+                      final height = (width - 48) *
                           historicalData[i].height /
                           historicalData[i].width;
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          if (lowerResNewImages[i].isEmpty)
+                          if (lowerResImages[i].isNotEmpty &&
+                              lowerResNewImages[i].isEmpty)
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24),
@@ -112,6 +113,7 @@ class _HistoryPageState extends State<HistoryPage>
                                 borderRadius: BorderRadius.circular(8),
                                 child: CustomImage(
                                   lowerResImages[i],
+                                  height: height,
                                   placeholderColor:
                                       Theme.of(context).dividerColor,
                                 ),
