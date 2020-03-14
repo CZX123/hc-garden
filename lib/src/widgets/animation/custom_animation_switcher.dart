@@ -8,6 +8,7 @@ class CustomAnimatedSwitcher extends StatelessWidget {
   final Duration duration;
   final Curve switchInCurve;
   final Curve switchOutCurve;
+  final Alignment alignment;
 
   const CustomAnimatedSwitcher({
     Key key,
@@ -18,9 +19,10 @@ class CustomAnimatedSwitcher extends StatelessWidget {
     this.duration = const Duration(milliseconds: 300),
     this.switchInCurve,
     this.switchOutCurve,
+    this.alignment = Alignment.center,
   }) : super(key: key);
 
-  static Widget layoutBuilder(
+  Widget layoutBuilder(
     Widget currentChild,
     List<Widget> previousChildren,
   ) {
@@ -29,7 +31,7 @@ class CustomAnimatedSwitcher extends StatelessWidget {
         ...previousChildren,
         if (currentChild != null) currentChild,
       ],
-      alignment: Alignment.center,
+      alignment: alignment,
     );
   }
 
