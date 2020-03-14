@@ -2,14 +2,15 @@ import 'package:hc_garden/src/library.dart';
 
 /// [FilterNotifier] is a single [ChangeNotifier] that deals with anything
 /// involving searching, sorting & filtering of [Entity]s.
-/// 
+///
 /// Notable properties:
 /// - [searchTerm]: set the search term when searching [Entity]s
 /// - [selectedTrailKeys]: the list of trail keys that are selected in [FilterDrawer]
 /// - [toggleSortByDist()]: toggle the sorting by distance for all [Entity]s
+/// - [filter]: accepts an [EntityMap] and returns a sorted & filtered [EntityMap]
+/// based on the different filters present in the [FilterNotifier]
 
 class FilterNotifier extends ChangeNotifier {
-
   // Searching of [Entity]
 
   final searchBarFocusNode = FocusNode();
@@ -24,7 +25,6 @@ class FilterNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-
   // Filtering by [Trail]
 
   /// All trails are selected by default
@@ -36,7 +36,6 @@ class FilterNotifier extends ChangeNotifier {
     _selectedTrailKeys = selectedTrailKeys;
     notifyListeners();
   }
-
 
   // Sorting alpabetically or by distance
 
@@ -97,6 +96,46 @@ class FilterNotifier extends ChangeNotifier {
       }
       entitiesByDist[category].sort();
     });
+  }
+
+  EntityMap filter(EntityMap entities) {
+    final newEntityMap = EntityMap();
+    final categories = entities.keys.toList()..sort();
+    for (final category in categories) {
+      // Sort by distance and does filtering based on trails and search inside as well
+      if (isSortedByDistance) {
+        newEntityMap[category] = [];
+        for (final entityDistance in entities[category]) {
+          final entity = entities[category][entityDistance.key.id];
+          if (!selectedTrailKeys.every((trailKey) {
+                return entity.locations.every((location) {
+                  return location.trailLocationKey.trailKey != trailKey;
+                });
+              }) &&
+              entity.satisfies(searchTerm)) newEntityMap[category].add(entity);
+        }
+      }
+
+      // Filter by trail, no sorting by distance
+      else {
+        if (selectedTrailKeys.length == 3) {
+          newEntityMap[category] = entities[category].where((entity) {
+            return entity.satisfies(searchTerm);
+          }).toList();
+        } else {
+          newEntityMap[category] = entities[category].where((entity) {
+            return !selectedTrailKeys.every((trailKey) {
+                  return entity.locations.every((location) {
+                    return location.trailLocationKey.trailKey != trailKey;
+                  });
+                }) &&
+                entity.satisfies(searchTerm);
+          }).toList();
+        }
+        newEntityMap[category].sort();
+      }
+    }
+    return newEntityMap;
   }
 }
 

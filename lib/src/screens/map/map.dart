@@ -31,8 +31,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
     _mapController = controller;
     mapNotifier.mapController = _mapController;
-    _mapController.setMapStyle(
-        mapNotifier.mapType == CustomMapType.dark ? darkMapStyle : mapStyle);
+    _mapController.setMapStyle(mapStyle);
     // Needed to correctly apply padding
     rebuild();
   }
@@ -99,9 +98,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                 top: MediaQuery.of(context).padding.top,
               ),
               myLocationEnabled: true,
-              mapType: mapNotifier.mapType == CustomMapType.satellite
-                  ? MapType.hybrid
-                  : MapType.normal,
+              mapType: mapNotifier.mapType,
               rotateGesturesEnabled: false,
               onMapCreated: _onMapCreated,
               onCameraMove: (position) {
@@ -208,9 +205,7 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
           }
         },
       ),
-      icon: mapNotifier.mapType == CustomMapType.dark
-          ? mapNotifier.darkThemeMarkerIcons[location.key.trailKey.id]
-          : mapNotifier.lightThemeMarkerIcons[location.key.trailKey.id],
+      icon: mapNotifier.markerIcons[location.key.trailKey.id],
     );
   }
 
@@ -250,10 +245,4 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
 
   @override
   Widget build(BuildContext context) => widget.child;
-}
-
-enum CustomMapType {
-  normal,
-  satellite,
-  dark,
 }

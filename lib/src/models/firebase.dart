@@ -129,6 +129,15 @@ class FirebaseData {
 class EntityMap extends MapView<String, List<Entity>> {
   EntityMap() : super({});
 
+  /// Returns a shallow copy of the current [EntityMap]
+  EntityMap clone() {
+    final newMap = EntityMap();
+    forEach((category, entityList) {
+      newMap[category] = entityList;
+    });
+    return newMap;
+  }
+
   /// Adds entities by their `category`.
   void addEntities({String category, Map entitiesJson}) {
     this[category] = [];
