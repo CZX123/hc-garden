@@ -360,14 +360,13 @@ class HomePageScreenshot extends StatelessWidget {
         shape: RoundedRectangleBorder(
           side: BorderSide(
             color: Colors.black.withOpacity(0.78),
-            width: HomePageScreenshotLayoutDetails.borderWidth,
+            width: layoutDetails.homePageScreenshot.borderWidth,
           ),
           borderRadius: BorderRadius.circular(24.0),
         ),
         child: Container(
           width: layoutDetails.homePageScreenshot.width,
-          padding:
-              const EdgeInsets.all(HomePageScreenshotLayoutDetails.borderWidth),
+          padding: EdgeInsets.all(layoutDetails.homePageScreenshot.borderWidth),
           child: Image.asset(
             "assets/images/screenshots/homepage.png",
           ),
@@ -528,32 +527,28 @@ class HomePageScreenshotLayoutDetails {
   final OnboardingLayoutDetails parent;
   const HomePageScreenshotLayoutDetails(this.parent);
 
-  static const borderWidth = 6.0;
-  static const aspectRatio =
-      (1440.0 + 2 * borderWidth) / (2960.0 + 2 * borderWidth);
-  static const bottomBarAspectRatio =
-      (1440.0 + 2 * borderWidth) / (336.0 + borderWidth);
-  static const page3AspectRatio =
-      (1440.0 + 2 * borderWidth) / (1896.0 + borderWidth);
-  static const page4AspectRatio =
-      (1440.0 + 2 * borderWidth) / (2336.0 + borderWidth);
-  static const page5AspectRatio =
-      (1440.0 + 2 * borderWidth) / (1702.0 + borderWidth);
   static const imageWidthRatio = 0.85;
+  static const borderWidthRatio = 0.018;
+  static const imageAspectRatio = 1440 / 2960;
+  static const bottomBarAspectRatio = 1440.0 / 283.0;
+  static const page3AspectRatio = 1440.0 / 1904.0;
+  static const page4AspectRatio = 1440.0 / 2336.0;
+  static const page5AspectRatio = 1440.0 / 1702.0;
 
-  double get width => imageWidthRatio * parent.screenWidth + 2 * borderWidth;
-  double get height => width / aspectRatio;
+  double get width => imageWidthRatio * parent.screenWidth;
+  double get borderWidth => borderWidthRatio * parent.screenWidth;
+  double get height => (width - 2*borderWidth) / imageAspectRatio + 2*borderWidth;
   // 0.19 is the height ratio of the text and 0.04 is the height ratio
   // of the padding between the text and screenshot
   double get page2Y => (0.19 + 0.04) * parent.screenHeight;
   // 0.73 is the height ratio of the screenshot of the homepage
   double get page2Scale => 0.73 * parent.screenHeight / height;
   // page3AspectRatio is the aspect ratio of the top map portion of the screenshot
-  double get page3Y => parent.screenHeight - width / page3AspectRatio;
+  double get page3Y => parent.screenHeight - ((width - 2*borderWidth) / page3AspectRatio + borderWidth);
   // page4AspectRatio is the aspect ratio of the bottom portion of the screenshot
-  double get page4Y => width / page4AspectRatio - height;
+  double get page4Y => ((width - 2*borderWidth) / page4AspectRatio + borderWidth) - height;
   // page5AspectRatio is the aspect ratio of the bottom sheet portion of the screenshot
-  double get page5Y => width / page5AspectRatio - height;
+  double get page5Y => ((width - 2*borderWidth) / page5AspectRatio +borderWidth) - height;
 
   Offset get offset {
     if (parent.page <= 1.0)
@@ -638,10 +633,10 @@ class PageFourBottomSheetLayoutDetails {
   }
 
   double get page4Y =>
-      parent.homePageScreenshot.width /
-          HomePageScreenshotLayoutDetails.page4AspectRatio -
-      parent.homePageScreenshot.width /
-          HomePageScreenshotLayoutDetails.bottomBarAspectRatio;
+      ((parent.homePageScreenshot.width - 2*parent.homePageScreenshot.borderWidth) /
+          HomePageScreenshotLayoutDetails.page4AspectRatio + parent.homePageScreenshot.borderWidth)-
+      ((parent.homePageScreenshot.width - 2*parent.homePageScreenshot.borderWidth) /
+          HomePageScreenshotLayoutDetails.bottomBarAspectRatio + parent.homePageScreenshot.borderWidth);
 
   Offset get offset {
     // Initial y-coordinate is more than screenHeight in order to hide the shadow
