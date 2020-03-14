@@ -81,7 +81,7 @@ class _OnboardingPageState extends State<OnboardingPage>
             ),
             Padding(
               padding: const EdgeInsets.symmetric(
-                vertical: 4,
+                vertical: 56,
                 horizontal: 8,
               ),
               child: Row(

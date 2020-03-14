@@ -1,4 +1,5 @@
 import 'src/library.dart';
+import 'src/screens/onboarding/onboarding_testing.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
