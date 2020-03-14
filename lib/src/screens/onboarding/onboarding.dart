@@ -7,11 +7,20 @@ class OnboardingPage extends StatefulWidget {
   _OnboardingPageState createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> {
+class _OnboardingPageState extends State<OnboardingPage>
+    with SingleTickerProviderStateMixin {
   final _pageController = PageController();
+  AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController.unbounded(vsync: this);
+  }
 
   @override
   void dispose() {
+    _animationController.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -37,6 +46,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 return ChangeNotifierProvider(
                   create: (context) => OnboardingLayoutDetails(
                     pageController: _pageController,
+                    animationController: _animationController,
                     screenWidth: screenWidth,
                     screenHeight: constraints.maxHeight - topPadding,
                   ),
@@ -49,14 +59,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           itemBuilder: (context, index) {
                             if (index == 0)
                               return _OnboardingPageOne();
-                            else if (index == 1)
-                              return _OnboardingPageTwo();
-                            else if (index == 2) return SizedBox.shrink();
-                            return Center(
-                              child: Text(index.toString()),
-                            );
+                            else if (index == 1) return _OnboardingPageTwo();
+                            return SizedBox.shrink();
                           },
-                          itemCount: 4,
+                          itemCount: 5,
                         ),
                       ),
                       OnboardingAnimationWidget(),
@@ -198,9 +204,10 @@ class OnboardingAnimationWidget extends StatelessWidget {
               children: <Widget>[
                 Transform.translate(
                   offset: layoutDetails.pageThreeText.offset,
-                  child: Opacity(
-                      opacity: layoutDetails.pageThreeText.opacity,
-                      child: _PageThreeText()),
+                  child: FadeTransition(
+                    opacity: layoutDetails.pageThreeText.opacity,
+                    child: _PageThreeText(),
+                  ),
                 ),
                 Transform.translate(
                   offset: layoutDetails.homePageScreenshot.offset,
@@ -214,8 +221,15 @@ class OnboardingAnimationWidget extends StatelessWidget {
                   ),
                 ),
                 Transform.translate(
-                  offset: layoutDetails.homePageCover.offset,
-                  child: HomePageCover(),
+                  offset: layoutDetails.pageFiveText.offset,
+                  child: FadeTransition(
+                    opacity: layoutDetails.pageFiveText.opacity,
+                    child: _PageFiveText()
+                  ),
+                ),
+                Transform.translate(
+                  offset: layoutDetails.pageFourBottomSheet.offset,
+                  child: PageFourBottomSheet(),
                 ),
               ],
             ),
@@ -232,30 +246,24 @@ class _PageThreeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final layoutDetails = context.provide<OnboardingLayoutDetails>();
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24),
-        child: Container(
-          alignment: Alignment.bottomCenter,
-          height: layoutDetails.pageThreeText.containerHeight,
-          padding: EdgeInsets.only(bottom: 0.04 * layoutDetails.screenHeight),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                "Explore our",
-                style: Theme.of(context).textTheme.display1,
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                "school with Google Maps!",
-                style: Theme.of(context).textTheme.display1,
-                textAlign: TextAlign.center,
-              ),
-            ],
+    return Container(
+      alignment: Alignment.bottomCenter,
+      height: layoutDetails.pageThreeText.containerHeight,
+      padding: EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 0.04 * layoutDetails.screenHeight),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            "Explore our school",
+            style: Theme.of(context).textTheme.display1,
+            textAlign: TextAlign.center,
           ),
-        ),
+          Text(
+            "with Google Maps!",
+            style: Theme.of(context).textTheme.display1,
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -288,22 +296,101 @@ class HomePageScreenshot extends StatelessWidget {
   }
 }
 
-class HomePageCover extends StatelessWidget {
-  const HomePageCover({Key key}) : super(key: key);
+class PageFourBottomSheet extends StatelessWidget {
+  const PageFourBottomSheet({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final layoutDetails = context.provide<OnboardingLayoutDetails>();
+    final containerHeight =
+        layoutDetails.screenHeight - layoutDetails.pageFourBottomSheet.page4Y;
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(0.0, 1.0),
+            blurRadius: 10.0,
+            spreadRadius: 0.0,
+            color: Colors.black45,
+          ),
+        ],
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+        color: Theme.of(context).canvasColor,
+      ),
+      height: containerHeight,
+      width: layoutDetails.screenWidth,
+      child: Container(
+        padding: EdgeInsets.fromLTRB(
+            24.0, 0.06 * layoutDetails.screenHeight, 24.0, 0.0),
+        alignment: Alignment.topCenter,
+        height: containerHeight,
+        child: FadeTransition(
+          opacity: layoutDetails.pageFourBottomSheet.opacity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                "Check out our nature trails,",
+                style: Theme.of(context).textTheme.display1,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                "or discover our school's vibrant wildlife!",
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PageFiveText extends StatelessWidget {
+  const _PageFiveText({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final layoutDetails = context.provide<OnboardingLayoutDetails>();
     return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(offset: Offset(0.0, 1.0), blurRadius: 10.0, spreadRadius: 0.0, color: Colors.black45),
+      alignment: Alignment.topCenter,
+      height: layoutDetails.pageFiveText.containerHeight,
+      padding: EdgeInsets.fromLTRB(24.0, 0.08 * layoutDetails.screenHeight, 24.0, 0.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            "Customise your preferences",
+            style: Theme.of(context).textTheme.display1,
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            "by tapping on the menu icon, ",
+            textAlign: TextAlign.center,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            child: Text(
+              "&",
+              style: Theme.of(context).textTheme.display1.copyWith(
+                fontFamily: "Roboto",
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Text(
+            "Learn about our history",
+            style: Theme.of(context).textTheme.display1,
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            "by tapping on the history icon!",
+            textAlign: TextAlign.center,
+          ),
         ],
-        color: Colors.white,
-      ),
-      child: Container(
-        height: layoutDetails.screenHeight,
-        width: layoutDetails.screenWidth,
       ),
     );
   }
@@ -312,35 +399,47 @@ class HomePageCover extends StatelessWidget {
 class OnboardingLayoutDetails extends ChangeNotifier {
   final PageController pageController;
   double get page => pageController.page ?? 0;
+  final AnimationController _animationController;
+  Animation<double> get animation => _animationController.view;
   final double screenWidth, screenHeight;
 
   HomePageScreenshotLayoutDetails _homePageScreenshot;
   HomePageScreenshotLayoutDetails get homePageScreenshot => _homePageScreenshot;
   PageThreeTextLayoutDetails _pageThreeText;
   PageThreeTextLayoutDetails get pageThreeText => _pageThreeText;
-  HomePageCoverLayoutDetails _homePageCover;
-  HomePageCoverLayoutDetails get homePageCover => _homePageCover;
+  PageFourBottomSheetLayoutDetails _pageFourBottomSheet;
+  PageFourBottomSheetLayoutDetails get pageFourBottomSheet =>
+      _pageFourBottomSheet;
+  PageFiveTextLayoutDetails _pageFiveText;
+  PageFiveTextLayoutDetails get pageFiveText => _pageFiveText;
 
   OnboardingLayoutDetails({
     @required this.pageController,
+    @required AnimationController animationController,
     @required this.screenWidth,
     @required this.screenHeight,
-  }) {
+  }) : _animationController = animationController {
     _homePageScreenshot = HomePageScreenshotLayoutDetails(this);
     _pageThreeText = PageThreeTextLayoutDetails(this);
-    _homePageCover = HomePageCoverLayoutDetails(this);
-    pageController.addListener(notifyListeners);
+    _pageFourBottomSheet = PageFourBottomSheetLayoutDetails(this);
+    _pageFiveText = PageFiveTextLayoutDetails(this);
+    pageController.addListener(pageControllerListener);
+  }
+
+  void pageControllerListener() {
+    _animationController.value = page;
+    notifyListeners();
   }
 
   @override
   void dispose() {
-    pageController.removeListener(notifyListeners);
+    pageController.removeListener(pageControllerListener);
     super.dispose();
   }
 
   double _lerp(double startX, double endX, double startY, double endY) {
-    assert(startX <= page);
-    assert(page <= endX);
+    // assert(startX <= page);
+    // assert(page <= endX);
     return startY + ((page - startX) / (endX - startX)) * (endY - startY);
   }
 }
@@ -358,18 +457,23 @@ class HomePageScreenshotLayoutDetails {
       (1440.0 + 2 * borderWidth) / (1896.0 + borderWidth);
   static const page4AspectRatio =
       (1440.0 + 2 * borderWidth) / (2336.0 + borderWidth);
+  static const page5AspectRatio =
+      (1440.0 + 2 * borderWidth) / (1596.0 + borderWidth);
   static const imageWidthRatio = 0.85;
 
   double get width => imageWidthRatio * parent.screenWidth + 2 * borderWidth;
+  double get height => width / aspectRatio;
   // 0.19 is the height ratio of the text and 0.04 is the height ratio
   // of the padding between the text and screenshot
   double get page2Y => (0.19 + 0.04) * parent.screenHeight;
   // 0.73 is the height ratio of the screenshot of the homepage
-  double get page2Scale => 0.73 * parent.screenHeight / (width / aspectRatio);
+  double get page2Scale => 0.73 * parent.screenHeight / height;
   // page3AspectRatio is the aspect ratio of the top map portion of the screenshot
   double get page3Y => parent.screenHeight - width / page3AspectRatio;
   // page4AspectRatio is the aspect ratio of the bottom portion of the screenshot
-  double get page4Y => width / page4AspectRatio - width / aspectRatio;
+  double get page4Y => width / page4AspectRatio - height;
+  // page5AspectRatio is the aspect ratio of the bottom sheet portion of the screenshot
+  double get page5Y => width / page5AspectRatio - height;
 
   Offset get offset {
     if (parent.page <= 1.0)
@@ -381,6 +485,8 @@ class HomePageScreenshotLayoutDetails {
       return Offset(0, page3Y);
     else if (parent.page > 2.0 && parent.page <= 3.0)
       return Offset(0, parent._lerp(2.0, 3.0, page3Y, page4Y));
+    else if (parent.page > 3.0 && parent.page <= 4.0)
+      return Offset(0, parent._lerp(3.0, 4.0, page4Y, page5Y));
     return Offset(0, 0);
   }
 
@@ -395,7 +501,17 @@ class HomePageScreenshotLayoutDetails {
 
 class PageThreeTextLayoutDetails {
   final OnboardingLayoutDetails parent;
-  const PageThreeTextLayoutDetails(this.parent);
+
+  Animation<double> _page2To3Opacity, _page3To4Opacity;
+  PageThreeTextLayoutDetails(this.parent) {
+    // Opacity changes from 0 to 1.0 as the pageController changes from 1.5 to 2.0
+    _page2To3Opacity = Tween(begin: -3.0, end: -1.0).animate(parent.animation);
+    // Opacity changes from 1.0 to 0 as the pageController changes from 2.0 ro 2.3
+    _page3To4Opacity = Tween(
+      begin: 23 / 3,
+      end: 13 / 3,
+    ).animate(parent.animation);
+  }
 
   double get containerHeight => parent.homePageScreenshot.page3Y;
   // 0.19 is the height ratio of the text
@@ -411,28 +527,93 @@ class PageThreeTextLayoutDetails {
     return Offset(0, 0);
   }
 
-  double get opacity {
+  Animation<double> get opacity {
     // Text only starts appearing when the page controller is 1.5
     if (parent.page > 1.5 && parent.page <= 2.0)
-      return parent._lerp(1.5, 2.0, 0, 1.0);
+      return _page2To3Opacity;
     // Text disappears rapidly when the page controller is from 2.0 to 2.3
-    else if (parent.page > 2.0 && parent.page <= 2.3)
-      return parent._lerp(2.0, 2.3, 1.0, 0);
-    return 0;
+    else if (parent.page > 2.0 && parent.page <= 2.3) return _page3To4Opacity;
+    return const AlwaysStoppedAnimation(0.0);
   }
 }
 
-class HomePageCoverLayoutDetails {
+class PageFourBottomSheetLayoutDetails {
   final OnboardingLayoutDetails parent;
-  const HomePageCoverLayoutDetails(this.parent);
 
-  double get page4Y => parent.homePageScreenshot.width/HomePageScreenshotLayoutDetails.page4AspectRatio - parent.homePageScreenshot.width/HomePageScreenshotLayoutDetails.bottomBarAspectRatio;
+  Animation<double> _page3To4TextOpacity, _page4To5TextOpacity;
+  PageFourBottomSheetLayoutDetails(this.parent) {
+    // Opacity changes from 0 to 1.0 as the pageController changes from 2.5 to 3.0
+    _page3To4TextOpacity =
+        Tween(begin: -5.0, end: -3.0).animate(parent.animation);
+    // Opacity changes from 1.0 to 0 as the pageController changes from 3.0 to 3.3
+    _page4To5TextOpacity = Tween(
+      begin: 11.0,
+      end: 23 / 3,
+    ).animate(parent.animation);
+  }
+
+  double get page4Y =>
+      parent.homePageScreenshot.width /
+          HomePageScreenshotLayoutDetails.page4AspectRatio -
+      parent.homePageScreenshot.width /
+          HomePageScreenshotLayoutDetails.bottomBarAspectRatio;
 
   Offset get offset {
+    // Initial y-coordinate is more than screenHeight in order to hide the shadow
     if (parent.page <= 2.0)
-      return Offset(0, parent.screenHeight);
+      return Offset(0, parent.screenHeight + 20);
     else if (parent.page > 2.0 && parent.page <= 3.0)
-      return Offset(0, parent._lerp(2.0, 3.0, parent.screenHeight, page4Y));
+      return Offset(
+          0, parent._lerp(2.0, 3.0, parent.screenHeight + 20, page4Y));
+    // Material only moves when the pageController changes from 3.0 to 3.6
+    else if (parent.page > 3.0 && parent.page <= 3.6)
+      return Offset(
+          0, parent._lerp(3.0, 3.6, page4Y, parent.screenHeight + 20));
+    else if (parent.page > 3.6 && parent.page <= 4.0)
+      return Offset(0, parent.screenHeight + 20);
     return Offset(0, 0);
+  }
+
+  Animation<double> get opacity {
+    if (parent.page > 2.5 && parent.page <= 3.0)
+      return _page3To4TextOpacity;
+    else if (parent.page > 3.0 && parent.page <= 3.3)
+      return _page4To5TextOpacity;
+    return const AlwaysStoppedAnimation(0.0);
+  }
+}
+
+class PageFiveTextLayoutDetails {
+  final OnboardingLayoutDetails parent;
+
+  Animation<double> _page4To5TextOpacity, _page5To6TextOpacity;
+  PageFiveTextLayoutDetails(this.parent) {
+    // Opacity changes from 0 to 1.0 as the pageController changes from 3.5 to 4.0
+    _page4To5TextOpacity =
+        Tween(begin: -7.0, end: -5.0).animate(parent.animation);
+    // Opacity changes from 1.0 to 0 as the pageController changes from 4.0 to 4.3
+    // _page5To6TextOpacity = Tween(
+    //   begin: 11.0,
+    //   end: 23 / 3,
+    // ).animate(parent.animation);
+  }
+
+  double get page5Y =>
+      parent.homePageScreenshot.page5Y +
+      parent.homePageScreenshot.height;
+  double get containerHeight => parent.screenHeight - page5Y;
+
+  Offset get offset {
+    if (parent.page <= 3.0)
+      return Offset(0, parent.screenHeight);
+    else if (parent.page > 3.0 && parent.page <= 4.0)
+      return Offset(
+          0, parent._lerp(3.0, 4.0, parent.screenHeight, page5Y));
+    return Offset(0, parent.screenHeight);
+  }
+
+  Animation<double> get opacity {
+    if(parent.page > 3.5 && parent.page <= 4.0) return _page4To5TextOpacity;
+    return AlwaysStoppedAnimation(0.0);
   }
 }
