@@ -5,24 +5,12 @@ class MapNotifier extends ChangeNotifier {
   bool permissionEnabled;
   bool gpsOn;
   GoogleMapController mapController;
-  final lightThemeMarkerIcons = [
+  final markerIcons = [
     BitmapDescriptor.defaultMarkerWithHue(38),
     BitmapDescriptor.defaultMarkerWithHue(340),
     BitmapDescriptor.defaultMarkerWithHue(199),
     BitmapDescriptor.defaultMarkerWithHue(90),
   ];
-  List<BitmapDescriptor> _darkThemeMarkerIcons;
-  List<BitmapDescriptor> get darkThemeMarkerIcons {
-    if (_darkThemeMarkerIcons == null) {
-      // If something goes wrong, return the light theme icons instead so no fatal errors occur
-      return lightThemeMarkerIcons;
-    }
-    return _darkThemeMarkerIcons;
-  }
-
-  set darkThemeMarkerIcons(List<BitmapDescriptor> darkThemeMarkerIcons) {
-    _darkThemeMarkerIcons = darkThemeMarkerIcons;
-  }
 
   CameraPosition cameraPosition;
 
@@ -39,53 +27,15 @@ class MapNotifier extends ChangeNotifier {
     return angle;
   }
 
-  CustomMapType _mapType = CustomMapType.normal;
-  CustomMapType get mapType => _mapType;
-  set mapType(CustomMapType mapType) {
-    if (mapType != _mapType) {
-      if (mapType == CustomMapType.dark) {
-        mapController?.setMapStyle(darkMapStyle);
-        for (var id in defaultMarkers?.keys ?? []) {
-          defaultMarkers[id] = defaultMarkers[id].copyWith(
-            iconParam:
-                darkThemeMarkerIcons[int.parse(id.value.split(' ').first) - 1],
-          );
-        }
-        for (var id in markers?.keys ?? []) {
-          markers[id] = markers[id].copyWith(
-            iconParam: greenMarkers.contains(id)
-                ? darkThemeMarkerIcons.last
-                : darkThemeMarkerIcons[
-                    int.parse(id.value.split(' ').first) - 1],
-          );
-        }
-      } else {
-        if (mapType == CustomMapType.normal) {
-          mapController?.setMapStyle(mapStyle);
-        }
-        if (_mapType == CustomMapType.dark) {
-          for (var id in defaultMarkers?.keys ?? []) {
-            defaultMarkers[id] = defaultMarkers[id].copyWith(
-              iconParam: lightThemeMarkerIcons[
-                  int.parse(id.value.split(' ').first) - 1],
-            );
-          }
-          for (var id in markers?.keys ?? []) {
-            markers[id] = markers[id].copyWith(
-              iconParam: greenMarkers.contains(id)
-                  ? lightThemeMarkerIcons.last
-                  : lightThemeMarkerIcons[
-                      int.parse(id.value.split(' ').first) - 1],
-            );
-          }
-        }
-      }
-      SharedPreferences.getInstance().then((prefs) {
-        prefs.setInt('mapType', CustomMapType.values.indexOf(mapType));
-      });
-      _mapType = mapType;
-      notifyListeners();
-    }
+  MapType _mapType = MapType.normal;
+  MapType get mapType => _mapType;
+  set mapType(MapType mapType) {
+    if (mapType == _mapType) return;
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setInt('mapType', MapType.values.indexOf(mapType));
+    });
+    _mapType = mapType;
+    notifyListeners();
   }
 
   List<MarkerId> greenMarkers = [];
@@ -122,9 +72,7 @@ class MapNotifier extends ChangeNotifier {
     isDefaultMarkers = false;
     greenMarkers.add(markerId);
     markers[markerId] = markers[markerId].copyWith(
-      iconParam: mapType == CustomMapType.dark
-          ? darkThemeMarkerIcons.last
-          : lightThemeMarkerIcons.last,
+      iconParam: markerIcons.last,
     );
   }
 

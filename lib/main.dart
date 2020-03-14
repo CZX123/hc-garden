@@ -57,20 +57,7 @@ class _HcGardenAppState extends State<HcGardenApp> {
       final isDark = prefs.getBool('isDark');
       _firstTime = isDark == null;
       _themeNotifier.value = isDark ?? false;
-      _mapNotifier.mapType = CustomMapType.values[prefs.getInt('mapType') ?? 0];
-    });
-
-    // Load and convert all markers to bitmap descriptors
-    final markerColors = ['yellow', 'pink', 'blue', 'green'];
-    Future.wait<BitmapDescriptor>(
-      markerColors.map((color) {
-        return BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(),
-          'assets/images/google_maps/${color}_marker.png',
-        );
-      }),
-    ).then((bitmapList) {
-      _mapNotifier.darkThemeMarkerIcons = bitmapList;
+      _mapNotifier.mapType = MapType.values[prefs.getInt('mapType') ?? 0];
     });
 
     // Handle firebase data

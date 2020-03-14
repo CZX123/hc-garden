@@ -39,8 +39,9 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
     });
   }
 
-  void _changeMapType(CustomMapType newType) {
-    Provider.of<MapNotifier>(context, listen: false).mapType = newType;
+  void _changeMapType(MapType newType) {
+    final mapNotifier = context.provide<MapNotifier>(listen: false);
+    mapNotifier.mapType = newType;
   }
 
   @override
@@ -106,39 +107,28 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                         style: Theme.of(context).textTheme.subtitle,
                       ),
                     ),
-                    Selector<MapNotifier, CustomMapType>(
+                    Selector<MapNotifier, MapType>(
                       selector: (context, m) => m.mapType,
                       builder: (context, mapType, child) {
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            RadioListTile<CustomMapType>(
+                            RadioListTile<MapType>(
                               dense: true,
                               controlAffinity: ListTileControlAffinity.trailing,
                               groupValue: mapType,
-                              value: CustomMapType.normal,
+                              value: MapType.normal,
                               title: Text(
                                 'Normal',
                                 style: Theme.of(context).textTheme.body1,
                               ),
                               onChanged: _changeMapType,
                             ),
-                            RadioListTile<CustomMapType>(
+                            RadioListTile<MapType>(
                               dense: true,
                               controlAffinity: ListTileControlAffinity.trailing,
                               groupValue: mapType,
-                              value: CustomMapType.dark,
-                              title: Text(
-                                'Dark',
-                                style: Theme.of(context).textTheme.body1,
-                              ),
-                              onChanged: _changeMapType,
-                            ),
-                            RadioListTile<CustomMapType>(
-                              dense: true,
-                              controlAffinity: ListTileControlAffinity.trailing,
-                              groupValue: mapType,
-                              value: CustomMapType.satellite,
+                              value: MapType.hybrid,
                               title: Text(
                                 'Satellite',
                                 style: Theme.of(context).textTheme.body1,

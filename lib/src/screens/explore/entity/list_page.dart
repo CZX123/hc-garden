@@ -16,66 +16,26 @@ class EntityListPage extends StatelessWidget {
     final firebaseData = context.provide<FirebaseData>();
     if (firebaseData == null) return const SizedBox.shrink();
 
-    final entities = firebaseData.entities;
-
-    List<String> categories = ['flora'];
-    if (!isFlora) {
-      categories = entities.keys.where((category) {
-        return category != 'flora';
-      }).toList()
-        ..sort();
+    EntityMap entities;
+    if (isFlora) {
+      entities = EntityMap();
+      entities['flora'] = firebaseData.entities['flora'];
+    } else {
+      entities = firebaseData.entities.clone();
+      entities.remove('flora');
     }
 
     final filterNotifier = context.provide<FilterNotifier>();
-    final searchTerm = filterNotifier.searchTerm;
-    var selectedTrailKeys = filterNotifier.selectedTrailKeys;
-    final newEntityMap = EntityMap();
-
-    for (final category in categories) {
-      // Sort by distance and does filtering based on trails and search inside as well
-      if (filterNotifier.isSortedByDistance) {
-        newEntityMap[category] = [];
-        for (final entityDistance in filterNotifier.entitiesByDist[category]) {
-          final entity = firebaseData.entities[category][entityDistance.key.id];
-          if (!selectedTrailKeys.every((trailKey) {
-                return entity.locations.every((location) {
-                  return location.trailLocationKey.trailKey != trailKey;
-                });
-              }) &&
-              entity.satisfies(searchTerm)) newEntityMap[category].add(entity);
-        }
-      }
-
-      // Filter by trail, no sorting by distance
-      else {
-        if (selectedTrailKeys.length == 3) {
-          newEntityMap[category] =
-              firebaseData.entities[category].where((entity) {
-            return entity.satisfies(searchTerm);
-          }).toList();
-        } else {
-          newEntityMap[category] =
-              firebaseData.entities[category].where((entity) {
-            return !selectedTrailKeys.every((trailKey) {
-                  return entity.locations.every((location) {
-                    return location.trailLocationKey.trailKey != trailKey;
-                  });
-                }) &&
-                entity.satisfies(searchTerm);
-          }).toList();
-        }
-        newEntityMap[category].sort();
-      }
-    }
+    final newEntityMap = filterNotifier.filter(entities);
 
     final categoriesEntityCount = newEntityMap.map((category, entities) {
       return MapEntry(category, max(entities.length, 1));
     });
-    final key = searchTerm + categoriesEntityCount.values.join();
 
     return CustomAnimatedSwitcher(
       child: Stack(
-        key: ValueKey(key),
+        key: ValueKey(
+            filterNotifier.searchTerm + categoriesEntityCount.values.join()),
         children: <Widget>[
           CustomScrollView(
             controller: scrollController,
@@ -86,12 +46,12 @@ class EntityListPage extends StatelessWidget {
                   height: 16,
                 ),
               ),
-              for (final category in categories) ...[
+              for (final entry in newEntityMap.entries) ...[
                 if (!isFlora) SliverEntityHeaderSpace(),
                 SliverEntityList(
                   categoriesEntityCount: categoriesEntityCount,
-                  entities: newEntityMap[category],
-                  category: category,
+                  entities: entry.value,
+                  category: entry.key,
                   scrollController: scrollController,
                 ),
               ],
@@ -129,7 +89,6 @@ class _FaunaListCategoriesState extends State<FaunaListCategories>
     with TickerProviderStateMixin {
   // Needed when scroll scontroller throws an error, so this offset can be used instead
   List<double> _breakPoints = [0];
-  List<Widget> _categoryButtons;
 
   @override
   void initState() {
@@ -143,19 +102,6 @@ class _FaunaListCategoriesState extends State<FaunaListCategories>
           48.0 + count * (searchTerm.isEmpty ? 104 : 84) + _breakPoints.last);
     });
     _breakPoints.removeLast();
-    _categoryButtons = [
-      for (int i = 0; i < widget.categoriesEntityCount.length; i++)
-        EntityCategoryButton(
-          title: widget.categoriesEntityCount.keys.elementAt(i),
-          onTap: () {
-            widget.scrollController.animateTo(
-              _breakPoints[i],
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.fastOutSlowIn,
-            );
-          },
-        ),
-    ];
   }
 
   @override
@@ -169,125 +115,24 @@ class _FaunaListCategoriesState extends State<FaunaListCategories>
           48.0 + count * (searchTerm.isEmpty ? 104 : 84) + _breakPoints.last);
     });
     _breakPoints.removeLast();
-    _categoryButtons = [
-      for (int i = 0; i < widget.categoriesEntityCount.length; i++)
-        EntityCategoryButton(
-          title: widget.categoriesEntityCount.keys.elementAt(i),
-          onTap: () {
-            widget.scrollController.animateTo(
-              _breakPoints[i] + 16,
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.fastOutSlowIn,
-            );
-          },
-        ),
-    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = Theme.of(context).canvasColor;
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final height = MediaQuery.of(context).size.height;
+    final categories = widget.categoriesEntityCount.keys.toList();
+
     return Stack(
       fit: StackFit.expand,
       children: [
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: bottomPadding + Sizes.kBottomBarHeight - 1,
-          child: AnimatedBuilder(
-            animation: widget.scrollController,
-            builder: (context, child) {
-              double current = 0;
-              try {
-                current = widget.scrollController.offset;
-              } catch (e) {}
-              final end = _breakPoints.last + 16;
-              final start = end -
-                  height +
-                  topPadding +
-                  Sizes.hEntityButtonHeightCollapsed +
-                  16 +
-                  bottomPadding +
-                  Sizes.kBottomBarHeight +
-                  40;
-              return Material(
-                shape: Border(
-                  top: BorderSide(
-                    color: current > start
-                        ? Colors.transparent
-                        : Theme.of(context).dividerColor,
-                  ),
-                ),
-                color: current > start ? Colors.transparent : bgColor,
-                child: child,
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 9, top: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  for (int i = 0; i < _categoryButtons.length; i++)
-                    AnimatedBuilder(
-                      animation: widget.scrollController,
-                      builder: (context, child) {
-                        double current = 0;
-                        double speed = 0;
-                        try {
-                          current = widget.scrollController.offset;
-                          speed = widget
-                              .scrollController.position.activity.velocity
-                              .abs();
-                        } catch (e) {}
-                        final duration =
-                            speed == 0 ? 100 : min(100, 100000 ~/ speed);
-                        final end = _breakPoints[i] + 16;
-                        final start = end -
-                            height +
-                            topPadding +
-                            Sizes.hEntityButtonHeightCollapsed +
-                            16 +
-                            bottomPadding +
-                            Sizes.kBottomBarHeight +
-                            40;
-                        final widthFactor = current > start + 48 ? 0.0 : 1.0;
-                        return TweenAnimationBuilder(
-                          tween: Tween(
-                            begin: widthFactor,
-                            end: widthFactor,
-                          ),
-                          duration: Duration(milliseconds: duration),
-                          curve: Curves.easeOutQuad,
-                          builder: (context, value, child) {
-                            return Align(
-                              alignment: Alignment.centerLeft,
-                              widthFactor: value,
-                              child: Visibility(
-                                visible: current < start,
-                                maintainState: true,
-                                maintainAnimation: true,
-                                maintainSize: true,
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: child,
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 14),
-                        child: _categoryButtons[i],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
+        FaunaCategoriesRow(
+          scrollController: widget.scrollController,
+          categories: categories,
+          breakPoints: _breakPoints,
         ),
-        for (int i = 0; i < _categoryButtons.length; i++)
+        for (int i = 0; i < categories.length; i++)
           AnimatedBuilder(
             animation: widget.scrollController,
             builder: (context, child) {
@@ -304,17 +149,24 @@ class _FaunaListCategoriesState extends State<FaunaListCategories>
                   bottomPadding +
                   Sizes.kBottomBarHeight +
                   40;
-              final nextEnd = i + 1 == _categoryButtons.length
+              final nextEnd = i + 1 == categories.length
                   ? double.infinity
                   : _breakPoints[i + 1] + 16;
               double y = 0;
+              double headerMorphRatio = 1;
               if (current < start || current > nextEnd) {
-                return const SizedBox();
+                return const SizedBox.shrink();
               } else if (current >= start && current < end) {
                 y = end - current;
+                if (current < end - 16) {
+                  headerMorphRatio = 0;
+                } else {
+                  headerMorphRatio = 1 - y / 16;
+                }
               } else if (current > nextEnd - 48) {
                 y = nextEnd - 48 - current;
               }
+
               return Positioned(
                 top: y,
                 left: 0,
@@ -328,48 +180,194 @@ class _FaunaListCategoriesState extends State<FaunaListCategories>
                     ),
                   ),
                   color: current < end ? Colors.transparent : null,
-                  child: child,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        child: Material(
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              color: ColorTween(
+                                begin: Theme.of(context).dividerColor,
+                                end: Theme.of(context)
+                                    .dividerColor
+                                    .withOpacity(0),
+                              ).transform(headerMorphRatio * 2),
+                            ),
+                            borderRadius: BorderRadius.circular(69),
+                          ),
+                          animationDuration: Duration.zero,
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            child: Container(
+                              height: FaunaCategoryButton.height,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8 - headerMorphRatio * 8,
+                              ),
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                categories[i][0].toUpperCase() +
+                                    categories[i].substring(1),
+                                style: Theme.of(context).textTheme.subtitle,
+                              ),
+                            ),
+                            onTap: headerMorphRatio > 0.5
+                                ? null
+                                : () {
+                                    widget.scrollController.animateTo(
+                                      _breakPoints[i] + 20,
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      curve: Curves.fastOutSlowIn,
+                                    );
+                                  },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  child: _categoryButtons[i],
-                ),
-              ],
-            ),
           ),
       ],
     );
   }
 }
 
-class SliverEntityHeaderSpace extends StatelessWidget {
-  const SliverEntityHeaderSpace({Key key}) : super(key: key);
+class FaunaCategoriesRow extends StatelessWidget {
+  final ScrollController scrollController;
+  final List<String> categories;
+  final List<double> breakPoints;
+  const FaunaCategoriesRow({
+    Key key,
+    @required this.scrollController,
+    @required this.categories,
+    @required this.breakPoints,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const SliverToBoxAdapter(
-      child: SizedBox(
-        height: 48,
+    final bgColor = Theme.of(context).canvasColor;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final height = MediaQuery.of(context).size.height;
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: bottomPadding + Sizes.kBottomBarHeight - 1,
+      child: AnimatedBuilder(
+        animation: scrollController,
+        builder: (context, child) {
+          double current = 0;
+          try {
+            current = scrollController.offset;
+          } catch (e) {}
+          final end = breakPoints.last + 16;
+          final start = end -
+              height +
+              topPadding +
+              Sizes.hEntityButtonHeightCollapsed +
+              16 +
+              bottomPadding +
+              Sizes.kBottomBarHeight +
+              40;
+          return Material(
+            animationDuration: const Duration(milliseconds: 100),
+            shape: Border(
+              top: BorderSide(
+                color: current > start
+                    ? Colors.transparent
+                    : Theme.of(context).dividerColor,
+              ),
+            ),
+            color: current > start ? Colors.transparent : bgColor,
+            child: child,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 9, top: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              for (int i = 0; i < categories.length; i++)
+                AnimatedBuilder(
+                  animation: scrollController,
+                  builder: (context, child) {
+                    double current = 0;
+                    double speed = 0;
+                    try {
+                      current = scrollController.offset;
+                      speed = scrollController.position.activity.velocity.abs();
+                    } catch (e) {}
+                    final duration =
+                        speed == 0 ? 100 : min(100, 100000 ~/ speed);
+                    final end = breakPoints[i] + 16;
+                    final start = end -
+                        height +
+                        topPadding +
+                        Sizes.hEntityButtonHeightCollapsed +
+                        16 +
+                        bottomPadding +
+                        Sizes.kBottomBarHeight +
+                        40;
+                    final widthFactor = current > start + 48 ? 0.0 : 1.0;
+                    return TweenAnimationBuilder(
+                      tween: Tween(
+                        begin: widthFactor,
+                        end: widthFactor,
+                      ),
+                      duration: Duration(milliseconds: duration),
+                      curve: Curves.easeOutQuad,
+                      builder: (context, value, child) {
+                        return Align(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: value,
+                          child: Visibility(
+                            visible: current < start,
+                            maintainState: true,
+                            maintainAnimation: true,
+                            maintainSize: true,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: child,
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 14),
+                    child: FaunaCategoryButton(
+                      title: categories[i],
+                      onTap: () {
+                        scrollController.animateTo(
+                          breakPoints[i] + 20,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.fastOutSlowIn,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-class EntityCategoryButton extends StatelessWidget {
+class FaunaCategoryButton extends StatelessWidget {
   static const height = 32.0;
 
   final String title;
   final VoidCallback onTap;
 
-  const EntityCategoryButton({
+  const FaunaCategoryButton({
     Key key,
     @required this.title,
     @required this.onTap,
@@ -401,6 +399,19 @@ class EntityCategoryButton extends StatelessWidget {
   }
 }
 
+class SliverEntityHeaderSpace extends StatelessWidget {
+  const SliverEntityHeaderSpace({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const SliverToBoxAdapter(
+      child: SizedBox(
+        height: 48,
+      ),
+    );
+  }
+}
+
 class SliverEntityList extends StatelessWidget {
   final Map<String, int> categoriesEntityCount;
   final List<Entity> entities;
@@ -414,13 +425,13 @@ class SliverEntityList extends StatelessWidget {
     @required this.scrollController,
   }) : super(key: key);
 
-  static const notFoundIcons = [
-    Icons.nature_people,
-    Icons.filter_vintage,
-    Icons.spa,
-    Icons.bug_report,
-    Icons.pets,
-  ];
+  // static const notFoundIcons = [
+  //   Icons.nature_people,
+  //   Icons.filter_vintage,
+  //   Icons.spa,
+  //   Icons.bug_report,
+  //   Icons.pets,
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -495,7 +506,7 @@ class _EntityListRowState extends State<EntityListRow> {
 
   /// Needed for fauna, where the space for previous categories also\
   /// needs to be correctly calculated
-  double _previousCategoriesHeight = 0;
+  double _previousCategoriesHeight;
 
   double _getSourceTop() {
     if (!widget.scrollController.hasClients) return null;
@@ -518,6 +529,7 @@ class _EntityListRowState extends State<EntityListRow> {
         context.provide<FilterNotifier>(listen: false).searchTerm;
     _rowHeight = searchTerm.isEmpty ? 104 : 84;
 
+    _previousCategoriesHeight = 0;
     if (widget.entity.key.category != 'flora') {
       _previousCategoriesHeight += 48;
       for (final entry in widget.categoriesEntityCount.entries) {

@@ -58,10 +58,6 @@ flutter:
     - assets/images/hci.png
     - assets/images/app_logo/android.png
     - assets/images/app_logo/app_logo.png
-    - assets/images/google_maps/blue_marker.png
-    - assets/images/google_maps/pink_marker.png
-    - assets/images/google_maps/yellow_marker.png
-    - assets/images/google_maps/green_marker.png
     - assets/images/screenshots/homepage.png
   fonts:
     - family: Manrope

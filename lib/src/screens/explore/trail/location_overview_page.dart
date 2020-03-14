@@ -13,10 +13,104 @@ class TrailLocationOverviewPage extends StatefulWidget {
 }
 
 class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
-  bool _init = false;
-  BottomSheetNotifier _bottomSheetNotifier;
   final _scrollController = ScrollController();
-  double _aspectRatio;
+
+  @override
+  void initState() {
+    super.initState();
+    final appNotifier = context.provide<AppNotifier>(listen: false);
+    appNotifier.updateScrollController(
+      context: context,
+      dataKey: widget.trailLocationKey,
+      scrollController: _scrollController,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomSheetNotifier =
+        context.provide<BottomSheetNotifier>(listen: false);
+
+    final trailLocation = FirebaseData.getTrailLocation(
+      context: context,
+      key: widget.trailLocationKey,
+    );
+
+    return Material(
+      type: MaterialType.transparency,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ValueListenableBuilder(
+              valueListenable: bottomSheetNotifier.animation,
+              builder: (context, value, child) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight - value,
+                  ),
+                  child: child,
+                );
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const TopPaddingSpace(),
+                  Hero(
+                    tag: widget.trailLocationKey,
+                    child: InfoRow(
+                      image: trailLocation.smallImage,
+                      title: trailLocation.name,
+                      subtitle: trailLocation.entityPositions
+                          .map((position) {
+                            return FirebaseData.getEntity(
+                              context: context,
+                              key: position.entityKey,
+                            )?.name;
+                          })
+                          .where((name) => name != null)
+                          .join(', '),
+                      subtitleStyle:
+                          Theme.of(context).textTheme.caption.copyWith(
+                                fontSize: 13.5,
+                              ),
+                    ),
+                  ),
+                  TrailLocationOverview(
+                    trailLocation: trailLocation,
+                  ),
+                  const SizedBox(height: Sizes.kBottomBarHeight),
+                  const BottomPadding(),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class TrailLocationOverview extends StatefulWidget {
+  final TrailLocation trailLocation;
+  const TrailLocationOverview({
+    Key key,
+    @required this.trailLocation,
+  }) : super(key: key);
+
+  @override
+  _TrailLocationOverviewState createState() => _TrailLocationOverviewState();
+}
+
+class _TrailLocationOverviewState extends State<TrailLocationOverview> {
+  BottomSheetNotifier _bottomSheetNotifier;
+  final _aspectRatio = ValueNotifier<double>(null);
   final _rotate = ValueNotifier(false);
   final _showRotateIcon = ValueNotifier(false);
   Timer _hideRotateIconTimer;
@@ -32,7 +126,7 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
     _hideRotateIconTimer?.cancel();
     if (!_showRotateIcon.value) {
       if (_bottomSheetNotifier.animation.value > 10 ||
-          _aspectRatio != null && _aspectRatio <= 1) return;
+          _aspectRatio.value != null && _aspectRatio.value <= 1) return;
       _hideRotateIconTimer = Timer(Duration(seconds: 3), () {
         if (_showRotateIcon.value) _showRotateIcon.value = false;
       });
@@ -48,167 +142,100 @@ class _TrailLocationOverviewPageState extends State<TrailLocationOverviewPage> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_init) {
-      context.provide<AppNotifier>(listen: false).updateScrollController(
-            context: context,
-            dataKey: widget.trailLocationKey,
-            scrollController: _scrollController,
-          );
-      _init = true;
-    }
-  }
-
-  @override
   void dispose() {
     _hideRotateIconTimer?.cancel();
     _bottomSheetNotifier.animation.removeListener(_listener);
-    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final trailLocation = FirebaseData.getTrailLocation(
-      context: context,
-      key: widget.trailLocationKey,
-    );
-
-    return GestureDetector(
-      onTap: _toggleRotateIcon,
-      child: Material(
-        type: MaterialType.transparency,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Align(
-              alignment: Alignment.topCenter,
-              child: ValueListenableBuilder(
-                valueListenable: _bottomSheetNotifier.animation,
-                builder: (context, value, child) {
-                  return ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: constraints.maxHeight - value,
-                    ),
-                    child: child,
-                  );
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const TopPaddingSpace(),
-                    Hero(
-                      tag: widget.trailLocationKey,
-                      child: InfoRow(
-                        image: trailLocation.smallImage,
-                        title: trailLocation.name,
-                        subtitle: trailLocation.entityPositions
-                            .map((position) {
-                              return FirebaseData.getEntity(
-                                context: context,
-                                key: position.entityKey,
-                              )?.name;
-                            })
-                            .where((name) => name != null)
-                            .join(', '),
-                        subtitleStyle:
-                            Theme.of(context).textTheme.caption.copyWith(
-                                  fontSize: 13.5,
-                                ),
+    return Expanded(
+      child: GestureDetector(
+        onTap: _toggleRotateIcon,
+        child: ClipRect(
+          child: Stack(
+            children: <Widget>[
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return OverflowBox(
+                    minHeight: 0,
+                    maxHeight: double.infinity,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: 0,
+                        maxHeight: 5000,
                       ),
-                    ),
-                    Expanded(
-                      child: ClipRect(
-                        child: Stack(
-                          children: <Widget>[
-                            LayoutBuilder(
-                              builder: (context, constraints) {
-                                return OverflowBox(
-                                  minHeight: 0,
-                                  maxHeight: double.infinity,
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minHeight: 0,
-                                      maxHeight: 5000,
-                                    ),
-                                    child: Center(
-                                      child: ValueListenableBuilder<bool>(
-                                        valueListenable: _rotate,
-                                        builder: (context, value, child) {
-                                          return CustomAnimatedSwitcher(
-                                            child: RotatedBox(
-                                              key: ValueKey(value),
-                                              quarterTurns: value ? 1 : 0,
-                                              child: TrailLocationImageWidget(
-                                                trailLocation: trailLocation,
-                                                aspectRatio: _aspectRatio,
-                                                onLoad: (double aspectRatio) {
-                                                  setState(() {
-                                                    _aspectRatio = aspectRatio;
-                                                  });
-                                                  _toggleRotateIcon();
-                                                },
-                                                rotated: value,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            Positioned(
-                              bottom: 8,
-                              right: 8,
-                              child: ValueListenableBuilder<bool>(
-                                valueListenable: _showRotateIcon,
-                                builder: (context, value, child) {
-                                  return IgnorePointer(
-                                    ignoring: !value,
-                                    child: AnimatedOpacity(
-                                      duration:
-                                          const Duration(milliseconds: 200),
-                                      curve: Curves.ease,
-                                      opacity: value ? 1 : 0,
-                                      child: child,
-                                    ),
-                                  );
-                                },
-                                child: FloatingActionButton(
-                                  child: Icon(
-                                    Icons.sync,
-                                    color: Theme.of(context).hintColor,
-                                  ),
-                                  shape: CircleBorder(
-                                    side: BorderSide(
-                                      color: Theme.of(context).dividerColor,
-                                    ),
-                                  ),
-                                  elevation: 0,
-                                  highlightElevation: 0,
-                                  mini: true,
-                                  backgroundColor:
-                                      Theme.of(context).bottomAppBarColor,
-                                  onPressed: () {
-                                    _rotate.value = !_rotate.value;
-                                    _toggleRotateIcon();
+                      child: Center(
+                        child: ValueListenableBuilder<bool>(
+                          valueListenable: _rotate,
+                          builder: (context, value, child) {
+                            return CustomAnimatedSwitcher(
+                              child: RotatedBox(
+                                key: ValueKey(value),
+                                quarterTurns: value ? 1 : 0,
+                                child: ValueListenableBuilder<double>(
+                                  valueListenable: _aspectRatio,
+                                  builder: (context, ratio, child) {
+                                    return TrailLocationImageWidget(
+                                      trailLocation: widget.trailLocation,
+                                      aspectRatio: ratio,
+                                      onLoad: (double aspectRatio) {
+                                        _aspectRatio.value = aspectRatio;
+                                        _toggleRotateIcon();
+                                      },
+                                      rotated: value,
+                                    );
                                   },
                                 ),
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
                       ),
                     ),
-                    const SizedBox(height: Sizes.kBottomBarHeight),
-                    const BottomPadding(),
-                  ],
+                  );
+                },
+              ),
+              Positioned(
+                bottom: 8,
+                right: 8,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _showRotateIcon,
+                  builder: (context, value, child) {
+                    return IgnorePointer(
+                      ignoring: !value,
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.ease,
+                        opacity: value ? 1 : 0,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: FloatingActionButton(
+                    child: Icon(
+                      Icons.sync,
+                      color: Theme.of(context).hintColor,
+                    ),
+                    shape: CircleBorder(
+                      side: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                      ),
+                    ),
+                    elevation: 0,
+                    highlightElevation: 0,
+                    mini: true,
+                    backgroundColor: Theme.of(context).bottomAppBarColor,
+                    onPressed: () {
+                      _rotate.value = !_rotate.value;
+                      _toggleRotateIcon();
+                    },
+                  ),
                 ),
               ),
-            );
-          },
+            ],
+          ),
         ),
       ),
     );
