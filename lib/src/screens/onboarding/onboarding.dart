@@ -81,7 +81,7 @@ class _OnboardingPageState extends State<OnboardingPage>
             ),
             Padding(
               padding: const EdgeInsets.symmetric(
-                vertical: 56,
+                vertical: 4,
                 horizontal: 8,
               ),
               child: Row(
@@ -542,7 +542,7 @@ class HomePageScreenshotLayoutDetails {
   // of the padding between the text and screenshot
   double get page2Y => (0.19 + 0.04) * parent.screenHeight;
   // 0.73 is the height ratio of the screenshot of the homepage
-  double get page2Scale => 0.73 * parent.screenHeight / height;
+  double get page2Scale => 0.71 * parent.screenHeight / height;
   // page3AspectRatio is the aspect ratio of the top map portion of the screenshot
   double get page3Y => parent.screenHeight - ((width - 2*borderWidth) / page3AspectRatio + borderWidth);
   // page4AspectRatio is the aspect ratio of the bottom portion of the screenshot
