@@ -25,6 +25,9 @@ class _OnboardingPageState extends State<OnboardingPage>
     super.dispose();
   }
 
+  double get page =>
+      _pageController.hasClients ? (_pageController.page ?? 0) : 0;
+
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
@@ -59,10 +62,12 @@ class _OnboardingPageState extends State<OnboardingPage>
                           itemBuilder: (context, index) {
                             if (index == 0)
                               return _OnboardingPageOne();
-                            else if (index == 1) return _OnboardingPageTwo();
+                            else if (index == 1)
+                              return _OnboardingPageTwo();
+                            else if (index == 5) return _OnboardingPageSix();
                             return SizedBox.shrink();
                           },
-                          itemCount: 5,
+                          itemCount: 6,
                         ),
                       ),
                       OnboardingAnimationWidget(),
@@ -94,20 +99,51 @@ class _OnboardingPageState extends State<OnboardingPage>
                         textTheme: ButtonTextTheme.accent,
                       ),
                     ),
-                    child: FlatButton(
-                      child: const Text('Cancel'),
-                      onPressed: Navigator.of(context).pop,
+                    child: AnimatedBuilder(
+                      animation: _pageController,
+                      builder: (context, child) {
+                        return FlatButton(
+                          child: CustomAnimatedSwitcher(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              page < 0.5 ? 'Cancel' : 'Previous',
+                              key: ValueKey((page < 0.5).toString()),
+                            ),
+                          ),
+                          onPressed: page < 1
+                              ? Navigator.of(context).pop
+                              : () {
+                                  _pageController.previousPage(
+                                    duration: const Duration(milliseconds: 400),
+                                    curve: Curves.fastOutSlowIn,
+                                  );
+                                },
+                        );
+                      },
                     ),
                   ),
                   ButtonTheme(
                     minWidth: 0,
-                    child: FlatButton(
-                      textTheme: ButtonTextTheme.accent,
-                      child: const Text('Next'),
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 400),
-                          curve: Curves.fastOutSlowIn,
+                    child: AnimatedBuilder(
+                      animation: _pageController,
+                      builder: (context, child) {
+                        return FlatButton(
+                          textTheme: ButtonTextTheme.accent,
+                          child: CustomAnimatedSwitcher(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              page < 4.5 ? 'Next' : 'Done',
+                            ),
+                            key: ValueKey(page < 4.5),
+                          ),
+                          onPressed: page < 4.5
+                              ? () {
+                                  _pageController.nextPage(
+                                    duration: const Duration(milliseconds: 400),
+                                    curve: Curves.fastOutSlowIn,
+                                  );
+                                }
+                              : Navigator.of(context).pop,
                         );
                       },
                     ),
@@ -188,6 +224,47 @@ class _OnboardingPageTwo extends StatelessWidget {
   }
 }
 
+class _OnboardingPageSix extends StatelessWidget {
+  const _OnboardingPageSix({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final layoutDetails = context.provide<OnboardingLayoutDetails>();
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: FadeTransition(
+        // Opacity changes from 0 to 1.0 as the pageController changes from 4.5 to 5.0
+        opacity: (layoutDetails.page > 4.5 && layoutDetails.page <= 5.0)
+            ? Tween(begin: -9.0, end: -7.0).animate(layoutDetails.animation)
+            : AlwaysStoppedAnimation(0.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            SizedBox(
+              height: 0.08 * layoutDetails.screenHeight,
+            ),
+            Image.asset(
+              'assets/images/app_logo/app_logo.png',
+              height: 216,
+            ),
+            Text(
+              'Start your\nHC Garden\njourney now!',
+              style: Theme.of(context).textTheme.display2.copyWith(
+                    color: Theme.of(context).accentColor,
+                    fontSize: 26,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              height: 0.08 * layoutDetails.screenHeight,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class OnboardingAnimationWidget extends StatelessWidget {
   const OnboardingAnimationWidget({Key key}) : super(key: key);
 
@@ -216,16 +293,17 @@ class OnboardingAnimationWidget extends StatelessWidget {
                     scale: layoutDetails.homePageScreenshot.scale,
                     child: Align(
                       alignment: Alignment.topCenter,
-                      child: HomePageScreenshot(),
+                      child: Opacity(
+                          opacity: (layoutDetails.page < 5.0) ? 1 : 0,
+                          child: HomePageScreenshot()),
                     ),
                   ),
                 ),
                 Transform.translate(
                   offset: layoutDetails.pageFiveText.offset,
                   child: FadeTransition(
-                    opacity: layoutDetails.pageFiveText.opacity,
-                    child: _PageFiveText()
-                  ),
+                      opacity: layoutDetails.pageFiveText.opacity,
+                      child: _PageFiveText()),
                 ),
                 Transform.translate(
                   offset: layoutDetails.pageFourBottomSheet.offset,
@@ -249,7 +327,8 @@ class _PageThreeText extends StatelessWidget {
     return Container(
       alignment: Alignment.bottomCenter,
       height: layoutDetails.pageThreeText.containerHeight,
-      padding: EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 0.04 * layoutDetails.screenHeight),
+      padding: EdgeInsets.fromLTRB(
+          24.0, 0.0, 24.0, 0.04 * layoutDetails.screenHeight),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -338,7 +417,7 @@ class PageFourBottomSheet extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Text(
-                "or discover our school's vibrant wildlife!",
+                "and discover our school's vibrant wildlife!",
                 textAlign: TextAlign.center,
               ),
             ],
@@ -358,7 +437,8 @@ class _PageFiveText extends StatelessWidget {
     return Container(
       alignment: Alignment.topCenter,
       height: layoutDetails.pageFiveText.containerHeight,
-      padding: EdgeInsets.fromLTRB(24.0, 0.08 * layoutDetails.screenHeight, 24.0, 0.0),
+      padding: EdgeInsets.fromLTRB(
+          24.0, 0.06 * layoutDetails.screenHeight, 24.0, 0.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -376,8 +456,8 @@ class _PageFiveText extends StatelessWidget {
             child: Text(
               "&",
               style: Theme.of(context).textTheme.display1.copyWith(
-                fontFamily: "Roboto",
-              ),
+                    fontFamily: "Roboto",
+                  ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -458,7 +538,7 @@ class HomePageScreenshotLayoutDetails {
   static const page4AspectRatio =
       (1440.0 + 2 * borderWidth) / (2336.0 + borderWidth);
   static const page5AspectRatio =
-      (1440.0 + 2 * borderWidth) / (1596.0 + borderWidth);
+      (1440.0 + 2 * borderWidth) / (1702.0 + borderWidth);
   static const imageWidthRatio = 0.85;
 
   double get width => imageWidthRatio * parent.screenWidth + 2 * borderWidth;
@@ -487,7 +567,12 @@ class HomePageScreenshotLayoutDetails {
       return Offset(0, parent._lerp(2.0, 3.0, page3Y, page4Y));
     else if (parent.page > 3.0 && parent.page <= 4.0)
       return Offset(0, parent._lerp(3.0, 4.0, page4Y, page5Y));
-    return Offset(0, 0);
+    // Image only moves when the page controller is from 4.0 to 4.6
+    // so that it moves more quickly
+    // Movement of an additional 60 pixels upwards to move past status bar (top padding)
+    else if (parent.page > 4.0 && parent.page <= 4.6)
+      return Offset(0, parent._lerp(4.0, 4.6, page5Y, -height - 80.0));
+    return Offset(0, -height - 80.0);
   }
 
   double get scale {
@@ -571,7 +656,7 @@ class PageFourBottomSheetLayoutDetails {
           0, parent._lerp(3.0, 3.6, page4Y, parent.screenHeight + 20));
     else if (parent.page > 3.6 && parent.page <= 4.0)
       return Offset(0, parent.screenHeight + 20);
-    return Offset(0, 0);
+    return Offset(0, parent.screenHeight + 20);
   }
 
   Animation<double> get opacity {
@@ -592,28 +677,31 @@ class PageFiveTextLayoutDetails {
     _page4To5TextOpacity =
         Tween(begin: -7.0, end: -5.0).animate(parent.animation);
     // Opacity changes from 1.0 to 0 as the pageController changes from 4.0 to 4.3
-    // _page5To6TextOpacity = Tween(
-    //   begin: 11.0,
-    //   end: 23 / 3,
-    // ).animate(parent.animation);
+    _page5To6TextOpacity = Tween(
+      begin: 43 / 3,
+      end: 11.0,
+    ).animate(parent.animation);
   }
 
   double get page5Y =>
-      parent.homePageScreenshot.page5Y +
-      parent.homePageScreenshot.height;
+      parent.homePageScreenshot.page5Y + parent.homePageScreenshot.height;
   double get containerHeight => parent.screenHeight - page5Y;
 
   Offset get offset {
     if (parent.page <= 3.0)
       return Offset(0, parent.screenHeight);
     else if (parent.page > 3.0 && parent.page <= 4.0)
-      return Offset(
-          0, parent._lerp(3.0, 4.0, parent.screenHeight, page5Y));
+      return Offset(0, parent._lerp(3.0, 4.0, parent.screenHeight, page5Y));
+    else if (parent.page > 4.0 && parent.page <= 4.6)
+      return Offset(0, parent._lerp(4.0, 4.6, page5Y, parent.screenHeight));
     return Offset(0, parent.screenHeight);
   }
 
   Animation<double> get opacity {
-    if(parent.page > 3.5 && parent.page <= 4.0) return _page4To5TextOpacity;
+    if (parent.page > 3.5 && parent.page <= 4.0)
+      return _page4To5TextOpacity;
+    else if (parent.page > 4.0 && parent.page <= 4.3)
+      return _page5To6TextOpacity;
     return AlwaysStoppedAnimation(0.0);
   }
 }
