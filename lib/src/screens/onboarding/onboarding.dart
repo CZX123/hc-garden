@@ -32,26 +32,28 @@ class _OnboardingPageState extends State<OnboardingPage>
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
     final screenWidth = MediaQuery.of(context).size.width;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnnotatedRegion(
-      value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarColor: Colors.grey[50],
-        systemNavigationBarIconBrightness: Brightness.dark,
+      value: (isDark
+              ? ThemeNotifier.darkOverlayStyle
+              : ThemeNotifier.lightOverlayStyle)
+          .copyWith(
+        statusBarColor: Theme.of(context).canvasColor.withOpacity(
+              isDark ? .5 : .8,
+            ),
+        systemNavigationBarColor: Theme.of(context).canvasColor,
       ),
       child: Material(
         child: Column(
           children: <Widget>[
             Expanded(
               child: LayoutBuilder(builder: (context, constraints) {
-                //print(MediaQuery.of(context).size.height);
-                //print(constraints.maxHeight);
                 return ChangeNotifierProvider(
                   create: (context) => OnboardingLayoutDetails(
                     pageController: _pageController,
                     animationController: _animationController,
-                    screenWidth: screenWidth,
-                    screenHeight: constraints.maxHeight - topPadding,
+                    maxWidth: screenWidth,
+                    maxHeight: constraints.maxHeight - topPadding,
                   ),
                   child: Stack(
                     children: <Widget>[
@@ -241,7 +243,7 @@ class _OnboardingPageSix extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             SizedBox(
-              height: 0.08 * layoutDetails.screenHeight,
+              height: 0.08 * layoutDetails.maxHeight,
             ),
             Image.asset(
               'assets/images/app_logo/app_logo.png',
@@ -256,7 +258,7 @@ class _OnboardingPageSix extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SizedBox(
-              height: 0.08 * layoutDetails.screenHeight,
+              height: 0.08 * layoutDetails.maxHeight,
             ),
           ],
         ),
@@ -327,8 +329,8 @@ class _PageThreeText extends StatelessWidget {
     return Container(
       alignment: Alignment.bottomCenter,
       height: layoutDetails.pageThreeText.containerHeight,
-      padding: EdgeInsets.fromLTRB(
-          24.0, 0.0, 24.0, 0.04 * layoutDetails.screenHeight),
+      padding:
+          EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 0.04 * layoutDetails.maxHeight),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -381,7 +383,7 @@ class PageFourBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final layoutDetails = context.provide<OnboardingLayoutDetails>();
     final containerHeight =
-        layoutDetails.screenHeight - layoutDetails.pageFourBottomSheet.page4Y;
+        layoutDetails.maxHeight - layoutDetails.pageFourBottomSheet.page4Y;
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -399,10 +401,10 @@ class PageFourBottomSheet extends StatelessWidget {
         color: Theme.of(context).canvasColor,
       ),
       height: containerHeight,
-      width: layoutDetails.screenWidth,
+      width: layoutDetails.maxWidth,
       child: Container(
         padding: EdgeInsets.fromLTRB(
-            24.0, 0.06 * layoutDetails.screenHeight, 24.0, 0.0),
+            24.0, 0.06 * layoutDetails.maxHeight, 24.0, 0.0),
         alignment: Alignment.topCenter,
         height: containerHeight,
         child: FadeTransition(
@@ -436,8 +438,8 @@ class _PageFiveText extends StatelessWidget {
     return Container(
       alignment: Alignment.topCenter,
       height: layoutDetails.pageFiveText.containerHeight,
-      padding: EdgeInsets.fromLTRB(
-          24.0, 0.06 * layoutDetails.screenHeight, 24.0, 0.0),
+      padding:
+          EdgeInsets.fromLTRB(24.0, 0.06 * layoutDetails.maxHeight, 24.0, 0.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -478,25 +480,33 @@ class _PageFiveText extends StatelessWidget {
 class OnboardingLayoutDetails extends ChangeNotifier {
   final PageController pageController;
   double get page => pageController.page ?? 0;
+
+  /// An [AnimationController] that is perfectly in sync with the pageController,
+  /// for use in animation widgets like [FadeTransition]
   final AnimationController _animationController;
   Animation<double> get animation => _animationController.view;
-  final double screenWidth, screenHeight;
+
+  /// The width & height of the [OnboardingAnimationWidget]
+  final double maxWidth, maxHeight;
 
   HomePageScreenshotLayoutDetails _homePageScreenshot;
   HomePageScreenshotLayoutDetails get homePageScreenshot => _homePageScreenshot;
+
   PageThreeTextLayoutDetails _pageThreeText;
   PageThreeTextLayoutDetails get pageThreeText => _pageThreeText;
+
   PageFourBottomSheetLayoutDetails _pageFourBottomSheet;
   PageFourBottomSheetLayoutDetails get pageFourBottomSheet =>
       _pageFourBottomSheet;
+
   PageFiveTextLayoutDetails _pageFiveText;
   PageFiveTextLayoutDetails get pageFiveText => _pageFiveText;
 
   OnboardingLayoutDetails({
     @required this.pageController,
     @required AnimationController animationController,
-    @required this.screenWidth,
-    @required this.screenHeight,
+    @required this.maxWidth,
+    @required this.maxHeight,
   }) : _animationController = animationController {
     _homePageScreenshot = HomePageScreenshotLayoutDetails(this);
     _pageThreeText = PageThreeTextLayoutDetails(this);
@@ -516,10 +526,30 @@ class OnboardingLayoutDetails extends ChangeNotifier {
     super.dispose();
   }
 
-  double _lerp(double startX, double endX, double startY, double endY) {
-    // assert(startX <= page);
-    // assert(page <= endX);
-    return startY + ((page - startX) / (endX - startX)) * (endY - startY);
+  /// Linearly interpolates between 2 points, based on the `currentX` value,
+  /// which by default is the `page` property of the [PageController]
+  double _lerp(
+    double startX,
+    double endX,
+    double startY,
+    double endY, [
+    double currentX,
+  ]) {
+    currentX ??= page;
+    return startY + ((currentX - startX) / (endX - startX)) * (endY - startY);
+  }
+
+  /// An [Animation] equivalent to [_lerp], with the same arguments as [_lerp].
+  Animation<double> _lerpAnim(
+    double startX,
+    double endX,
+    double startY,
+    double endY,
+  ) {
+    return animation.drive(Tween(
+      begin: _lerp(startX, endX, startY, endY, 0),
+      end: _lerp(startX, endX, startY, endY, 1),
+    ));
   }
 }
 
@@ -535,24 +565,29 @@ class HomePageScreenshotLayoutDetails {
   static const page4AspectRatio = 1440.0 / 2336.0;
   static const page5AspectRatio = 1440.0 / 1702.0;
 
-  double get width => imageWidthRatio * parent.screenWidth;
-  double get borderWidth => borderWidthRatio * parent.screenWidth;
-  double get height => (width - 2*borderWidth) / imageAspectRatio + 2*borderWidth;
+  double get width => imageWidthRatio * parent.maxWidth;
+  double get borderWidth => borderWidthRatio * parent.maxWidth;
+  double get height =>
+      (width - 2 * borderWidth) / imageAspectRatio + 2 * borderWidth;
   // 0.19 is the height ratio of the text and 0.04 is the height ratio
   // of the padding between the text and screenshot
-  double get page2Y => (0.19 + 0.04) * parent.screenHeight;
+  double get page2Y => (0.19 + 0.04) * parent.maxHeight;
   // 0.73 is the height ratio of the screenshot of the homepage
-  double get page2Scale => 0.71 * parent.screenHeight / height;
+  double get page2Scale => 0.71 * parent.maxHeight / height;
   // page3AspectRatio is the aspect ratio of the top map portion of the screenshot
-  double get page3Y => parent.screenHeight - ((width - 2*borderWidth) / page3AspectRatio + borderWidth);
+  double get page3Y =>
+      parent.maxHeight -
+      ((width - 2 * borderWidth) / page3AspectRatio + borderWidth);
   // page4AspectRatio is the aspect ratio of the bottom portion of the screenshot
-  double get page4Y => ((width - 2*borderWidth) / page4AspectRatio + borderWidth) - height;
+  double get page4Y =>
+      ((width - 2 * borderWidth) / page4AspectRatio + borderWidth) - height;
   // page5AspectRatio is the aspect ratio of the bottom sheet portion of the screenshot
-  double get page5Y => ((width - 2*borderWidth) / page5AspectRatio +borderWidth) - height;
+  double get page5Y =>
+      ((width - 2 * borderWidth) / page5AspectRatio + borderWidth) - height;
 
   Offset get offset {
     if (parent.page <= 1.0)
-      return Offset(parent._lerp(0, 1.0, parent.screenWidth, 0), page2Y);
+      return Offset(parent._lerp(0, 1.0, parent.maxWidth, 0), page2Y);
     // Image only moves when the page controller is from 1.0 to 1.7
     else if (parent.page > 1.0 && parent.page <= 1.7)
       return Offset(0, parent._lerp(1.0, 1.7, page2Y, page3Y));
@@ -581,21 +616,17 @@ class HomePageScreenshotLayoutDetails {
 
 class PageThreeTextLayoutDetails {
   final OnboardingLayoutDetails parent;
+  final Animation<double> _page2To3Opacity, _page3To4Opacity;
 
-  Animation<double> _page2To3Opacity, _page3To4Opacity;
-  PageThreeTextLayoutDetails(this.parent) {
-    // Opacity changes from 0 to 1.0 as the pageController changes from 1.5 to 2.0
-    _page2To3Opacity = Tween(begin: -3.0, end: -1.0).animate(parent.animation);
-    // Opacity changes from 1.0 to 0 as the pageController changes from 2.0 ro 2.3
-    _page3To4Opacity = Tween(
-      begin: 23 / 3,
-      end: 13 / 3,
-    ).animate(parent.animation);
-  }
+  PageThreeTextLayoutDetails(this.parent)
+      : // Opacity changes from 0 to 1.0 as the pageController changes from 1.5 to 2.0
+        _page2To3Opacity = parent._lerpAnim(1.5, 2, 0, 1),
+        // Opacity changes from 1.0 to 0 as the pageController changes from 2.0 ro 2.3
+        _page3To4Opacity = parent._lerpAnim(2, 2.3, 1, 0);
 
   double get containerHeight => parent.homePageScreenshot.page3Y;
   // 0.19 is the height ratio of the text
-  double get page2Y => 0.19 * parent.screenHeight - containerHeight;
+  double get page2Y => 0.19 * parent.maxHeight - containerHeight;
   // page4Y is double of page2Y to increase the speed of upward translation
   double get page4Y => 2 * page2Y;
 
@@ -619,77 +650,71 @@ class PageThreeTextLayoutDetails {
 
 class PageFourBottomSheetLayoutDetails {
   final OnboardingLayoutDetails parent;
+  final Animation<double> _page3To4TextOpacity, _page4To5TextOpacity;
 
-  Animation<double> _page3To4TextOpacity, _page4To5TextOpacity;
-  PageFourBottomSheetLayoutDetails(this.parent) {
-    // Opacity changes from 0 to 1.0 as the pageController changes from 2.5 to 3.0
-    _page3To4TextOpacity =
-        Tween(begin: -5.0, end: -3.0).animate(parent.animation);
-    // Opacity changes from 1.0 to 0 as the pageController changes from 3.0 to 3.3
-    _page4To5TextOpacity = Tween(
-      begin: 11.0,
-      end: 23 / 3,
-    ).animate(parent.animation);
-  }
+  PageFourBottomSheetLayoutDetails(this.parent)
+      : // Opacity changes from 0 to 1.0 as the pageController changes from 2.5 to 3.0
+        _page3To4TextOpacity = parent._lerpAnim(2.5, 3, 0, 1),
+        // Opacity changes from 1.0 to 0 as the pageController changes from 3.0 to 3.3
+        _page4To5TextOpacity = parent._lerpAnim(3, 3.3, 1, 0);
 
   double get page4Y =>
-      ((parent.homePageScreenshot.width - 2*parent.homePageScreenshot.borderWidth) /
-          HomePageScreenshotLayoutDetails.page4AspectRatio + parent.homePageScreenshot.borderWidth)-
-      ((parent.homePageScreenshot.width - 2*parent.homePageScreenshot.borderWidth) /
-          HomePageScreenshotLayoutDetails.bottomBarAspectRatio + parent.homePageScreenshot.borderWidth);
+      ((parent.homePageScreenshot.width -
+                  2 * parent.homePageScreenshot.borderWidth) /
+              HomePageScreenshotLayoutDetails.page4AspectRatio +
+          parent.homePageScreenshot.borderWidth) -
+      ((parent.homePageScreenshot.width -
+                  2 * parent.homePageScreenshot.borderWidth) /
+              HomePageScreenshotLayoutDetails.bottomBarAspectRatio +
+          parent.homePageScreenshot.borderWidth);
 
   Offset get offset {
-    // Initial y-coordinate is more than screenHeight in order to hide the shadow
+    // Initial y-coordinate is more than maxHeight in order to hide the shadow
     if (parent.page <= 2.0)
-      return Offset(0, parent.screenHeight + 20);
+      return Offset(0, parent.maxHeight + 20);
     else if (parent.page > 2.0 && parent.page <= 3.0)
-      return Offset(
-          0, parent._lerp(2.0, 3.0, parent.screenHeight + 20, page4Y));
+      return Offset(0, parent._lerp(2.0, 3.0, parent.maxHeight + 20, page4Y));
     // Material only moves when the pageController changes from 3.0 to 3.6
     else if (parent.page > 3.0 && parent.page <= 3.6)
-      return Offset(
-          0, parent._lerp(3.0, 3.6, page4Y, parent.screenHeight + 20));
+      return Offset(0, parent._lerp(3.0, 3.6, page4Y, parent.maxHeight + 20));
     else if (parent.page > 3.6 && parent.page <= 4.0)
-      return Offset(0, parent.screenHeight + 20);
-    return Offset(0, parent.screenHeight + 20);
+      return Offset(0, parent.maxHeight + 20);
+    return Offset(0, parent.maxHeight + 20);
   }
+
+  static const _zeroOpacity = AlwaysStoppedAnimation(0.0);
 
   Animation<double> get opacity {
     if (parent.page > 2.5 && parent.page <= 3.0)
       return _page3To4TextOpacity;
     else if (parent.page > 3.0 && parent.page <= 3.3)
       return _page4To5TextOpacity;
-    return const AlwaysStoppedAnimation(0.0);
+    return _zeroOpacity;
   }
 }
 
 class PageFiveTextLayoutDetails {
   final OnboardingLayoutDetails parent;
+  final Animation<double> _page4To5TextOpacity, _page5To6TextOpacity;
 
-  Animation<double> _page4To5TextOpacity, _page5To6TextOpacity;
-  PageFiveTextLayoutDetails(this.parent) {
-    // Opacity changes from 0 to 1.0 as the pageController changes from 3.5 to 4.0
-    _page4To5TextOpacity =
-        Tween(begin: -7.0, end: -5.0).animate(parent.animation);
-    // Opacity changes from 1.0 to 0 as the pageController changes from 4.0 to 4.3
-    _page5To6TextOpacity = Tween(
-      begin: 43 / 3,
-      end: 11.0,
-    ).animate(parent.animation);
-  }
+  PageFiveTextLayoutDetails(this.parent)
+      : // Opacity changes from 0 to 1.0 as the pageController changes from 3.5 to 4.0
+        _page4To5TextOpacity = parent._lerpAnim(3.5, 4, 0, 1),
+        // Opacity changes from 1.0 to 0 as the pageController changes from 4.0 to 4.3
+        _page5To6TextOpacity = parent._lerpAnim(4, 4.3, 1, 0);
 
   double get page5Y =>
       parent.homePageScreenshot.page5Y + parent.homePageScreenshot.height;
-  double get containerHeight => parent.screenHeight - page5Y;
+  double get containerHeight => parent.maxHeight - page5Y;
 
   Offset get offset {
     if (parent.page <= 3.0)
-      return Offset(0, parent.screenHeight);
+      return Offset(0, parent.maxHeight);
     else if (parent.page > 3.0 && parent.page <= 4.0)
-      return Offset(0, parent._lerp(3.0, 4.0, parent.screenHeight, page5Y));
+      return Offset(0, parent._lerp(3.0, 4.0, parent.maxHeight, page5Y));
     else if (parent.page > 4.0 && parent.page <= 4.6)
-      return Offset(0, parent._lerp(4.0, 4.6, page5Y, parent.screenHeight));
-    return Offset(0, parent.screenHeight);
+      return Offset(0, parent._lerp(4.0, 4.6, page5Y, parent.maxHeight));
+    return Offset(0, parent.maxHeight);
   }
 
   Animation<double> get opacity {

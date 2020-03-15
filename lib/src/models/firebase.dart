@@ -6,12 +6,14 @@ class FirebaseData {
   final TrailMap trails;
   final List<HistoricalData> historicalDataList;
   final List<AboutPageData> aboutPageDataList;
+  final Set<Polygon> mapPolygons;
 
   const FirebaseData({
     this.entities,
     this.trails,
     this.historicalDataList,
     this.aboutPageDataList,
+    this.mapPolygons,
   });
 
   static const List<String> trailNames = [
@@ -65,10 +67,11 @@ class FirebaseData {
   /// Creates an instance of [FirebaseData] based on the `data` supplied.
   /// `data` should be the JSON data of the entire database.
   factory FirebaseData.fromJson(dynamic data) {
-    EntityMap entities = EntityMap();
-    TrailMap trails = TrailMap();
-    List<HistoricalData> historicalDataList = [];
-    List<AboutPageData> aboutPageDataList = [];
+    final entities = EntityMap();
+    final trails = TrailMap();
+    final List<HistoricalData> historicalDataList = [];
+    final List<AboutPageData> aboutPageDataList = [];
+    final Set<Polygon> mapPolygons = {};
 
     // Adding entities
     entities.addEntities(
@@ -116,11 +119,18 @@ class FirebaseData {
     });
     aboutPageDataList.sort((a, b) => a.id.compareTo(b.id));
 
+    // Add Map Polygons/Outlines for each building
+    _getMap(data['mapPolygons']).forEach((key, value) {
+      final polygon = generatePolygonFromJson(key, value);
+      if (polygon != null) mapPolygons.add(polygon);
+    });
+
     return FirebaseData(
       entities: entities,
       trails: trails,
       historicalDataList: historicalDataList,
       aboutPageDataList: aboutPageDataList,
+      mapPolygons: mapPolygons,
     );
   }
 }

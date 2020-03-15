@@ -1,5 +1,4 @@
 import 'src/library.dart';
-import 'src/screens/onboarding/onboarding_testing.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,7 +57,7 @@ class _HcGardenAppState extends State<HcGardenApp> {
       final isDark = prefs.getBool('isDark');
       _firstTime = isDark == null;
       _themeNotifier.value = isDark ?? false;
-      _mapNotifier.mapType = MapType.values[prefs.getInt('mapType') ?? 0];
+      _mapNotifier.mapType = MapType.values[prefs.getInt('mapType') ?? 1];
     });
 
     // Handle firebase data
@@ -119,30 +118,42 @@ class _HcGardenAppState extends State<HcGardenApp> {
           if (themeNotifier.value == null) return const SizedBox.shrink();
           return Consumer<DebugNotifier>(
             builder: (context, debugInfo, child) {
-              return MaterialApp(
-                title: 'HC Garden',
-                theme:
-                    (themeNotifier.value ? darkThemeData : themeData).copyWith(
-                  platform: debugInfo.isIOS
-                      ? TargetPlatform.iOS
-                      : TargetPlatform.android,
+              return Container(
+                color: themeNotifier.value
+                    ? darkThemeData.canvasColor
+                    : themeData.canvasColor,
+                child: MaterialApp(
+                  title: 'HC Garden',
+                  theme: (themeNotifier.value ? darkThemeData : themeData)
+                      .copyWith(
+                    platform: debugInfo.isIOS
+                        ? TargetPlatform.iOS
+                        : TargetPlatform.android,
+                  ),
+                  onGenerateRoute: (settings) {
+                    if (settings.isInitialRoute) {
+                      return PageRouteBuilder(
+                        pageBuilder: (context, _, secondaryAnimation) {
+                          final fadeOut = secondaryAnimation.drive(Tween(
+                            begin: 1.0,
+                            end: -1.0,
+                          ));
+                          return MapDataWidget(
+                            firebaseDataStream: _stream,
+                            child: FadeTransition(
+                              opacity: fadeOut,
+                              child: MyHomePage(
+                                firstTime: _firstTime,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                    return null;
+                  },
+                  showPerformanceOverlay: debugInfo.showPerformanceOverlay,
                 ),
-                onGenerateRoute: (settings) {
-                  if (settings.isInitialRoute) {
-                    return PageRouteBuilder(
-                      pageBuilder: (context, _, __) {
-                        return MarkerDataWidget(
-                          firebaseDataStream: _stream,
-                          child: MyHomePage(
-                            firstTime: _firstTime,
-                          ),
-                        );
-                      },
-                    );
-                  }
-                  return null;
-                },
-                showPerformanceOverlay: debugInfo.showPerformanceOverlay,
               );
             },
           );
@@ -250,8 +261,8 @@ class _MyHomePageState extends State<MyHomePage>
     final appNotifier = context.provide<AppNotifier>(listen: false);
     if (!_init) {
       if (widget.firstTime) {
-        Future.delayed(const Duration(seconds: 1), () {
-          Navigator.of(context).push(OnboardingPageRoute(
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).push(CrossFadePageRoute(
             builder: (context) => const OnboardingPage(),
           ));
         });

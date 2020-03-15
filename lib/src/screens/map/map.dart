@@ -106,103 +106,83 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
               },
               initialCameraPosition: _initialCameraPosition,
               markers: mapNotifier.markers.values.toSet(),
-              polygons: polygons,
+              polygons: mapNotifier.polygons,
             ),
     );
   }
 }
 
-/// Updates default markers of [MapNotifier] by listening to the firebase data stream
-class MarkerDataWidget extends StatefulWidget {
+/// Updates default markers and polygons of [MapNotifier] by listening to the firebase data stream
+class MapDataWidget extends StatefulWidget {
   final Stream<FirebaseData> firebaseDataStream;
   final Widget child;
-  const MarkerDataWidget({
+  const MapDataWidget({
     Key key,
     @required this.firebaseDataStream,
     @required this.child,
   }) : super(key: key);
 
   @override
-  _MarkerDataWidgetState createState() => _MarkerDataWidgetState();
+  _MapDataWidgetState createState() => _MapDataWidgetState();
 }
 
-class _MarkerDataWidgetState extends State<MarkerDataWidget> {
+class _MapDataWidgetState extends State<MapDataWidget> {
   bool _init = false;
   StreamSubscription<FirebaseData> _streamSubscription;
+
+  void _markerOnTap({
+    BuildContext context,
+    TrailLocation location,
+  }) {
+    final appNotifier = Provider.of<AppNotifier>(
+      context,
+      listen: false,
+    );
+    if (appNotifier.routes.isNotEmpty &&
+        appNotifier.routes.last.dataKey is TrailLocationKey &&
+        appNotifier.routes.last.dataKey == location.key) {
+      Provider.of<BottomSheetNotifier>(
+        context,
+        listen: false,
+      ).animateTo(0);
+    } else {
+      appNotifier.push(
+        context: context,
+        routeInfo: RouteInfo(
+          name: location.name,
+          dataKey: location.key,
+          route: CrossFadePageRoute(
+            builder: (context) {
+              return Material(
+                color: Theme.of(context).bottomAppBarColor,
+                child: TrailLocationOverviewPage(
+                  trailLocationKey: location.key,
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
+  }
 
   Marker _generateMarker({
     BuildContext context,
     TrailLocation location,
   }) {
     final mapNotifier = Provider.of<MapNotifier>(context, listen: false);
+    final markerId = MarkerId('${location.key.trailKey.id} ${location.key.id}');
     return Marker(
       onTap: () {
-        final appNotifier = Provider.of<AppNotifier>(
-          context,
-          listen: false,
-        );
-        if (appNotifier.routes.isNotEmpty &&
-            appNotifier.routes.last.dataKey is TrailLocationKey &&
-            appNotifier.routes.last.dataKey == location.key) {
-          Provider.of<BottomSheetNotifier>(
-            context,
-            listen: false,
-          ).animateTo(0);
-        } else {
-          appNotifier.push(
-            context: context,
-            routeInfo: RouteInfo(
-              name: location.name,
-              dataKey: location.key,
-              route: CrossFadePageRoute(
-                builder: (context) {
-                  return Material(
-                    color: Theme.of(context).bottomAppBarColor,
-                    child: TrailLocationOverviewPage(
-                      trailLocationKey: location.key,
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        }
+        mapNotifier.activeMarker = markerId;
+        _markerOnTap(context: context, location: location);
       },
-      markerId: MarkerId('${location.key.trailKey.id} ${location.key.id}'),
+      markerId: markerId,
       position: location.coordinates,
       infoWindow: InfoWindow(
         title: location.name,
         onTap: () {
-          final appNotifier = Provider.of<AppNotifier>(
-            context,
-            listen: false,
-          );
-          if (appNotifier.routes.isNotEmpty &&
-              appNotifier.routes.last.dataKey is TrailLocationKey &&
-              appNotifier.routes.last.dataKey == location.key) {
-            Provider.of<BottomSheetNotifier>(
-              context,
-              listen: false,
-            ).animateTo(0);
-          } else {
-            appNotifier.push(
-              context: context,
-              routeInfo: RouteInfo(
-                name: location.name,
-                dataKey: location.key,
-                route: CrossFadePageRoute(
-                  builder: (context) {
-                    return Material(
-                      color: Theme.of(context).bottomAppBarColor,
-                      child: TrailLocationOverviewPage(
-                        trailLocationKey: location.key,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
-          }
+          _markerOnTap(context: context, location: location);
         },
       ),
       icon: mapNotifier.markerIcons[location.key.trailKey.id],
@@ -210,6 +190,7 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
   }
 
   void onData(FirebaseData data, {bool notify = true}) {
+    final mapNotifier = context.provide<MapNotifier>(listen: false);
     Map<MarkerId, Marker> mapMarkers = {};
     data?.trails?.forEach((trailKey, locations) {
       locations.forEach((key, value) {
@@ -220,11 +201,12 @@ class _MarkerDataWidgetState extends State<MarkerDataWidget> {
       });
     });
     if (mapMarkers.isNotEmpty) {
-      Provider.of<MapNotifier>(context, listen: false).setDefaultMarkers(
+      mapNotifier.setDefaultMarkers(
         mapMarkers,
         notify: notify,
       );
     }
+    mapNotifier.setPolygons(data?.mapPolygons, notify: notify);
   }
 
   @override
