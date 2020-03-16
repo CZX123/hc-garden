@@ -286,16 +286,20 @@ class OnboardingAnimationWidget extends StatelessWidget {
                     child: _PageThreeText(),
                   ),
                 ),
-                Transform.translate(
-                  offset: layoutDetails.homePageScreenshot.offset,
-                  child: Transform.scale(
-                    alignment: Alignment.topCenter,
-                    scale: layoutDetails.homePageScreenshot.scale,
-                    child: Align(
+                OverflowBox(
+                  alignment: Alignment.topCenter,
+                  maxHeight: 5000,
+                  child: Transform.translate(
+                    offset: layoutDetails.homePageScreenshot.offset,
+                    child: Transform.scale(
                       alignment: Alignment.topCenter,
-                      child: Opacity(
-                          opacity: (layoutDetails.page < 5.0) ? 1 : 0,
-                          child: HomePageScreenshot()),
+                      scale: layoutDetails.homePageScreenshot.scale,
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Opacity(
+                            opacity: (layoutDetails.page < 5.0) ? 1 : 0,
+                            child: HomePageScreenshot()),
+                      ),
                     ),
                   ),
                 ),
@@ -537,18 +541,23 @@ class HomePageScreenshotLayoutDetails {
 
   double get width => imageWidthRatio * parent.screenWidth;
   double get borderWidth => borderWidthRatio * parent.screenWidth;
-  double get height => (width - 2*borderWidth) / imageAspectRatio + 2*borderWidth;
+  double get height =>
+      (width - 2 * borderWidth) / imageAspectRatio + 2 * borderWidth;
   // 0.19 is the height ratio of the text and 0.04 is the height ratio
   // of the padding between the text and screenshot
   double get page2Y => (0.19 + 0.04) * parent.screenHeight;
   // 0.73 is the height ratio of the screenshot of the homepage
   double get page2Scale => 0.71 * parent.screenHeight / height;
   // page3AspectRatio is the aspect ratio of the top map portion of the screenshot
-  double get page3Y => parent.screenHeight - ((width - 2*borderWidth) / page3AspectRatio + borderWidth);
+  double get page3Y =>
+      parent.screenHeight -
+      ((width - 2 * borderWidth) / page3AspectRatio + borderWidth);
   // page4AspectRatio is the aspect ratio of the bottom portion of the screenshot
-  double get page4Y => ((width - 2*borderWidth) / page4AspectRatio + borderWidth) - height;
+  double get page4Y =>
+      ((width - 2 * borderWidth) / page4AspectRatio + borderWidth) - height;
   // page5AspectRatio is the aspect ratio of the bottom sheet portion of the screenshot
-  double get page5Y => ((width - 2*borderWidth) / page5AspectRatio +borderWidth) - height;
+  double get page5Y =>
+      ((width - 2 * borderWidth) / page5AspectRatio + borderWidth) - height;
 
   Offset get offset {
     if (parent.page <= 1.0)
@@ -633,10 +642,14 @@ class PageFourBottomSheetLayoutDetails {
   }
 
   double get page4Y =>
-      ((parent.homePageScreenshot.width - 2*parent.homePageScreenshot.borderWidth) /
-          HomePageScreenshotLayoutDetails.page4AspectRatio + parent.homePageScreenshot.borderWidth)-
-      ((parent.homePageScreenshot.width - 2*parent.homePageScreenshot.borderWidth) /
-          HomePageScreenshotLayoutDetails.bottomBarAspectRatio + parent.homePageScreenshot.borderWidth);
+      ((parent.homePageScreenshot.width -
+                  2 * parent.homePageScreenshot.borderWidth) /
+              HomePageScreenshotLayoutDetails.page4AspectRatio +
+          parent.homePageScreenshot.borderWidth) -
+      ((parent.homePageScreenshot.width -
+                  2 * parent.homePageScreenshot.borderWidth) /
+              HomePageScreenshotLayoutDetails.bottomBarAspectRatio +
+          parent.homePageScreenshot.borderWidth);
 
   Offset get offset {
     // Initial y-coordinate is more than screenHeight in order to hide the shadow
