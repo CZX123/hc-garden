@@ -124,9 +124,10 @@ class _TrailLocationOverviewState extends State<TrailLocationOverview> {
 
   void _toggleRotateIcon() {
     _hideRotateIconTimer?.cancel();
+    if (_aspectRatio.value == null) return;
     if (!_showRotateIcon.value) {
-      if (_bottomSheetNotifier.animation.value > 10 ||
-          _aspectRatio.value != null && _aspectRatio.value <= 1) return;
+      if (_bottomSheetNotifier.animation.value > 10 || _aspectRatio.value <= 1)
+        return;
       _hideRotateIconTimer = Timer(Duration(seconds: 3), () {
         if (_showRotateIcon.value) _showRotateIcon.value = false;
       });
@@ -326,16 +327,6 @@ class EntityPositionWidget extends StatelessWidget {
         ),
       ),
     );
-    // return Positioned(
-    //   left: entityPosition.left * imageWidth - size / 2,
-    //   top: entityPosition.top * imageHeight - size / 2,
-    //   width: size,
-    //   height: size,
-    //   child: AnimatedEntityPulseCircle(
-    //     entity: entity,
-    //     size: size,
-    //   ),
-    // );
   }
 }
 

@@ -204,7 +204,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                   color: Theme.of(context).hintColor,
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.push(context, OnboardingPageRoute(
+                    Navigator.push(context, CrossFadePageRoute(
                       builder: (context) => OnboardingPage(),
                     ));
                   },

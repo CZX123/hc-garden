@@ -16,4 +16,3 @@ export 'map/map.dart';
 export 'map/map_data.dart';
 export 'map/map_notifier.dart';
 export 'onboarding/onboarding.dart';
-export 'onboarding/onboarding_page_route.dart';

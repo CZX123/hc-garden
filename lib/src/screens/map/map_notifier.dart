@@ -38,6 +38,14 @@ class MapNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  Set<Polygon> _polygons;
+  Set<Polygon> get polygons => _polygons;
+  void setPolygons(Set<Polygon> polygons, {bool notify = true}) {
+    if (setEquals(_polygons, polygons)) return;
+    _polygons = polygons;
+    if (notify) notifyListeners();
+  }
+
   List<MarkerId> greenMarkers = [];
   bool isDefaultMarkers = false;
 
@@ -47,6 +55,7 @@ class MapNotifier extends ChangeNotifier {
     Map<MarkerId, Marker> defaultMarkers, {
     bool notify = true,
   }) {
+    if (mapEquals(_defaultMarkers, defaultMarkers)) return;
     _defaultMarkers = defaultMarkers;
     if (_markers == null || isDefaultMarkers) {
       _markers = _defaultMarkers;
@@ -75,6 +84,9 @@ class MapNotifier extends ChangeNotifier {
       iconParam: markerIcons.last,
     );
   }
+
+  /// The active marker that has its info window showing
+  MarkerId activeMarker;
 
   void rebuildMap() {
     notifyListeners();
@@ -154,6 +166,12 @@ class MapNotifier extends ChangeNotifier {
       markers = defaultMarkers;
       isDefaultMarkers = true;
     }
+    if (activeMarker != null) {
+      try {
+        mapController.hideMarkerInfoWindow(activeMarker);
+      } catch (e) {}
+      activeMarker = null;
+    }
     _animateToPoint(center, 16.4, adjusted);
   }
 
@@ -164,15 +182,15 @@ class MapNotifier extends ChangeNotifier {
     bool adjusted = false,
     bool changeMarkerColor = false,
   }) {
+    final markerId = MarkerId('${location.key.trailKey.id} ${location.key.id}');
     if (changeMarkerColor) {
       final newMarkers = Map<MarkerId, Marker>.from(defaultMarkers);
       greenMarkers = [];
-      final markerId =
-          MarkerId('${location.key.trailKey.id} ${location.key.id}');
       _replaceWithGreenMarker(newMarkers, markerId);
-      mapController.showMarkerInfoWindow(markerId);
+      activeMarker = markerId;
       markers = newMarkers;
     }
+    mapController.showMarkerInfoWindow(markerId);
     _animateToPoint(location.coordinates, zoom ?? 18.5, adjusted);
   }
 
@@ -194,6 +212,12 @@ class MapNotifier extends ChangeNotifier {
       return location.coordinates;
     }).toList();
     markers = newMarkers;
+    if (activeMarker != null) {
+      try {
+        mapController.hideMarkerInfoWindow(activeMarker);
+      } catch (e) {}
+      activeMarker = null;
+    }
     _animateToPoints(points, adjusted, mapSize);
   }
 
@@ -209,6 +233,12 @@ class MapNotifier extends ChangeNotifier {
       isDefaultMarkers = true;
     }
     final points = locations.map((location) => location.coordinates).toList();
+    if (activeMarker != null) {
+      try {
+        mapController.hideMarkerInfoWindow(activeMarker);
+      } catch (e) {}
+      activeMarker = null;
+    }
     _animateToPoints(points, adjusted, mapSize);
   }
 

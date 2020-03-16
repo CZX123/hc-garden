@@ -9,15 +9,14 @@ The official newly-redesigned HC Garden app! Explore the diversity of flora and 
 ### High Priority
 
 #### Map
-- Highlight buildings on map, correct colour selection (high school/college)
+- Highlight buildings on map, correct colour selection (high school/college) ✔️
 
 #### Map Markers
-- Going to location should also focus on the marker (need wait for package update)
+- Going to location should also focus on the marker (need wait for package update) ✔️
 - Marker window should also contain image (need wait for package update)
 
 #### Onboarding
-- Onboarding tutorial on how to use the apps
-	- Overlays, ability to skip, able to access from settings
+- Onboarding tutorial on how to use the apps ✔️
 
 ### Medium Priority
 
@@ -26,7 +25,7 @@ The official newly-redesigned HC Garden app! Explore the diversity of flora and 
 - Include a map for each location?
 
 #### About Screen
-- Include HC Garden Student Committee members
+- Include HC Garden Student Committee members ✔️
 
 ### Low Priority
 
