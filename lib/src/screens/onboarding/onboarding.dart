@@ -182,7 +182,7 @@ class _OnboardingPageOne extends StatelessWidget {
                 ),
           ),
           Text(
-            'Swipe right to learn more ->',
+            'Swipe to learn more ->',
             style: Theme.of(context).textTheme.subhead,
           ),
           SizedBox.shrink(),
