@@ -1,27 +1,4 @@
-import 'dart:io' show Platform;
 import 'package:hc_garden/src/library.dart';
-import 'package:flutter/scheduler.dart' show timeDilation;
-
-class DebugNotifier extends ChangeNotifier {
-  bool _isIOS = Platform.isIOS;
-  bool get isIOS => _isIOS;
-  bool _showPerformanceOverlay = false;
-  bool get showPerformanceOverlay => _showPerformanceOverlay;
-
-  void toggleIOS() {
-    _isIOS = !_isIOS;
-    notifyListeners();
-  }
-
-  void toggleSlowAnimations() {
-    timeDilation = timeDilation == 1.0 ? 5.0 : 1.0;
-  }
-
-  void togglePerformanceOverlay() {
-    _showPerformanceOverlay = !_showPerformanceOverlay;
-    notifyListeners();
-  }
-}
 
 class SettingsDrawer extends StatefulWidget {
   const SettingsDrawer({Key key}) : super(key: key);
@@ -139,75 +116,52 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                         );
                       },
                     ),
-                    if (_showDebug)
-                      Consumer<DebugNotifier>(
-                        builder: (context, debugInfo, child) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(16, 28, 16, 12),
-                                child: Text(
-                                  'Debug',
-                                  style: Theme.of(context).textTheme.subtitle,
-                                ),
-                              ),
-                              CheckboxListTile(
-                                dense: true,
-                                title: Text(
-                                  'Show Performance Overlay',
-                                  style: Theme.of(context).textTheme.body1,
-                                ),
-                                value: debugInfo.showPerformanceOverlay,
-                                checkColor: Theme.of(context).canvasColor,
-                                onChanged: (_) =>
-                                    debugInfo.togglePerformanceOverlay(),
-                              ),
-                              StatefulBuilder(
-                                builder: (context, setState) {
-                                  return CheckboxListTile(
-                                    dense: true,
-                                    title: Text(
-                                      'Slow Animations',
-                                      style: Theme.of(context).textTheme.body1,
-                                    ),
-                                    value: timeDilation != 1.0,
-                                    checkColor: Theme.of(context).canvasColor,
-                                    onChanged: (_) {
-                                      debugInfo.toggleSlowAnimations();
-                                      setState(() {});
-                                    },
-                                  );
-                                },
-                              ),
-                              CheckboxListTile(
-                                dense: true,
-                                title: Text(
-                                  'Toggle iOS',
-                                  style: Theme.of(context).textTheme.body1,
-                                ),
-                                value: debugInfo.isIOS,
-                                checkColor: Theme.of(context).canvasColor,
-                                onChanged: (_) => debugInfo.toggleIOS(),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
                   ],
                 ),
                 const SizedBox.shrink(),
-                IconButton(
-                  icon: const Icon(Icons.help),
-                  color: Theme.of(context).hintColor,
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(context, CrossFadePageRoute(
-                      builder: (context) => OnboardingPage(),
-                    ));
-                  },
+                Row(
+                  // crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Product of',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).hintColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 0.5),
+                          child: Image.asset(
+                            'assets/images/irs.png',
+                            height: 24,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                      ],
+                    ),
+                    Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.help),
+                      color: Theme.of(context).hintColor,
+                      tooltip: 'Help',
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          CrossFadePageRoute(
+                            builder: (context) => OnboardingPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                  ],
                 ),
               ],
             ),

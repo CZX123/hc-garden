@@ -1,7 +1,28 @@
 import 'package:hc_garden/src/library.dart';
 
-class FilterDrawer extends StatelessWidget {
+class FilterDrawer extends StatefulWidget {
   const FilterDrawer({Key key}) : super(key: key);
+
+  @override
+  _FilterDrawerState createState() => _FilterDrawerState();
+}
+
+enum DistanceSortingState {
+  none,
+  loading,
+  locationPermissionDenied,
+  locationOff,
+}
+
+class _FilterDrawerState extends State<FilterDrawer> {
+  final _distanceSortingState = ValueNotifier(DistanceSortingState.none);
+  Timer _errorFadeOutTimer;
+
+  @override
+  void dispose() {
+    _distanceSortingState.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,15 +138,69 @@ class FilterDrawer extends StatelessWidget {
                               controlAffinity: ListTileControlAffinity.trailing,
                               groupValue: groupValue,
                               value: true,
-                              title: Text(
-                                'Distance',
-                                style: Theme.of(context).textTheme.body1,
+                              title: Row(
+                                children: <Widget>[
+                                  Text(
+                                    'Distance',
+                                    style: Theme.of(context).textTheme.body1,
+                                  ),
+                                  Spacer(),
+                                  ValueListenableBuilder<DistanceSortingState>(
+                                    valueListenable: _distanceSortingState,
+                                    builder: (context, value, _) {
+                                      Widget child = SizedBox.shrink(
+                                        key: ObjectKey(value),
+                                      );
+                                      if (value ==
+                                          DistanceSortingState.loading) {
+                                        child = SizedBox(
+                                          key: ObjectKey(value),
+                                          height: 16,
+                                          width: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        );
+                                      } else if (value != DistanceSortingState.none) {
+                                        child = Text(
+                                          value ==
+                                                  DistanceSortingState
+                                                      .locationPermissionDenied
+                                              ? 'Permission\ndenied'
+                                              : 'Location\noff',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            height: 1,
+                                            color: Theme.of(context).errorColor,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        );
+                                      }
+                                      return CustomAnimatedSwitcher(
+                                        child: child,
+                                        alignment: Alignment.centerRight,
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
-                              onChanged: (value) {
-                                Provider.of<FilterNotifier>(
+                              onChanged: (value) async {
+                                _errorFadeOutTimer?.cancel();
+                                _distanceSortingState.value =
+                                    DistanceSortingState.loading;
+                                _distanceSortingState.value =
+                                    await Provider.of<FilterNotifier>(
                                   context,
                                   listen: false,
                                 ).toggleSortByDist(context);
+                                if (_distanceSortingState.value !=
+                                    DistanceSortingState.none) {
+                                  _errorFadeOutTimer =
+                                      Timer(const Duration(seconds: 3), () {
+                                    _distanceSortingState.value =
+                                        DistanceSortingState.none;
+                                  });
+                                }
                               },
                             ),
                           ],

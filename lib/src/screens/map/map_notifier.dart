@@ -2,8 +2,8 @@ import 'package:hc_garden/src/library.dart';
 
 class MapNotifier extends ChangeNotifier {
   // todo: Do something with these information
-  bool permissionEnabled;
-  bool gpsOn;
+  bool permissionEnabled = false;
+  bool gpsOn = false;
   GoogleMapController mapController;
   final markerIcons = [
     BitmapDescriptor.defaultMarkerWithHue(38),

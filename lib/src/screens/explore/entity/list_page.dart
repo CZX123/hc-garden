@@ -34,8 +34,9 @@ class EntityListPage extends StatelessWidget {
 
     return CustomAnimatedSwitcher(
       child: Stack(
-        key: ValueKey(
-            filterNotifier.searchTerm + categoriesEntityCount.values.join()),
+        key: ValueKey(filterNotifier.searchTerm +
+            categoriesEntityCount.values.join() +
+            filterNotifier.isSortedByDistance.toString()),
         children: <Widget>[
           CustomScrollView(
             controller: scrollController,

@@ -44,7 +44,7 @@ class FilterNotifier extends ChangeNotifier {
 
   Map<String, List<EntityDistance>> entitiesByDist = {};
 
-  void toggleSortByDist(BuildContext context) async {
+  Future<DistanceSortingState> toggleSortByDist(BuildContext context) async {
     if (_isSortedByDistance) {
       entitiesByDist.clear();
     } else {
@@ -52,7 +52,24 @@ class FilterNotifier extends ChangeNotifier {
         context,
         listen: false,
       );
+      final mapNotifier = context.provide<MapNotifier>(listen: false);
       final location = Location();
+      if (!mapNotifier.permissionEnabled) {
+        final success = await location.requestPermission();
+        if (success) {
+          mapNotifier.permissionEnabled = true;
+        } else {
+          return DistanceSortingState.locationPermissionDenied;
+        }
+      }
+      if (!mapNotifier.gpsOn) {
+        final success = await location.requestService();
+        if (success) {
+          mapNotifier.gpsOn = true;
+        } else {
+          return DistanceSortingState.locationOff;
+        }
+      }
       final locationData = await location.getLocation();
       _sortEntitiesByDist(
         firebaseData.entities,
@@ -62,6 +79,7 @@ class FilterNotifier extends ChangeNotifier {
     }
     notifyListeners();
     _isSortedByDistance = !_isSortedByDistance;
+    return DistanceSortingState.none;
   }
 
   void _sortEntitiesByDist(

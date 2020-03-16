@@ -19,38 +19,13 @@ class _HcGardenAppState extends State<HcGardenApp> {
   Stream<FirebaseData> _stream;
 
   /// An instance of [Location]
-  final _location = Location();
   final _themeNotifier = ThemeNotifier(null);
   final _mapNotifier = MapNotifier();
   bool _firstTime = false;
 
-  /// Check if location permission is on
-  void checkPermission() async {
-    var granted = await _location.hasPermission();
-    if (!granted) {
-      granted = await _location.requestPermission();
-    }
-    _mapNotifier.permissionEnabled = granted;
-    if (granted) {
-      checkGPS();
-    }
-  }
-
-  /// Check if GPS itself is turned on
-  void checkGPS() async {
-    var isOn = await _location.serviceEnabled();
-    if (!isOn) {
-      isOn = await _location.requestService();
-    }
-    _mapNotifier.gpsOn = isOn;
-    if (isOn) _mapNotifier.rebuildMap();
-  }
-
   @override
   void initState() {
     super.initState();
-
-    checkPermission();
 
     // Get values
     SharedPreferences.getInstance().then((prefs) {
@@ -93,10 +68,6 @@ class _HcGardenAppState extends State<HcGardenApp> {
         ChangeNotifierProvider.value(
           value: _mapNotifier,
         ),
-        // To be removed
-        ChangeNotifierProvider(
-          create: (context) => DebugNotifier(),
-        ),
         // Main AppNotifier in changed of main app flow
         ChangeNotifierProvider(
           create: (context) => AppNotifier(),
@@ -116,46 +87,36 @@ class _HcGardenAppState extends State<HcGardenApp> {
       child: Consumer<ThemeNotifier>(
         builder: (context, themeNotifier, child) {
           if (themeNotifier.value == null) return const SizedBox.shrink();
-          return Consumer<DebugNotifier>(
-            builder: (context, debugInfo, child) {
-              return Container(
-                color: themeNotifier.value
-                    ? darkThemeData.canvasColor
-                    : themeData.canvasColor,
-                child: MaterialApp(
-                  title: 'HC Garden',
-                  theme: (themeNotifier.value ? darkThemeData : themeData)
-                      .copyWith(
-                    platform: debugInfo.isIOS
-                        ? TargetPlatform.iOS
-                        : TargetPlatform.android,
-                  ),
-                  onGenerateRoute: (settings) {
-                    if (settings.isInitialRoute) {
-                      return PageRouteBuilder(
-                        pageBuilder: (context, _, secondaryAnimation) {
-                          final fadeOut = secondaryAnimation.drive(Tween(
-                            begin: 1.0,
-                            end: -1.0,
-                          ));
-                          return MapDataWidget(
-                            firebaseDataStream: _stream,
-                            child: FadeTransition(
-                              opacity: fadeOut,
-                              child: MyHomePage(
-                                firstTime: _firstTime,
-                              ),
-                            ),
-                          );
-                        },
+          return Container(
+            color: themeNotifier.value
+                ? darkThemeData.canvasColor
+                : themeData.canvasColor,
+            child: MaterialApp(
+              title: 'HC Garden',
+              theme: themeNotifier.value ? darkThemeData : themeData,
+              onGenerateRoute: (settings) {
+                if (settings.isInitialRoute) {
+                  return PageRouteBuilder(
+                    pageBuilder: (context, _, secondaryAnimation) {
+                      final fadeOut = secondaryAnimation.drive(Tween(
+                        begin: 1.0,
+                        end: -1.0,
+                      ));
+                      return MapDataWidget(
+                        firebaseDataStream: _stream,
+                        child: FadeTransition(
+                          opacity: fadeOut,
+                          child: MyHomePage(
+                            firstTime: _firstTime,
+                          ),
+                        ),
                       );
-                    }
-                    return null;
-                  },
-                  showPerformanceOverlay: debugInfo.showPerformanceOverlay,
-                ),
-              );
-            },
+                    },
+                  );
+                }
+                return null;
+              },
+            ),
           );
         },
       ),
@@ -179,6 +140,32 @@ class _MyHomePageState extends State<MyHomePage>
   TabController _tabController;
   double topPadding;
   double height;
+
+  /// An instance of [Location]
+  final _location = Location();
+  MapNotifier _mapNotifier;
+
+  /// Check if location permission is on
+  void _checkPermission() async {
+    var granted = await _location.hasPermission();
+    if (!granted) {
+      granted = await _location.requestPermission();
+    }
+    _mapNotifier.permissionEnabled = granted;
+    if (granted) {
+      checkGPS();
+    }
+  }
+
+  /// Check if GPS itself is turned on
+  void checkGPS() async {
+    var isOn = await _location.serviceEnabled();
+    if (!isOn) {
+      isOn = await _location.requestService();
+    }
+    _mapNotifier.gpsOn = isOn;
+    if (isOn) _mapNotifier.rebuildMap();
+  }
 
   Future<bool> onBack(BuildContext context) async {
     final scaffoldState = Scaffold.of(context);
@@ -259,13 +246,17 @@ class _MyHomePageState extends State<MyHomePage>
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final heightTooSmall = height - Sizes.kBottomHeight < 100;
     final appNotifier = context.provide<AppNotifier>(listen: false);
+    _mapNotifier = context.provide<MapNotifier>(listen: false);
     if (!_init) {
       if (widget.firstTime) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).push(CrossFadePageRoute(
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await Navigator.of(context).push(CrossFadePageRoute(
             builder: (context) => const OnboardingPage(),
           ));
+          _checkPermission();
         });
+      } else {
+        _checkPermission();
       }
       Provider.of<BottomSheetNotifier>(context, listen: false)
         ..snappingPositions.value = [

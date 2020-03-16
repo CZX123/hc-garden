@@ -56,6 +56,7 @@ flutter:
     - assets/images/flora.jpg
     - assets/images/fauna.jpg
     - assets/images/hci.png
+    - assets/images/irs.png
     - assets/images/app_logo/android.png
     - assets/images/app_logo/app_logo.png
     - assets/images/screenshots/homepage.png
