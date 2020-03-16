@@ -120,7 +120,6 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                 ),
                 const SizedBox.shrink(),
                 Row(
-                  // crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     const SizedBox(width: 16),
                     Column(
