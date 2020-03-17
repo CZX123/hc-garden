@@ -119,47 +119,53 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                   ],
                 ),
                 const SizedBox.shrink(),
-                Row(
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: <Widget>[
-                        Text(
-                          'Product of',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).hintColor,
-                          ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              'Product of',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).hintColor,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 0.5),
+                              child: Image.asset(
+                                'assets/images/irs.png',
+                                height: 24,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                          ],
                         ),
-                        const SizedBox(height: 4),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 0.5),
-                          child: Image.asset(
-                            'assets/images/irs.png',
-                            height: 24,
-                          ),
+                        Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.help),
+                          color: Theme.of(context).hintColor,
+                          tooltip: 'Help',
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              CrossFadePageRoute(
+                                builder: (context) => OnboardingPage(),
+                              ),
+                            );
+                          },
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(width: 8),
                       ],
                     ),
-                    Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.help),
-                      color: Theme.of(context).hintColor,
-                      tooltip: 'Help',
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          CrossFadePageRoute(
-                            builder: (context) => OnboardingPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 8),
+                    const BottomPadding(),
                   ],
                 ),
               ],

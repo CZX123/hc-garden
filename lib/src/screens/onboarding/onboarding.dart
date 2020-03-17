@@ -153,6 +153,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                 ],
               ),
             ),
+            const BottomPadding(),
           ],
         ),
       ),

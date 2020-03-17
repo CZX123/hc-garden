@@ -124,10 +124,13 @@ class _TrailLocationOverviewState extends State<TrailLocationOverview> {
 
   void _toggleRotateIcon() {
     _hideRotateIconTimer?.cancel();
-    if (_aspectRatio.value == null) return;
+    if (_aspectRatio.value == null ||
+        _aspectRatio.value <= 1 ||
+        _bottomSheetNotifier.animation.value > 10) {
+      if (_showRotateIcon.value) _showRotateIcon.value = false;
+      return;
+    }
     if (!_showRotateIcon.value) {
-      if (_bottomSheetNotifier.animation.value > 10 || _aspectRatio.value <= 1)
-        return;
       _hideRotateIconTimer = Timer(Duration(seconds: 3), () {
         if (_showRotateIcon.value) _showRotateIcon.value = false;
       });
