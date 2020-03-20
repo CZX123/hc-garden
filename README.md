@@ -4,7 +4,14 @@ The official newly-redesigned HC Garden app! Explore the diversity of flora and 
 
 <img src="assets/images/screenshots/homepage.png" height="400">
 
-## TODOs
+## TODOS v1.1
+
+### iOS
+- Fix image Hero issue (will need to remind Weiqi)
+- Fix search bar alignment issues
+- Fix text line-height inconsistencies with Android
+
+## General TODOs
 
 ### High Priority
 
