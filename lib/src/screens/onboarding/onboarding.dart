@@ -1,4 +1,5 @@
 import 'package:hc_garden/src/library.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({Key key}) : super(key: key);
@@ -25,8 +26,9 @@ class _OnboardingPageState extends State<OnboardingPage>
     super.dispose();
   }
 
-  double get page =>
-      _pageController.hasClients ? (_pageController.page ?? 0) : 0;
+  double get page {
+    return _pageController.hasClients ? (_pageController.page ?? 0) : 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,36 +49,38 @@ class _OnboardingPageState extends State<OnboardingPage>
         child: Column(
           children: <Widget>[
             Expanded(
-              child: LayoutBuilder(builder: (context, constraints) {
-                return ChangeNotifierProvider(
-                  create: (context) => OnboardingLayoutDetails(
-                    pageController: _pageController,
-                    animationController: _animationController,
-                    maxWidth: screenWidth,
-                    maxHeight: constraints.maxHeight - topPadding,
-                  ),
-                  child: Stack(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(top: topPadding),
-                        child: PageView.builder(
-                          controller: _pageController,
-                          itemBuilder: (context, index) {
-                            if (index == 0)
-                              return _OnboardingPageOne();
-                            else if (index == 1)
-                              return _OnboardingPageTwo();
-                            else if (index == 5) return _OnboardingPageSix();
-                            return SizedBox.shrink();
-                          },
-                          itemCount: 6,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return ChangeNotifierProvider(
+                    create: (context) => OnboardingLayoutDetails(
+                      pageController: _pageController,
+                      animationController: _animationController,
+                      maxWidth: screenWidth,
+                      maxHeight: constraints.maxHeight - topPadding,
+                    ),
+                    child: Stack(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(top: topPadding),
+                          child: PageView.builder(
+                            controller: _pageController,
+                            itemBuilder: (context, index) {
+                              if (index == 0)
+                                return _OnboardingPageOne();
+                              else if (index == 1)
+                                return _OnboardingPageTwo();
+                              else if (index == 5) return _OnboardingPageSix();
+                              return SizedBox.shrink();
+                            },
+                            itemCount: 6,
+                          ),
                         ),
-                      ),
-                      OnboardingAnimationWidget(),
-                    ],
-                  ),
-                );
-              }),
+                        OnboardingAnimationWidget(),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
             Divider(
               height: 1,
@@ -86,68 +90,65 @@ class _OnboardingPageState extends State<OnboardingPage>
                 vertical: 4,
                 horizontal: 8,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Stack(
                 children: <Widget>[
-                  Theme(
-                    data: ThemeData(
-                      fontFamily: 'Manrope',
-                      accentColor:
-                          Theme.of(context).brightness == Brightness.dark
-                              ? Color(0xFFF5730F)
-                              : Color(0xFF7A3735),
-                      buttonTheme: ButtonThemeData(
-                        minWidth: 0,
-                        textTheme: ButtonTextTheme.accent,
-                      ),
-                    ),
-                    child: AnimatedBuilder(
-                      animation: _pageController,
-                      builder: (context, child) {
-                        return FlatButton(
-                          child: CustomAnimatedSwitcher(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              page < 0.5 ? 'Cancel' : 'Previous',
-                              key: ValueKey((page < 0.5).toString()),
+                  AnimatedBuilder(
+                    animation: _pageController,
+                    builder: (context, child) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _BottomBarButton(
+                            prefixIcon: Icon(
+                              page < 0.5 ? Icons.redo : Icons.chevron_left,
                             ),
+                            title: page < 0.5 ? 'Skip' : 'Back',
+                            onTap: page < 0.5
+                                ? Navigator.of(context).pop
+                                : () {
+                                    _pageController.previousPage(
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      curve: Cubic(.3, 0, .2, 1),
+                                    );
+                                  },
                           ),
-                          onPressed: page < 1
-                              ? Navigator.of(context).pop
-                              : () {
-                                  _pageController.previousPage(
-                                    duration: const Duration(milliseconds: 400),
-                                    curve: Curves.fastOutSlowIn,
-                                  );
-                                },
-                        );
-                      },
-                    ),
+                          _BottomBarButton(
+                            suffixIcon: Icon(
+                              page < 4.5 ? Icons.chevron_right : Icons.check,
+                            ),
+                            title: page < 4.5 ? 'Next' : 'Done',
+                            onTap: page < 4.5
+                                ? () {
+                                    _pageController.nextPage(
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      curve: Cubic(.3, 0, .2, 1),
+                                    );
+                                  }
+                                : Navigator.of(context).pop,
+                          ),
+                        ],
+                      );
+                    },
                   ),
-                  ButtonTheme(
-                    minWidth: 0,
-                    child: AnimatedBuilder(
-                      animation: _pageController,
-                      builder: (context, child) {
-                        return FlatButton(
-                          textTheme: ButtonTextTheme.accent,
-                          child: CustomAnimatedSwitcher(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              page < 4.5 ? 'Next' : 'Done',
-                            ),
-                            key: ValueKey(page < 4.5),
-                          ),
-                          onPressed: page < 4.5
-                              ? () {
-                                  _pageController.nextPage(
-                                    duration: const Duration(milliseconds: 400),
-                                    curve: Curves.fastOutSlowIn,
-                                  );
-                                }
-                              : Navigator.of(context).pop,
-                        );
-                      },
+                  Positioned(
+                    top: 21,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: SmoothPageIndicator(
+                        controller: _pageController,
+                        count: 6,
+                        effect: WormEffect(
+                          dotWidth: 6,
+                          dotHeight: 6,
+                          spacing: 3,
+                          dotColor: Theme.of(context).dividerColor,
+                          activeDotColor: Theme.of(context).accentColor,
+                          strokeWidth: 0,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -155,6 +156,74 @@ class _OnboardingPageState extends State<OnboardingPage>
             ),
             const BottomPadding(),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomBarButton extends StatelessWidget {
+  final Icon prefixIcon;
+  final String title;
+  final Icon suffixIcon;
+  final VoidCallback onTap;
+
+  const _BottomBarButton({
+    Key key,
+    this.prefixIcon,
+    @required this.title,
+    this.suffixIcon,
+    this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).textTheme.display2.color;
+    return Theme(
+      data: ThemeData(
+        fontFamily: 'Manrope',
+        accentColor: color,
+        buttonTheme: ButtonThemeData(
+          minWidth: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+          textTheme: ButtonTextTheme.accent,
+        ),
+        iconTheme: IconThemeData(
+          color: color ?? Theme.of(context).accentColor,
+          size: 20,
+        ),
+      ),
+      child: CustomAnimatedSwitcher(
+        alignment:
+            prefixIcon != null ? Alignment.centerLeft : Alignment.centerRight,
+        child: Builder(
+          key: ValueKey(title),
+          builder: (context) {
+            return FlatButton(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  if (prefixIcon != null) prefixIcon,
+                  // Skip icon is much wider, so need to hardcode more padding
+                  SizedBox(width: title == 'Skip' ? 6 : 4),
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.subtitle.copyWith(
+                          color: color,
+                          height: 1.3,
+                        ),
+                  ),
+                  SizedBox(width: 4),
+                  if (suffixIcon != null)
+                    suffixIcon,
+                ],
+              ),
+              onPressed: onTap,
+            );
+          },
         ),
       ),
     );
@@ -182,9 +251,22 @@ class _OnboardingPageOne extends StatelessWidget {
                   color: Theme.of(context).accentColor,
                 ),
           ),
-          Text(
-            'Swipe to learn more ->',
-            style: Theme.of(context).textTheme.subhead,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.subhead,
+                  children: [
+                    TextSpan(text: 'Swipe to learn more'),
+                    WidgetSpan(
+                      child: Icon(Icons.chevron_right),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           SizedBox.shrink(),
         ],
@@ -300,8 +382,9 @@ class OnboardingAnimationWidget extends StatelessWidget {
                       child: Align(
                         alignment: Alignment.topCenter,
                         child: Opacity(
-                            opacity: (layoutDetails.page < 5.0) ? 1 : 0,
-                            child: HomePageScreenshot()),
+                          opacity: (layoutDetails.page < 5.0) ? 1 : 0,
+                          child: HomePageScreenshot(),
+                        ),
                       ),
                     ),
                   ),
@@ -309,8 +392,9 @@ class OnboardingAnimationWidget extends StatelessWidget {
                 Transform.translate(
                   offset: layoutDetails.pageFiveText.offset,
                   child: FadeTransition(
-                      opacity: layoutDetails.pageFiveText.opacity,
-                      child: _PageFiveText()),
+                    opacity: layoutDetails.pageFiveText.opacity,
+                    child: _PageFiveText(),
+                  ),
                 ),
                 Transform.translate(
                   offset: layoutDetails.pageFourBottomSheet.offset,
@@ -361,23 +445,69 @@ class HomePageScreenshot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final layoutDetails = context.provide<OnboardingLayoutDetails>();
-    return Material(
-        elevation: 4,
+
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(0, .7),
+            blurRadius: 1,
+            color: Colors.black.withOpacity(0.039),
+          ),
+          BoxShadow(
+            offset: Offset(0, 1.6),
+            blurRadius: 2.7,
+            color: Colors.black.withOpacity(0.057),
+          ),
+          BoxShadow(
+            offset: Offset(0, 3),
+            blurRadius: 5,
+            color: Colors.black.withOpacity(0.07),
+          ),
+          BoxShadow(
+            offset: Offset(0, 5.4),
+            blurRadius: 8.9,
+            color: Colors.black.withOpacity(0.083),
+          ),
+          BoxShadow(
+            offset: Offset(0, 10),
+            blurRadius: 16.7,
+            color: Colors.black.withOpacity(0.101),
+          ),
+          BoxShadow(
+            offset: Offset(0, 24),
+            blurRadius: 40,
+            color: Colors.black.withOpacity(0.14),
+          ),
+        ],
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Material(
         clipBehavior: Clip.antiAlias,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white.withOpacity(.24)
+            : Colors.black.withOpacity(.72),
         shape: RoundedRectangleBorder(
           side: BorderSide(
-            color: Colors.black.withOpacity(0.78),
+            color: Colors.transparent,
             width: layoutDetails.homePageScreenshot.borderWidth,
           ),
-          borderRadius: BorderRadius.circular(24.0),
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Container(
           width: layoutDetails.homePageScreenshot.width,
           padding: EdgeInsets.all(layoutDetails.homePageScreenshot.borderWidth),
-          child: Image.asset(
-            "assets/images/screenshots/homepage.png",
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(
+              24 - layoutDetails.homePageScreenshot.borderWidth,
+            ),
+            child: Image.asset(
+              "assets/images/screenshots/homepage.png",
+            ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
 
@@ -457,15 +587,12 @@ class _PageFiveText extends StatelessWidget {
             "by tapping on the menu icon, ",
             textAlign: TextAlign.center,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            child: Text(
-              "&",
-              style: Theme.of(context).textTheme.display1.copyWith(
-                    fontFamily: "Roboto",
-                  ),
-              textAlign: TextAlign.center,
-            ),
+          const SizedBox(height: 1),
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 16),
+            height: 1.5,
+            width: 24,
+            color: Theme.of(context).dividerColor,
           ),
           Text(
             "Learn about our history",
@@ -594,9 +721,9 @@ class HomePageScreenshotLayoutDetails {
     if (parent.page <= 1.0)
       return Offset(parent._lerp(0, 1.0, parent.maxWidth, 0), page2Y);
     // Image only moves when the page controller is from 1.0 to 1.7
-    else if (parent.page > 1.0 && parent.page <= 1.7)
-      return Offset(0, parent._lerp(1.0, 1.7, page2Y, page3Y));
-    else if (parent.page > 1.7 && parent.page <= 2.0)
+    else if (parent.page > 1.0 && parent.page <= 1.8)
+      return Offset(0, parent._lerp(1.0, 1.8, page2Y, page3Y));
+    else if (parent.page > 1.8 && parent.page <= 2.0)
       return Offset(0, page3Y);
     else if (parent.page > 2.0 && parent.page <= 3.0)
       return Offset(0, parent._lerp(2.0, 3.0, page3Y, page4Y));

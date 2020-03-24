@@ -139,8 +139,8 @@ class _CustomNavbar extends StatelessWidget {
         children: [
           IconButton(
             icon: const Icon(Icons.menu),
-            // padding: const EdgeInsets.all(16),
             onPressed: () => Scaffold.of(context).openDrawer(),
+            tooltip: 'Menu',
           ),
           ValueListenableBuilder<int>(
             valueListenable: pageIndex,
@@ -261,6 +261,7 @@ class _BottomNavbarButton extends StatelessWidget {
                   curve: Curves.fastOutSlowIn,
                   child: Text(title),
                 ),
+                const SizedBox(height: 1),
               ],
             ),
           ),

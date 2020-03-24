@@ -8,14 +8,6 @@ class SettingsDrawer extends StatefulWidget {
 }
 
 class _SettingsDrawerState extends State<SettingsDrawer> {
-  bool _showDebug = false;
-
-  void _toggleDebugOptions() {
-    setState(() {
-      _showDebug = !_showDebug;
-    });
-  }
-
   void _changeMapType(MapType newType) {
     final mapNotifier = context.provide<MapNotifier>(listen: false);
     mapNotifier.mapType = newType;
@@ -71,7 +63,6 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                             value: themeNotifier.value,
                             onChanged: (value) => themeNotifier.value = value,
                           ),
-                          onLongPress: _toggleDebugOptions,
                           onTap: () =>
                               themeNotifier.value = !themeNotifier.value,
                         );

@@ -36,6 +36,12 @@ final ThemeData themeData = ThemeData(
   cursorColor: Color(0xFF27B50E),
   textSelectionHandleColor: Color(0xFF27B50E),
   textTheme: lightText,
+  tooltipTheme: TooltipThemeData(
+    textStyle: TextStyle(
+      color: Colors.white,
+      height: 1.5,
+    ),
+  ),
   // highlightColor: Color(0xFF27B50E).withOpacity(.12),
   // splashColor: Color(0xFF27B50E).withOpacity(.12),
 );
@@ -54,6 +60,12 @@ final ThemeData darkThemeData = ThemeData(
   toggleableActiveColor: Colors.lightGreenAccent[400],
   textSelectionHandleColor: Colors.lightGreenAccent[400],
   textTheme: darkText,
+  tooltipTheme: TooltipThemeData(
+    textStyle: TextStyle(
+      color: Colors.black87,
+      height: 1.5,
+    ),
+  ),
 );
 
 final lightText = textTheme.merge(lightThemeText);
@@ -83,6 +95,7 @@ const TextTheme textTheme = TextTheme(
   // Used for each entity's name in entity list page and trail's name in trail details page, as well as info row titles
   subhead: TextStyle(
     fontSize: 17,
+    height: 1.8,
   ),
   // Used for each entity's description in entity list page
   caption: TextStyle(
@@ -90,14 +103,17 @@ const TextTheme textTheme = TextTheme(
   ),
   subtitle: TextStyle(
     fontSize: 14.5,
+    height: 1.8,
     fontWeight: FontWeight.bold,
   ),
   // Main paragraph text
   body1: TextStyle(
     fontSize: 14,
+    height: 1.8,
   ),
   body2: TextStyle(
     fontSize: 14,
+    height: 1.8,
   ),
   // For latin names
   overline: TextStyle(

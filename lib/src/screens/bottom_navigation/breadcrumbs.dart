@@ -17,6 +17,7 @@ class _BreadcrumbNavigationState extends State<BreadcrumbNavigation> {
     final TextSpan span = TextSpan(
       style: Theme.of(context).textTheme.subtitle.copyWith(
             fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            height: 1.4,
           ),
       text: text,
     );
@@ -189,11 +190,13 @@ class Breadcrumb extends StatelessWidget {
                             .subtitle
                             .color
                             .withOpacity(active ? 1 : .7),
+                        height: 1.4,
                       ),
                 ),
               ),
               onTap: () {
-                context.provide<AppNotifier>(listen: false)
+                context
+                    .provide<AppNotifier>(listen: false)
                     .popUntil(context, index);
                 if (index < 0) {
                   final bottomSheetNotifier =
