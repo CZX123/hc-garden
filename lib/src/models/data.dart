@@ -63,15 +63,12 @@ class Entity implements Comparable {
     );
   }
 
-  /// Returns whether the [Entity] satisfies the `searchTerm`
-  bool satisfies(String searchTerm) {
-    if (searchTerm.isEmpty || searchTerm == '*') return true;
-    return !name.split(' ').every((name) {
-          return !name.toLowerCase().startsWith(searchTerm.toLowerCase());
-        }) ||
-        !sciName.split(' ').every((name) {
-          return !name.toLowerCase().startsWith(searchTerm.toLowerCase());
-        });
+  /// Returns the level of relevance that the [Entity] matches the `searchTerm`
+  int matches(String searchTerm) {
+    if (searchTerm.isEmpty || searchTerm == '*') return 3;
+    if (Search.matches(name, searchTerm)) return 2;
+    else if (Search.matches(sciName, searchTerm)) return 1;
+    return 0;
   }
 
   bool get isValid {

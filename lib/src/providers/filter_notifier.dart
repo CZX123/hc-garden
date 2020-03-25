@@ -25,6 +25,8 @@ class FilterNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get isSearching => _searchTerm.trim().isNotEmpty;
+
   // Filtering by [Trail]
 
   /// All trails are selected by default
@@ -89,6 +91,9 @@ class FilterNotifier extends ChangeNotifier {
   ) {
     entities.forEach((category, entityList) {
       entitiesByDist[category] = [];
+      // Clone and sort the list alphabetically first
+      entityList = List.from(entityList);
+      entityList.sort();
       for (final entity in entityList) {
         double minDist = double.infinity;
         for (var location in entity.locations) {
@@ -116,41 +121,69 @@ class FilterNotifier extends ChangeNotifier {
     });
   }
 
+  bool _entityIsInTrails(Entity entity) {
+    if (selectedTrailKeys.length == 3) return true;
+    return !selectedTrailKeys.every((trailKey) {
+      return entity.locations.every((location) {
+        return location.trailLocationKey.trailKey != trailKey;
+      });
+    });
+  }
+
   EntityMap filter(EntityMap entities) {
     final newEntityMap = EntityMap();
     final categories = entities.keys.toList()..sort();
     for (final category in categories) {
       // Sort by distance and does filtering based on trails and search inside as well
       if (isSortedByDistance) {
-        newEntityMap[category] = [];
-        for (final entityDistance in entities[category]) {
-          final entity = entities[category][entityDistance.key.id];
-          if (!selectedTrailKeys.every((trailKey) {
-                return entity.locations.every((location) {
-                  return location.trailLocationKey.trailKey != trailKey;
-                });
-              }) &&
-              entity.satisfies(searchTerm)) newEntityMap[category].add(entity);
+        if (isSearching) {
+          final matchingEntities = <MapEntry<Entity, int>>[];
+          for (final entityDistance in entitiesByDist[category]) {
+            final entity = entities[category][entityDistance.key.id];
+            if (_entityIsInTrails(entity)) {
+              final relevance = entity.matches(searchTerm);
+              if (relevance != 0) {
+                matchingEntities.add(MapEntry(entity, relevance));
+              }
+            }
+          }
+          // From highest to lowest
+          matchingEntities.sort((a, b) => b.value.compareTo(a.value));
+          newEntityMap[category] =
+              matchingEntities.map((entry) => entry.key).toList();
+        } else {
+          newEntityMap[category] = [];
+          for (final entityDistance in entitiesByDist[category]) {
+            final entity = entities[category][entityDistance.key.id];
+            if (_entityIsInTrails(entity)) {
+              newEntityMap[category].add(entity);
+            }
+          }
         }
       }
 
       // Filter by trail, no sorting by distance
       else {
-        if (selectedTrailKeys.length == 3) {
-          newEntityMap[category] = entities[category].where((entity) {
-            return entity.satisfies(searchTerm);
-          }).toList();
+        if (isSearching) {
+          final matchingEntities = <MapEntry<Entity, int>>[];
+          final entityList = List.from(entities[category])..sort();
+          for (final entity in entityList) {
+            if (_entityIsInTrails(entity)) {
+              final relevance = entity.matches(searchTerm);
+              if (relevance != 0) {
+                matchingEntities.add(MapEntry(entity, relevance));
+              }
+            }
+          }
+          // From highest to lowest
+          matchingEntities.sort((a, b) => b.value.compareTo(a.value));
+          newEntityMap[category] =
+              matchingEntities.map((entry) => entry.key).toList();
         } else {
-          newEntityMap[category] = entities[category].where((entity) {
-            return !selectedTrailKeys.every((trailKey) {
-                  return entity.locations.every((location) {
-                    return location.trailLocationKey.trailKey != trailKey;
-                  });
-                }) &&
-                entity.satisfies(searchTerm);
-          }).toList();
+          newEntityMap[category] =
+              entities[category].where(_entityIsInTrails).toList();
+          newEntityMap[category].sort();
         }
-        newEntityMap[category].sort();
       }
     }
     return newEntityMap;
@@ -169,5 +202,28 @@ class EntityDistance implements Comparable {
     final int comparison = distance.compareTo(typedOther.distance);
     if (comparison == 0) return name.compareTo(typedOther.name);
     return comparison;
+  }
+}
+
+class Search {
+  /// Checks if the start of each word within [text] starts with the [pattern]
+  /// Uses spaces to separate between different words in [text]
+  static bool matches(String text, String pattern) {
+    assert(pattern.isNotEmpty);
+    bool check = true;
+    final m = text.length - pattern.length + 1;
+    for (int i = 0; i < m; i++) {
+      if (check) {
+        if (text
+            .substring(i)
+            .toLowerCase()
+            .startsWith(pattern.trim().toLowerCase())) {
+          return true;
+        }
+        check = false;
+      }
+      if (text[i] == ' ') check = true;
+    }
+    return false;
   }
 }
