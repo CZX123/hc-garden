@@ -4,6 +4,7 @@ import 'package:hc_garden/src/library.dart';
 ///
 /// Implmenting [Comparable] allows [Entities]s in a list to be sorted without a
 /// comparator function, i.e. the `sort()` function can be used without arguments.
+/// By defalt, [Entity]s are sorted by their `name`.
 class Entity implements Comparable {
   final EntityKey key;
   final String name;
@@ -134,9 +135,7 @@ class EntityLocation {
   @override
   int get hashCode => trailLocationKey.hashCode;
 
-  bool get isValid {
-    return trailLocationKey.isValid;
-  }
+  bool get isValid => trailLocationKey.isValid;
 }
 
 /// A [TrailLocation] is a point on the trail

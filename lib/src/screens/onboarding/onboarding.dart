@@ -449,6 +449,7 @@ class HomePageScreenshot extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
+          // Shadows generated at https://brumm.af/shadows
           BoxShadow(
             offset: Offset(0, .7),
             blurRadius: 1,
@@ -686,62 +687,124 @@ class OnboardingLayoutDetails extends ChangeNotifier {
 }
 
 class HomePageScreenshotLayoutDetails {
-  final OnboardingLayoutDetails parent;
-  const HomePageScreenshotLayoutDetails(this.parent);
-
+  /// Width of screenshot as a ratio to screen width
   static const imageWidthRatio = 0.85;
+
+  /// Width of border as a ratio to screen width
   static const borderWidthRatio = 0.018;
   static const imageAspectRatio = 1440 / 2960;
-  static const bottomBarAspectRatio = 1440.0 / 283.0;
-  static const page3AspectRatio = 1440.0 / 1904.0;
-  static const page4AspectRatio = 1440.0 / 2336.0;
-  static const page5AspectRatio = 1440.0 / 1702.0;
 
-  double get width => imageWidthRatio * parent.maxWidth;
-  double get borderWidth => borderWidthRatio * parent.maxWidth;
-  double get height =>
-      (width - 2 * borderWidth) / imageAspectRatio + 2 * borderWidth;
-  // 0.19 is the height ratio of the text and 0.04 is the height ratio
-  // of the padding between the text and screenshot
-  double get page2Y => (0.19 + 0.04) * parent.maxHeight;
-  // 0.73 is the height ratio of the screenshot of the homepage
-  double get page2Scale => 0.71 * parent.maxHeight / height;
-  // page3AspectRatio is the aspect ratio of the top map portion of the screenshot
-  double get page3Y =>
-      parent.maxHeight -
-      ((width - 2 * borderWidth) / page3AspectRatio + borderWidth);
-  // page4AspectRatio is the aspect ratio of the bottom portion of the screenshot
-  double get page4Y =>
-      ((width - 2 * borderWidth) / page4AspectRatio + borderWidth) - height;
-  // page5AspectRatio is the aspect ratio of the bottom sheet portion of the screenshot
-  double get page5Y =>
-      ((width - 2 * borderWidth) / page5AspectRatio + borderWidth) - height;
+  /// Ratio of width of bottom nav bar in the image compared to height
+  static const bottomBarAspectRatio = 1440 / 283;
+
+  /// Ratio of the width of the top portion of the screenshot to its height
+  static const page3AspectRatio = 1440 / 1904;
+
+  /// Ratio of the width of the bottom portion of the screenshot to its height.
+  /// It goes from somewhere in the middle of the map, all the way down to the bottom.
+  static const page4AspectRatio = 1440 / 2336;
+
+  /// Ratio of the width of the bottom visible portion of the screenshot to its height
+  /// It goes from slightly before the top of bottom sheet, all the way down.
+  static const page5AspectRatio = 1440 / 1702;
+
+  /// Needed for getting the page attribute, and use of the `_lerp` or `_lerpAnim` functions
+  final OnboardingLayoutDetails _parent;
+
+  /// Physical width of the screenshot in pixels, inclusive of the border
+  final double width;
+
+  /// Border width in pixels
+  final double borderWidth;
+
+  /// Physical height of the screenshot in pixels, inclusive of the border
+  final double height;
+
+  /// Y-offset of the screenshot in pixels, from the top of the layout, in page 2
+  final double page2Y;
+
+  /// Scale of the screenshot in page 2. It is scaled down to fit the entire screenshot on screen.
+  final double page2Scale;
+
+  /// Y-offset of the screenshot in pixels, from the top of the layout, in page 3.
+  ///
+  /// Used to showcase the map in the screenshot.
+  final double page3Y;
+
+  /// Y-offset of the screenshot in pixels, from the top of the layout, in page 4.
+  ///
+  /// Used to showcase the trails, flora & fauna in the bottom sheet
+  final double page4Y;
+
+  /// Y-offset of the screenshot in pixels, from the top of the layout, in page 5.
+  ///
+  /// Used to showcase the menu and the bottom navigation bar.
+  final double page5Y;
+
+  const HomePageScreenshotLayoutDetails._(
+    this._parent,
+    this.width,
+    this.borderWidth,
+    this.height,
+    this.page2Y,
+    this.page2Scale,
+    this.page3Y,
+    this.page4Y,
+    this.page5Y,
+  );
+
+  factory HomePageScreenshotLayoutDetails(OnboardingLayoutDetails parent) {
+    final width = imageWidthRatio * parent.maxWidth;
+    final borderWidth = borderWidthRatio * parent.maxWidth;
+    // Width of image without the borders
+    final _imageWidth = width - 2 * borderWidth;
+    final height = _imageWidth / imageAspectRatio + 2 * borderWidth;
+
+    // 0.19 is the height ratio of the top text in page 2.
+    // 0.04 is the height ratio of the padding between the text and screenshot.
+    final page2Y = (0.19 + 0.04) * parent.maxHeight;
+    // 0.71 is the height ratio of the screenshot in page 2, compared to max height.
+    // 0.71 = 1 - 0.19 - 0.04 - 0.06
+    final page2Scale = 0.71 * parent.maxHeight / height;
+    // Image is displayed from the bottom of the screen, so page3Y starts from the bottom,
+    // i.e. parent.maxHeight and the visible area is subtracted from it.
+    final page3Y =
+        parent.maxHeight - (_imageWidth / page3AspectRatio + borderWidth);
+    // Image is displayed from the top of the screen, so resulting value is negative
+    // to hide the non visible areas of the image
+    final page4Y = (_imageWidth / page4AspectRatio + borderWidth) - height;
+    // Simlar as above
+    final page5Y = (_imageWidth / page5AspectRatio + borderWidth) - height;
+
+    return HomePageScreenshotLayoutDetails._(parent, width, borderWidth, height,
+        page2Y, page2Scale, page3Y, page4Y, page5Y);
+  }
 
   Offset get offset {
-    if (parent.page <= 1.0)
-      return Offset(parent._lerp(0, 1.0, parent.maxWidth, 0), page2Y);
+    if (_parent.page <= 1.0)
+      return Offset(_parent._lerp(0, 1.0, _parent.maxWidth, 0), page2Y);
     // Image only moves when the page controller is from 1.0 to 1.7
-    else if (parent.page > 1.0 && parent.page <= 1.8)
-      return Offset(0, parent._lerp(1.0, 1.8, page2Y, page3Y));
-    else if (parent.page > 1.8 && parent.page <= 2.0)
+    else if (_parent.page > 1.0 && _parent.page <= 1.8)
+      return Offset(0, _parent._lerp(1.0, 1.8, page2Y, page3Y));
+    else if (_parent.page > 1.8 && _parent.page <= 2.0)
       return Offset(0, page3Y);
-    else if (parent.page > 2.0 && parent.page <= 3.0)
-      return Offset(0, parent._lerp(2.0, 3.0, page3Y, page4Y));
-    else if (parent.page > 3.0 && parent.page <= 4.0)
-      return Offset(0, parent._lerp(3.0, 4.0, page4Y, page5Y));
+    else if (_parent.page > 2.0 && _parent.page <= 3.0)
+      return Offset(0, _parent._lerp(2.0, 3.0, page3Y, page4Y));
+    else if (_parent.page > 3.0 && _parent.page <= 4.0)
+      return Offset(0, _parent._lerp(3.0, 4.0, page4Y, page5Y));
     // Image only moves when the page controller is from 4.0 to 4.6
     // so that it moves more quickly
     // Movement of an additional 60 pixels upwards to move past status bar (top padding)
-    else if (parent.page > 4.0 && parent.page <= 4.6)
-      return Offset(0, parent._lerp(4.0, 4.6, page5Y, -height - 80.0));
+    else if (_parent.page > 4.0 && _parent.page <= 4.6)
+      return Offset(0, _parent._lerp(4.0, 4.6, page5Y, -height - 80.0));
     return Offset(0, -height - 80.0);
   }
 
   double get scale {
-    if (parent.page <= 1)
+    if (_parent.page <= 1)
       return page2Scale;
-    else if (parent.page > 1 && parent.page <= 1.9)
-      return parent._lerp(1, 1.9, page2Scale, 1);
+    else if (_parent.page > 1 && _parent.page <= 1.9)
+      return _parent._lerp(1, 1.9, page2Scale, 1);
     return 1;
   }
 }
@@ -760,6 +823,7 @@ class PageThreeTextLayoutDetails {
   // 0.19 is the height ratio of the text
   double get page2Y => 0.19 * parent.maxHeight - containerHeight;
   // page4Y is double of page2Y to increase the speed of upward translation
+  // from page 3 to page 4
   double get page4Y => 2 * page2Y;
 
   Offset get offset {
@@ -770,90 +834,95 @@ class PageThreeTextLayoutDetails {
     return Offset(0, 0);
   }
 
+  static const _zeroOpacity = AlwaysStoppedAnimation(0.0);
+
   Animation<double> get opacity {
     // Text only starts appearing when the page controller is 1.5
     if (parent.page > 1.5 && parent.page <= 2.0)
       return _page2To3Opacity;
     // Text disappears rapidly when the page controller is from 2.0 to 2.3
     else if (parent.page > 2.0 && parent.page <= 2.3) return _page3To4Opacity;
-    return const AlwaysStoppedAnimation(0.0);
+    return _zeroOpacity;
   }
 }
 
 class PageFourBottomSheetLayoutDetails {
-  final OnboardingLayoutDetails parent;
+  final OnboardingLayoutDetails _parent;
   final Animation<double> _page3To4TextOpacity, _page4To5TextOpacity;
 
-  PageFourBottomSheetLayoutDetails(this.parent)
+  PageFourBottomSheetLayoutDetails(this._parent)
       : // Opacity changes from 0 to 1.0 as the pageController changes from 2.5 to 3.0
-        _page3To4TextOpacity = parent._lerpAnim(2.5, 3, 0, 1),
+        _page3To4TextOpacity = _parent._lerpAnim(2.5, 3, 0, 1),
         // Opacity changes from 1.0 to 0 as the pageController changes from 3.0 to 3.3
-        _page4To5TextOpacity = parent._lerpAnim(3, 3.3, 1, 0);
+        _page4To5TextOpacity = _parent._lerpAnim(3, 3.3, 1, 0);
 
   double get page4Y =>
-      ((parent.homePageScreenshot.width -
-                  2 * parent.homePageScreenshot.borderWidth) /
+      ((_parent.homePageScreenshot.width -
+                  2 * _parent.homePageScreenshot.borderWidth) /
               HomePageScreenshotLayoutDetails.page4AspectRatio +
-          parent.homePageScreenshot.borderWidth) -
-      ((parent.homePageScreenshot.width -
-                  2 * parent.homePageScreenshot.borderWidth) /
+          _parent.homePageScreenshot.borderWidth) -
+      ((_parent.homePageScreenshot.width -
+                  2 * _parent.homePageScreenshot.borderWidth) /
               HomePageScreenshotLayoutDetails.bottomBarAspectRatio +
-          parent.homePageScreenshot.borderWidth);
+          _parent.homePageScreenshot.borderWidth);
 
   Offset get offset {
     // Initial y-coordinate is more than maxHeight in order to hide the shadow
-    if (parent.page <= 2.0)
-      return Offset(0, parent.maxHeight + 20);
-    else if (parent.page > 2.0 && parent.page <= 3.0)
-      return Offset(0, parent._lerp(2.0, 3.0, parent.maxHeight + 20, page4Y));
+    if (_parent.page <= 2.0)
+      return Offset(0, _parent.maxHeight + 20);
+    else if (_parent.page > 2.0 && _parent.page <= 3.0)
+      return Offset(0, _parent._lerp(2.0, 3.0, _parent.maxHeight + 20, page4Y));
     // Material only moves when the pageController changes from 3.0 to 3.6
-    else if (parent.page > 3.0 && parent.page <= 3.6)
-      return Offset(0, parent._lerp(3.0, 3.6, page4Y, parent.maxHeight + 20));
-    else if (parent.page > 3.6 && parent.page <= 4.0)
-      return Offset(0, parent.maxHeight + 20);
-    return Offset(0, parent.maxHeight + 20);
+    else if (_parent.page > 3.0 && _parent.page <= 3.6)
+      return Offset(0, _parent._lerp(3.0, 3.6, page4Y, _parent.maxHeight + 20));
+    else if (_parent.page > 3.6 && _parent.page <= 4.0)
+      return Offset(0, _parent.maxHeight + 20);
+    return Offset(0, _parent.maxHeight + 20);
   }
 
   static const _zeroOpacity = AlwaysStoppedAnimation(0.0);
 
   Animation<double> get opacity {
-    if (parent.page > 2.5 && parent.page <= 3.0)
+    if (_parent.page > 2.5 && _parent.page <= 3.0)
       return _page3To4TextOpacity;
-    else if (parent.page > 3.0 && parent.page <= 3.3)
+    else if (_parent.page > 3.0 && _parent.page <= 3.3)
       return _page4To5TextOpacity;
     return _zeroOpacity;
   }
 }
 
 class PageFiveTextLayoutDetails {
-  final OnboardingLayoutDetails parent;
+  final OnboardingLayoutDetails _parent;
   final Animation<double> _page4To5TextOpacity, _page5To6TextOpacity;
 
-  PageFiveTextLayoutDetails(this.parent)
+  PageFiveTextLayoutDetails(this._parent)
       : // Opacity changes from 0 to 1.0 as the pageController changes from 3.5 to 4.0
-        _page4To5TextOpacity = parent._lerpAnim(3.5, 4, 0, 1),
+        _page4To5TextOpacity = _parent._lerpAnim(3.5, 4, 0, 1),
         // Opacity changes from 1.0 to 0 as the pageController changes from 4.0 to 4.3
-        _page5To6TextOpacity = parent._lerpAnim(4, 4.3, 1, 0);
+        _page5To6TextOpacity = _parent._lerpAnim(4, 4.3, 1, 0);
 
   double get page5Y =>
-      parent.homePageScreenshot.page5Y + parent.homePageScreenshot.height;
-  double get containerHeight => parent.maxHeight - page5Y;
+      _parent.homePageScreenshot.page5Y + _parent.homePageScreenshot.height;
+
+  double get containerHeight => _parent.maxHeight - page5Y;
 
   Offset get offset {
-    if (parent.page <= 3.0)
-      return Offset(0, parent.maxHeight);
-    else if (parent.page > 3.0 && parent.page <= 4.0)
-      return Offset(0, parent._lerp(3.0, 4.0, parent.maxHeight, page5Y));
-    else if (parent.page > 4.0 && parent.page <= 4.6)
-      return Offset(0, parent._lerp(4.0, 4.6, page5Y, parent.maxHeight));
-    return Offset(0, parent.maxHeight);
+    if (_parent.page <= 3.0)
+      return Offset(0, _parent.maxHeight);
+    else if (_parent.page > 3.0 && _parent.page <= 4.0)
+      return Offset(0, _parent._lerp(3.0, 4.0, _parent.maxHeight, page5Y));
+    else if (_parent.page > 4.0 && _parent.page <= 4.6)
+      return Offset(0, _parent._lerp(4.0, 4.6, page5Y, _parent.maxHeight));
+    return Offset(0, _parent.maxHeight);
   }
 
+  static const _zeroOpacity = AlwaysStoppedAnimation(0.0);
+
   Animation<double> get opacity {
-    if (parent.page > 3.5 && parent.page <= 4.0)
+    if (_parent.page > 3.5 && _parent.page <= 4.0)
       return _page4To5TextOpacity;
-    else if (parent.page > 4.0 && parent.page <= 4.3)
+    else if (_parent.page > 4.0 && _parent.page <= 4.3)
       return _page5To6TextOpacity;
-    return AlwaysStoppedAnimation(0.0);
+    return _zeroOpacity;
   }
 }

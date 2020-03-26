@@ -1,4 +1,5 @@
 import 'package:hc_garden/src/library.dart';
+import 'dart:io' show Platform;
 
 // TODO: Cater to smaller screens by removing/shifting some elements of the ExploreHeader, like the app logo
 class ExploreHeader extends StatelessWidget {
@@ -10,7 +11,8 @@ class ExploreHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomSheetNotifier = context.provide<BottomSheetNotifier>(listen: false);
+    final bottomSheetNotifier =
+        context.provide<BottomSheetNotifier>(listen: false);
     final animation = bottomSheetNotifier.animation;
     final animTween = bottomSheetNotifier.animTween;
     final topPadding = MediaQuery.of(context).padding.top;
@@ -159,11 +161,15 @@ class TrailButtonsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const _trails = ['Kah Kee\nTrail', 'Kong Chian\nTrail', 'Jing Xian\nTrail'];
-    final _colors = [Colors.lightBlue, Colors.pink, Colors.amber[700]];
+    final _colors = [
+      Colors.lightBlue,
+      Colors.pink,
+      Platform.isIOS ? Colors.orange[600] : Colors.amber[700],
+    ];
     final _textColors = [
       Color(0xFF00C3FF),
       Color(0xFFFF668C),
-      Color(0xFFFFBF00),
+      Platform.isIOS ? Color(0xFFFF9500) : Color(0xFFFFBF00),
     ];
 
     return FadeTransition(
@@ -178,21 +184,21 @@ class TrailButtonsRow extends StatelessWidget {
                 textColor: _textColors[i],
                 trailName: _trails[i],
                 onPressed: () {
-                  final trailKey = TrailKey(id: 2-i);
+                  final trailKey = TrailKey(id: 2 - i);
                   context.provide<AppNotifier>(listen: false).push(
-                    context: context,
-                    routeInfo: RouteInfo(
-                      name: FirebaseData.trailNames[2-i],
-                      dataKey: trailKey,
-                      route: CrossFadePageRoute(
-                        builder: (context) {
-                          return TrailDetailsPage(
-                            trailKey: trailKey,
-                          );
-                        },
-                      ),
-                    ),
-                  );
+                        context: context,
+                        routeInfo: RouteInfo(
+                          name: FirebaseData.trailNames[2 - i],
+                          dataKey: trailKey,
+                          route: CrossFadePageRoute(
+                            builder: (context) {
+                              return TrailDetailsPage(
+                                trailKey: trailKey,
+                              );
+                            },
+                          ),
+                        ),
+                      );
                 },
               ),
           ],

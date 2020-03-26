@@ -1,12 +1,12 @@
 import 'package:hc_garden/src/library.dart';
+import 'dart:io' show Platform;
 
 class MapNotifier extends ChangeNotifier {
-  // todo: Do something with these information
   bool permissionEnabled = false;
   bool gpsOn = false;
   GoogleMapController mapController;
   final markerIcons = [
-    BitmapDescriptor.defaultMarkerWithHue(38),
+    BitmapDescriptor.defaultMarkerWithHue(Platform.isIOS ? 20 : 38),
     BitmapDescriptor.defaultMarkerWithHue(340),
     BitmapDescriptor.defaultMarkerWithHue(199),
     BitmapDescriptor.defaultMarkerWithHue(90),
