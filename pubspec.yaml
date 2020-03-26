@@ -35,11 +35,11 @@ dev_dependencies:
     sdk: flutter
 
 flutter_icons:
-  image_path_android: assets/images/app_logo/android.png
-  image_path_ios: assets/images/app_logo/ios.png
+  image_path_android: assets/images/app_logo/original/android.png
+  image_path_ios: assets/images/app_logo/original/ios.png
   android: true
   ios: true
-  adaptive_icon_foreground: assets/images/app_logo/foreground.png
+  adaptive_icon_foreground: assets/images/app_logo/original/foreground.png
   adaptive_icon_background: "#FFFFFF"
 
 
@@ -58,7 +58,6 @@ flutter:
     - assets/images/fauna.jpg
     - assets/images/hci.png
     - assets/images/irs.png
-    - assets/images/app_logo/android.png
     - assets/images/app_logo/app_logo.png
     - assets/images/screenshots/homepage.png
   fonts:
