@@ -4,46 +4,26 @@ The official newly-redesigned HC Garden app! Explore the diversity of flora and 
 
 <img src="assets/images/screenshots/homepage.png" height="400">
 
-## TODOS v1.1
+## Where can I download HC Garden?
 
-### iOS
-- Fix image Hero issue (will need to remind Weiqi)
-- Fix search bar alignment issues
-- Fix text line-height inconsistencies with Android
+Android: https://play.google.com/store/apps/details?id=com.hci.hcgarden<br>
+iOS: https://apps.apple.com/sg/app/hc-garden/id1489599259
 
-## General TODOs
+## Documentation
 
-### High Priority
+Explanations of the code can be found in the folder _documentation_. 
 
-#### Map
-- Highlight buildings on map, correct colour selection (high school/college) ✔️
+## Potental Improvements
 
-#### Map Markers
-- Going to location should also focus on the marker (need wait for package update) ✔️
-- Marker window should also contain image (need wait for package update)
+### Shorter Term
+- History Screen
+    - Categorise each photo by location
+    - Include a map for each location
+- Map
+    - Improve dark theme
+    - Correctly size dark marker icons
 
-#### Onboarding
-- Onboarding tutorial on how to use the apps ✔️
-
-### Medium Priority
-
-#### History Screen
-- Categorise each photo by location
-- Include a map for each location?
-
-#### About Screen
-- Include HC Garden Student Committee members ✔️
-
-### Low Priority
-
-#### Search
-- Search should perhaps highlight the searchTerm within the name for clarity
-
-#### Map
-- Improved dark theme
-- Correctly size dark marker icons
-
-## Future Improvements
+### Longer Term
 - Tablet support
 - Web support
-- Should there be a Google Maps for Dart SDK in the future, migrate to it asap.
+- Should there be a Google Maps for Dart SDK in the future, migrate to it asap
