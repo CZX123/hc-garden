@@ -11,7 +11,7 @@ iOS: https://apps.apple.com/sg/app/hc-garden/id1489599259
 
 ## Documentation
 
-Explanations of the code can be found in the folder _documentation_. 
+Explanations of the code can be found in the folder _documentation_. GitHub's Wiki was not used because it lacked the folder and subfolder compatibility needed. 
 
 ## Potental Improvements
 
