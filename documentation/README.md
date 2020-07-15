@@ -8,6 +8,8 @@ For official documentation on Flutter and Dart, read: <br>
 Flutter: https://flutter.dev/docs <br>
 Dart: https://dart.dev/tutorials
 
+Throughout the documentation, it may prove useful to run and refer to the actual app for a better visual representation of the concepts/specifications being described. 
+
 ## Contents
 
 ### Concepts
