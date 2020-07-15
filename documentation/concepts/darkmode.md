@@ -5,9 +5,9 @@
 - [Colors](#colors)
 - [Code](#code)
 
-## Relevant files
+## Relevant Files
 
-- [src/theme/theme.dart](src/theme/theme.dart)
+- [/lib/src/theme/theme.dart](/lib/src/theme/theme.dart)
 
 ## Colors
 
