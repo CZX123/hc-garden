@@ -16,7 +16,7 @@ Dart: https://dart.dev/tutorials
     - Navigation Stack
     - Scroll Managemment (Scroll controllers)
 - Images (CustomImage widget)
-- [Themes (Dark mode)](concepts/Dark-Mode.md)
+- [Themes (Dark mode)](concepts/darkmode.md)
 
 ### Pages
 - Explore
@@ -45,7 +45,7 @@ Dart: https://dart.dev/tutorials
     - Left Drawer
     - Right Drawer
 - Image Gallery (for Entities)
-- Onboarding
+- [Onboarding](components/onboarding.md)
 
 ### Data Management
 - Data Keys
